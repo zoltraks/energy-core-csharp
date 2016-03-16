@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Date and time
+    /// </summary>
     public class Clock
     {
         /// <summary>
@@ -104,12 +107,32 @@ namespace Energy.Base
             return s.ToString();
         }
 
+        /// <summary>
+        /// Represent date and time as ISO readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00". 
+        /// If day is not set (equal to "0001-01-01", only time will be returned. Milliseconds are optional.
+        /// </summary>
+        /// <param name="stamp">Date and time</param>
+        /// <returns>Date, time and zone ISO readable string</returns>
         public static string GetZoneString(DateTime? stamp)
         {
-            if (stamp == null)
+            if (stamp == null || stamp == DateTime.MinValue)
+            {
                 return String.Empty;
-            else
-                return ((DateTime)stamp).ToString("yyyy-MM-dd HH:mm:ss.fff zzz");
+            }
+
+            string format = "yyyy-MM-dd HH:mm:ss.fff zzz";
+
+            if (((DateTime)stamp).Day == DateTime.MinValue.Day)
+            {
+                format = format.Replace("yyyy-MM-dd ", "");
+            }
+
+            if (((DateTime)stamp).Millisecond == 0)
+            {
+                format = format.Replace(".fff", "");
+            }
+
+            return ((DateTime)stamp).ToString(format);
         }
 
         #endregion

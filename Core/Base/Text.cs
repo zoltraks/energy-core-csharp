@@ -34,5 +34,47 @@ namespace Energy.Base
             }
             return null;
         }
+
+        /// <summary>
+        /// Surround text with delimiters if contains delimiter itself or any of special characters.
+        /// </summary>
+        /// <param name="value">Text value</param>
+        /// <param name="delimiter">Delimiter like ' or "</param>
+        /// <param name="special">List of special char</param>
+        /// <returns></returns>
+        public static string Surround(string value, string delimiter, string[] special = null)
+        {
+            if (value == null || value == "")
+                return value;
+
+            bool quote = false;
+
+            if (String.IsNullOrEmpty(delimiter))
+            {
+                if (special == null)
+                    return value;
+            }
+            else if (value.Contains(delimiter))
+            {
+                quote = true;
+            }
+
+            if (!quote && special != null)
+            {
+                for (int i = 0; i < special.Length; i++)
+                {
+                    if (value.Contains(special[i]))
+                    {
+                        quote = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!quote)
+                return value;
+
+            return String.Concat(delimiter, value, delimiter);
+        }
     }
 }

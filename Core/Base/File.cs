@@ -29,14 +29,15 @@ namespace Energy.Base
                 return "";
             }
         }
-        
+
         /// <summary>
-                 /// Return unique name for file
-                 /// </summary>
-                 /// <param name="file">string</param>
-                 /// <param name="path">string</param>
-                 /// <param name="reserve">bool</param>
-                 /// <returns>string</returns>
+        /// Return unique name for file by checking it's not exists.
+        /// This method may create empty file if reserve option is set true and it is 
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <param name="path">string</param>
+        /// <param name="reserve">bool</param>
+        /// <returns>string</returns>
         public static string FileUniqueIdentity(string file, string path, bool reserve)
         {
             if (String.IsNullOrEmpty(path)) return null;
@@ -46,7 +47,7 @@ namespace Energy.Base
             string simple = System.IO.Path.GetFileNameWithoutExtension(file);
             string iterator, unique;
 
-            lock (one)
+            lock (Static.One)
             {
                 int n = 0;
                 do
@@ -176,8 +177,7 @@ namespace Energy.Base
             return path;
         }
 
-        private static readonly object one = new object();
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
 
         /// <summary>
         /// Return unique file name
@@ -213,7 +213,7 @@ namespace Energy.Base
             int iterator = randomize ? 1 + random.Next(9999) : 0;
             int life = 100;
 
-            lock (one)
+            lock (Static.One)
             {
                 while (true)
                 {
@@ -293,7 +293,7 @@ namespace Energy.Base
         /// <param name="current">string</param>
         /// <returns>string</returns>
         public static string AbsolutePath(string file, string current)
-        {          
+        {
             throw new NotImplementedException();
         }
 

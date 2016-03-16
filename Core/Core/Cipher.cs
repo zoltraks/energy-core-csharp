@@ -79,7 +79,6 @@ namespace Energy.Core
             /// Encrypt a string using DES algorithm
             /// </summary>
             /// <param name="text">Decrypted string</param>
-            /// <param name="secret">Decryption key</param>
             /// <returns>Encrypted string</returns>
             public override string Encrypt(string text)
             {

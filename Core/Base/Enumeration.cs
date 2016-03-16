@@ -50,11 +50,21 @@ namespace Energy.Base
         /// </summary>
         public enum SQL
         {
+            /// <summary>Dialect not specified</summary>
             None,
+            /// <summary>ANSI SQL-92 standard. Probably will not work with Microsoft SQL Server.</summary>
             ANSI,
-            MSSQL,
+            /// <summary>Microsoft SQL Server (2008 and later)</summary>
+            SqlServer,
+            /// <summary>MySQL</summary>
             MySQL,
+            /// <summary>PostgreSQL</summary>
             PostgreSQL,
+            /// <summary>Oracle</summary>
+            Oracle,
+            /// <summary>Firebird</summary>
+            Firebird,
+            /// <summary>SQLite</summary>
             SQLite,
         }
 

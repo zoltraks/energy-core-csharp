@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +52,7 @@
     <Compile Include="Base\AssociativeArray.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
+    <Compile Include="Base\Static.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Console\Tilde.cs" />
     <Compile Include="Core\Cipher.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\Script.cs" />
     <Compile Include="Source\Connection.cs" />
+    <Compile Include="Source\Dialect.cs" />
     <Compile Include="Source\Factory.cs" />
     <Compile Include="Base\Structure.cs" />
     <Compile Include="Base\Xml.cs" />

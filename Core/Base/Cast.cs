@@ -90,6 +90,25 @@ namespace Energy.Base
 
         #endregion
 
+        #region Decimal
+
+        /// <summary>
+        /// Convert string to decimal value without exception
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>decimal</returns>
+        public static decimal StringToDecimal(string value)
+        {
+            decimal result = 0;
+            if (!String.IsNullOrEmpty(value))
+            {
+                decimal.TryParse(value.Trim(' ', '\t', '\r', '\n', '\v', '\0'), out result);
+            }
+            return result;
+        }
+ 
+        #endregion
+
         #region Double
 
         /// <summary>

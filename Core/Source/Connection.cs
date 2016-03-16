@@ -10,25 +10,17 @@ namespace Energy.Source
 {
     public class Connection : IDisposable
     {
+        #region Constructor
 
-        //[XmlIgnore]
-        //public System.Type Vendor { get; set; }
+        public Connection()
+        {
+        }
 
-        //[XmlIgnore]
-        //private DbConnection driver;
+        #endregion
 
-        //private DbConnection Driver
-        //{
-        //    get
-        //    {
-        //        if (driver == null)
-        //        {
-        //            driver = (DbConnection)Activator.CreateInstance(Vendor);
-        //        }
-        //        return driver;
-        //    }
-        //}
-
+        /// <summary>
+        /// SQL dialect type
+        /// </summary>
         public Base.Enumeration.SQL Dialect { get; set; }
 
         private System.Type vendor;
@@ -50,14 +42,21 @@ namespace Energy.Source
             }
         }
 
+        /// <summary>
+        /// Connection string used for opening SQL connection.
+        /// </summary>
         public Energy.Base.ConnectionString ConnectionString { get; set; }
 
+        /// <summary>
+        /// Log
+        /// </summary>
         public Energy.Core.Log Log { get; set; }
 
         private DbConnection driver;
-        //private Type type;
-
-        private DbConnection Driver
+        /// <summary>
+        /// SQL connection driver class.
+        /// </summary>
+        public DbConnection Driver
         {
             get
             {
@@ -67,31 +66,48 @@ namespace Energy.Source
                     {
                         if (driver == null)
                         {
-                            driver = (DbConnection)Activator.CreateInstance(vendor);
+                            try
+                            {
+                                driver = (DbConnection)Activator.CreateInstance(vendor);
+                            }
+                            catch
+                            {
+                                throw;
+                            }
                             driver.ConnectionString = ConnectionString.ToString();
                         }
                     }
                 }
                 return driver;
             }
+            set
+            {
+                driver = value;
+                if (value != null)
+                {
+                    vendor = value.GetType();
+                }
+            }
         }
 
-        //private static readonly object semaphore = new object();
+        private Configuration configuration;
 
-        //public Source(Query.Layer layer, string connectionString = "")
-        //    : this(layer, null, connectionString)
-        //{
-        //}
-
-        public Connection(Type vendor = null, string connectionString = "", Base.Enumeration.SQL layer = Base.Enumeration.SQL.None)
+        public Connection(Type vendor, string connectionString = "", Base.Enumeration.SQL dialect = Base.Enumeration.SQL.None)
         {
             if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
             {
                 throw new Exception("Vendor must derrive from DbConnection class");
             }            
-            this.Dialect = layer;
+            this.Dialect = dialect;
             this.Vendor = vendor;
             this.ConnectionString = connectionString;
+        }
+
+        public Connection(Type vendor, Configuration configuration)
+        {
+            this.Vendor = vendor;
+            this.Dialect = configuration.Dialect;
+            this.configuration = configuration;
         }
 
         public bool Active
