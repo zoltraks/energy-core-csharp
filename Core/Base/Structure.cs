@@ -42,6 +42,13 @@ namespace Energy.Base
                     return null;
                 }
 
+                public Column New()
+                {
+                    Column item = new Column();
+                    base.Add(item);
+                    return item;
+                }
+
                 public new Column Add(Column item)
                 {
                     base.Add(item);

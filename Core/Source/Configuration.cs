@@ -17,7 +17,7 @@ namespace Energy.Source
         /// <summary>
         /// Connection string type. This value is used for making connection string for any SQL server in exact form recognized by .
         /// </summary>
-        public Energy.Base.Enumeration.SQL Dialect { get; set;  }
+        public Energy.Enumeration.SqlDialect Dialect { get; set;  }
 
         /// <summary>
         /// Server
@@ -75,7 +75,7 @@ namespace Energy.Source
             string[] special = new string[] { ";" };
             List<string> list = new List<string>();
 
-            if (Dialect == Base.Enumeration.SQL.SqlServer)
+            if (Dialect == Energy.Enumeration.SqlDialect.SqlServer)
             {
                 //Data Source=.\SQLEXPRESS;Initial Catalog=BisSQL;Integrated Security=Yes;Connect Timeout=10;
                 //Data Source=.\SQLEXPRESS;Initial Catalog=BisSQL;Integrated Security=False;User ID=abc;Password=xyz;Connect Timeout=10
@@ -104,7 +104,7 @@ namespace Energy.Source
                 }
             }
 
-            if (this.Dialect == Base.Enumeration.SQL.MySQL)
+            if (this.Dialect == Energy.Enumeration.SqlDialect.MySQL)
             {
                 string server = String.IsNullOrEmpty(Server) ? "localhost" : Server;
                 list.Add("Server=" + server);
@@ -134,17 +134,17 @@ namespace Energy.Source
         {
             switch (Dialect)
             {
-                case Base.Enumeration.SQL.MySQL:
+                case Energy.Enumeration.SqlDialect.MySQL:
                     return "mysql";
-                case Base.Enumeration.SQL.SqlServer:
+                case Energy.Enumeration.SqlDialect.SqlServer:
                     return "sqlsrv";
-                case Base.Enumeration.SQL.PostgreSQL:
+                case Energy.Enumeration.SqlDialect.PostgreSQL:
                     return "pg";
-                case Base.Enumeration.SQL.Oracle:
+                case Energy.Enumeration.SqlDialect.Oracle:
                     return "oracle";
-                case Base.Enumeration.SQL.SQLite:
+                case Energy.Enumeration.SqlDialect.SQLite:
                     return "sqlite";
-                case Base.Enumeration.SQL.Firebird:
+                case Energy.Enumeration.SqlDialect.Firebird:
                     return "firebird";
                 default:
                     return "";
@@ -161,7 +161,7 @@ namespace Energy.Source
 
             List<string> list = new List<string>();
 
-            if (Dialect == Base.Enumeration.SQL.SqlServer)
+            if (Dialect == Energy.Enumeration.SqlDialect.SqlServer)
             {
                 string[] special = new string[] { ";", "\"" };
                 string server = String.IsNullOrEmpty(Server) ? "." : Energy.Base.Text.Surround(Server, "'", special);

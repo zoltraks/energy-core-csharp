@@ -9,14 +9,12 @@ namespace Energy.Core
     /// Cipher functions
     /// </summary>
     public class Cipher
-    {        
+    {
         /// <summary>
         /// Generic class for cipher algorithms with default behaviour of
         /// throwing NotSupportedException if method is not implemented
         /// </summary>
-        /// <throws>
-        /// NotSupportedException
-        /// </throws>
+        /// <exception cref="NotSupportedException">Thrown when method is not supported</exception>>
         public abstract class Method
         {
             public virtual string Encrypt(string content)

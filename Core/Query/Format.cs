@@ -3,98 +3,59 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Energy.Base;
 
 namespace Energy.Query
 {
+    /// <summary>
+    /// Text formatter class for SQL queries.
+    /// </summary>
     public class Format
     {
+        /// <summary>
+        /// Format as TEXT.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public string Text(string value)
         {
-            if (LiteralQuote.Prefix == null && LiteralQuote.Suffix == null)
-            {
-                return value;
-            }
-            if (LiteralQuote.Prefix != null && value.Contains(LiteralQuote.Prefix))
-            {
-                return LiteralQuote.Prefix + value.Replace(LiteralQuote.Prefix, LiteralQuote.Prefix + LiteralQuote.Prefix) + LiteralQuote.Suffix;
-            }
-            return LiteralQuote.Prefix + value + LiteralQuote.Suffix;
+            return LiteralQuote.Escape(value);
         }
 
-        public struct Quote
+        /// <summary>
+        /// Format as database object (table, column, ...).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string Object(string value)
         {
-            public string Prefix;
-            public string Suffix;
-
-            public string Bracket
-            {
-                set
-                {
-                    if (value.Length % 2 == 0)
-                    {
-                        Prefix = value.Substring(0, value.Length / 2);
-                        Suffix = value.Substring(value.Length);
-                    }
-                    else
-                    {
-                        Prefix = Suffix = value;
-                    }
-                }
-            }
-
-            public string Escape(string content)
-            {
-                if (content.Contains(Prefix))
-                {
-                    return content.Replace(Prefix, Prefix + Prefix);
-                }
-                else
-                {
-                    return content;
-                }
-            }
-
-            public string Unescape(string content)
-            {
-                return content.Replace(Prefix + Prefix, Prefix);
-            }
+            return ObjectQuote.Escape(value);
         }
 
-        public Quote LiteralQuote; // 'column'
-        public Quote ObjectQuote; // "value"
+        public Energy.Base.Format.Quote LiteralQuote; // 'column'
+        public Energy.Base.Format.Quote ObjectQuote; // "value"
 
-        public class ANSI : Format
+        public static implicit operator Format(Energy.Enumeration.SqlDialect dialect)
         {
-            public ANSI()
+            Format format = new Format();
+            if (false)
+            { }
+            else if (dialect == Energy.Enumeration.SqlDialect.SqlServer)
             {
-                ObjectQuote.Prefix = ObjectQuote.Suffix = "`";
+                format.LiteralQuote = "'";
+                format.ObjectQuote = "[]";
             }
-        }
-
-        public class MySQL : Format
-        {
-            public MySQL()
+            else if (dialect == Energy.Enumeration.SqlDialect.MySQL)
             {
-                LiteralQuote.Bracket = "'";
-                ObjectQuote.Bracket = ObjectQuote.Suffix = "`";
+                format.LiteralQuote = "'";
+                format.ObjectQuote = "`";
             }
-        }
-
-        public class SQLServer : Format
-        {
-            public SQLServer()
+            else
             {
-                ObjectQuote.Prefix = "[";
-                ObjectQuote.Suffix = "]";
+                format.LiteralQuote = "'";
+                format.ObjectQuote = "\"";
             }
-        }
-
-        public class SQLite : Format
-        {
-            public SQLite()
-            {
-                ObjectQuote.Prefix = ObjectQuote.Suffix = "'";
-            }
+            return format;
         }
     }
 }

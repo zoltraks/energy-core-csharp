@@ -19,9 +19,9 @@ namespace Energy.Source
         #endregion
 
         /// <summary>
-        /// SQL dialect type
+        /// SQL dialect
         /// </summary>
-        public Base.Enumeration.SQL Dialect { get; set; }
+        public Energy.Enumeration.SqlDialect Dialect { get; set; }
 
         private System.Type vendor;
  
@@ -92,7 +92,7 @@ namespace Energy.Source
 
         private Configuration configuration;
 
-        public Connection(Type vendor, string connectionString = "", Base.Enumeration.SQL dialect = Base.Enumeration.SQL.None)
+        public Connection(Type vendor, string connectionString = "", Energy.Enumeration.SqlDialect dialect = Energy.Enumeration.SqlDialect.None)
         {
             if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
             {

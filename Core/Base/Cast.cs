@@ -72,17 +72,17 @@ namespace Energy.Base
         /// <param name="value"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string BoolToString(bool value, Enumeration.BooleanStyle style)
+        public static string BoolToString(bool value, Energy.Enumeration.BooleanStyle style)
         {
             switch (style)
             {
-                case Enumeration.BooleanStyle.X: return value ? "X" : "";
-                case Enumeration.BooleanStyle.V: return value ? "V" : "";
-                case Enumeration.BooleanStyle.B: return value ? "1" : "0";
-                case Enumeration.BooleanStyle.Y: return BoolToString(value, "Y/N");
-                case Enumeration.BooleanStyle.T: return BoolToString(value, "T/F");
-                case Enumeration.BooleanStyle.YesNo: return BoolToString(value, "Yes/No");
-                case Enumeration.BooleanStyle.TrueFalse: return BoolToString(value, "True/False");
+                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : "";
+                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : "";
+                case Energy.Enumeration.BooleanStyle.B: return value ? "1" : "0";
+                case Energy.Enumeration.BooleanStyle.Y: return BoolToString(value, "Y/N");
+                case Energy.Enumeration.BooleanStyle.T: return BoolToString(value, "T/F");
+                case Energy.Enumeration.BooleanStyle.YesNo: return BoolToString(value, "Yes/No");
+                case Energy.Enumeration.BooleanStyle.TrueFalse: return BoolToString(value, "True/False");
                 default:
                     throw new NotSupportedException();
             }
