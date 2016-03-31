@@ -7,6 +7,7 @@ namespace Energy.Base
     /// <summary>
     /// Text related functions
     /// </summary>
+    // TODO This class probably should be renamed to avoid conflicts and allow to add using Energy.Base
     public class Text
     {
         /// <summary>
@@ -75,6 +76,18 @@ namespace Energy.Base
                 return value;
 
             return String.Concat(delimiter, value, delimiter);
+        }
+
+        /// <summary>
+        /// Remove leading and trailing whitespace
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Trimmed string</returns>
+        public static string TrimWhite(string value)
+        {
+            if (value == null)
+                return null;
+            return value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
+    <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Path.cs" />
     <Compile Include="Base\Graphics.cs" />
     <Compile Include="Base\Hash.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Core\Memory.cs" />
+    <Compile Include="Base\Currency.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
     <Compile Include="Enumeration\FormMode.cs" />
@@ -86,6 +88,9 @@
     <Compile Include="Source\Factory.cs" />
     <Compile Include="Base\Structure.cs" />
     <Compile Include="Base\Xml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Harmony\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

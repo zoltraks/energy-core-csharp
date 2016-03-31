@@ -4,7 +4,7 @@ using System.Text;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace Energy
+namespace Energy.Core
 {
     /// <summary>
     /// Version information
@@ -12,36 +12,22 @@ namespace Energy
     public class Version
     {
         /// <summary>
-        /// Product information
-        /// </summary>
-        private static string product;
-
-        /// <summary>
-        /// Compilation information
-        /// </summary>
-        private static string compilation;
-
-        /// <summary>
-        /// Version description
-        /// </summary>
-        private static string description;
-
-        /// <summary>
         /// Get product version
         /// </summary>
         /// <returns>string</returns>
-        public static string Product { get { return product; } }
+        public string Product { get; private set; }
 
         /// <summary>
         /// Get compilation date
         /// </summary>
         /// <returns>string</returns>
-        public static string Compilation { get { return compilation; } }
+        public string Compilation { get; private set; }
 
+        private string description;
         /// <summary>
         /// Public version description
         /// </summary>
-        public static string Description
+        public string Description
         {
             get
             {
@@ -53,6 +39,8 @@ namespace Energy
                 description = value;
             }
         }
+
+        #region Static
 
         /// <summary>
         /// Get product version for assembly
@@ -98,11 +86,13 @@ namespace Energy
             return GetCompilation(Assembly.GetExecutingAssembly());
         }
 
+        #endregion
+
         /// <summary>
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-        public static void Set(Assembly assembly)
+        public void Set(Assembly assembly)
         {
             product = GetProduct(assembly);
             compilation = GetCompilation(assembly);
@@ -123,8 +113,8 @@ namespace Energy
             string[] sb = b.Split(separator);
             for (int i = 0; i < sa.Length; i++)
             {
-                int ia = Core.Basic.StringToInteger(sa[i]);
-                int ib = sb.Length > i ? Core.Basic.StringToInteger(sb[i]) : 0;
+                int ia = Energy.Base.Cast.StringToInteger(sa[i]);
+                int ib = sb.Length > i ? Energy.Base.Cast.StringToInteger(sb[i]) : 0;
                 if (ia < ib) return +1;
                 if (ia > ib) return -1;
             }

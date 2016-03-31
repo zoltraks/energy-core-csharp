@@ -212,7 +212,7 @@ namespace Energy.Source
             return null;
         }
 
-        public virtual string Scalar(string query)
+        public virtual object Scalar(string query)
         {
             if (!Active && !Open())
             {
@@ -222,7 +222,8 @@ namespace Energy.Source
             command.CommandText = Parse(query);
             try
             {
-                return Energy.Base.Cast.ObjectToString(command.ExecuteScalar());
+                object value = command.ExecuteScalar();
+                return value == DBNull.Value ? null : value;
             }
             catch (DbException x)
             {
