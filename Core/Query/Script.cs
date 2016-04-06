@@ -85,24 +85,24 @@ namespace Energy.Query
 
         #region CREATE
 
-        public string CreateTable(Energy.Base.Structure.Table table)
+        public string CreateTable(Energy.Source.Structure.Table table)
         {
             return Create.Table(dialect, table);
         }
 
-        public string CreateDescription(Energy.Base.Structure.Table table)
+        public string CreateDescription(Energy.Source.Structure.Table table)
         {
             return Create.Description(dialect, table);
         }
 
-        public string CreateIndex(Energy.Base.Structure.Table table)
+        public string CreateIndex(Energy.Source.Structure.Table table)
         {
             return Create.Index(dialect, table);
         }
 
         public class Create
         {
-            public static string Table(Energy.Enumeration.SqlDialect dialect, Energy.Base.Structure.Table table)
+            public static string Table(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table)
             {
                 if (dialect == Energy.Enumeration.SqlDialect.None || table == null || table.Column.Count == 0) return "";
 
@@ -117,19 +117,19 @@ namespace Energy.Query
 
                 if (!String.IsNullOrEmpty(table.Identity))
                 {
-                    Energy.Base.Structure.Column column = table.Column.Get(table.Identity)
-                        ?? new Energy.Base.Structure.Column() { Name = table.Identity, Type = "BIGINT" };
+                    Energy.Source.Structure.Column column = table.Column.Get(table.Identity)
+                        ?? new Energy.Source.Structure.Column() { Name = table.Identity, Type = "BIGINT" };
                     string type = column.Type;
                     if (type == null || type.Length == 0) type = "BIGINT";
                     script.Add("\t[" + column.Name + "] " + type + " IDENTITY(1,1) NOT NULL ,");
                     identity = table.Identity;
                 }
-                else if (table.Column.Get(identity) == default(Energy.Base.Structure.Column))
+                else if (table.Column.Get(identity) == default(Energy.Source.Structure.Column))
                 {
                     script.Add("\t[" + identity + "] BIGINT IDENTITY(1,1) NOT NULL ,");
                 }
 
-                foreach (Energy.Base.Structure.Column column in table.Column)
+                foreach (Energy.Source.Structure.Column column in table.Column)
                 {
                     if (!column.Ignore && !String.IsNullOrEmpty(column.Name) && column.Name != table.Identity)
                     {
@@ -151,14 +151,14 @@ namespace Energy.Query
                 return String.Join(Environment.NewLine, script.ToArray());
             }
 
-            public static string Description(Energy.Enumeration.SqlDialect dialect, Energy.Base.Structure.Table table)
+            public static string Description(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table)
             {
                 List<string> script = new List<string>();
                 string schema = "dbo";
 
                 script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'Klucz',@level0type='SCHEMA',@level0name='" 
                     + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
-                foreach (Energy.Base.Structure.Column column in table.Column)
+                foreach (Energy.Source.Structure.Column column in table.Column)
                 {
                     script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'" + column.Label 
                         + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name 
@@ -171,7 +171,7 @@ namespace Energy.Query
 
                 script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'Klucz',@level0type='SCHEMA',@level0name='" 
                     + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
-                foreach (Energy.Base.Structure.Column column in table.Column)
+                foreach (Energy.Source.Structure.Column column in table.Column)
                 {
                     string description = String.IsNullOrEmpty(column.Description) ? column.Label : column.Description;
                     script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'" + description 
@@ -185,11 +185,11 @@ namespace Energy.Query
                 return String.Join(Environment.NewLine, script.ToArray());
             }
 
-            public static string Index(Energy.Enumeration.SqlDialect dialect, Energy.Base.Structure.Table table)
+            public static string Index(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table)
             {
                 List<string> script = new List<string>();
                 string tableName = "[" + table.Name + "]";
-                foreach (Energy.Base.Structure.Index index in table.Index)
+                foreach (Energy.Source.Structure.Index index in table.Index)
                 {
                     string indexName = "[" + index.Name + "]";
                     script.Add("--BEGIN TRY DROP INDEX " + indexName + " ON " + tableName + " END TRY BEGIN CATCH END CATCH");
@@ -200,7 +200,7 @@ namespace Energy.Query
                     script.Add("(");
                     List<string> list;
                     list = new List<string>();
-                    foreach (Energy.Base.Structure.Column column in index.Column)
+                    foreach (Energy.Source.Structure.Column column in index.Column)
                     {
                         list.Add("[" + column.Name + "]");
                     }
@@ -211,7 +211,7 @@ namespace Energy.Query
                         script.Add("INCLUDE");
                         script.Add("(");
                         list = new List<string>();
-                        foreach (Energy.Base.Structure.Column column in index.Include)
+                        foreach (Energy.Source.Structure.Column column in index.Include)
                         {
                             list.Add("[" + column.Name + "]");
                         }
@@ -246,7 +246,7 @@ namespace Energy.Query
 
         #endregion
 
-        public string Merge(Energy.Base.Structure.Table table, bool compact = false)
+        public string Merge(Energy.Source.Structure.Table table, bool compact = false)
         {
             string name = "[" + table.Name + "]";
             StringBuilder script = new StringBuilder();

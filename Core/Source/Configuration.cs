@@ -160,10 +160,10 @@ namespace Energy.Source
             string prefix = GetDSNPrefix();
 
             List<string> list = new List<string>();
+            string[] special = new string[] { ";", "\"" };
 
             if (Dialect == Energy.Enumeration.SqlDialect.SqlServer)
             {
-                string[] special = new string[] { ";", "\"" };
                 string server = String.IsNullOrEmpty(Server) ? "." : Energy.Base.Text.Surround(Server, "'", special);
                 string port = Port > 0 ? ',' + Port.ToString() : "";
                 list.Add(String.Concat("Server=", server, port));
@@ -172,6 +172,17 @@ namespace Energy.Source
                 {
                     list.Add("Database=" + Energy.Base.Text.Surround(Catalog, "'", special));
                 }
+            }
+
+            if (Dialect == Enumeration.SqlDialect.MySQL)
+            {
+                list.Add("host=" + (String.IsNullOrEmpty(Server) ? "localhost" : Energy.Base.Text.Surround(Server, "'", special)));
+                if (Port > 0)
+                    list.Add("port=" + Port.ToString());
+                if (!String.IsNullOrEmpty(Catalog))
+                    list.Add("dbname=" + Energy.Base.Text.Surround(Catalog, "'", special));
+                if (!String.IsNullOrEmpty(Charset))
+                    list.Add("charset=" + Charset);
             }
 
             return String.Concat(prefix, ":", String.Join(";", list.ToArray()));

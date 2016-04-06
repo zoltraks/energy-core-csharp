@@ -32,7 +32,7 @@ namespace Energy.Core
             get
             {
                 if (!String.IsNullOrEmpty(description)) return description;
-                return String.Format("Version {0} Compilation {1}", product, compilation);
+                return String.Format("Version {0} Compilation {1}", Product, Compilation);
             }
             set
             {
@@ -94,8 +94,8 @@ namespace Energy.Core
         /// <param name="assembly">System.Reflection.Assembly</param>
         public void Set(Assembly assembly)
         {
-            product = GetProduct(assembly);
-            compilation = GetCompilation(assembly);
+            Product = GetProduct(assembly);
+            Compilation = GetCompilation(assembly);
         }
 
         /// <summary>

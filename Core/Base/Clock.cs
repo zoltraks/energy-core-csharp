@@ -21,6 +21,17 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Return time as UnixTime
+        /// </summary>
+        /// <param name="stamp"></param>
+        /// <returns></returns>
+        public static double GetUnixTime(DateTime stamp)
+        {
+            TimeSpan span = (stamp - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
+            return span.TotalSeconds;
+        }
+
         #region ISO 8601
 
         /// <summary>
@@ -180,6 +191,5 @@ namespace Energy.Base
         }
 
         #endregion
-
     }
 }

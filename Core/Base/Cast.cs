@@ -114,6 +114,30 @@ namespace Energy.Base
 
         #endregion
 
+        #region Long
+
+        /// <summary>
+        /// Convert string to long integer value without exception
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static long StringToLong(string value)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            long result = 0;
+            if (long.TryParse(value, out result))
+                return result;
+            string trim = Energy.Base.Text.TrimWhite(value);
+            if (trim.Length == value.Length)
+                return 0;
+            if (long.TryParse(value, out result))
+                return result;
+            return 0;
+        }
+
+        #endregion
+
         #region Decimal
 
         /// <summary>

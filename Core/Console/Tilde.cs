@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Energy.Enumeration;
 
 namespace Energy.Console
 {
@@ -56,26 +57,32 @@ namespace Energy.Console
                                 break;
                             case "1":
                             case "darkblue":
+                            case "db":
                                 current = System.ConsoleColor.DarkBlue;
                                 break;
                             case "2":
                             case "darkgreen":
+                            case "dg":
                                 current = System.ConsoleColor.DarkGreen;
                                 break;
                             case "3":
                             case "darkcyan":
+                            case "dc":
                                 current = System.ConsoleColor.DarkCyan;
                                 break;
                             case "4":
                             case "darkred":
+                            case "dr":
                                 current = System.ConsoleColor.DarkRed;
                                 break;
                             case "5":
                             case "darkmagenta":
+                            case "dm":
                                 current = System.ConsoleColor.DarkMagenta;
                                 break;
                             case "6":
                             case "darkyellow":
+                            case "dy":
                                 current = System.ConsoleColor.DarkYellow;
                                 break;
                             case "7":
@@ -88,30 +95,37 @@ namespace Energy.Console
                                 break;
                             case "9":
                             case "blue":
+                            case "b":
                                 current = System.ConsoleColor.Blue;
                                 break;
                             case "10":
                             case "green":
+                            case "g":
                                 current = System.ConsoleColor.Green;
                                 break;
                             case "11":
                             case "cyan":
+                            case "c":
                                 current = System.ConsoleColor.Cyan;
                                 break;
-                            case "12":
+                            case "12":                            
                             case "red":
+                            case "r":
                                 current = System.ConsoleColor.Red;
                                 break;
                             case "13":
                             case "magenta":
+                            case "m":
                                 current = System.ConsoleColor.Magenta;
                                 break;
                             case "14":
                             case "yellow":
+                            case "y":
                                 current = System.ConsoleColor.Yellow;
                                 break;
                             case "15":
                             case "white":
+                            case "w":
                                 current = System.ConsoleColor.White;
                                 break;
                         }
@@ -123,6 +137,22 @@ namespace Energy.Console
                     m = m.NextMatch();
                 }
                 return list;
+            }
+        }
+
+        public static string Ask(string question, CharacterCasing casing, string value = "")
+        {
+            string answer = Ask(question);
+            if (String.IsNullOrEmpty(answer))
+                return value;
+            switch (casing)
+            {
+                default:
+                    return answer;
+                case CharacterCasing.Lower:
+                    return answer.ToLower();
+                case CharacterCasing.Upper:
+                    return answer.ToUpper();
             }
         }
 
@@ -168,6 +198,8 @@ namespace Energy.Console
 
         /// <summary>
         /// Write text line using color settings ~white~, ~15~, ~14~, ~13~, ..., ~0~
+        /// <br />
+        /// After print console color settings will remain the same.
         /// <code>
         ///     Energy.Console.Tilde.WriteLine("~lightgreen~Hello ~white~World~lightred~!");
         /// </code>
@@ -210,7 +242,7 @@ namespace Energy.Console
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="value">Default value</param>
-        /// <returns>Value entered or default if skipped</returns>
+        /// <returns>Value entered or default if skipped. Default is an empty string.</returns>
         public static string Ask(string question, string value = "")
         {
             Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");

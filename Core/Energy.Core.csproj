@@ -55,12 +55,14 @@
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Static.cs" />
     <Compile Include="Base\Text.cs" />
+    <Compile Include="Cast\As.cs" />
     <Compile Include="Console\Tilde.cs" />
     <Compile Include="Core\Cipher.cs" />
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Core\Memory.cs" />
     <Compile Include="Base\Currency.cs" />
+    <Compile Include="Core\Version.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
     <Compile Include="Enumeration\FormMode.cs" />
@@ -86,8 +88,8 @@
     <Compile Include="Query\Script.cs" />
     <Compile Include="Source\Connection.cs" />
     <Compile Include="Source\Factory.cs" />
-    <Compile Include="Base\Structure.cs" />
-    <Compile Include="Base\Xml.cs" />
+    <Compile Include="Source\Structure.cs" />
+    <Compile Include="Core\Xml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Harmony\" />

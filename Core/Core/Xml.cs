@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
 
-namespace Energy.Base
+namespace Energy.Core
 {
     /// <summary>
     /// XML
@@ -221,6 +221,22 @@ namespace Energy.Base
                 if (value.ToString().Length == 0) return;
             }
             WriteXmlString(writer, key, value);
+        }
+
+        /// <summary>
+        /// Write XML element
+        /// </summary>
+        /// <param name="writer">XmlWriter</param>
+        /// <param name="key">string</param>
+        /// <param name="value">object</param>
+        public static void Write(XmlWriter writer, string key, object value)
+        {
+            if (value == null) return;
+            string content = value.ToString();
+            if (content.Length == 0) return;
+            writer.WriteStartElement(key);
+            writer.WriteValue(value);
+            writer.WriteEndElement();
         }
     }
 }
