@@ -48,6 +48,7 @@ namespace Energy.Base
                     if (String.Compare(_, key, true, System.Globalization.CultureInfo.InvariantCulture) == 0)
                     {
                         base.Remove(_);
+                        break;
                     }
                 }
                 base[key] = value;

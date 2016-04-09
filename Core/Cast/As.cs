@@ -33,5 +33,15 @@ namespace Energy.Cast
                 return Energy.Base.Cast.StringToLong((string)value);
             return Energy.Base.Cast.StringToLong(value.ToString());
         }
+
+        /// <summary>
+        /// Convert double value to string
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <returns>Text representaiton</returns>
+        public static string String(double value)
+        {
+            return Energy.Base.Cast.DoubleToString(value);
+        }
     }
 }

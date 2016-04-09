@@ -12,18 +12,20 @@ namespace Energy.Base
         /// <summary>
         /// Amount
         /// </summary>
-        public decimal Amount { get; }
+        public decimal Amount { get; private set; }
 
         /// <summary>
         /// Currency
         /// </summary>
-        public Currency Currency { get; }
+        public Currency Currency { get; private set; }
 
         public Money(decimal amount, Currency currency)
+            : this()
         {
             if (currency == null)
             {
-                throw new ArgumentNullException(nameof(currency));
+                //throw new ArgumentNullException(nameof(currency));
+                throw new ArgumentNullException();
             }
 
             Amount = amount;
@@ -66,7 +68,13 @@ namespace Energy.Base
 
         public override string ToString()
         {
-            return $"{Amount} {Currency}";
+            //return $"{Amount} {Currency}";
+            return String.Concat(Amount, " ", Currency);
         }
+
+        //public static implicit operator Money(string text)
+        //{
+        //    return new Money();
+        //}
     }
 }

@@ -22,7 +22,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return time as UnixTime
+        /// Return time as unix time
         /// </summary>
         /// <param name="stamp"></param>
         /// <returns></returns>

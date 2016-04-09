@@ -55,7 +55,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// For each characters addcharacter numeric value and left shift by 4 bits (PJW hash)
+        /// For each characters add character numeric value and left shift by 4 bits (PJW hash)
         /// </summary>
         /// <remarks>
         /// Aho, Sethi, and Ullman pp. 434-438
