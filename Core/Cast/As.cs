@@ -43,5 +43,15 @@ namespace Energy.Cast
         {
             return Energy.Base.Cast.DoubleToString(value);
         }
+
+        /// <summary>
+        /// Convert string to enum
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>object</returns>
+        public static T Enum<T>(string value)
+        {
+            return (T)Energy.Base.Cast.StringToEnum(value, typeof(T));
+        }
     }
 }

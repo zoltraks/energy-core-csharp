@@ -294,5 +294,28 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Enum
+
+        /// <summary>
+        /// Convert string to enum
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="type">Type</param>
+        /// <returns>object</returns>
+        public static object StringToEnum(string value, Type type)
+        {
+            string[] names = Enum.GetNames(type);
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (String.Compare(value, names[i], true) == 0)
+                {
+                    return Enum.Parse(type, value, true);
+                }
+            }
+            return 0;
+        }
+
+        #endregion
     }
 }
