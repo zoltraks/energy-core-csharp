@@ -43,12 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\Byte.cs" />
+    <Compile Include="Base\Color.cs" />
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Path.cs" />
-    <Compile Include="Base\Graphics.cs" />
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\AssociativeArray.cs" />
     <Compile Include="Base\Hex.cs" />

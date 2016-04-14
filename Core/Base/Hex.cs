@@ -58,7 +58,7 @@ namespace Energy.Base
         /// <param name="array">Byte array</param>
         /// <param name="space">Optional hexadecimal separator</param>
         /// <returns>string</returns>
-        public static string ByteArrayToHex(byte[] array, string space = "")
+        public static string ArrayToHex(byte[] array, string space = "")
         {
             if (array == null) return null;
             string hex = BitConverter.ToString(array);
