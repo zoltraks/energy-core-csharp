@@ -51,7 +51,6 @@
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Path.cs" />
     <Compile Include="Base\Hash.cs" />
-    <Compile Include="Base\AssociativeArray.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Static.cs" />
@@ -70,9 +69,10 @@
     <Compile Include="Enumeration\FormMode.cs" />
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
+    <Compile Include="Query\Dialect\SQLite.cs" />
     <Compile Include="Query\Format.cs" />
-    <Compile Include="Query\MySQL.cs" />
-    <Compile Include="Query\SqlServer.cs" />
+    <Compile Include="Query\Dialect\MySQL.cs" />
+    <Compile Include="Query\Dialect\SqlServer.cs" />
     <Compile Include="Query\Configuration.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Core\Application.cs" />
