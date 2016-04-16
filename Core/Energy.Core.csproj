@@ -47,6 +47,7 @@
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
+    <Compile Include="Base\History.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Path.cs" />
     <Compile Include="Base\Hash.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Static.cs" />
+    <Compile Include="Base\Structure.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Cast\As.cs" />
     <Compile Include="Console\Tilde.cs" />
@@ -69,6 +71,9 @@
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Query\Format.cs" />
+    <Compile Include="Query\MySQL.cs" />
+    <Compile Include="Query\SqlServer.cs" />
+    <Compile Include="Query\Configuration.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Core\Application.cs" />
     <Compile Include="Core\Expression.cs" />

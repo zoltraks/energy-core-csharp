@@ -9,7 +9,7 @@ namespace Energy.Base
 {
     public class Collection
     {
-        public class Array<T> : List<T>, IXmlSerializable
+        public class Array<T> : List<T>
         {
             public T First
             {
@@ -32,26 +32,6 @@ namespace Energy.Base
                 T item = (T)Activator.CreateInstance(typeof(T));
                 base.Add(item);
                 return item;
-            }
-
-            public XmlSchema GetSchema()
-            {
-                return null;
-            }
-
-            public void ReadXml(XmlReader reader)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void WriteXml(XmlWriter writer)
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                for (int i = 0; i < Count; i++)
-                {
-                    serializer.Serialize(writer, this[i]);
-                    //Energy.Core.Xml.Write(writer, this[i]);
-                }
             }
         }
     }

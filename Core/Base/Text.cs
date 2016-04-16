@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Base
 {
@@ -88,6 +87,27 @@ namespace Energy.Base
             if (value == null)
                 return null;
             return value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+        }
+
+        /// <summary>
+        /// Join non empty strings into one list with separator
+        /// </summary>
+        /// <param name="with">Separator string</param>
+        /// <param name="parts">Parts to join</param>
+        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
+        public static string JoinWith(string with, params string[] parts)
+        {
+            List<string> list = new List<string>();
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (String.IsNullOrEmpty(parts[i]))
+                    continue;
+                string trim = parts[i].Trim();
+                if (trim.Length == 0)
+                    continue;
+                list.Add(trim);
+            }
+            return String.Join(with, list.ToArray());
         }
     }
 }
