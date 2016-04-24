@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Energy.Base
@@ -9,6 +10,84 @@ namespace Energy.Base
     /// </summary>
     public static class Cast
     {
+        #region As
+
+        /// <summary>
+        /// Convert string to integer value without exception
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static int AsInteger(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return 0;
+            if (value is string)
+                return Energy.Base.Cast.StringToInteger((string)value);
+            return Energy.Base.Cast.StringToInteger(value.ToString());
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static long AsLong(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return 0;
+            if (value is string)
+                return Energy.Base.Cast.StringToLong((string)value);
+            return Energy.Base.Cast.StringToLong(value.ToString());
+        }
+
+        /// <summary>
+        /// Convert double value to string
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <returns>Text representaiton</returns>
+        public static string AsString(double value)
+        {
+            return Energy.Base.Cast.DoubleToString(value);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56</param>
+        /// <returns>String</returns>
+        public static string AsString(double value, int precision, System.Globalization.CultureInfo culture = null)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision, culture);
+        }
+
+        /// <summary>
+        /// Convert string to enum
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>object</returns>
+        public static T AsEnum<T>(string value)
+        {
+            return (T)Energy.Base.Cast.StringToEnum(value, typeof(T));
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="trim">Trim zeroes from end</param>
+        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
+        public static string DoubleToString(double value, int precision, bool trim, CultureInfo culture)
+        {
+            string text = DoubleToString(value, precision, culture);
+            return trim ? text.TrimEnd('0').TrimEnd('.') : text;
+        }
+
+        #endregion
+
         #region Boolean
 
         /// <summary>
@@ -154,7 +233,7 @@ namespace Energy.Base
             }
             return result;
         }
- 
+
         #endregion
 
         #region Double
@@ -171,15 +250,14 @@ namespace Energy.Base
             {
                 value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
                 if (value.Contains(" ")) value = value.Replace(" ", null);
-                if (!double.TryParse(value,
-                    System.Globalization.NumberStyles.Float,
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    out result))
+                if (value.Contains("_")) value = value.Replace("_", null);
+                if (!double.TryParse(value, System.Globalization.NumberStyles.Float
+                    , System.Globalization.CultureInfo.InvariantCulture
+                    , out result))
                 {
-                    double.TryParse(value,
-                        System.Globalization.NumberStyles.Float,
-                        System.Globalization.CultureInfo.CurrentCulture,
-                        out result);
+                    double.TryParse(value, System.Globalization.NumberStyles.Float
+                        , System.Globalization.CultureInfo.CurrentCulture
+                        , out result);
                 }
             }
             return result;
@@ -206,12 +284,12 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert floating value to invariant string.
+        /// Convert double value to invariant string.
         /// </summary>
-        /// <param name="value">double</param>
-        /// <param name="precision">precision</param>
-        /// <param name="culture"></param>
-        /// <returns>string</returns>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
         public static string DoubleToString(double value, int precision, System.Globalization.CultureInfo culture = null)
         {
             // HACK: Missing "??=" operator :-)
@@ -305,6 +383,8 @@ namespace Energy.Base
         /// <returns>object</returns>
         public static object StringToEnum(string value, Type type)
         {
+            if (String.IsNullOrEmpty(value))
+                return 0;
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
@@ -314,6 +394,34 @@ namespace Energy.Base
                 }
             }
             return 0;
+        }
+
+        #endregion
+
+        #region DMS (geolocation)
+
+        /// <summary>
+        /// Return number as degrees ° minutes ' seconds "
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static string DoubleToDMS(double coordinate)
+        {
+            int degrees = (int)coordinate;
+            double minute = (coordinate - degrees) * 60;
+            double second = (minute - (int)minute) * 60;
+            second = Math.Round(second, 6);
+            if (second >= 60)
+            {
+                minute += 1;
+                second -= 60;
+            }
+            string potato = "";
+            if (Math.Abs(second) >= 0.01)
+                potato = String.Concat(" "
+                    , Energy.Base.Cast.DoubleToString(second, 2).TrimEnd('0').TrimEnd('.')
+                    , "\"");
+            return String.Concat(degrees.ToString(), "° ", ((int)minute).ToString(), "'", potato);
         }
 
         #endregion

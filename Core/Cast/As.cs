@@ -45,6 +45,31 @@ namespace Energy.Cast
         }
 
         /// <summary>
+        /// Convert double value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
+        public static string String(double value, int precision, System.Globalization.CultureInfo culture = null)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision, culture);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="trim">Trim zeroes from end</param>
+        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
+        public static string String(double value, int precision, bool trim, System.Globalization.CultureInfo culture = null)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision, trim, culture);
+        }
+
+        /// <summary>
         /// Convert string to enum
         /// </summary>
         /// <param name="value">string</param>
@@ -54,4 +79,5 @@ namespace Energy.Cast
             return (T)Energy.Base.Cast.StringToEnum(value, typeof(T));
         }
     }
+
 }

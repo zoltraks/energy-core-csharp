@@ -10,7 +10,6 @@ namespace Energy.Base
 {
     public class Structure
     {
-
         #region Column
 
         /// <summary>
@@ -195,6 +194,17 @@ namespace Energy.Base
                 }
 
                 throw new NotImplementedException("Unsupported class of new element");
+            }
+
+            public static Table Create(Type type)
+            {
+                Table table = new Table();
+                string[] fields = Energy.Base.Class.GetFieldsAndProperties(type);
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    table.Columns.New(fields[i]);
+                }
+                return table;
             }
         }
 
