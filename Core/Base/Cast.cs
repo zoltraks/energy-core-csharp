@@ -63,6 +63,26 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Return DateTime as ISO 8601 string (empty if default)
+        /// </summary>
+        /// <param name="stamp">DateTime</param>
+        /// <returns>Date and time string representation</returns>
+        public static string AsString(DateTime stamp)
+        {
+            return Energy.Base.Cast.DateTimeToString(stamp);
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 string (empty if default or null)
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date and time string representation</returns>
+        public static string AsString(DateTime? stamp)
+        {
+            return Energy.Base.Cast.DateTimeToString(stamp);
+        }
+
+        /// <summary>
         /// Convert string to enum
         /// </summary>
         /// <param name="value">string</param>
@@ -318,6 +338,108 @@ namespace Energy.Base
         {
             return String.Join(" ", (new List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))
                 .ConvertAll<string>(delegate (string s) { return s.Trim(); }).ToArray());
+        }
+
+        #endregion
+
+        #region DateTime
+
+        /// <summary>
+        /// Convert stamp text to DateTime
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>DateTime</returns>
+        public static DateTime StringToDateTime(string text)
+        {
+            return Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 string (empty if default)
+        /// </summary>
+        /// <param name="stamp">DateTime</param>
+        /// <returns>Date and time string representation</returns>
+        public static string DateTimeToString(DateTime stamp)
+        {
+            if (stamp == DateTime.MinValue) return "";
+            return stamp.ToString("u").Replace("Z", "");
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 string (empty if default or null)
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <returns>Date and time string representation</returns>
+        public static string DateTimeToString(DateTime? stamp)
+        {
+            return stamp == null ? "" : DateTimeToString((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Convert DateTime to unix time
+        /// </summary>
+        /// <param name="stamp">DateTime</param>
+        /// <returns>Unix time</returns>
+        public static double DateTimeToUnixTime(DateTime stamp)
+        {
+            return Energy.Base.Clock.GetUnixTime(stamp);
+        }
+
+        /// <summary>
+        /// Convert DateTime to unix time
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <returns>Unix time</returns>
+        public static double DateTimeToUnixTime(DateTime? stamp)
+        {
+            if (stamp == null)
+                return 0;
+            return Energy.Base.Clock.GetUnixTime((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Return unix time as DateTime
+        /// </summary>
+        /// <param name="time">Unix time</param>
+        /// <returns>DateTime</returns>
+        public static DateTime UnixTimeToDateTime(double time)
+        {
+            return Energy.Base.Clock.GetDateTime(time);
+        }
+
+        /// <summary>
+        /// Represent unix time as ISO 8601 string
+        /// </summary>
+        /// <param name="time">Unix time</param>
+        /// <returns>String</returns>
+        public static string UnixTimeToString(double time)
+        {
+            return DateTimeToString(Energy.Base.Clock.GetDateTime(time));
+        }
+
+        /// <summary>
+        /// Convert any input to datetime. Includes ISO date, time format and unix time (UTC).
+        /// </summary>
+        /// <param name="input">Any object</param>
+        /// <returns>DateTime.MinValue if date or time was not recognized.</returns>
+        public static DateTime InputToDateTime(object input)
+        {
+            string value = input is string ? (string)input : input.ToString();
+
+            if (String.IsNullOrEmpty(value) || (value = value.Trim()).Length == 0)
+            {
+                return DateTime.MinValue;
+            }
+
+            double unix = Energy.Base.Cast.StringToDouble(value);
+            if (unix == 0)
+            {
+                return StringToDateTime(value);
+            }
+            else
+            {
+                return UnixTimeToDateTime(unix);
+            }
         }
 
         #endregion

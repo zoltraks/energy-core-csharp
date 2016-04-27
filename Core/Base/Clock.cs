@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace Energy.Base
@@ -22,14 +23,37 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Return current time in unix time format, i.e. 1461477755.353
+        /// </summary>
+        /// <returns></returns>
+        public static double CurrentUnixTime
+        {
+            get
+            {
+                return GetUnixTime(DateTime.Now);
+            }
+        }
+
+        /// <summary>
         /// Return time as unix time
         /// </summary>
         /// <param name="stamp"></param>
         /// <returns></returns>
         public static double GetUnixTime(DateTime stamp)
         {
-            TimeSpan span = (stamp - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
+            TimeSpan span = (stamp.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
             return span.TotalSeconds;
+        }
+
+        /// <summary>
+        /// Return unix time as DateTime
+        /// </summary>
+        /// <param name="unix">Unix time</param>
+        /// <returns>DateTime</returns>
+        public static DateTime GetDateTime(double unix)
+        {
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(unix).ToLocalTime();
         }
 
         #region ISO 8601
@@ -191,5 +215,112 @@ namespace Energy.Base
         }
 
         #endregion
+
+
+        private static Regex _DateRegex;
+        /// <summary>Singleton</summary>
+        public static Regex DateRegex
+        {
+            get
+            {
+                if (_DateRegex == null)
+                {
+                    lock (typeof(Regex))
+                    {
+                        if (_DateRegex == null)
+                        {
+                            _DateRegex = new Regex(Energy.Base.Pattern.Date, RegexOptions.Compiled);
+                        }
+                    }
+                }
+                return _DateRegex;
+            }
+        }
+
+        private static Regex _TimeRegex;
+        /// <summary>Singleton</summary>
+        public static Regex TimeRegex
+        {
+            get
+            {
+                if (_TimeRegex == null)
+                {
+                    lock (typeof(Regex))
+                    {
+                        if (_TimeRegex == null)
+                        {
+                            _TimeRegex = new Regex(Energy.Base.Pattern.Time, RegexOptions.Compiled);
+                        }
+                    }
+                }
+                return _TimeRegex;
+            }
+        }
+
+        /// <summary>
+        /// Parse stamp string
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static DateTime Parse(string text)
+        {
+            DateTime result = DateTime.MinValue;
+
+            if (String.IsNullOrEmpty(text))
+                return result;
+
+            text = text.Trim();
+            int n;
+            Match match;
+
+            //match = Regex.Match(text, Energy.Base.Pattern.Date);
+            match = DateRegex.Match(text);
+
+            if (match.Success)
+            {
+                if (int.TryParse(match.Groups["year"].ToString(), out n))
+                {
+                    result = result.AddYears(n - 1);
+                }
+                if (int.TryParse(match.Groups["month"].ToString(), out n))
+                {
+                    result = result.AddMonths(n - 1);
+                }
+                if (int.TryParse(match.Groups["day"].ToString(), out n))
+                {
+                    result = result.AddDays(n - 1);
+                }
+            }
+
+            //match = Regex.Match(text, Energy.Base.Pattern.Time);
+            match = TimeRegex.Match(text);
+
+            if (match.Success)
+            {
+                if (int.TryParse(match.Groups["hour"].ToString(), out n))
+                {
+                    result = result.AddHours(n);
+                }
+                if (int.TryParse(match.Groups["minute"].ToString(), out n))
+                {
+                    result = result.AddMinutes(n);
+                }
+                if (int.TryParse(match.Groups["second"].ToString(), out n))
+                {
+                    result = result.AddSeconds(n);
+                }
+                if (!string.IsNullOrEmpty(match.Groups["fraction"].Value))
+                {
+                    double d;
+                    if (double.TryParse(string.Concat("0.", match.Groups["fraction"]), System.Globalization.NumberStyles.Any
+                        , System.Globalization.CultureInfo.InvariantCulture, out d))
+                    {
+                        result = result.AddSeconds(d);
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

@@ -87,10 +87,12 @@ namespace Energy.Console
                                 break;
                             case "7":
                             case "gray":
+                            case "s":
                                 current = System.ConsoleColor.Gray;
                                 break;
                             case "8":
                             case "darkgray":
+                            case "ds":
                                 current = System.ConsoleColor.DarkGray;
                                 break;
                             case "9":
@@ -140,6 +142,8 @@ namespace Energy.Console
             }
         }
 
+        private static readonly object one = new object();
+
         public static string Ask(string question, CharacterCasing casing, string value = "")
         {
             string answer = Ask(question);
@@ -162,38 +166,54 @@ namespace Energy.Console
         /// <param name="count"></param>
         public static void Break(int count = 1)
         {
-            if (defaultForeground != null) System.Console.ForegroundColor = (ConsoleColor)defaultForeground;
-            for (int i = 0; i < count; i++)
+            lock (one)
             {
-                System.Console.WriteLine();
+                if (defaultForeground != null) System.Console.ForegroundColor = (ConsoleColor)defaultForeground;
+                for (int i = 0; i < count; i++)
+                {
+                    System.Console.WriteLine();
+                }
             }
         }
 
         private static ConsoleColor? defaultForeground;
 
         /// <summary>
-        /// Write text using color settings ~white~, ~15~, ~14~, ~13~, ..., ~0~
+        /// Write text using color settings ~15~, ~white~, ~w~, ~14~, ~yellow~, ~y~, 
+        /// ~13~, ~magenta~, ~m~, ~2~, ~darkgreen~, ~dg~, ~0~
         /// </summary>
+        /// <code>
+        /// <table>
+        /// <tr><td>~0~</td><td>~default~</td><td></td><td>Black</td></tr>
+        /// <tr><td>~1~</td><td>~darkblue~</td><td>~db~</td><td>Black</td></tr>
+        /// <tr><td>~2~</td><td>~darkgreen~</td><td>~dg~</td><td>Dark green</td></tr>        
+        /// <tr><td>~13~</td><td>~magenta~</td><td>~m~</td><td>Magenta</td></tr>
+        /// <tr><td>~14~</td><td>~yellow~</td><td>~y~</td><td>Yellow</td></tr>
+        /// </table>
+        /// </code>
         /// <example>
         /// Tilde.Write(Tilde.ExampleColorPalleteTildeString);
         /// </example>
         /// <param name="value"></param>
         public static void Write(string value)
         {
-            if (value == null) return;
-            // fix new lines :)
-            //value = value.Replace("\r\n", "\n").Replace("\n", "\r\n");
-            if (defaultForeground == null)
+            lock (one)
             {
-                defaultForeground = System.Console.ForegroundColor;
+                if (value == null) return;
+                // fix new lines :)
+                //value = value.Replace("\r\n", "\n").Replace("\n", "\r\n");
+                if (defaultForeground == null)
+                {
+                    defaultForeground = System.Console.ForegroundColor;
+                }
+                TextList list = TextList.Explode(value);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    System.Console.ForegroundColor = list[i].Color != ConsoleColor.Black ? list[i].Color : (ConsoleColor)defaultForeground;
+                    System.Console.Write(list[i].Text);
+                }
+                //System.Console.ForegroundColor = foreground;
             }
-            TextList list = TextList.Explode(value);
-            for (int i = 0; i < list.Count; i++)
-            {
-                System.Console.ForegroundColor = list[i].Color != ConsoleColor.Black ? list[i].Color : (ConsoleColor)defaultForeground;
-                System.Console.Write(list[i].Text);
-            }
-            //System.Console.ForegroundColor = foreground;
         }
 
         /// <summary>
@@ -212,8 +232,7 @@ namespace Energy.Console
         /// <param name="value"></param>
         public static void WriteLine(string value)
         {
-            Write(value);
-            Break();
+            Write(value + Environment.NewLine);
         }
 
         /// <summary>
