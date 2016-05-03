@@ -75,6 +75,18 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Return true if file name does not contain expteions
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static bool HasNoExtension(string file)
+        {
+            string name = System.IO.Path.GetFileName(file);
+            int index = name.IndexOf('.');
+            return index <= 0 || index == name.Length - 1;
+        }
+
+        /// <summary>
         /// Return unique name for file
         /// </summary>
         /// <param name="file">string</param>
@@ -281,9 +293,11 @@ namespace Energy.Base
         /// </summary>
         /// <param name="file">string</param>
         /// <returns>string</returns>
-        public static string AbsolutePath(string file)
+        public static string GetAbsolutePath(string file)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(file))
+                return file;
+            return GetAbsolutePath(file, System.IO.Directory.GetCurrentDirectory());
         }
 
         /// <summary>
@@ -292,9 +306,42 @@ namespace Energy.Base
         /// <param name="file">string</param>
         /// <param name="current">string</param>
         /// <returns>string</returns>
-        public static string AbsolutePath(string file, string current)
+        public static string GetAbsolutePath(string file, string current)
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(file) || String.IsNullOrEmpty(current))
+                return file;
+            if (!IsRelativePath(file))
+                return file;
+            string path = IncludeTrailingPathSeparator(current);
+            return String.Concat(path, file);
+        }
+
+        /// <summary>
+        /// Check if file or directory path is relative or absolute
+        /// </summary>
+        /// <param name="path">string</param>
+        /// <param name="separator">Separator list</param>
+        /// <returns>bool</returns>
+        public static bool IsRelativePath(string path, string[] separator = null)
+        {
+            if (separator == null)
+                separator = new string[] { System.IO.Path.DirectorySeparatorChar.ToString() };
+            if (String.IsNullOrEmpty(path))
+                return true;
+
+            string list = "";
+            foreach (string _ in separator)
+            {
+                if (path.StartsWith(_))
+                    return false;
+                list += (_ == "\\" ? "\\" + _ : _);
+            }
+            string pattern = @"[A-Za-z]+[\d+]?:[$1]".Replace("$1", list);
+
+            if (Regex.Match(path, pattern).Success)
+                return false;
+
+            return true;
         }
 
         /// <summary>

@@ -361,8 +361,12 @@ namespace Energy.Base
         /// <returns>Date and time string representation</returns>
         public static string DateTimeToString(DateTime stamp)
         {
-            if (stamp == DateTime.MinValue) return "";
-            return stamp.ToString("u").Replace("Z", "");
+            if (stamp == DateTime.MinValue)
+                return "";
+            if (stamp.Millisecond != 0)
+                return stamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            else
+                return stamp.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         /// <summary>

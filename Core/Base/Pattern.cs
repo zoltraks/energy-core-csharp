@@ -24,7 +24,8 @@ namespace Energy.Base
         /// 51,5074 N 0,1278 W
         /// -51,5074 -0,1278
         /// </summary>
-        public static string LatitudeAndLongitude = @"(?:
+        public static string LatitudeAndLongitude = @"(?:(?<latitude_name>[A-Za-z][^:]*):\s*)?
+(?:
 (?:
 (?<latitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*°\s*
 (?:(?<latitude_minute>[-+]?\d+(?:[.,]\d+)?)\s*[′']\s*)?
@@ -35,8 +36,9 @@ namespace Energy.Base
 (?<latitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*
 )
 )
-(?:(?<latitude_direction>[NSns])\s*?)
-(?:[,.]\s*)?
+(?:(?<latitude_direction>[NSns]\s*)?)
+(?:[,.|]\s*)?
+(?:(?<longitude_name>\w[^:]*):\s*)?
 (?:
 (?:
 (?<longitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*°\s*
@@ -47,9 +49,7 @@ namespace Energy.Base
 (?:
 (?<longitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*
 )
-)
-(?:(?<longitude_direction>[WEwe])\s*?)
-";
+)";
 
         /// <summary>
         /// Date pattern (year + month + day)

@@ -9,6 +9,9 @@ namespace Energy.Core
     /// </summary>
     public class Locale
     {
-
+        public string Translate(string message)
+        {
+            return message;
+        }
     }
 }

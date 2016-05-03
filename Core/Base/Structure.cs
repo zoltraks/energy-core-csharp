@@ -163,12 +163,31 @@ namespace Energy.Base
             public Column.Array Columns = new Column.Array();
             [XmlElement("Index")]
             public Index.Array Indexes = new Index.Array();
-            [XmlElement("Row")]
-            public Row.Array Rows = new Row.Array();
             [XmlElement("Keys")]
             public List<string> Keys = new List<string>();
 
-            public class Array : Energy.Base.Collection.Array<Table> { }
+            [XmlElement("Row")]
+            public Row.Array Rows = new Row.Array();
+
+            public class Array : Energy.Base.Collection.Array<Table>
+            {
+                public Table Get(string name)
+                {
+                    for (int i = 0; i < Count; i++)
+                    {
+                        if (this[i].ToString() == name)
+                        {
+                            return this[i];
+                        }
+                    }
+                    return null;
+                }
+
+                public Table Find(string name)
+                {
+                    return Find((_) => 0 == string.Compare(_.Name, name, true));
+                }
+            }
 
             public object New(Type type)
             {
@@ -205,6 +224,21 @@ namespace Energy.Base
                     table.Columns.New(fields[i]);
                 }
                 return table;
+            }
+
+            public bool Equals(Table table)
+            {
+                if (Name != table.Name)
+                    return false;
+                if (Identity != table.Identity)
+                    return false;
+                if (Columns.Count != table.Columns.Count || !Columns.Equals(table.Columns))
+                    return false;
+                if (Indexes.Count != table.Indexes.Count)
+                    return false;
+                if (Rows.Count != table.Rows.Count)
+                    return false;
+                return true;
             }
         }
 

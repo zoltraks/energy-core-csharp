@@ -35,6 +35,22 @@ namespace Energy.Base
                 base.Add(item);
                 return item;
             }
+
+            public bool Equals(Array<T> array)
+            {
+                if (this.Count != array.Count)
+                {
+                    return false;
+                }
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (!this[i].Equals(array[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
 
         #endregion

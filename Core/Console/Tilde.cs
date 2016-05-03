@@ -268,7 +268,7 @@ namespace Energy.Console
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
             System.Console.ForegroundColor = System.ConsoleColor.Yellow;
-            string answer = System.Console.ReadLine();
+            string answer = System.Console.ReadLine().Trim();
             int top = System.Console.CursorTop;
             System.Console.ForegroundColor = foreground;
             if (answer.Length == 0)
@@ -284,6 +284,43 @@ namespace Energy.Console
                 System.Console.WriteLine(answer);
             }
             return answer;
+        }
+
+        /// <summary>
+        /// Write out exception message
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="trace">Write also stack trace</param>
+        public static void Exception(Exception exception, bool trace = false)
+        {
+            string message = (exception.Message ?? "").Trim();
+            if (!String.IsNullOrEmpty(message))
+            {
+                message = "~r~" + message + "~0~\r\n";
+            }
+            if (exception.InnerException != null)
+            {
+                string next = (exception.InnerException.Message ?? "").Trim();
+                if (!String.IsNullOrEmpty(next))
+                {
+                    message += "~m~" + next + "~0~\r\n";
+                }
+            }
+            if (trace)
+            {
+                string comment = (new Regex(@"^\s*\w+\s*", RegexOptions.Multiline).Replace(exception.StackTrace, ""));
+                string[] split = Energy.Base.Text.SplitByNewLine(comment);
+                List<string> stack = new List<string>();
+                for (int i = split.Length - 1; i >= 0; i--)
+                {
+                    stack.Add(split[i]);
+                }
+                if (stack.Count > 0)
+                {
+                    message += "~ds~" + String.Join(Environment.NewLine, stack.ToArray()) + "~0~\r\n";
+                }
+            }
+            Tilde.Write(message);
         }
     }
 }

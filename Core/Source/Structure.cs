@@ -24,5 +24,19 @@ namespace Energy.Source
         public partial class Difference
         {
         }
+
+        public bool Equals(Structure s)
+        {
+            if (s.Tables.Count != Tables.Count)
+                return false;
+            for (int i = 0; i < Tables.Count; i++)
+            {
+                if (!Tables[i].Equals(s.Tables[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

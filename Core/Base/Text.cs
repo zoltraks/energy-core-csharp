@@ -109,5 +109,15 @@ namespace Energy.Base
             }
             return String.Join(with, list.ToArray());
         }
+
+        /// <summary>
+        /// Split string by new line
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string[] SplitByNewLine(string content)
+        {
+            return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+        }
     }
 }
