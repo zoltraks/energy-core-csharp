@@ -322,5 +322,15 @@ namespace Energy.Base
 
             return result;
         }
+
+        /// <summary>
+        /// Sample subroutine to calculate if a year is a leap year.
+        /// </summary>
+        /// <param name="year">Year</param>
+        /// <returns>True if a year is a leap year</returns>
+        public bool IsLeapYear(int year)
+        {
+            return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+        }
     }
 }
