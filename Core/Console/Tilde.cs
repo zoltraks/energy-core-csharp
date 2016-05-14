@@ -160,6 +160,15 @@ namespace Energy.Console
             }
         }
 
+        public static object Ask(string question, object value)
+        {
+            string text = Energy.Cast.As.String(value);
+            string answer = Ask(question, text);
+            if (String.IsNullOrEmpty(answer))
+                return value;
+            return answer;
+        }
+
         /// <summary>
         /// Break new line and set default text color
         /// </summary>

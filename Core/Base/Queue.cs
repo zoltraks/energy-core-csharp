@@ -19,8 +19,11 @@ namespace Energy.Base
 
         public void Dispose()
         {
-            _List.Clear();
-            _List = null;
+            lock (_List)
+            {
+                _List.Clear();
+                _List = null;
+            }
         }
 
         public bool IsEmpty

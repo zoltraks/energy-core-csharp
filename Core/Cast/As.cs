@@ -70,6 +70,16 @@ namespace Energy.Cast
         }
 
         /// <summary>
+        /// Represent object as string by using conversions or ToString() method
+        /// </summary>
+        /// <param name="value">Object instance</param>
+        /// <returns>String representation</returns>
+        public static string String(object value)
+        {
+            return Energy.Base.Cast.ObjectToString(value);
+        }
+
+        /// <summary>
         /// Convert string to enum
         /// </summary>
         /// <param name="value">string</param>

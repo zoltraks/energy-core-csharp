@@ -159,6 +159,7 @@ namespace Energy.Base
         {
             public string Name;
             public string Identity;
+            public string Description;
             [XmlElement("Column")]
             public Column.Array Columns = new Column.Array();
             [XmlElement("Index")]

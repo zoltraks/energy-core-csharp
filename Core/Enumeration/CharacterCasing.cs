@@ -9,7 +9,7 @@ namespace Energy.Enumeration
     /// </summary>
     public enum CharacterCasing
     {
-        /// <summary>None</summary>
+        /// <summary>Not specified, as is</summary>
         None,
         /// <summary>Lower</summary>
         Lower,

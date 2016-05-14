@@ -14,12 +14,18 @@ namespace Energy.Source
     /// </summary>
     public partial class Structure
     {
+        /// <summary>
+        /// List of other structures to include
+        /// </summary>
+        [XmlElement("Include")]
+        public List<string> Includes = new List<string>();
+
         /// <summary>Table</summary>
         [XmlElement("Table")]
         public Energy.Base.Structure.Table.Array Tables = new Base.Structure.Table.Array();
 
         /// <summary>
-        /// Represents difference between schemas
+        /// Represents difference between structures
         /// </summary>
         public partial class Difference
         {

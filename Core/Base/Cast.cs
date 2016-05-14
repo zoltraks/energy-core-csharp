@@ -451,10 +451,10 @@ namespace Energy.Base
         #region Object
 
         /// <summary>
-        /// Represent object value as string
+        /// Represent object as string by using conversions or ToString() method
         /// </summary>
-        /// <param name="value">object</param>
-        /// <returns>string</returns>
+        /// <param name="value">Object instance</param>
+        /// <returns>String representation</returns>
         public static string ObjectToString(object value)
         {
             // treat DBNull as empty string
