@@ -59,6 +59,7 @@
     <Compile Include="Base\Static.cs" />
     <Compile Include="Base\Structure.cs" />
     <Compile Include="Base\Text.cs" />
+    <Compile Include="Base\Url.cs" />
     <Compile Include="Cast\As.cs" />
     <Compile Include="Console\Tilde.cs" />
     <Compile Include="Core\Cipher.cs" />
