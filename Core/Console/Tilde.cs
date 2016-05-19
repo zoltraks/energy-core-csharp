@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using Energy.Enumeration;
 
@@ -110,7 +109,7 @@ namespace Energy.Console
                             case "c":
                                 current = System.ConsoleColor.Cyan;
                                 break;
-                            case "12":                            
+                            case "12":
                             case "red":
                             case "r":
                                 current = System.ConsoleColor.Red;
@@ -144,6 +143,38 @@ namespace Energy.Console
 
         private static readonly object one = new object();
 
+        #region Ask
+
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <param name="value">Default value</param>
+        /// <returns>Value entered or default if skipped. Default is an empty string.</returns>
+        public static string Ask(string question, string value = "")
+        {
+            Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
+            int left = System.Console.CursorLeft;
+            System.ConsoleColor foreground = System.Console.ForegroundColor;
+            System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+            string answer = System.Console.ReadLine().Trim();
+            int top = System.Console.CursorTop;
+            System.Console.ForegroundColor = foreground;
+            if (answer.Length == 0)
+            {
+                answer = value;
+                try
+                {
+                    System.Console.SetCursorPosition(left, top - 1);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                }
+                System.Console.WriteLine(answer);
+            }
+            return answer;
+        }
+
         public static string Ask(string question, CharacterCasing casing, string value = "")
         {
             string answer = Ask(question);
@@ -168,6 +199,8 @@ namespace Energy.Console
                 return value;
             return answer;
         }
+
+        #endregion
 
         /// <summary>
         /// Break new line and set default text color
@@ -264,36 +297,6 @@ namespace Energy.Console
             + "~yellow~ ~ yellow ~  ~ 14 ~    "
             + "~white~ ~ white ~  ~ 15 ~    "
             ;
-
-        /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
-        /// </summary>
-        /// <param name="question">Question string</param>
-        /// <param name="value">Default value</param>
-        /// <returns>Value entered or default if skipped. Default is an empty string.</returns>
-        public static string Ask(string question, string value = "")
-        {
-            Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
-            int left = System.Console.CursorLeft;
-            System.ConsoleColor foreground = System.Console.ForegroundColor;
-            System.Console.ForegroundColor = System.ConsoleColor.Yellow;
-            string answer = System.Console.ReadLine().Trim();
-            int top = System.Console.CursorTop;
-            System.Console.ForegroundColor = foreground;
-            if (answer.Length == 0)
-            {
-                answer = value;
-                try
-                {
-                    System.Console.SetCursorPosition(left, top - 1);
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                }
-                System.Console.WriteLine(answer);
-            }
-            return answer;
-        }
 
         /// <summary>
         /// Write out exception message

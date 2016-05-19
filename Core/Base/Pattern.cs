@@ -64,11 +64,11 @@ namespace Energy.Base
         /// <summary>
         /// URL pattern (protocol + host + port + address)
         /// </summary>
-        public static readonly string Url = @"(?:(?<protocol>\w+)://)?(?<host>[\w\d_\-\.]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^#\r\n]*))?";
+        public static readonly string Url = @"(?:(?<protocol>\w+)://)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^\r\n]*))?";
 
         /// <summary>
         /// URI pattern (scheme + user + password + host + port + path + query + fragment)
         /// </summary>
-        public static readonly string Uri = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
+        public static readonly string Uri = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
     }
 }
