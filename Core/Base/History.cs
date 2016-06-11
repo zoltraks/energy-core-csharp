@@ -10,13 +10,13 @@ namespace Energy.Base
     public class History
     {
         /// <summary>
-        /// Insert element into history
+        /// Insert string element into history or move it to the top
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="element"></param>
-        /// <param name="insensitive"></param>
-        /// <returns></returns>
-        public static List<string> Insert(List<string> list, string element, bool insensitive = false)
+        /// <param name="list">String list</param>
+        /// <param name="element">String element</param>
+        /// <param name="insensitive">Ignore case</param>
+        /// <returns>String list</returns>
+        public static List<string> Insert(List<string> list, string element, bool insensitive)
         {
             if (list == null)
                 return null;
@@ -32,7 +32,7 @@ namespace Energy.Base
             {
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
-                    if (0 == String.Compare(list[i], element, true))
+                    if (0 == String.Compare(list[i], element, insensitive))
                     {
                         list.RemoveAt(i);
                     }
@@ -46,11 +46,22 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Insert element into history
+        /// Insert string element into history or move it to the top
         /// </summary>
-        /// <param name="array"></param>
-        /// <param name="element"></param>
-        /// <returns></returns>
+        /// <param name="list">String list</param>
+        /// <param name="element">String element</param>
+        /// <returns>String list</returns>
+        public static List<string> Insert(List<string> list, string element)
+        {
+            return Insert(list, element, true);
+        }
+
+        /// <summary>
+        /// Insert string element into history or move it to the top
+        /// </summary>
+        /// <param name="array">String list</param>
+        /// <param name="element">String element</param>
+        /// <returns>String array</returns>
         public static string[] Insert(string[] array, string element)
         {
             if (array == null)

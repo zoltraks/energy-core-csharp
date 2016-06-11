@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace Energy.Base
@@ -370,16 +371,24 @@ namespace Energy.Base
 
         public string Code { get; private set; }
         public string Name { get; private set; }
-        public int Numeric { get; private set; }
-        public int Minor { get; private set; }
         public string Symbol { get; private set; }
+        [DefaultValue(0)]
+        public int Numeric { get; private set; }
+        [DefaultValue(0)]
+        public int Minor { get; private set; }
 
-        public Currency(string code, string name, int numeric, int minor, string symbol = "")
+        public Currency(string code, string name, int numeric, int minor, string symbol)
         {
             Code = code;
             Name = name;
             Numeric = numeric;
             Minor = minor;
+            Symbol = symbol;
+        }
+
+        public Currency(string code, string name, int numeric, int minor)
+            : this(code, name, numeric, minor, "")
+        {
         }
 
         public override bool Equals(object obj)

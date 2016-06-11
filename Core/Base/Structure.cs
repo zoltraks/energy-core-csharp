@@ -17,20 +17,47 @@ namespace Energy.Base
         /// </summary>
         public partial class Column
         {
-            public string Name { get; set; }
-            public string Label { get; set; }
-            public string Description { get; set; }
-            public string Type { get; set; }
+            #region Private
+
+            private string _Name = "";
+
+            private string _Type = "";
+
+            private string _Label = "";
+
+            private string _Description = "";
+
+            private string _Format = "";
+
+            #endregion
+
+            #region Property
+
+            [DefaultValue("")]
+            public string Name { get { return _Name; } set { _Name = value == null ? "" : value; } }
+            [DefaultValue("")]
+            public string Type { get { return _Type; } set { _Type = value == null ? "" : value; } }
+
+            [DefaultValue("")]
+            public string Label { get { return _Label; } set { _Label = value == null ? "" : value; } }
+            [DefaultValue("")]
+            public string Description { get { return _Description; } set { _Description = value == null ? "" : value; } }
+
+            [DefaultValue("")]
+            public string Format { get { return _Format; } set { _Format = value == null ? "" : value; } }
+
             [DefaultValue(false)]
             public bool Ignore { get; set; }
+
             [DefaultValue(0)]
             public int Length { get; set; }
-            public string Format { get; set; }
 
             [DefaultValue(0)]
             public double Minimum { get; set; }
             [DefaultValue(0)]
             public double Maximum { get; set; }
+
+            #endregion
 
             #region Array
 
@@ -55,12 +82,10 @@ namespace Energy.Base
                 /// Create new element
                 /// </summary>
                 /// <param name="name"></param>
-                /// <param name="type"></param>
-                /// <param name="label"></param>
                 /// <returns></returns>
-                public Column New(string name, string type = "", string label = "")
+                public Column New(string name)
                 {
-                    Column item = new Column(name, type, label);
+                    Column item = new Column(name);
                     Add(item);
                     return item;
                 }
@@ -68,12 +93,22 @@ namespace Energy.Base
 
             public Column() { }
 
-            public Column(string name, string type = "", string label = "")
-                : this()
+            public Column(string name, string type, string label)
             {
                 Name = name;
                 Type = type;
                 Label = label;
+            }
+
+            public Column(string name)
+            {
+                Name = name;
+            }
+
+            public Column(string name, string type)
+            {
+                Name = name;
+                Type = type;
             }
 
             #endregion

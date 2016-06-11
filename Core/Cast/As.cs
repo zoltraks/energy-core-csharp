@@ -45,28 +45,51 @@ namespace Energy.Cast
         }
 
         /// <summary>
-        /// Convert double value to invariant string.
+        /// Convert double value to invariant string
         /// </summary>
         /// <param name="value">Number</param>
         /// <param name="precision">Precision</param>
-        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
         /// <returns>String</returns>
-        public static string String(double value, int precision, System.Globalization.CultureInfo culture = null)
+        public static string String(double value, int precision, System.Globalization.CultureInfo culture)
         {
             return Energy.Base.Cast.DoubleToString(value, precision, culture);
         }
 
         /// <summary>
-        /// Convert double value to invariant string.
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <returns>String</returns>
+        public static string String(double value, int precision)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string
         /// </summary>
         /// <param name="value">Number</param>
         /// <param name="precision">Precision</param>
         /// <param name="trim">Trim zeroes from end</param>
-        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
         /// <returns>String</returns>
-        public static string String(double value, int precision, bool trim, System.Globalization.CultureInfo culture = null)
+        public static string String(double value, int precision, bool trim, System.Globalization.CultureInfo culture)
         {
             return Energy.Base.Cast.DoubleToString(value, precision, trim, culture);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="trim">Trim zeroes from end</param>
+        /// <returns>String</returns>
+        public static string String(double value, int precision, bool trim)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision, trim, null);
         }
 
         /// <summary>

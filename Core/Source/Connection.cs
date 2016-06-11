@@ -92,7 +92,7 @@ namespace Energy.Source
 
         private Configuration configuration;
 
-        public Connection(Type vendor, string connectionString = "", Energy.Enumeration.SqlDialect dialect = Energy.Enumeration.SqlDialect.None)
+        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
         {
             if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
             {

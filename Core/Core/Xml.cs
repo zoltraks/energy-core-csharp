@@ -18,14 +18,14 @@ namespace Energy.Core
         /// Object class must implement IXmlSerializable interface
         /// </para>
         /// <code>
-        /// string xml = Energy.Base.Xml.Serialize(myObject);
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
         /// </code>
         /// </summary>
-        /// <param name="data">object</param>
-        /// <param name="root">string</param>
-        /// <param name="space">string</param>
-        /// <returns>string</returns>
-        public static string Serialize(object data, string root = "", string space = "")
+        /// <param name="data">Object</param>
+        /// <param name="root">XML root</param>
+        /// <param name="space">XML namespace</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root, string space)
         {
             string xml = null;
             try
@@ -51,6 +51,39 @@ namespace Energy.Core
                 }
             }
             return xml;
+        }
+
+        /// <summary>
+        /// Serialize object to XML
+        /// <para>
+        /// Object class must implement IXmlSerializable interface
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data)
+        {
+            return Serialize(data, "", "");
+        }
+
+        /// <summary>
+        /// Serialize object to XML
+        /// <para>
+        /// Object class must implement IXmlSerializable interface
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object</param>
+        /// <param name="root">XML root</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root)
+        {
+            return Serialize(data, root, "");
         }
 
         /// <summary>

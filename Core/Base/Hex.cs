@@ -53,16 +53,36 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Byte array to string
+        /// Convert byte array to hex string
         /// </summary>
         /// <param name="array">Byte array</param>
         /// <param name="space">Optional hexadecimal separator</param>
         /// <returns>string</returns>
-        public static string ArrayToHex(byte[] array, string space = "")
+        public static string ArrayToHex(byte[] array, string space)
         {
             if (array == null) return null;
             string hex = BitConverter.ToString(array);
             return hex.Replace("-", space);
+        }
+
+        /// <summary>
+        /// Convert byte array to hex string
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <returns>string</returns>
+        public static string ArrayToHex(byte[] array)
+        {
+            return ArrayToHex(array, "");
+        }
+
+        /// <summary>
+        /// Represent byte as two-digit hexadecimal value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ByteToHex(byte value)
+        {
+            return value.ToString("X2");
         }
 
         /// <summary>
@@ -100,10 +120,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="array">Byte array</param>
         /// <param name="size">Number of bytes in one line</param>
-        /// <param name="representation">Character representation</param>
         /// <param name="divide">Put extra space between each division columns</param>
+        /// <param name="representation">Character representation</param>
         /// <returns>Text representation</returns>
-        public static string Print(byte[] array, int size = 16, bool representation = true, int divide = 4)
+        public static string Print(byte[] array, int size, int divide, bool representation)
         {
             StringBuilder b = new StringBuilder();
             string s = BitConverter.ToString(array).Replace("-", "").ToLower();
@@ -151,6 +171,39 @@ namespace Energy.Base
                 }
             }
             return b.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form with text represenation
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <param name="size">Number of bytes in one line</param>
+        /// <param name="divide">Put extra space between each division columns</param>
+        /// <returns>Text representation</returns>
+        public static string Print(byte[] array, int size, int divide)
+        {
+            return Print(array, size, divide, true);
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form with text represenation
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <param name="size">Number of bytes in one line</param>
+        /// <returns>Text representation</returns>
+        public static string Print(byte[] array, int size)
+        {
+            return Print(array, size, 4, true);
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form with text represenation
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <returns>Text representation</returns>
+        public static string Print(byte[] array)
+        {
+            return Print(array, 16, 4, true);
         }
     }
 }

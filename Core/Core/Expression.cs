@@ -31,7 +31,7 @@ namespace Energy.Core
 
             public Dictionary<string, Regex> Dictionary = new Dictionary<string, Regex>();
 
-            public static Regex Get(string pattern, RegexOptions option = RegexOptions.None)
+            public static Regex Get(string pattern, RegexOptions option)
             {
                 if (option == RegexOptions.None)
                 {
@@ -48,6 +48,11 @@ namespace Energy.Core
                 Regex expression = new Regex(pattern, option);
                 Instance.Dictionary.Add(pattern, expression);
                 return expression;
+            }
+
+            public static Regex Get(string pattern)
+            {
+                return Get(pattern, RegexOptions.None);
             }
         }
     }

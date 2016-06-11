@@ -51,6 +51,7 @@
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Money.cs" />
+    <Compile Include="Base\Nibble.cs" />
     <Compile Include="Base\Path.cs" />
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Hex.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Base\Structure.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Url.cs" />
+    <Compile Include="Base\Bcd.cs" />
     <Compile Include="Cast\As.cs" />
     <Compile Include="Console\Tilde.cs" />
     <Compile Include="Core\Cipher.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Core\Memory.cs" />
     <Compile Include="Base\Currency.cs" />
     <Compile Include="Core\Version.cs" />
+    <Compile Include="Enumeration\TextAlign.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
     <Compile Include="Enumeration\FormMode.cs" />

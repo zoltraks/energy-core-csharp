@@ -39,6 +39,10 @@ namespace Energy.Base
                 return base.ToString();
             }
 
+            /// <summary>
+            /// Create point object from string constant
+            /// </summary>
+            /// <param name="value"></param>
             public static implicit operator Point(string value)
             {
                 string pattern = Energy.Base.Pattern.LatitudeAndLongitude;

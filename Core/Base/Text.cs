@@ -36,13 +36,13 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Surround text with delimiters if contains delimiter itself or any of special characters.
+        /// Surround text with delimiters if contains delimiter itself or any of special characters
         /// </summary>
         /// <param name="value">Text value</param>
         /// <param name="delimiter">Delimiter like ' or "</param>
         /// <param name="special">List of special char</param>
         /// <returns></returns>
-        public static string Surround(string value, string delimiter, string[] special = null)
+        public static string Surround(string value, string delimiter, string[] special)
         {
             if (value == null || value == "")
                 return value;
@@ -75,6 +75,17 @@ namespace Energy.Base
                 return value;
 
             return String.Concat(delimiter, value, delimiter);
+        }
+
+        /// <summary>
+        /// Surround text with delimiters if contains delimiter itself or any of special characters
+        /// </summary>
+        /// <param name="value">Text value</param>
+        /// <param name="delimiter">Delimiter like ' or "</param>
+        /// <returns></returns>
+        public static string Surround(string value, string delimiter)
+        {
+            return Surround(value, delimiter, null);
         }
 
         /// <summary>

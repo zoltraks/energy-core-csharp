@@ -14,6 +14,6 @@ namespace Energy.Interface
         /// </summary>
         /// <param name="file">Path to file</param>
         /// <returns>True on write success</returns>
-        bool Save(string file = null);
+        bool Save(string file);
     }
 }

@@ -56,7 +56,7 @@ namespace Energy.Query
 
         public string CreateTable(Energy.Base.Structure.Table table)
         {
-            return Create.Table(dialect, table);
+            return Create.Table(dialect, table, null);
         }
 
         public string CreateDescription(Energy.Base.Structure.Table table)
@@ -78,7 +78,7 @@ namespace Energy.Query
             /// <param name="table"></param>
             /// <param name="configuration"></param>
             /// <returns></returns>
-            public static string Table(Energy.Enumeration.SqlDialect dialect, Energy.Base.Structure.Table table, Energy.Query.Configuration configuration = null)
+            public static string Table(Energy.Enumeration.SqlDialect dialect, Energy.Base.Structure.Table table, Energy.Query.Configuration configuration)
             {
                 switch (dialect)
                 {
@@ -99,12 +99,12 @@ namespace Energy.Query
                 List<string> script = new List<string>();
                 string schema = "dbo";
 
-                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption' , @value=N'Klucz' , @level0type='SCHEMA' , @level0name='" 
+                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption' , @value=N'Klucz' , @level0type='SCHEMA' , @level0name='"
                     + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
                 foreach (Energy.Base.Structure.Column column in table.Columns)
                 {
-                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'" + column.Label 
-                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name 
+                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'" + column.Label
+                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
                         + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
                 }
 
@@ -112,13 +112,13 @@ namespace Energy.Query
                 script.Add("GO");
                 script.Add("");
 
-                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'Klucz',@level0type='SCHEMA',@level0name='" 
+                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'Klucz',@level0type='SCHEMA',@level0name='"
                     + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
                 foreach (Energy.Base.Structure.Column column in table.Columns)
                 {
                     string description = String.IsNullOrEmpty(column.Description) ? column.Label : column.Description;
-                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'" + description 
-                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name 
+                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'" + description
+                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
                         + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
                 }
 
@@ -189,7 +189,7 @@ namespace Energy.Query
 
         #endregion
 
-        public string Merge(Energy.Base.Structure.Table table, bool compact = false)
+        public string Merge(Energy.Base.Structure.Table table, bool compact)
         {
             string name = "[" + table.Name + "]";
             StringBuilder script = new StringBuilder();
@@ -232,6 +232,11 @@ namespace Energy.Query
             }
 
             return script.ToString().Trim();
+        }
+
+        public string Merge(Energy.Base.Structure.Table table)
+        {
+            return Merge(table, false);
         }
     }
 }

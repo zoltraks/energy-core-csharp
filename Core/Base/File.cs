@@ -322,7 +322,7 @@ namespace Energy.Base
         /// <param name="path">string</param>
         /// <param name="separator">Separator list</param>
         /// <returns>bool</returns>
-        public static bool IsRelativePath(string path, string[] separator = null)
+        public static bool IsRelativePath(string path, string[] separator)
         {
             if (separator == null)
                 separator = new string[] { System.IO.Path.DirectorySeparatorChar.ToString() };
@@ -342,6 +342,16 @@ namespace Energy.Base
                 return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Check if file or directory path is relative or absolute
+        /// </summary>
+        /// <param name="path">string</param>
+        /// <returns>bool</returns>
+        public static bool IsRelativePath(string path)
+        {
+            return IsRelativePath(path, null);
         }
 
         /// <summary>

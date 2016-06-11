@@ -20,7 +20,7 @@ namespace Energy.Query.Dialect
             /// <param name="table"></param>
             /// <param name="configuration"></param>
             /// <returns></returns>
-            public static string Table(Energy.Base.Structure.Table table, Energy.Query.Configuration configuration = null)
+            public static string Table(Energy.Base.Structure.Table table, Energy.Query.Configuration configuration)
             {
                 if (table == null || table.Columns.Count == 0) return "";
                 if (configuration == null) configuration = Energy.Query.Configuration.Default;

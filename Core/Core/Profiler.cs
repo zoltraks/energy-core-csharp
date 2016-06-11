@@ -71,7 +71,7 @@ namespace Energy.Core
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="name"></param>
-        public static Result Profile(Action function, int iterations = 1, string name = null)
+        public static Result Profile(Action function, int iterations, string name)
         {
             Result result = new Result() { Name = name ?? function.Method.Name, Iterations = iterations };
 
@@ -112,6 +112,25 @@ namespace Energy.Core
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Profile function
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="iterations"></param>
+        public static Result Profile(Action function, int iterations)
+        {
+            return Profile(function, iterations, null);
+        }
+
+        /// <summary>
+        /// Profile function
+        /// </summary>
+        /// <param name="function"></param>
+        public static Result Profile(Action function)
+        {
+            return Profile(function, 1, null);
         }
 
         [System.AttributeUsage(System.AttributeTargets.Parameter)]

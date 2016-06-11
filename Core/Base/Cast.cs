@@ -57,9 +57,20 @@ namespace Energy.Base
         /// <param name="precision">Precision</param>
         /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56</param>
         /// <returns>String</returns>
-        public static string AsString(double value, int precision, System.Globalization.CultureInfo culture = null)
+        public static string AsString(double value, int precision, System.Globalization.CultureInfo culture)
         {
             return Energy.Base.Cast.DoubleToString(value, precision, culture);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <returns>String</returns>
+        public static string AsString(double value, int precision)
+        {
+            return Energy.Base.Cast.DoubleToString(value, precision, null);
         }
 
         /// <summary>
@@ -259,7 +270,7 @@ namespace Energy.Base
         #region Double
 
         /// <summary>
-        /// Convert string to double value without exception.
+        /// Convert string to double value without exception
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>double</returns>
@@ -284,7 +295,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert floating value to invariant string.
+        /// Convert floating value to invariant string
         /// </summary>
         /// <param name="value">double</param>
         /// <returns>string</returns>
@@ -294,7 +305,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert numeric text to invariant string.
+        /// Convert numeric text to invariant string
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>string</returns>
@@ -304,13 +315,13 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert double value to invariant string.
+        /// Convert double value to invariant string
         /// </summary>
         /// <param name="value">Number</param>
         /// <param name="precision">Precision</param>
-        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
+        /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
         /// <returns>String</returns>
-        public static string DoubleToString(double value, int precision, System.Globalization.CultureInfo culture = null)
+        public static string DoubleToString(double value, int precision, System.Globalization.CultureInfo culture)
         {
             // HACK: Missing "??=" operator :-)
             //culture ??= System.Globalization.CultureInfo.InvariantCulture;
@@ -325,15 +336,26 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <returns>String</returns>
+        public static string DoubleToString(double value, int precision)
+        {
+            return DoubleToString(value, precision, null);
+        }
+
         #endregion
 
-        #region Text
+            #region Text
 
-        /// <summary>
-        /// Join multiline text into single string
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+            /// <summary>
+            /// Join multiline text into single string
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
         public static string SingleLine(string text)
         {
             return String.Join(" ", (new List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))

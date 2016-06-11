@@ -77,15 +77,6 @@ namespace Energy.Core
             }
         }
 
-        /// <summary>
-        /// Get library compilation date
-        /// </summary>
-        /// <returns>string</returns>
-        public static string GetLibraryCompilation()
-        {
-            return GetCompilation(Assembly.GetExecutingAssembly());
-        }
-
         #endregion
 
         /// <summary>
@@ -120,5 +111,45 @@ namespace Energy.Core
             }
             return 0;
         }
+
+        #region Library version information
+
+        private static string _LibraryProduct;
+        /// <summary>Library version</summary>
+        public static string LibraryVersion
+        {
+            get
+            {
+                if (_LibraryProduct == null)
+                {
+                    _LibraryProduct = GetProduct(Assembly.GetExecutingAssembly());
+                }
+                return _LibraryProduct;
+            }
+            set
+            {
+                _LibraryProduct = value;
+            }
+        }
+
+        private static string _LibraryCompilation;
+        /// <summary>Library compilation</summary>
+        public static string LibraryCompilation
+        {
+            get
+            {
+                if (_LibraryCompilation == null)
+                {
+                    _LibraryCompilation = GetCompilation(Assembly.GetExecutingAssembly());
+                }
+                return _LibraryCompilation;
+            }
+            set
+            {
+                _LibraryCompilation = value;
+            }
+        }
+
+        #endregion
     }
 }

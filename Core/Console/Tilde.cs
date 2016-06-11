@@ -40,8 +40,7 @@ namespace Energy.Console
             {
                 if (message == null) return null;
                 TextList list = new TextList();
-                Regex r = new Regex(@"~\d+~|~[\w\d]+~|~+|[^~]+");
-                Match m = r.Match(message);
+                Match m = Regex.Match(message, @"~\d+~|~[\w\d]+~|~+|[^~]+");
                 System.ConsoleColor current = System.ConsoleColor.Black;
                 while (m.Success)
                 {
@@ -87,6 +86,7 @@ namespace Energy.Console
                             case "7":
                             case "gray":
                             case "s":
+                            case "ls":
                                 current = System.ConsoleColor.Gray;
                                 break;
                             case "8":
@@ -97,31 +97,37 @@ namespace Energy.Console
                             case "9":
                             case "blue":
                             case "b":
+                            case "lb":
                                 current = System.ConsoleColor.Blue;
                                 break;
                             case "10":
                             case "green":
                             case "g":
+                            case "lg":
                                 current = System.ConsoleColor.Green;
                                 break;
                             case "11":
                             case "cyan":
                             case "c":
+                            case "lc":
                                 current = System.ConsoleColor.Cyan;
                                 break;
                             case "12":
                             case "red":
                             case "r":
+                            case "lr":
                                 current = System.ConsoleColor.Red;
                                 break;
                             case "13":
                             case "magenta":
                             case "m":
+                            case "lm":
                                 current = System.ConsoleColor.Magenta;
                                 break;
                             case "14":
                             case "yellow":
                             case "y":
+                            case "ly":
                                 current = System.ConsoleColor.Yellow;
                                 break;
                             case "15":
@@ -150,8 +156,8 @@ namespace Energy.Console
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="value">Default value</param>
-        /// <returns>Value entered or default if skipped. Default is an empty string.</returns>
-        public static string Ask(string question, string value = "")
+        /// <returns>Value entered or default if skipped</returns>
+        public static string Ask(string question, string value)
         {
             Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
             int left = System.Console.CursorLeft;
@@ -175,7 +181,25 @@ namespace Energy.Console
             return answer;
         }
 
-        public static string Ask(string question, CharacterCasing casing, string value = "")
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <returns>Value entered or default if skipped, empty string by default</returns>
+        public static string Ask(string question)
+        {
+            return Ask(question, "");
+        }
+
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Return input value lower or upper case.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <param name="casing">Character casing</param>
+        /// <param name="value">Default value</param>
+        /// <returns>Value entered or default if skipped</returns>
+        public static string Ask(string question, CharacterCasing casing, string value)
         {
             string answer = Ask(question);
             if (String.IsNullOrEmpty(answer))
@@ -191,6 +215,18 @@ namespace Energy.Console
             }
         }
 
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Return input value lower or upper case.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <param name="casing">Character casing</param>
+        /// <returns>Value entered or default if skipped, empty string by default</returns>
+        public static string Ask(string question, CharacterCasing casing)
+        {
+            return Ask(question, casing, "");
+        }
+
         public static object Ask(string question, object value)
         {
             string text = Energy.Cast.As.String(value);
@@ -203,10 +239,10 @@ namespace Energy.Console
         #endregion
 
         /// <summary>
-        /// Break new line and set default text color
+        /// Break with new lines and set default text color
         /// </summary>
         /// <param name="count"></param>
-        public static void Break(int count = 1)
+        public static void Break(int count)
         {
             lock (one)
             {
@@ -216,6 +252,14 @@ namespace Energy.Console
                     System.Console.WriteLine();
                 }
             }
+        }
+
+        /// <summary>
+        /// Break one line and set default text color
+        /// </summary>
+        public static void Break()
+        {
+            Break(1);
         }
 
         private static ConsoleColor? defaultForeground;
@@ -303,7 +347,7 @@ namespace Energy.Console
         /// </summary>
         /// <param name="exception"></param>
         /// <param name="trace">Write also stack trace</param>
-        public static void Exception(Exception exception, bool trace = false)
+        public static void Exception(Exception exception, bool trace)
         {
             string message = (exception.Message ?? "").Trim();
             if (!String.IsNullOrEmpty(message))
@@ -333,6 +377,15 @@ namespace Energy.Console
                 }
             }
             Tilde.Write(message);
+        }
+
+        /// <summary>
+        /// Write out exception message
+        /// </summary>
+        /// <param name="exception"></param>
+        public static void Exception(Exception exception)
+        {
+            Exception(exception, false);
         }
     }
 }
