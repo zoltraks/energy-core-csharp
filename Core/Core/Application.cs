@@ -27,7 +27,7 @@ namespace Energy.Core
         /// <summary>
         /// Application syntax
         /// </summary>
-        public Syntax Syntax { get; set; }
+        public Variable Syntax { get; set; }
 
         private volatile Log _Log;
         

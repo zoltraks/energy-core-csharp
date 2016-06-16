@@ -91,7 +91,7 @@
     <Compile Include="Base\Clock.cs" />
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Core\Plain.cs" />
-    <Compile Include="Core\Syntax.cs" />
+    <Compile Include="Core\Variable.cs" />
     <Compile Include="Interface\ISaveToFile.cs" />
     <Compile Include="Interface\ILoadFromFile.cs" />
     <Compile Include="Core\Manager.cs" />

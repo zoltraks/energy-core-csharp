@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Core
 {
-    public class Syntax
+    public class Variable
     {
     }
 }

@@ -9,7 +9,7 @@ namespace Energy.Base
         /// <summary>
         /// Protocol
         /// </summary>
-        public string Scheme;
+        public string Protocol;
         /// <summary>
         /// Server name
         /// </summary>
@@ -51,8 +51,8 @@ namespace Energy.Base
             {
                 result += "?" + Query;
             }
-            if (!String.IsNullOrEmpty(Scheme))
-                result = Scheme + "://" + result;
+            if (!String.IsNullOrEmpty(Protocol))
+                result = Protocol + "://" + result;
             return result;
         }
 
@@ -69,7 +69,7 @@ namespace Energy.Base
             if (!m.Success)
                 return null;
             Energy.Base.Url result = new Energy.Base.Url();
-            result.Scheme = m.Groups["protocol"].Value;
+            result.Protocol = m.Groups["protocol"].Value;
             result.Host = m.Groups["host"].Value;
             result.Port = Energy.Base.Cast.AsInteger(m.Groups["port"].Value);
             result.Path = m.Groups["path"].Value;

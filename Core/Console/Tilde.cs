@@ -10,6 +10,8 @@ namespace Energy.Console
     /// </summary>
     public class Tilde
     {
+        #region Class
+
         /// <summary>
         /// List of texts with different coloring
         /// </summary>
@@ -30,124 +32,157 @@ namespace Energy.Console
                 /// </summary>
                 public string Text;
             }
-
-            /// <summary>
-            /// Explode text to a list separated by color change
-            /// </summary>
-            /// <param name="message">Text</param>
-            /// <returns>List of texts</returns>
-            public static TextList Explode(string message)
-            {
-                if (message == null) return null;
-                TextList list = new TextList();
-                Match m = Regex.Match(message, @"~\d+~|~[\w\d]+~|~+|[^~]+");
-                System.ConsoleColor current = System.ConsoleColor.Black;
-                while (m.Success)
-                {
-                    if (m.Value.StartsWith("~") && m.Value.EndsWith("~") && m.Value.Length > 2 && m.Value[1] != '~')
-                    {
-                        switch (m.Value.Substring(1, m.Value.Length - 2).ToLower())
-                        {
-                            default:
-                            case "0":
-                            case "default":
-                                current = System.ConsoleColor.Black;
-                                break;
-                            case "1":
-                            case "darkblue":
-                            case "db":
-                                current = System.ConsoleColor.DarkBlue;
-                                break;
-                            case "2":
-                            case "darkgreen":
-                            case "dg":
-                                current = System.ConsoleColor.DarkGreen;
-                                break;
-                            case "3":
-                            case "darkcyan":
-                            case "dc":
-                                current = System.ConsoleColor.DarkCyan;
-                                break;
-                            case "4":
-                            case "darkred":
-                            case "dr":
-                                current = System.ConsoleColor.DarkRed;
-                                break;
-                            case "5":
-                            case "darkmagenta":
-                            case "dm":
-                                current = System.ConsoleColor.DarkMagenta;
-                                break;
-                            case "6":
-                            case "darkyellow":
-                            case "dy":
-                                current = System.ConsoleColor.DarkYellow;
-                                break;
-                            case "7":
-                            case "gray":
-                            case "s":
-                            case "ls":
-                                current = System.ConsoleColor.Gray;
-                                break;
-                            case "8":
-                            case "darkgray":
-                            case "ds":
-                                current = System.ConsoleColor.DarkGray;
-                                break;
-                            case "9":
-                            case "blue":
-                            case "b":
-                            case "lb":
-                                current = System.ConsoleColor.Blue;
-                                break;
-                            case "10":
-                            case "green":
-                            case "g":
-                            case "lg":
-                                current = System.ConsoleColor.Green;
-                                break;
-                            case "11":
-                            case "cyan":
-                            case "c":
-                            case "lc":
-                                current = System.ConsoleColor.Cyan;
-                                break;
-                            case "12":
-                            case "red":
-                            case "r":
-                            case "lr":
-                                current = System.ConsoleColor.Red;
-                                break;
-                            case "13":
-                            case "magenta":
-                            case "m":
-                            case "lm":
-                                current = System.ConsoleColor.Magenta;
-                                break;
-                            case "14":
-                            case "yellow":
-                            case "y":
-                            case "ly":
-                                current = System.ConsoleColor.Yellow;
-                                break;
-                            case "15":
-                            case "white":
-                            case "w":
-                                current = System.ConsoleColor.White;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        list.Add(new Item() { Color = current, Text = m.Value });
-                    }
-                    m = m.NextMatch();
-                }
-                return list;
-            }
         }
 
+        #endregion
+
+        #region Global
+
         private static readonly object one = new object();
+
+        private static ConsoleColor? defaultForeground;
+
+        /// <summary>
+        /// Cheat sheet for all colors defined by default
+        /// </summary>
+        public readonly static string ExampleColorPalleteTildeString = ""
+            + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
+            + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
+            + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
+            + "~darkred~ ~ darkred ~  ~ 4 ~    "
+            + "~darkmagenta~ ~ darkmagenta ~  ~ 5 ~    "
+            + "~darkyellow~ ~ darkyellow ~  ~ 6 ~    "
+            + "~gray~ ~ gray ~  ~ 7 ~    "
+            + "~darkgray~ ~ darkgray ~  ~ 8 ~    "
+            + "~blue~ ~ blue ~  ~ 9 ~    "
+            + "~green~ ~ green ~  ~ 10 ~    "
+            + "~cyan~ ~ cyan ~  ~ 11 ~    "
+            + "~red~ ~ red ~  ~ 12 ~    "
+            + "~magenta~ ~ magenta ~  ~ 13 ~    "
+            + "~yellow~ ~ yellow ~  ~ 14 ~    "
+            + "~white~ ~ white ~  ~ 15 ~    "
+            ;
+
+        #endregion
+
+        #region Explode
+
+        /// <summary>
+        /// Explode text to a list separated by color change
+        /// </summary>
+        /// <param name="message">Text</param>
+        /// <returns>List of texts</returns>
+        public static TextList Explode(string message)
+        {
+            if (message == null) return null;
+            TextList list = new TextList();
+            Match m = Regex.Match(message, @"~\d+~|~[\w\d]+~|~+|[^~]+");
+            System.ConsoleColor current = System.ConsoleColor.Black;
+            while (m.Success)
+            {
+                if (m.Value.StartsWith("~") && m.Value.EndsWith("~") && m.Value.Length > 2 && m.Value[1] != '~')
+                {
+                    switch (m.Value.Substring(1, m.Value.Length - 2).ToLower())
+                    {
+                        default:
+                        case "0":
+                        case "default":
+                            current = System.ConsoleColor.Black;
+                            break;
+                        case "1":
+                        case "darkblue":
+                        case "db":
+                            current = System.ConsoleColor.DarkBlue;
+                            break;
+                        case "2":
+                        case "darkgreen":
+                        case "dg":
+                            current = System.ConsoleColor.DarkGreen;
+                            break;
+                        case "3":
+                        case "darkcyan":
+                        case "dc":
+                            current = System.ConsoleColor.DarkCyan;
+                            break;
+                        case "4":
+                        case "darkred":
+                        case "dr":
+                            current = System.ConsoleColor.DarkRed;
+                            break;
+                        case "5":
+                        case "darkmagenta":
+                        case "dm":
+                            current = System.ConsoleColor.DarkMagenta;
+                            break;
+                        case "6":
+                        case "darkyellow":
+                        case "dy":
+                            current = System.ConsoleColor.DarkYellow;
+                            break;
+                        case "7":
+                        case "gray":
+                        case "s":
+                        case "ls":
+                            current = System.ConsoleColor.Gray;
+                            break;
+                        case "8":
+                        case "darkgray":
+                        case "ds":
+                            current = System.ConsoleColor.DarkGray;
+                            break;
+                        case "9":
+                        case "blue":
+                        case "b":
+                        case "lb":
+                            current = System.ConsoleColor.Blue;
+                            break;
+                        case "10":
+                        case "green":
+                        case "g":
+                        case "lg":
+                            current = System.ConsoleColor.Green;
+                            break;
+                        case "11":
+                        case "cyan":
+                        case "c":
+                        case "lc":
+                            current = System.ConsoleColor.Cyan;
+                            break;
+                        case "12":
+                        case "red":
+                        case "r":
+                        case "lr":
+                            current = System.ConsoleColor.Red;
+                            break;
+                        case "13":
+                        case "magenta":
+                        case "m":
+                        case "lm":
+                            current = System.ConsoleColor.Magenta;
+                            break;
+                        case "14":
+                        case "yellow":
+                        case "y":
+                        case "ly":
+                            current = System.ConsoleColor.Yellow;
+                            break;
+                        case "15":
+                        case "white":
+                        case "w":
+                            current = System.ConsoleColor.White;
+                            break;
+                    }
+                }
+                else
+                {
+                    list.Add(new TextList.Item() { Color = current, Text = m.Value });
+                }
+                m = m.NextMatch();
+            }
+            return list;
+        }
+
+        #endregion
 
         #region Ask
 
@@ -238,6 +273,8 @@ namespace Energy.Console
 
         #endregion
 
+        #region Break
+
         /// <summary>
         /// Break with new lines and set default text color
         /// </summary>
@@ -262,7 +299,9 @@ namespace Energy.Console
             Break(1);
         }
 
-        private static ConsoleColor? defaultForeground;
+        #endregion
+
+        #region Write
 
         /// <summary>
         /// Write text using color settings ~15~, ~white~, ~w~, ~14~, ~yellow~, ~y~, 
@@ -292,7 +331,7 @@ namespace Energy.Console
                 {
                     defaultForeground = System.Console.ForegroundColor;
                 }
-                TextList list = TextList.Explode(value);
+                TextList list = Explode(value);
                 for (int i = 0; i < list.Count; i++)
                 {
                     System.Console.ForegroundColor = list[i].Color != ConsoleColor.Black ? list[i].Color : (ConsoleColor)defaultForeground;
@@ -321,26 +360,9 @@ namespace Energy.Console
             Write(value + Environment.NewLine);
         }
 
-        /// <summary>
-        /// Cheat sheet for all colors defined by default
-        /// </summary>
-        public readonly static string ExampleColorPalleteTildeString = ""
-            + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
-            + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
-            + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
-            + "~darkred~ ~ darkred ~  ~ 4 ~    "
-            + "~darkmagenta~ ~ darkmagenta ~  ~ 5 ~    "
-            + "~darkyellow~ ~ darkyellow ~  ~ 6 ~    "
-            + "~gray~ ~ gray ~  ~ 7 ~    "
-            + "~darkgray~ ~ darkgray ~  ~ 8 ~    "
-            + "~blue~ ~ blue ~  ~ 9 ~    "
-            + "~green~ ~ green ~  ~ 10 ~    "
-            + "~cyan~ ~ cyan ~  ~ 11 ~    "
-            + "~red~ ~ red ~  ~ 12 ~    "
-            + "~magenta~ ~ magenta ~  ~ 13 ~    "
-            + "~yellow~ ~ yellow ~  ~ 14 ~    "
-            + "~white~ ~ white ~  ~ 15 ~    "
-            ;
+        #endregion
+
+        #region Exception
 
         /// <summary>
         /// Write out exception message
@@ -387,5 +409,7 @@ namespace Energy.Console
         {
             Exception(exception, false);
         }
+
+        #endregion
     }
 }
