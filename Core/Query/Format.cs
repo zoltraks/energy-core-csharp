@@ -12,6 +12,10 @@ namespace Energy.Query
     /// </summary>
     public class Format
     {
+        public Energy.Base.Format.Quote LiteralQuote; // 'column'
+
+        public Energy.Base.Format.Quote ObjectQuote; // "value"
+
         /// <summary>
         /// Format as TEXT.
         /// </summary>
@@ -31,9 +35,6 @@ namespace Energy.Query
         {
             return ObjectQuote.Escape(value);
         }
-
-        public Energy.Base.Format.Quote LiteralQuote; // 'column'
-        public Energy.Base.Format.Quote ObjectQuote; // "value"
 
         public static implicit operator Format(Energy.Enumeration.SqlDialect dialect)
         {

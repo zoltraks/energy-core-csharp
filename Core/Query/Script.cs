@@ -86,11 +86,11 @@ namespace Energy.Query
                     case Enumeration.SqlDialect.None:
                         throw new Exception();
                     case Enumeration.SqlDialect.SqlServer:
-                        return Energy.Query.Dialect.SqlServer.Create.Table(table, configuration);
+                        return (new Energy.Query.Dialect.SqlServer()).CreateTable(table);
                     case Enumeration.SqlDialect.MySQL:
-                        return Energy.Query.Dialect.MySQL.Create.Table(table, configuration);
+                        return (new Energy.Query.Dialect.MySQL()).CreateTable(table);
                     case Enumeration.SqlDialect.SQLite:
-                        return Energy.Query.Dialect.SQLite.Create.Table(table, configuration);
+                        return (new Energy.Query.Dialect.SQLite()).CreateTable(table);
                 }
             }
 

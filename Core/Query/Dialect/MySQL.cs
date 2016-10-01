@@ -1,32 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Energy.Base;
 
 namespace Energy.Query.Dialect
 {
     /// <summary>
     /// MySQL
     /// </summary>
-    public class MySQL
+    public class MySQL: Script, Energy.Interface.IQueryDialect
     {
-        /// <summary>
-        /// Create
-        /// </summary>
-        public class Create
+        public MySQL()
         {
-            /// <summary>
-            /// Create table
-            /// </summary>
-            /// <param name="table"></param>
-            /// <param name="configuration"></param>
-            /// <returns></returns>
-            public static string Table(Energy.Base.Structure.Table table, Energy.Query.Configuration configuration)
-            {
-                if (table == null || table.Columns.Count == 0) return "";
-                if (configuration == null) configuration = Energy.Query.Configuration.Default;
+            Format.LiteralQuote = "'";
+            Format.ObjectQuote = "`";
+        }
 
-                return "";
-            }
+        public string CreateColumn(Structure.Column column)
+        {
+            return "";
+        }
+
+        public string CreateIndex(Structure.Index index)
+        {
+            return "";
+        }
+
+        public string CreateTable(Structure.Table table)
+        {
+            return "";
+        }
+
+        public string DeleteColumn(Structure.Column column)
+        {
+            return "";
+        }
+
+        public string DeleteIndex(Structure.Index index)
+        {
+            return "";
+        }
+
+        public string DeleteTable(Structure.Table table)
+        {
+            return "";
+        }
+
+        public string Select(Select select)
+        {
+            throw new NotImplementedException();
         }
     }
 }
