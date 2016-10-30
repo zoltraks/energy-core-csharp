@@ -89,7 +89,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove leading and trailing whitespace
+        /// Remove leading and trailing whitespace.
+        /// Includes space, tabulation (horizontal and vertical), new line and null characters.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Trimmed string</returns>
@@ -108,7 +109,7 @@ namespace Energy.Base
         /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
         public static string JoinWith(string with, params string[] parts)
         {
-            List<string> list = new List<string>();
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             for (int i = 0; i < parts.Length; i++)
             {
                 if (String.IsNullOrEmpty(parts[i]))

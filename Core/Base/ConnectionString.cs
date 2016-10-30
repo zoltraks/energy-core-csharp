@@ -79,7 +79,7 @@ namespace Energy.Base
         /// <returns>Connection string</returns>
         public override string ToString()
         {
-            List<string> list = new List<string>();
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             foreach (KeyValuePair<string, string> item in this)
             {
                 list.Add(Escape(item.Key) + "=" + Quote(item.Value));

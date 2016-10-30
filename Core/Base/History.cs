@@ -16,7 +16,7 @@ namespace Energy.Base
         /// <param name="element">String element</param>
         /// <param name="insensitive">Ignore case</param>
         /// <returns>String list</returns>
-        public static List<string> Insert(List<string> list, string element, bool insensitive)
+        public static List<string> Insert(System.Collections.Generic.List<string> list, string element, bool insensitive)
         {
             if (list == null)
                 return null;
@@ -51,7 +51,7 @@ namespace Energy.Base
         /// <param name="list">String list</param>
         /// <param name="element">String element</param>
         /// <returns>String list</returns>
-        public static List<string> Insert(List<string> list, string element)
+        public static List<string> Insert(System.Collections.Generic.List<string> list, string element)
         {
             return Insert(list, element, true);
         }

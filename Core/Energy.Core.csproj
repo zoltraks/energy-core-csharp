@@ -47,18 +47,22 @@
     <Compile Include="Base\Class.cs" />
     <Compile Include="Base\Color.cs" />
     <Compile Include="Base\ConnectionString.cs" />
+    <Compile Include="Base\Csv.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Nibble.cs" />
-    <Compile Include="Base\Path.cs" />
+    <Compile Include="Base\Directory.cs" />
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
+    <Compile Include="Base\Plain.cs" />
     <Compile Include="Base\Queue.cs" />
+    <Compile Include="Base\Range.cs" />
     <Compile Include="Base\Static.cs" />
+    <Compile Include="Base\Tree.cs" />
     <Compile Include="Source\Interface\IConnection.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
@@ -102,7 +106,7 @@
     <Compile Include="Source\Connection.cs" />
     <Compile Include="Source\Factory.cs" />
     <Compile Include="Source\Schema.cs" />
-    <Compile Include="Core\Xml.cs" />
+    <Compile Include="Base\Xml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Harmony\" />

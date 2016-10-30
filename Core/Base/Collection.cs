@@ -11,7 +11,7 @@ namespace Energy.Base
     {
         #region Array
 
-        public class Array<T> : List<T>
+        public class Array<T> : System.Collections.Generic.List<T>
         {
             public T First
             {

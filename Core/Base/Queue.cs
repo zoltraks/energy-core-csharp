@@ -6,7 +6,7 @@ namespace Energy.Base
 {
     public class Queue<T>: IDisposable
     {
-        private List<T> _List = new List<T>();
+        private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
 
         public Queue()
         {            
@@ -102,7 +102,7 @@ namespace Energy.Base
                 int max = _List.Count;
                 if (count == 0 || count > max)
                     count = max;
-                List<T> list = new List<T>();
+                System.Collections.Generic.List<T> list = new System.Collections.Generic.List<T>();
                 while (count-- > 0)
                 {
                     list.Add(_List[0]);

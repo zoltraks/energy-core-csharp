@@ -366,7 +366,7 @@ namespace Energy.Base
                 return null;
             }
 
-            List<string> list = new List<string>();
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
 
             for (int i = 0; i < files.Length; i++)
             {

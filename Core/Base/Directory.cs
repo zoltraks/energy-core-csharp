@@ -8,14 +8,14 @@ namespace Energy.Base
     /// <summary>
     /// File directory class for I/O operations
     /// </summary>
-    public class Path
+    public class Directory
     {
         /// <summary>
         /// Make directory
         /// </summary>
         /// <param name="path"></param>
         /// <returns>True if directory exists or was created sucesfully</returns>
-        public static bool MakeDirectory(string path)
+        public static bool Make(string path)
         {
             if (String.IsNullOrEmpty(path))
             {
@@ -57,7 +57,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert slash separator to System.IO.Path.DirectorySeparatorChar
+        /// Convert slash separator to System.IO.Path.DirectorySeparatorChar including both versions.
         /// </summary>
         /// <param name="path">string</param>
         public static string SetQualifiedDirectorySeparator(string path)
@@ -98,22 +98,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include leading root directory to the path if not specified
-        /// </summary>
-        /// <param name="path">string</param>
-        /// <param name="root">string</param>
-        /// <returns>string</returns>
-        public static string IncludeLeadingRoot(string path, string root)
-        {
-            string check = path.Trim().Replace("\\", "/");
-            if (check.StartsWith("/") || (new Regex("^[a-z]:/", RegexOptions.IgnoreCase)).Match(check).Success)
-            {
-                return path;
-            }
-            return IncludeTrailingPathSeparator(root) + path;
-        }
-
-        /// <summary>
         /// Exclude traling path directory separator
         /// </summary>
         /// <param name="path">string</param>
@@ -132,6 +116,22 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Include leading root directory to the path if not specified
+        /// </summary>
+        /// <param name="path">string</param>
+        /// <param name="root">string</param>
+        /// <returns>string</returns>
+        public static string IncludeLeadingRoot(string path, string root)
+        {
+            string check = path.Trim().Replace("\\", "/");
+            if (check.StartsWith("/") || (new Regex("^[a-z]:/", RegexOptions.IgnoreCase)).Match(check).Success)
+            {
+                return path;
+            }
+            return IncludeTrailingPathSeparator(root) + path;
+        }
+
+        /// <summary>
         /// Get directory path for a file without trailing directory separator.
         /// </summary>
         /// <param name="file"></param>
@@ -144,6 +144,19 @@ namespace Energy.Base
                 return file.Substring(0, file.Length - 1);
             }
             return System.IO.Path.GetDirectoryName(file);
+        }               
+
+        public Tree<string> Tree(string root, int depth)
+        {
+            if (!System.IO.Directory.Exists(root))
+            {
+                return null;
+            }
+            Tree<string> tree = new Base.Tree<string>();
+            var x = tree.Children.Add("x");
+            x.Children.Add("y");
+           
+            return null;
         }
     }
 }

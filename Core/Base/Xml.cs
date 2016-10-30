@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
 
-namespace Energy.Core
+namespace Energy.Base
 {
     /// <summary>
     /// XML

@@ -88,7 +88,7 @@ namespace Energy.Base
             /// <returns></returns>
             public string ToDMS()
             {
-                List<string> list = new List<string>();
+                System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
                 if (Latitude > 0)
                     list.Add(Energy.Base.Cast.DoubleToDMS(Latitude) + " N");
                 if (Latitude < 0)

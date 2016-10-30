@@ -14,7 +14,7 @@ namespace Energy.Base
         /// <returns>Array of string</returns>
         public static string[] GetFieldsAndProperties(Type type)
         {
-            List<string> field = new List<string>();
+            System.Collections.Generic.List<string> field = new System.Collections.Generic.List<string>();
             // Class properties //
             foreach (PropertyInfo _ in type.GetProperties())
             {

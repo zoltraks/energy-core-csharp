@@ -358,7 +358,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string SingleLine(string text)
         {
-            return String.Join(" ", (new List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))
+            return string.Join(" ", (new System.Collections.Generic.List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))
                 .ConvertAll<string>(delegate (string s) { return s.Trim(); }).ToArray());
         }
 

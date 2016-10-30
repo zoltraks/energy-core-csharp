@@ -177,7 +177,7 @@ namespace Energy.Source
             {
                 foreach (string key in this.Keys)
                 {
-                    Energy.Core.Xml.Write(writer, key, this[key]);
+                    Energy.Base.Xml.Write(writer, key, this[key]);
                 }
             }
 
