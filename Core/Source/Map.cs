@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Energy.Core
+namespace Energy.Source
 {
     /// <summary>
-    /// Plain text functions
+    /// Database mapping
     /// </summary>
-    public class Plain
+    public class Map
     {
+
     }
 }

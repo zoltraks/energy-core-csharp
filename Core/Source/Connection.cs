@@ -5,10 +5,11 @@ using System.Data;
 using System.Data.Common;
 using System.Xml.Serialization;
 using System.Threading;
+using Energy.Source.Interface;
 
 namespace Energy.Source
 {
-    public class Connection : IDisposable
+    public class Connection : IDisposable, Interface.IConnection
     {
         #region Constructor
 
@@ -23,27 +24,31 @@ namespace Energy.Source
         /// </summary>
         public Energy.Enumeration.SqlDialect Dialect { get; set; }
 
-        private System.Type vendor;
- 
-        public System.Type Vendor 
+        private System.Type _Vendor;
+
+        /// <summary>
+        /// DbConnection vendor class for SQL connection
+        /// </summary>
+        public System.Type Vendor
         {
             get
             {
-                return vendor;
+                return _Vendor;
             }
             set
             {
-                if (value != vendor)
+                if (value != _Vendor)
                 {
                     Close();                    
-                    vendor = value;
-                    driver = null;
+                    _Vendor = value;
+                    _Driver = null;
                 }
             }
         }
 
         /// <summary>
         /// Connection string used for opening SQL connection.
+        /// Connection should be closed on change.
         /// </summary>
         public Energy.Base.ConnectionString ConnectionString { get; set; }
 
@@ -52,7 +57,8 @@ namespace Energy.Source
         /// </summary>
         public Energy.Core.Log Log { get; set; }
 
-        private DbConnection driver;
+        private DbConnection _Driver;
+
         /// <summary>
         /// SQL connection driver class.
         /// </summary>
@@ -60,32 +66,32 @@ namespace Energy.Source
         {
             get
             {
-                if (driver == null)
+                if (_Driver == null)
                 {
                     lock (this)
                     {
-                        if (driver == null)
+                        if (_Driver == null)
                         {
                             try
                             {
-                                driver = (DbConnection)Activator.CreateInstance(vendor);
+                                _Driver = (DbConnection)Activator.CreateInstance(_Vendor);
                             }
                             catch
                             {
                                 throw;
                             }
-                            driver.ConnectionString = ConnectionString.ToString();
+                            _Driver.ConnectionString = ConnectionString.ToString();
                         }
                     }
                 }
-                return driver;
+                return _Driver;
             }
             set
             {
-                driver = value;
+                _Driver = value;
                 if (value != null)
                 {
-                    vendor = value.GetType();
+                    _Vendor = value.GetType();
                 }
             }
         }
@@ -114,8 +120,8 @@ namespace Energy.Source
         {
             get
             {
-                if (driver == null) return false;
-                if (driver.State == ConnectionState.Broken || driver.State == ConnectionState.Closed) return false;
+                if (_Driver == null) return false;
+                if (_Driver.State == ConnectionState.Broken || _Driver.State == ConnectionState.Closed) return false;
                 return true;
             }
         }
@@ -124,8 +130,8 @@ namespace Energy.Source
         {
             get
             {
-                if (driver == null) return false;
-                if (driver.State == ConnectionState.Connecting || driver.State == ConnectionState.Executing || driver.State == ConnectionState.Fetching) return true;
+                if (_Driver == null) return false;
+                if (_Driver.State == ConnectionState.Connecting || _Driver.State == ConnectionState.Executing || _Driver.State == ConnectionState.Fetching) return true;
                 return false;
             }
         }
@@ -176,10 +182,10 @@ namespace Energy.Source
         /// </summary>
         private void Close()
         {
-            if (driver == null) return;
+            if (_Driver == null) return;
             try
             {
-                driver.Close();
+                _Driver.Close();
             }
             catch (DbException x)
             {
@@ -189,7 +195,7 @@ namespace Energy.Source
                 }
                 Log.Add(x);
             }
-            driver = null;
+            _Driver = null;
         }
 
         public virtual DataSet Read(string query)
@@ -271,6 +277,24 @@ namespace Energy.Source
             }
         }
 
-        public Query.Format Format { get; set; }
+        void IConnection.Close()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Kill()
+        {
+            throw new NotImplementedException();
+        }
+
+        int IConnection.Execute(string query)
+        {
+            throw new NotImplementedException();
+        }
+
+        object IConnection.Fetch(string query)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

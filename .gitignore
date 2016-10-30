@@ -225,3 +225,6 @@ Documentation/html/
 /Widget
 /WindowsFormsApplication1
 /WindowsApp/
+
+Test/
+Test.*
