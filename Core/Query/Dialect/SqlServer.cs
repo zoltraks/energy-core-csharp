@@ -11,7 +11,7 @@ namespace Energy.Query.Dialect
     {
         public static class Create
         {
-            public static string Table(Energy.Base.Structure.Table table, Energy.Query.Configuration configuration)
+            public static string Table(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
             {
                 if (table == null || table.Columns.Count == 0) return "";
                 if (configuration == null) configuration = Energy.Query.Configuration.Default;
@@ -28,18 +28,18 @@ namespace Energy.Query.Dialect
 
                 if (!String.IsNullOrEmpty(table.Identity))
                 {
-                    Energy.Base.Structure.Column column = table.Columns.Get(table.Identity) ?? new Energy.Base.Structure.Column(table.Identity);
+                    Energy.Source.Structure.Column column = table.Columns.Get(table.Identity) ?? new Energy.Source.Structure.Column(table.Identity);
                     string type = column.Type;
                     if (type == null || type.Length == 0) type = configuration.IdentityType;
                     script.Add("\t[" + column.Name + "] " + type + " IDENTITY(1,1) NOT NULL ,");
                     identity = table.Identity;
                 }
-                else if (table.Columns.Get(identity) == default(Energy.Base.Structure.Column))
+                else if (table.Columns.Get(identity) == default(Energy.Source.Structure.Column))
                 {
                     script.Add("\t[" + identity + "] " + configuration.IdentityType + " IDENTITY(1,1) NOT NULL ,");
                 }
 
-                foreach (Energy.Base.Structure.Column column in table.Columns)
+                foreach (Energy.Source.Structure.Column column in table.Columns)
                 {
                     if (!column.Ignore && !String.IsNullOrEmpty(column.Name) && column.Name != table.Identity)
                     {

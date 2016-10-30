@@ -8,7 +8,7 @@ namespace Energy.Query.Dialect
     {
         public class Create
         {
-            public static string Table(Energy.Base.Structure.Table table, Energy.Query.Configuration configuration)
+            public static string Table(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
             {
                 return "";
             }

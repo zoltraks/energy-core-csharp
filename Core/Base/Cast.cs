@@ -349,13 +349,13 @@ namespace Energy.Base
 
         #endregion
 
-            #region Text
+        #region Text
 
-            /// <summary>
-            /// Join multiline text into single string
-            /// </summary>
-            /// <param name="text"></param>
-            /// <returns></returns>
+        /// <summary>
+        /// Join multiline text into single string
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string SingleLine(string text)
         {
             return String.Join(" ", (new List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))

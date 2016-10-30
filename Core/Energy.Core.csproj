@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Application.ico</ApplicationIcon>
@@ -58,7 +59,7 @@
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Static.cs" />
-    <Compile Include="Base\Structure.cs" />
+    <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Bcd.cs" />
@@ -101,7 +102,7 @@
     <Compile Include="Query\Script.cs" />
     <Compile Include="Source\Connection.cs" />
     <Compile Include="Source\Factory.cs" />
-    <Compile Include="Source\Structure.cs" />
+    <Compile Include="Source\Schema.cs" />
     <Compile Include="Core\Xml.cs" />
   </ItemGroup>
   <ItemGroup>
