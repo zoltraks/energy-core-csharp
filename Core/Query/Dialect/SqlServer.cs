@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Energy.Source;
 
 namespace Energy.Query.Dialect
 {
@@ -60,6 +61,11 @@ namespace Energy.Query.Dialect
 
                 return String.Join(Environment.NewLine, script.ToArray());
             }
+        }
+
+        internal string CreateTable(Structure.Table table)
+        {
+            throw new NotImplementedException();
         }
     }
 }

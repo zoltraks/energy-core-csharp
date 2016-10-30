@@ -59,6 +59,7 @@
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Static.cs" />
+    <Compile Include="Source\Interface\IConnection.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Url.cs" />
@@ -85,13 +86,11 @@
     <Compile Include="Query\Configuration.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Core\Application.cs" />
-    <Compile Include="Core\Expression.cs" />
     <Compile Include="Core\Information.cs" />
     <Compile Include="Core\Locale.cs" />
     <Compile Include="Core\Log.cs" />
     <Compile Include="Base\Clock.cs" />
     <Compile Include="Base\Cast.cs" />
-    <Compile Include="Core\Plain.cs" />
     <Compile Include="Core\Variable.cs" />
     <Compile Include="Interface\ISaveToFile.cs" />
     <Compile Include="Interface\ILoadFromFile.cs" />

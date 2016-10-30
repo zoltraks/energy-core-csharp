@@ -9,7 +9,7 @@ using Energy.Source.Interface;
 
 namespace Energy.Source
 {
-    public class Connection : IDisposable, Interface.IConnection
+    public class Connection : IDisposable, Energy.Source.Interface.IConnection
     {
         #region Constructor
 
@@ -277,17 +277,17 @@ namespace Energy.Source
             }
         }
 
-        void IConnection.Close()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Kill()
         {
             throw new NotImplementedException();
         }
 
         int IConnection.Execute(string query)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IConnection.Close()
         {
             throw new NotImplementedException();
         }
