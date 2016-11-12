@@ -5,7 +5,7 @@ using System.Text;
 namespace Energy.Base
 {
     /// <summary>
-    /// Separated values text
+    /// CSV
     /// </summary>
     public class Csv
     {

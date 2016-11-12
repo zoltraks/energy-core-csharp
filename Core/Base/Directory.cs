@@ -146,7 +146,7 @@ namespace Energy.Base
             return System.IO.Path.GetDirectoryName(file);
         }               
 
-        public Tree<string> Tree(string root, int depth)
+        public static Tree<string> Tree(string root, int depth)
         {
             if (!System.IO.Directory.Exists(root))
             {
@@ -156,7 +156,42 @@ namespace Energy.Base
             var x = tree.Children.Add("x");
             x.Children.Add("y");
            
-            return null;
+            return null;           
+        }
+
+        public static IEnumerable<string> GetAllFiles(string path, string search)
+        {
+            Stack<string> pending = new Stack<string>();
+            pending.Push(path);
+            while (pending.Count != 0)
+            {
+                path = pending.Pop();
+                string[] list = null;
+                try
+                {
+                    list = System.IO.Directory.GetFiles(path, search);
+                }
+                catch { }
+                if (list != null && list.Length != 0)
+                {
+                    for (int i = 0; i < list.Length; i++)
+                    {
+                        yield return list[i];
+                    }
+                }
+                try
+                {
+                    list = System.IO.Directory.GetDirectories(path);
+                }
+                catch { }
+                if (list != null && list.Length != 0)
+                {
+                    for (int i = 0; i < list.Length; i++)
+                    {
+                        pending.Push(list[i]);
+                    }
+                }
+            }
         }
     }
 }

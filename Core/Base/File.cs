@@ -47,31 +47,28 @@ namespace Energy.Base
             string simple = System.IO.Path.GetFileNameWithoutExtension(file);
             string iterator, unique;
 
-            lock (Static.One)
+            int n = 0;
+            do
             {
-                int n = 0;
-                do
-                {
-                    iterator = n < 1 ? "" : n.ToString();
-                    unique = System.IO.Path.Combine(path, simple + iterator + extension);
-                    n++;
-                }
-                while (System.IO.File.Exists(unique));
-
-                if (reserve)
-                {
-                    try
-                    {
-                        System.IO.File.Create(unique).Close();
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                }
-
-                return unique;
+                iterator = n < 1 ? "" : n.ToString();
+                unique = System.IO.Path.Combine(path, simple + iterator + extension);
+                n++;
             }
+            while (System.IO.File.Exists(unique));
+
+            if (reserve)
+            {
+                try
+                {
+                    System.IO.File.Create(unique).Close();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            return unique;
         }
 
         /// <summary>
@@ -225,53 +222,50 @@ namespace Energy.Base
             int iterator = randomize ? 1 + random.Next(9999) : 0;
             int life = 100;
 
-            lock (Static.One)
+            while (true)
             {
-                while (true)
+                string append = randomize ? String.Format("_{0:0000}", iterator) : (iterator > 0 ? "_" + iterator : null);
+
+                string unique = String.Format("{0}{1}{2:yyMMdd_HHmmss}{3}{4}", path, prefix, DateTime.Now, append, suffix);
+
+                if (System.IO.File.Exists(unique) || System.IO.File.Exists(unique))
                 {
-                    string append = randomize ? String.Format("_{0:0000}", iterator) : (iterator > 0 ? "_" + iterator : null);
-
-                    string unique = String.Format("{0}{1}{2:yyMMdd_HHmmss}{3}{4}", path, prefix, DateTime.Now, append, suffix);
-
-                    if (System.IO.File.Exists(unique) || System.IO.File.Exists(unique))
+                    if (randomize)
                     {
-                        if (randomize)
-                        {
-                            iterator = 1 + random.Next(9999);
-                        }
-                        else
-                        {
-                            iterator++;
-                        }
+                        iterator = 1 + random.Next(9999);
                     }
                     else
                     {
-                        if (reserve)
+                        iterator++;
+                    }
+                }
+                else
+                {
+                    if (reserve)
+                    {
+                        try
                         {
-                            try
-                            {
-                                System.IO.File.Create(unique).Close();
-                            }
-                            catch (UnauthorizedAccessException)
+                            System.IO.File.Create(unique).Close();
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            return null;
+                        }
+                        catch
+                        {
+                            if (--life < 0)
                             {
                                 return null;
                             }
-                            catch
+                            else
                             {
-                                if (--life < 0)
-                                {
-                                    return null;
-                                }
-                                else
-                                {
-                                    Thread.Sleep(0);
-                                    continue;
-                                }
+                                Thread.Sleep(0);
+                                continue;
                             }
                         }
-
-                        return unique;
                     }
+
+                    return unique;
                 }
             }
         }
@@ -434,6 +428,32 @@ namespace Energy.Base
                 }
             }
             return "";
+        }
+
+        /// <summary>
+        /// Create directory if not exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>True if directory exists or was created</returns>
+        public static bool MakeDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            try
+            {
+                if (System.IO.Directory.Exists(path))
+                {
+                    return true;
+                }
+                System.IO.DirectoryInfo dir = System.IO.Directory.CreateDirectory(path);
+                return dir != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
