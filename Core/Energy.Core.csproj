@@ -61,7 +61,6 @@
     <Compile Include="Base\Plain.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Range.cs" />
-    <Compile Include="Base\Static.cs" />
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Source\Interface\IConnection.cs" />
     <Compile Include="Source\Structure.cs" />
