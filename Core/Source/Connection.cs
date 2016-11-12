@@ -19,6 +19,10 @@ namespace Energy.Source
 
         #endregion
 
+        private int _Repeat = 1;
+        /// <summary>Repeat</summary>
+        public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
+
         /// <summary>
         /// SQL dialect
         /// </summary>
@@ -211,11 +215,27 @@ namespace Energy.Source
 
         public virtual DataTable Fetch(string query)
         {
-            if (!Active && !Open())
+            for (int i = 0; i <= _Repeat; i++)
             {
-                return null;
+                if (!Active && !Open())
+                {
+                    return null;
+                }
+                DbCommand command = Driver.CreateCommand();
+                command.CommandText = query;
+                DbDataReader reader = null;
+                try
+                {
+                    Prepare(command);
+                    reader = command.ExecuteReader();
+                }
+                catch { }
             }
-            return null;
+        }
+
+        private void Prepare(DbCommand command)
+        {
+            command.Connection = _Driver;
         }
 
         public virtual object Scalar(string query)
@@ -295,6 +315,14 @@ namespace Energy.Source
         object IConnection.Fetch(string query)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class Connection<T>: Connection
+    {
+        public Connection()
+        {
+            Vendor = typeof(T);
         }
     }
 }
