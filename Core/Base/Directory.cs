@@ -161,6 +161,10 @@ namespace Energy.Base
 
         public static IEnumerable<string> GetAllFiles(string path, string search)
         {
+            if (string.IsNullOrEmpty(search))
+            {
+                search = "*";
+            }
             Stack<string> pending = new Stack<string>();
             pending.Push(path);
             while (pending.Count != 0)
