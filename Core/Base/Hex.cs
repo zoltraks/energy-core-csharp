@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace Energy.Base
 {
@@ -9,6 +11,138 @@ namespace Energy.Base
     /// </summary>
     public class Hex
     {
+        #region GhostByteArray
+
+        /// <summary>
+        /// Byte array which can be serialized and deserialized with HEX string
+        /// </summary>
+        public class GhostByteArray
+        {
+            private byte[] _Data;
+            /// <summary>Data</summary>
+            [XmlIgnore]
+            public byte[] Data
+            {
+                get
+                {
+                    lock (Sync)
+                    {
+                        return _Data;
+                    }
+                }
+                set
+                {
+                    lock (Sync)
+                    {
+                        _Data = value;
+                        UpdateHex = true;
+                    }
+                }
+            }
+
+            private static readonly object Sync = new object();
+
+            private bool UpdateHex;
+
+            private string _Hex;
+            /// <summary>Hex</summary>
+            public string Hex
+            {
+                get
+                {
+                    lock (Sync)
+                    {
+                        if (UpdateHex)
+                        {
+                            _Hex = ByteArrayToHex(_Data);
+                            UpdateHex = false;
+                        }
+                        return _Hex;
+                    }
+                }
+                set
+                {
+                    lock (Sync)
+                    {
+                        _Hex = value;
+                        _Data = HexToByteArray(_Hex);
+                        UpdateHex = false;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Array of byte accessor
+            /// </summary>
+            /// <param name="offset"></param>
+            /// <returns></returns>
+            public byte this[int offset]
+            {
+                get
+                {
+                    return _Data[offset];
+                }
+                set
+                {
+                    _Data[offset] = value;
+                    // which one is better?
+                    UpdateHex = true;
+                    // or this?
+                    if (!UpdateHex) UpdateHex = true;
+                }
+            }
+
+            /// <summary>
+            /// Represent bytes as hexadecimal string
+            /// </summary>
+            /// <param name="array"></param>
+            /// <returns></returns>
+            public static string ByteArrayToHex(byte[] array)
+            {
+                if (array == null) return null;
+                if (array.Length == 0) return "";
+                return BitConverter.ToString(array).Replace("-", "").ToLower();
+            }
+
+            /// <summary>
+            /// Convert hex to byte array
+            /// </summary>
+            /// <param name="hex"></param>
+            /// <returns></returns>
+            public static byte[] HexToByteArray(string hex)
+            {
+                if (hex == null) return null;
+                hex = Regex.Replace(hex, @"\s", "");
+                if (hex.Length < 2) return new byte[] { };
+                int count = hex.Length / 2;
+                byte[] data = new byte[count];
+                for (int i = 0; i < count; i++)
+                {
+                    data[i] = (byte)(
+                       "0123456789ABCDEF".IndexOf(hex.Substring(i * 2, 1), StringComparison.InvariantCultureIgnoreCase) * 16 +
+                       "0123456789ABCDEF".IndexOf(hex.Substring(1 + i * 2, 1), StringComparison.InvariantCultureIgnoreCase)
+                    );
+                }
+                return data;
+            }
+
+            public static implicit operator GhostByteArray(string hex)
+            {
+                GhostByteArray o = new GhostByteArray();
+                o.Hex = hex;
+                return o;
+            }
+
+            public static implicit operator GhostByteArray(byte[] data)
+            {
+                GhostByteArray o = new GhostByteArray();
+                o.Data = data;
+                return o;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Convert byte to ASCII character
         /// </summary>

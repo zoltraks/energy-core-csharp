@@ -20,8 +20,12 @@ namespace Energy.Source
         #endregion
 
         private int _Repeat = 1;
-        /// <summary>Repeat</summary>
+        /// <summary>Repeat operation after recoverable error</summary>
         public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
+
+        private int _Timeout;
+        /// <summary>Time limit in seconds for SQL operations</summary>
+        public int Timeout { get { return _Timeout; } set { _Timeout = value; } }
 
         /// <summary>
         /// SQL dialect
@@ -228,14 +232,20 @@ namespace Energy.Source
                 {
                     Prepare(command);
                     reader = command.ExecuteReader();
+                    return new DataTable();
                 }
                 catch { }
             }
+            return null;
         }
 
         private void Prepare(DbCommand command)
         {
             command.Connection = _Driver;
+            if (Timeout > 0)
+            {
+                command.CommandTimeout = Timeout;
+            }
         }
 
         public virtual object Scalar(string query)
@@ -318,11 +328,21 @@ namespace Energy.Source
         }
     }
 
-    public class Connection<T>: Connection
+    /// <summary>
+    /// Generic method with type of SQL connection driver class
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Connection<T> : Connection
     {
         public Connection()
         {
             Vendor = typeof(T);
+        }
+
+        public Connection(Energy.Enumeration.SqlDialect dialect)
+            : this()
+        {
+            Dialect = dialect;
         }
     }
 }
