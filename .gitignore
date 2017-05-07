@@ -228,3 +228,5 @@ Documentation/html/
 
 Test/
 Test.*
+
+*.nupkg
