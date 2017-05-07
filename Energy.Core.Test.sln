@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core", "Core\Energy.Core.csproj", "{C8A325C9-5193-4819-9668-03F70904C9B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core", "Energy.Core\Energy.Core.csproj", "{C8A325C9-5193-4819-9668-03F70904C9B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Test\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Test\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresConnection", "Test\PostgresConnection\PostgresConnection.csproj", "{E68650F1-F266-479E-93A9-07F72ACE4C23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostgresConnection", "Energy.Core.Test\PostgresConnection\PostgresConnection.csproj", "{E68650F1-F266-479E-93A9-07F72ACE4C23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlConnection", "Test\MySqlConnection\MySqlConnection.csproj", "{C7F68FAF-C523-440E-969D-D0897FD8F98B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlConnection", "Energy.Core.Test\MySqlConnection\MySqlConnection.csproj", "{C7F68FAF-C523-440E-969D-D0897FD8F98B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
