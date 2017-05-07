@@ -229,4 +229,9 @@ Documentation/html/
 Test/
 Test.*
 
-*.nupkg
+# NuGet Packages alternative folder (Package)
+**/Package/*
+# except build/, which is used as an MSBuild target.
+!**/Package/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/Package/repositories.config
