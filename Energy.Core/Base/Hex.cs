@@ -11,12 +11,12 @@ namespace Energy.Base
     /// </summary>
     public class Hex
     {
-        #region GhostByteArray
+        #region ByteArray
 
         /// <summary>
-        /// Byte array which can be serialized and deserialized with HEX string
+        /// Byte array which can be serialized and deserialized with hexadecimal string
         /// </summary>
-        public class GhostByteArray
+        public class ByteArray
         {
             private byte[] _Data;
             /// <summary>Data</summary>
@@ -36,6 +36,18 @@ namespace Energy.Base
                     {
                         _Data = value;
                         UpdateHex = true;
+                    }
+                }
+            }
+
+            public int Length
+            {
+                get
+                {
+                    lock (Sync)
+                    {
+                        if (_Data == null) return 0;
+                        return _Data.Length;
                     }
                 }
             }
@@ -126,16 +138,16 @@ namespace Energy.Base
                 return data;
             }
 
-            public static implicit operator GhostByteArray(string hex)
+            public static implicit operator ByteArray(string hex)
             {
-                GhostByteArray o = new GhostByteArray();
+                ByteArray o = new ByteArray();
                 o.Hex = hex;
                 return o;
             }
 
-            public static implicit operator GhostByteArray(byte[] data)
+            public static implicit operator ByteArray(byte[] data)
             {
-                GhostByteArray o = new GhostByteArray();
+                ByteArray o = new ByteArray();
                 o.Data = data;
                 return o;
             }

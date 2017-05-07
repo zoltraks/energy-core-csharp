@@ -133,5 +133,77 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region KeyValueDictionary
+
+        public class KeyValueDictionary : Dictionary<string, string>
+        {
+            private bool _CaseSensitive = true;
+
+            public Dictionary<string, string> Index = null;
+
+            public bool CaseSensitive
+            {
+                get
+                {
+                    return _CaseSensitive;
+                }
+                set
+                {
+                    if (_CaseSensitive == value)
+                        return;
+                    _CaseSensitive = value;
+                    if (value)
+                        Index = null;
+                    else
+                        RebuildIndex();
+                }
+            }
+
+            public void RebuildIndex()
+            {
+                Index = new Dictionary<string, string>();
+                foreach (string key in this.Keys)
+                {
+                    string map = key.ToUpperInvariant();
+                    if (!Index.ContainsKey(map))
+                        Index.Add(map, key);
+                }
+            }
+
+            public void Set(string key, string value)
+            {
+                if (CaseSensitive)
+                {
+                    this[key] = value;
+                    return;
+                }
+                string map = key.ToUpperInvariant();
+                if (Index != null && Index.ContainsKey(map))
+                {
+                    string link = Index[map];
+                    this[link] = value;
+                }
+                else
+                {
+                    this[key] = value;
+                    if (Index == null)
+                        Index = new Dictionary<string, string>();
+                    Index.Add(map, key);
+                }
+            }
+
+            public string[] ToArray(string separator)
+            {
+                List<string> list = new List<string>();
+                foreach (string key in this.Keys)
+                {
+                    list.Add(string.Concat(key, separator, this[key]));
+                }
+                return list.ToArray();
+            }
+        }
+
+        #endregion
     }
 }
