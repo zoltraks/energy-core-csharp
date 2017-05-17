@@ -152,7 +152,8 @@ namespace Energy.Source
             }
             try
             {
-                if (Log != null) Log.Write("Opening connection", Energy.Core.Log.Level.Trace);
+                if (Log != null)
+                    Log.Write("Opening connection", Energy.Enumeration.LogLevel.Trace);
                 Driver.Open();
                 bool first = false;
                
@@ -171,17 +172,25 @@ namespace Energy.Source
 
                 return Active;
             }
+            catch (DbException dbException)
+            {
+                if (Log == null)
+                    throw;
+                //Log.Write(dbException);
+                int code = 0;
+                object _ = Energy.Base.Class.GetFieldOrPropertyValue(dbException, "Number", true, false);
+                if (_ != null && _ is int)
+                    code = (int)_;
+                Log.Write(dbException.Message, dbException.Source, code);
+                return false;
+            }
             catch (Exception x)
             {
                 if (Log == null)
-                {
                     throw;
-                }
-                else
-                {
-                    Log.Write(x);
-                    return false;
-                }
+
+                Log.Write(x);
+                return false;
             }
         }
 

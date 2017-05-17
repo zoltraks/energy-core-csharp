@@ -44,30 +44,27 @@ namespace Energy.Core
         private static volatile Log _default = null;
 
         #endregion
-
-        public enum Level
-        {
-            None = 0,
-            Stop = 1,
-            Alert = 2,
-            Error = 3,
-            Warning = 4,
-            Message = 5,
-            Information = 6,
-            Verbose = 7,
-            Trace = 8,
-            Bug = 9,
-            Default = Message,
-        }
-
+      
         public class Entry
         {
-            public string Message;
-            public Level Level;
+            public string Message { get; set; }
+
+            public long Code { get; set; }
+
+            public string Source { get; set; }
+
+            public Energy.Enumeration.LogLevel Level { get; set; }
+
             public List<object> Store = new List<object>();
             
             public override string ToString()
             {
+                if (Code != 0)
+                {
+                    if (string.IsNullOrEmpty(Message))
+                        return Code.ToString();
+                    return Code + ": " + Message;
+                }
                 return Message;
             }
         }
@@ -98,7 +95,7 @@ namespace Energy.Core
         public Entry Add(Exception x)
         {
             Entry entry = new Entry();
-            entry.Level = Level.Alert;
+            entry.Level = Energy.Enumeration.LogLevel.Alert;
             entry.Message = x.Message;
             //entry.Trace = 
             this.Add(entry);
@@ -118,7 +115,7 @@ namespace Energy.Core
             }
         }
 
-        public Entry Add(string message, Level level)
+        public Entry Add(string message, Energy.Enumeration.LogLevel level)
         {
             Entry entry = new Entry();
             entry.Message = message;
@@ -138,9 +135,31 @@ namespace Energy.Core
             }
         }
 
-        public void Write(string message, Level level)        
+        public void Write(string message, Energy.Enumeration.LogLevel level)        
         {
             Write(Add(message, level));
+        }
+
+        public void Write(string message)
+        {
+            Write(Add(message, Energy.Enumeration.LogLevel.Default));
+        }
+
+        public void Write(string message, string source, long code)
+        {
+            Write(message, source, code, Energy.Enumeration.LogLevel.Default);
+        }
+
+        public void Write(string message, string source, long code, Energy.Enumeration.LogLevel level)
+        {
+            Entry entry = new Entry()
+            {
+                Message = message,
+                Source = source,
+                Code = code,
+                Level = level,
+            };
+            Write(entry);
         }
     }
 
@@ -160,12 +179,12 @@ namespace Energy.Core
             /// <summary>
             /// Minimum entry log level for being accepted
             /// </summary>
-            public Level Minimum = Level.None;
+            public Energy.Enumeration.LogLevel Minimum = Energy.Enumeration.LogLevel.None;
 
             /// <summary>
             /// Minimum entry log level for being accepted
             /// </summary>
-            public Level Maximum = Level.None;
+            public Energy.Enumeration.LogLevel Maximum = Energy.Enumeration.LogLevel.None;
 
             /// <summary>
             /// Write list of entries
@@ -186,9 +205,9 @@ namespace Energy.Core
             /// <returns></returns>
             public bool Accept(Entry entry)
             {
-                if (Minimum != Level.None && entry.Level < Minimum)
+                if (Minimum != Energy.Enumeration.LogLevel.None && entry.Level < Minimum)
                     return false;
-                if (Maximum != Level.None && entry.Level > Maximum)
+                if (Maximum != Energy.Enumeration.LogLevel.None && entry.Level > Maximum)
                     return false;
                 return true;
             }
