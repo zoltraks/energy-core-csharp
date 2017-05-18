@@ -519,6 +519,76 @@ namespace Energy.Base
             return value.ToString();
         }
 
+        /// <summary>
+        /// Convert object to long integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static long ObjectToLong(object value)
+        {
+            if (value is long)
+                return (long)(long)value;
+            if (value is int)
+                return (long)(int)value;
+            if (value is double)
+                return (long)(double)value;
+            if (value is uint)
+                return (long)(uint)value;
+            if (value is ulong)
+                return (long)(ulong)value;
+            if (value is decimal)
+                return (long)(decimal)value;
+
+            if (value is Int16)
+                return (long)(Int16)value;
+            if (value is UInt16)
+                return (long)(UInt16)value;
+
+            if (value is short)
+                return (long)(short)value;
+            if (value is ushort)
+                return (long)(ushort)value;
+            if (value is byte)
+                return (long)(byte)value;
+            if (value is char)
+                return (long)(char)value;
+
+            string s = null;
+            if (value is string)
+                s = (string)value;
+            else
+                s = value.ToString();
+
+            if (s == null)
+                return 0;
+
+            long r = 0;
+            double d = 0;
+
+            if (long.TryParse(s, out r))
+                return r;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (long)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (long)d;
+
+            s = s.Trim();
+
+            if (long.TryParse(s, out r))
+                return r;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (long)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (long)d;
+
+            return 0;
+        }
+
+        public static int ObjectToInteger(object value)
+        {
+            return (int)ObjectToLong(value);
+        }
+
         #endregion
 
         #region Enum

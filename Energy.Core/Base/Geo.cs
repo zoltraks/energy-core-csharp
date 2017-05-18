@@ -77,8 +77,8 @@ namespace Energy.Base
             /// <returns></returns>
             public string ToLatLong()
             {
-                string latitude = Energy.Cast.As.String(Latitude, 6, true);
-                string longitude = Energy.Cast.As.String(Longitude, 6, true);
+                string latitude = Energy.Base.Cast.DoubleToString(Latitude, 6, true, null);
+                string longitude = Energy.Base.Cast.DoubleToString(Longitude, 6, true, null);
                 return String.Concat("(", latitude, " , ", longitude, ")");
             }
 
@@ -111,7 +111,10 @@ namespace Energy.Base
             return value * Math.PI / 180;
         }
 
-        private const double R = 6371;
+        /// <summary>
+        /// Earth radius
+        /// </summary>
+        public const double R = 6371;
 
         /// <summary>
         /// Get distance between two locations in kilometers

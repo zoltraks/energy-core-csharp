@@ -98,10 +98,10 @@ namespace Energy.Base
         /// <returns></returns>
         public static PropertyInfo FindPropertyInfo(Type type, string name, bool includePrivate, bool ignoreCase)
         {
-            BindingFlags bf = BindingFlags.Instance | BindingFlags.Public;
+            BindingFlags f = BindingFlags.Instance | BindingFlags.Public;
             if (includePrivate)
-                bf |= BindingFlags.NonPublic;
-            PropertyInfo[] search = type.GetProperties(bf);
+                f |= BindingFlags.NonPublic;
+            PropertyInfo[] search = type.GetProperties(f);
             for (int i = 0; i < search.Length; i++)
             {
                 PropertyInfo _ = search[i];
@@ -173,6 +173,120 @@ namespace Energy.Base
             if (property != null)
                 return property.GetValue(o, null);
             return null;
+        }
+
+        /// <summary>
+        /// Represent values of fields and properties of object as string array.
+        /// If names should be included, array will be returned as a set of key and value pairs
+        /// one by another.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="includePrivate"></param>
+        /// <param name="includeName"></param>
+        /// <returns></returns>
+        public static string[] ObjectToStringArray(object o, bool includePrivate, bool includeName)
+        {
+            Type type = o.GetType();
+            List<string> list = new List<string>();
+            foreach (FieldInfo _ in type.GetFields())
+            {
+                if (!includePrivate && _.IsPrivate)
+                    continue;
+                if (includeName)
+                    list.Add(_.Name);
+                list.Add(Energy.Base.Cast.ObjectToString(_.GetValue(o)));
+            }
+            BindingFlags f = BindingFlags.Instance | BindingFlags.Public;
+            if (includePrivate)
+                f |= BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(f))
+            {
+                if (includeName)
+                    list.Add(_.Name);
+                list.Add(Energy.Base.Cast.ObjectToString(_.GetValue(o, null)));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Get desired attribute for a class or null if not found.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        public static object GetClassAttribute(Type type, Type attribute)
+        {
+            System.Reflection.MemberInfo info = type;
+            object[] attributes = info.GetCustomAttributes(true);
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                if (attributes[i].GetType() == attribute)
+                {
+                    return attributes[i];
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get value of a field or property of object with custom attribute.
+        /// </summary>
+        /// <param name="o">Any object</param>
+        /// <param name="attribute">Attribute class type</param>
+        /// <returns>Value or null if not found</returns>
+        public static object[] GetValueWithAttribute(object o, Type attribute)
+        {
+            return GetValuesWithAttribute(o, attribute, true, 1);
+        }
+
+        /// <summary>
+        /// Get value of a field or property of object with custom attribute.
+        /// </summary>
+        /// <param name="item">Any object</param>
+        /// <param name="attribute">Attribute class type</param>
+        /// <param name="includePrivate">Include private fields and properties</param>
+        /// <param name="max">Maximum number of fields</param>
+        /// <returns>Value or null if not found</returns>
+        public static object[] GetValuesWithAttribute(object item, Type attribute, bool includePrivate, int max)
+        {
+            if (item == null)
+                return null;
+            List<object> list = new List<object>();
+            System.Type type = item.GetType();
+            foreach (FieldInfo _ in type.GetFields())
+            {
+                if (!includePrivate && _.IsPrivate)
+                    continue;
+                object[] a = _.GetCustomAttributes(true);
+                foreach (object x in a)
+                {
+                    if (x.GetType() == attribute)
+                    {
+                        list.Add(_.GetValue(item));
+                        break;
+                    }
+                }
+                if (max > 0 && list.Count >= max)
+                    return list.ToArray();
+            }
+            BindingFlags f = BindingFlags.Instance | BindingFlags.Public;
+            if (includePrivate)
+                f |= BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(f))
+            {
+                object[] a = _.GetCustomAttributes(true);
+                foreach (object x in a)
+                {
+                    if (x.GetType() == attribute)
+                    {
+                        list.Add(_.GetValue(item, null));
+                        break;
+                    }
+                    if (max > 0 && list.Count >= max)
+                        return list.ToArray();
+                }
+            }
+            return list.ToArray();
         }
     }
 }
