@@ -68,6 +68,7 @@
     <Compile Include="Harmony\IniFile.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Query\Dialect\ANSI.cs" />
     <Compile Include="Source\Interface\IConnection.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />

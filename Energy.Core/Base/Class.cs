@@ -234,9 +234,12 @@ namespace Energy.Base
         /// <param name="o">Any object</param>
         /// <param name="attribute">Attribute class type</param>
         /// <returns>Value or null if not found</returns>
-        public static object[] GetValueWithAttribute(object o, Type attribute)
+        public static object GetValueWithAttribute(object o, Type attribute)
         {
-            return GetValuesWithAttribute(o, attribute, true, 1);
+            object[] value = GetValuesWithAttribute(o, attribute, true, 1);
+            if (value == null || value.Length == 0)
+                return value;
+            return value[0];
         }
 
         /// <summary>

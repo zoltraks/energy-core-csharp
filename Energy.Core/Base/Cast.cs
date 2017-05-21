@@ -470,6 +470,26 @@ namespace Energy.Base
 
         #endregion
 
+        #region Dictionary
+
+        /// <summary>
+        /// Convert string dictionary to array containing key and value pairs one by another in one dimensional array.
+        /// </summary>
+        /// <param name="dictionary">Dictionary&gt;string, string&lt;</param>
+        /// <returns></returns>
+        public static string[] StringDictionaryToStringArray(Dictionary<string, string> dictionary)
+        {
+            List<string> list = new List<string>();
+            foreach (KeyValuePair<string, string> _ in dictionary)
+            {
+                list.Add(_.Key);
+                list.Add(_.Value);
+            }
+            return list.ToArray();
+        }
+
+        #endregion
+
         #region Object
 
         /// <summary>
