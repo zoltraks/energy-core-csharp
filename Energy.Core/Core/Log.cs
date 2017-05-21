@@ -56,7 +56,9 @@ namespace Energy.Core
             public Energy.Enumeration.LogLevel Level { get; set; }
 
             public List<object> Store = new List<object>();
-            
+
+            public DateTime Stamp;
+
             public override string ToString()
             {
                 if (Code != 0)
@@ -67,9 +69,23 @@ namespace Energy.Core
                 }
                 return Message;
             }
+
+            public string ToString(string format)
+            {
+                StringBuilder sb = new StringBuilder(format);
+                DateTime now = DateTime.Now;
+                if (format.Contains("{{DATE}}"))
+                    sb.Replace("{{DATE}}", now.ToString("yyyy-MM-dd"));
+                if (format.Contains("{{TIME}}"))
+                    sb.Replace("{{TIME}}", now.ToString("HH:mm:ss.fff").PadRight(12, '0'));
+                if (format.Contains("{{MESSAGE}}"))
+                    sb.Replace("{{MESSAGE}}", Message);
+                return sb.ToString();
+            }
         }
 
         public Energy.Base.Collection.Array<Target> Destination = new Energy.Base.Collection.Array<Target>();
+
         private List<string> log;
 
         public Log(Type type)
@@ -111,7 +127,7 @@ namespace Energy.Core
         {
             for (int i = 0; i < Destination.Count; i++)
             {
-                Destination[i].Write(this);
+                Destination[i].Write(this.ToArray());
             }
         }
 
@@ -191,11 +207,16 @@ namespace Energy.Core
             /// </summary>
             /// <param name="log">List&lt;Entry&gt; - log</param>
             /// <returns></returns>
-            public abstract bool Write(List<Entry> log);
+            public abstract bool Write(Entry[] log);
 
+            /// <summary>
+            /// Write single entry
+            /// </summary>
+            /// <param name="entry"></param>
+            /// <returns></returns>
             public bool Write(Entry entry)
             {
-                return Write(new List<Entry>(new Entry[] { entry }));
+                return Write(new Entry[] { entry });
             }
 
             /// <summary>
@@ -224,9 +245,11 @@ namespace Energy.Core
 
             public class Trace : Target
             {
-                public override bool Write(List<Entry> log)
+                public override bool Write(Entry[] log)
                 {
-                    for (int i = 0; i < log.Count; i++)
+                    if (log == null)
+                        return false;
+                    for (int i = 0; i < log.Length; i++)
                     {
                         if (log[i].Store.Contains(this))
                             continue;
@@ -247,19 +270,44 @@ namespace Energy.Core
 
             public class File : Target
             {
+                /// <summary>
+                /// File path
+                /// </summary>
                 public string Path;
 
-                public override bool Write(List<Entry> log)
+                /// <summary>
+                /// Write all messages even not accepted
+                /// </summary>
+                public bool All;
+
+                public override bool Write(Entry[] log)
                 {
-                    string file = Path;
-                    string content = String.Join(Environment.NewLine, (new List<Entry>(log)).ConvertAll<string>(delegate(Entry e) { return e.ToString(); }).ToArray())
-                        + Environment.NewLine;
-                    System.IO.File.AppendAllText(file, content);
-                    for (int i = 0; i < log.Count; i++)
+                    if (log == null)
+                        return false;
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < log.Length; i++)
+                    {
+                        if (!All && !Accept(log[i]))
+                            continue;
+                        sb.AppendLine(log[i].ToString());
+                    }
+                    if (sb.Length != 0)
+                    {
+                        string file = Path;
+                        string content = sb.ToString();
+                        try
+                        {
+                            System.IO.File.AppendAllText(file, content);
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    }
+                    for (int i = 0; i < log.Length; i++)
                     {
                         log[i].Store.Add(this);
-                    }
-                 
+                    }                 
                     return true;
                 }
             }
@@ -275,21 +323,20 @@ namespace Energy.Core
                     Immediate = true;
                 }
 
-                public string Format;
+                public string Format = "{{TIME}} {{MESSAGE}}";
 
-                public override bool Write(List<Entry> log)
+                public override bool Write(Entry[] log)
                 {
-                    for (int i = 0; i < log.Count; i++)
+                    for (int i = 0; i < log.Length; i++)
                     {
-                        if (log[i].Store.Contains(this))
+                        if (!Accept(log[i]))
                             continue;
-                        if (Accept(log[i]))
-                        {
-                            System.Console.WriteLine(log[i].ToString());
-                        }
+                        System.Console.WriteLine(log[i].ToString(Format));
+                    }
+                    for (int i = 0; i < log.Length; i++)
+                    {
                         log[i].Store.Add(this);
                     }
-               
                     return true;
                 }
             }
