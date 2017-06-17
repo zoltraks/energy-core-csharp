@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Energy Core")]
+[assembly: AssemblyTitle("Energy Core Library")]
 [assembly: AssemblyDescription("How much reality can you take?")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2017.03.14.*")]
-[assembly: AssemblyFileVersion("17.03.0")]
+[assembly: AssemblyVersion("2017.06.17.*")]
+[assembly: AssemblyFileVersion("17.06.0")]

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attribute\Data.cs" />
+    <Compile Include="Base\Array.cs" />
     <Compile Include="Base\Byte.cs" />
     <Compile Include="Base\Class.cs" />
     <Compile Include="Base\Color.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Range.cs" />
     <Compile Include="Base\Tree.cs" />
+    <Compile Include="Base\Variant.cs" />
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Enumeration\LogLevel.cs" />
     <Compile Include="Harmony\IniFile.cs">
