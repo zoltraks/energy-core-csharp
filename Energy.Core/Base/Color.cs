@@ -107,13 +107,23 @@ namespace Energy.Base
 
         #endregion
 
+        #region Explicit
+
+        public static explicit operator string(Color value)
+        {
+            return value.ToString();
+        }
+
+        #endregion
+
         /// <summary>
         /// Represent as string
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            if (!IsSet) return "";
+            if (!IsSet)
+                return "";
             return ColorToHtml(this);
         }
 
