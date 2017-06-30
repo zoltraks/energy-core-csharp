@@ -199,20 +199,23 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert byte array to hex string
+        /// Convert byte array to hexadecimal string
         /// </summary>
         /// <param name="array">Byte array</param>
         /// <param name="space">Optional hexadecimal separator</param>
         /// <returns>string</returns>
         public static string ArrayToHex(byte[] array, string space)
         {
-            if (array == null) return null;
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return "";
             string hex = BitConverter.ToString(array);
             return hex.Replace("-", space);
         }
 
         /// <summary>
-        /// Convert byte array to hex string
+        /// Convert byte array to hexadecimal string
         /// </summary>
         /// <param name="array">Byte array</param>
         /// <returns>string</returns>

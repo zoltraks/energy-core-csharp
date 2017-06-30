@@ -229,7 +229,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get value of a field or property of object with custom attribute.
+        /// Get value of a first field or property of object with custom attribute.
         /// </summary>
         /// <param name="o">Any object</param>
         /// <param name="attribute">Attribute class type</param>
@@ -243,7 +243,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get value of a field or property of object with custom attribute.
+        /// Get values of all fields and properties of object with custom attribute.
         /// </summary>
         /// <param name="item">Any object</param>
         /// <param name="attribute">Attribute class type</param>

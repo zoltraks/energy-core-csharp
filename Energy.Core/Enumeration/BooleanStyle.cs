@@ -24,13 +24,12 @@ namespace Energy.Enumeration
         /// <summary>
         /// Y/N
         /// </summary>
-        /// <remarks>Localised</remarks>
         Y,
         /// <summary>
         /// T/F
         /// </summary>
-        /// <remarks>Localised</remarks>
         T,
+
         /// <summary>
         /// Yes/No
         /// </summary>
@@ -41,7 +40,6 @@ namespace Energy.Enumeration
         /// </summary>
         /// <remarks>Localised</remarks>
         TrueFalse,
-
         /// <summary>
         /// 0/1
         /// </summary>

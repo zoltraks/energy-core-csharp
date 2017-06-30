@@ -39,7 +39,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +49,7 @@
     <Compile Include="Base\Color.cs" />
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\Csv.cs" />
+    <Compile Include="Base\Date.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Geo.cs" />
@@ -63,6 +63,7 @@
     <Compile Include="Base\Plain.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Range.cs" />
+    <Compile Include="Base\Time.cs" />
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Base\Variant.cs" />
     <Compile Include="Core\Shell.cs" />

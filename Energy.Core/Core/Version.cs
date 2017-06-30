@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using System.Diagnostics;
 
@@ -92,14 +90,14 @@ namespace Energy.Core
         /// <summary>
         /// Compare two versions
         /// </summary>
-        /// <param name="a">string</param>
-        /// <param name="b">string</param>
+        /// <param name="a">First</param>
+        /// <param name="b">Second</param>
+        /// <param name="separator">Separator character list</param>
         /// <returns>int</returns>
-        public static int Compare(string a, string b)
+        public static int Compare(string a, string b, char[] separator)
         {
             if (String.IsNullOrEmpty(a) && !String.IsNullOrEmpty(b)) return -1;
             if (!String.IsNullOrEmpty(a) && String.IsNullOrEmpty(b)) return 1;
-            char[] separator = new char[] { '.', '-', '_' };
             string[] sa = a.Split(separator);
             string[] sb = b.Split(separator);
             for (int i = 0; i < sa.Length; i++)
@@ -110,6 +108,17 @@ namespace Energy.Core
                 if (ia > ib) return -1;
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Compare two versions
+        /// </summary>
+        /// <param name="a">string</param>
+        /// <param name="b">string</param>
+        /// <returns>int</returns>
+        public static int Compare(string a, string b)
+        {
+            return Compare(a, b, new char[] { '.', '-', '_' });
         }
 
         #region Library version information

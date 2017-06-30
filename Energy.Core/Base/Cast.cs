@@ -166,6 +166,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static string BoolToString(bool value, string style)
         {
+            if (style == null)
+                return null;
             string[] array = style.Split('/');
             if (array.Length == 2)
             {
@@ -257,12 +259,13 @@ namespace Energy.Base
         /// <returns>decimal</returns>
         public static decimal StringToDecimal(string value)
         {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
             decimal result = 0;
-            if (!String.IsNullOrEmpty(value))
-            {
-                decimal.TryParse(value.Trim(' ', '\t', '\r', '\n', '\v', '\0'), out result);
-            }
-            return result;
+            if (decimal.TryParse(value, out result))
+                return result;
+            return 0;
         }
 
         #endregion
@@ -276,22 +279,42 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static double StringToDouble(string value)
         {
+            if (string.IsNullOrEmpty(value))
+                return 0;
             double result = 0;
-            if (value != null && value.Length > 0)
+            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            if (value.Contains(" ")) value = value.Replace(" ", null);
+            if (value.Contains("_")) value = value.Replace("_", null);
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.InvariantCulture
+                , out result))
             {
-                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-                if (value.Contains(" ")) value = value.Replace(" ", null);
-                if (value.Contains("_")) value = value.Replace("_", null);
-                if (!double.TryParse(value, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.InvariantCulture
-                    , out result))
-                {
-                    double.TryParse(value, System.Globalization.NumberStyles.Float
-                        , System.Globalization.CultureInfo.CurrentCulture
-                        , out result);
-                }
+                double.TryParse(value, System.Globalization.NumberStyles.Float
+                    , System.Globalization.CultureInfo.CurrentCulture
+                    , out result);
             }
+
             return result;
+        }
+
+        /// <summary>
+        /// Smart convert string to double value without exception.
+        /// 
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>double</returns>
+        public static double StringToDoubleSmart(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            if (value.Contains(" "))
+                value = value.Replace(" ", null);
+            if (value.Contains("_"))
+                value = value.Replace("_", null);
+            if (value.Contains("'"))
+                value = value.Replace("'", null);
+            return StringToDouble(value);
         }
 
         /// <summary>

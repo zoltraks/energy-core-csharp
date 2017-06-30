@@ -216,7 +216,6 @@ namespace Energy.Base
 
         #endregion
 
-
         private static Regex _DateRegex;
         /// <summary>Singleton</summary>
         public static Regex DateRegex
