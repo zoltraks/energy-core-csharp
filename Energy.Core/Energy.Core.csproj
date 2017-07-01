@@ -54,6 +54,7 @@
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\History.cs" />
+    <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Nibble.cs" />
     <Compile Include="Base\Directory.cs" />

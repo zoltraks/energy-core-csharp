@@ -21,6 +21,11 @@ namespace Energy.Enumeration
     public enum LogLevel
     {
         /// <summary>
+        /// Default severity level
+        /// </summary>
+        Default = Message,
+
+        /// <summary>
         /// Uknown severity level / Not used
         /// </summary>
         None = 0,
@@ -83,8 +88,6 @@ namespace Energy.Enumeration
 
         Critical = Stop,
         Fatal = Alert,
-
-        Default = Message,
 
         /// <summary>
         /// Very important severity

@@ -11,8 +11,14 @@ namespace Energy.Base
     {
         #region Array
 
+        /// <summary>
+        /// Thread safe array of objects
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         public class Array<T> : System.Collections.Generic.List<T>
         {
+            private readonly object Lock = new object();
+
             public T First
             {
                 get
