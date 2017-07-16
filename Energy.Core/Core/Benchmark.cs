@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Energy.Core
 {
-    public class Profiler
+    public class Benchmark
     {
         /// <summary>
         /// Test function delegate
@@ -39,29 +40,57 @@ namespace Energy.Core
             public double Average;
 
             /// <summary>
-            /// Represent as string
+            /// Number format
             /// </summary>
+            public string Format = "0.000";
+
+            /// <summary>
+            /// Represent result as string
+            /// </summary>
+            /// <param name="verbose">Include additional information</param>
+            /// <param name="format">Number format to use</param>
             /// <returns></returns>
-            public override string ToString()
+            public string ToString(bool verbose, string format)
             {
+                if (string.IsNullOrEmpty(format))
+                    format = Format;
                 List<string> list = new List<string>();
-                if (Garbage > 0)
+                if (verbose && Garbage > 0)
                 {
-                    list.Add(String.Format("Garbage collected in {0:0.000} s", Garbage));
+                    list.Add(string.Concat("Garbage collected in ", Garbage.ToString(format, CultureInfo.InvariantCulture), " s"));
                 }
-                if (Time > 0)
+                if (Time > 0 && (verbose || Average == 0))
                 {
                     string text = "Time taken";
-                    if (!String.IsNullOrEmpty(Name)) text += " by " + Name;
+                    if (!string.IsNullOrEmpty(Name)) text += " by " + Name;
                     if (Iterations > 1) text += " in " + Iterations.ToString() + " iterations";
-                    text += String.Format(" {0:0.000} s", Time);
+                    text += string.Concat(" ", Time.ToString(format, CultureInfo.InvariantCulture), " s");
                     list.Add(text);
                 }
                 if (Average > 0)
                 {
-                    list.Add(String.Format("Average time of execution {0:0.000} s", Average));
+                    list.Add(string.Concat("Average time of execution ", Average.ToString(format, CultureInfo.InvariantCulture), " s"));
                 }
                 return String.Join(Environment.NewLine, list.ToArray());
+            }
+
+            /// <summary>
+            /// Represent result as string
+            /// </summary>
+            /// <param name="verbose">Include additional information</param>
+            /// <returns></returns>
+            public string ToString(bool verbose)
+            {
+                return ToString(verbose, Format);
+            }
+
+            /// <summary>
+            /// Represent result as string
+            /// </summary>
+            /// <returns></returns>
+            public override string ToString()
+            {
+                return ToString(true, Format);
             }
         }
 

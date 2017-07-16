@@ -9,6 +9,8 @@ namespace Energy.Base
     /// </summary>
     public class Log
     {
+        #region Entry
+
         /// <summary>
         /// Log entry
         /// </summary>
@@ -38,11 +40,16 @@ namespace Energy.Base
             /// Log entry severity level
             /// </summary>
             public Energy.Enumeration.LogLevel Level { get; set; }
-            
+
             /// <summary>
             /// Log entry additional context
             /// </summary>
             public object Context { get; set; }
+
+            /// <summary>
+            /// Log entry exception
+            /// </summary>
+            public Exception Exception { get; set; }
 
             /// <summary>
             /// Log entry store information
@@ -50,6 +57,8 @@ namespace Energy.Base
             public List<object> Store = new List<object>();
 
             public static bool IsToStringWide { get; set; }
+
+            public static bool Bug { get; set; }
 
             #region Constructor
 
@@ -59,8 +68,8 @@ namespace Energy.Base
             }
 
             public Entry(string message)
+                : this()
             {
-                Stamp = DateTime.Now;
                 Message = message;
             }
 
@@ -77,8 +86,8 @@ namespace Energy.Base
             }
 
             public Entry(DateTime stamp, string message)
+                : this()
             {
-                Stamp = stamp;
                 Message = message;
             }
 
@@ -100,6 +109,12 @@ namespace Energy.Base
                 Level = level;
             }
 
+            public Entry(Exception exception)
+                : this(exception.Message)
+            {
+                Exception = exception;
+            }
+
             #endregion
 
             #region Override
@@ -109,7 +124,7 @@ namespace Energy.Base
                 if (wide)
                 {
                     DateTime stamp = this.Stamp != DateTime.MinValue ? this.Stamp : DateTime.Now;
-                    return string.Concat(stamp.ToString("HH:mm:ss.fff "), ToString(false));                    
+                    return string.Concat(stamp.ToString("HH:mm:ss.fff "), ToString(false));
                 }
                 if (Code != 0)
                 {
@@ -135,6 +150,8 @@ namespace Energy.Base
                     sb.Replace("{{TIME}}", stamp.ToString("HH:mm:ss.fff").PadRight(12, '0'));
                 if (format.Contains("{{MESSAGE}}"))
                     sb.Replace("{{MESSAGE}}", Message);
+                if (format.Contains("{{EXCEPTION}}"))
+                    sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.ExceptionMessage(Exception, true));
                 return sb.ToString();
             }
 
@@ -150,9 +167,85 @@ namespace Energy.Base
             #endregion
         }
 
-        public class Entry<T>: Entry
+        public class Entry<T> : Entry
         {
 
         }
+
+        #endregion
+
+        #region Target
+
+        /// <summary>
+        /// Abstract class for Log target (console, file, database, etc.)
+        /// </summary>
+        public abstract partial class Target
+        {
+            /// <summary>
+            /// Immediately call write on new entry
+            /// </summary>
+            public bool Immediate { get; set; }
+
+            /// <summary>
+            /// Minimum entry log level for being accepted
+            /// </summary>
+            public Energy.Enumeration.LogLevel Minimum = Energy.Enumeration.LogLevel.None;
+
+            /// <summary>
+            /// Minimum entry log level for being accepted
+            /// </summary>
+            public Energy.Enumeration.LogLevel Maximum = Energy.Enumeration.LogLevel.None;
+
+            /// <summary>
+            /// Write list of entries
+            /// </summary>
+            /// <param name="log">List&lt;Entry&gt; - log</param>
+            /// <returns></returns>
+            public abstract bool Write(Energy.Base.Log.Entry[] log);
+
+            /// <summary>
+            /// Write single entry
+            /// </summary>
+            /// <param name="entry"></param>
+            /// <returns></returns>
+            public bool Write(Energy.Base.Log.Entry entry)
+            {
+                return Write(new Energy.Base.Log.Entry[] { entry });
+            }
+
+            /// <summary>
+            /// Check if entry is accepted by level requirements if any
+            /// </summary>
+            /// <param name="entry"></param>
+            /// <returns></returns>
+            public bool Accept(Energy.Base.Log.Entry entry)
+            {
+                if (Minimum != Energy.Enumeration.LogLevel.None && entry.Level < Minimum)
+                    return false;
+                if (Maximum != Energy.Enumeration.LogLevel.None && entry.Level > Maximum)
+                    return false;
+                return true;
+            }
+        }
+
+        #endregion
+
+        #region Destination
+
+        public class Destination : Energy.Base.Collection.Array<Target>
+        {
+            #region Constructor
+
+            public Destination() { }
+
+            #endregion
+
+            public new Target Add(Target target)
+            {
+                return base.Add(target);
+            }
+        }
+
+        #endregion
     }
 }

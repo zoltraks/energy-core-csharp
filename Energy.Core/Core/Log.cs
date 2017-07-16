@@ -12,37 +12,66 @@ namespace Energy.Core
     /// </summary>
     public partial class Log : List<Energy.Base.Log.Entry>
     {
-        #region Default
+        /// <summary>
+        /// Destination
+        /// </summary>
+        public Energy.Base.Log.Destination Destination = new Energy.Base.Log.Destination();
 
-        public Manager Destination = new Manager();
+        #region Constructor
 
-        private static Log _Default = null;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Log()
+        {
+        }
 
-        private static readonly object _DefaultLock = new object();
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="type"></param>
+        public Log(Type type)
+            : this()
+        {
+            if (type.IsSubclassOf(typeof(Energy.Base.Log.Target)))
+            {
+                Destination.Add((Energy.Base.Log.Target)Activator.CreateInstance(type));
+            }
+        }
 
-        public static Log Default
+        #endregion
+
+        #region Static
+
+        private static Log _Static = null;
+
+        private static readonly object _StaticLock = new object();
+
+        /// <summary>
+        /// Singleton
+        /// </summary>
+        public static Log Static
         {
             get
             {
-                if (_Default == null)
+                if (_Static == null)
                 {
-                    lock (_DefaultLock)
+                    lock (_StaticLock)
                     {
-                        if (_Default == null)
+                        if (_Static == null)
                         {
-                            _Default = new Log();
+                            _Static = new Log();
                         }
                     }
-
                 }
 
-                return _Default;
+                return _Static;
             }
             set
             {
-                lock (_DefaultLock)
+                lock (_StaticLock)
                 {
-                    _Default = value;
+                    _Static = value;
                 }
             }
         }
@@ -51,11 +80,11 @@ namespace Energy.Core
 
         public event EventHandler OnFlush;
 
-        private static readonly object FlushStatic = new object();
+        private static readonly object FlushLock = new object();
 
         public void Flush()
         {
-            lock (FlushStatic)
+            lock (FlushLock)
             {
                 if (OnFlush != null)
                     OnFlush(this, null);
@@ -70,6 +99,11 @@ namespace Energy.Core
         /// </summary>
         public void Clean()
         {
+            if (Destination.Count == 0)
+            {
+                RemoveAll(delegate(Energy.Base.Log.Entry _) { return true; });
+                return;
+            }
             int i = Count;
             while (--i >= 0)
             {
@@ -77,7 +111,7 @@ namespace Energy.Core
                 bool remove = true;
                 for (int n = 0; n < Destination.Count; n++)
                 {
-                    Energy.Core.Log.Target target = Destination[n];
+                    Energy.Base.Log.Target target = Destination[n];
                     if (!entry.Store.Contains(target))
                     {
                         remove = false;
@@ -92,33 +126,9 @@ namespace Energy.Core
             }
         }
 
-        private List<string> log;
-
-        public Log(Type type)
-            : this()
-        {
-            if (type.IsSubclassOf(typeof(Target)))
-            {
-                Destination.Add((Target)Activator.CreateInstance(type));
-            }
-        }
-
-        public Log()
-        {
-            // TODO: Complete member initialization
-        }
-
-        public Log(List<string> log)
-        {
-            // TODO: Complete member initialization
-            this.log = log;
-        }
-
         public Energy.Base.Log.Entry Add(Exception x)
         {
-            Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry();
-            entry.Level = Energy.Enumeration.LogLevel.Alert;
-            entry.Message = x.Message;
+            Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry(x);
             this.Add(entry);
             return entry;
         }
@@ -135,7 +145,7 @@ namespace Energy.Core
                 Energy.Base.Log.Entry entry = this[n];
                 for (int i = 0; i < Destination.Count; i++)
                 {
-                    Energy.Core.Log.Target target = Destination[i];
+                    Energy.Base.Log.Target target = Destination[i];
                     if (!target.Immediate)
                         continue;
                     if (entry.Store.Contains(target))
@@ -154,9 +164,7 @@ namespace Energy.Core
 
         public Energy.Base.Log.Entry Add(string message, Energy.Enumeration.LogLevel level)
         {
-            Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry();
-            entry.Message = message;
-            entry.Level = level;
+            Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry(message, level);
             this.Add(entry);
             return entry;
         }
@@ -166,7 +174,7 @@ namespace Energy.Core
             this.Add(entry);
             for (int i = 0; i < Destination.Count; i++)
             {
-                Energy.Core.Log.Target target = Destination[i];
+                Energy.Base.Log.Target target = Destination[i];
                 if (!target.Immediate)
                     continue;
                 if (entry.Store.Contains(target))
@@ -216,67 +224,14 @@ namespace Energy.Core
 
     public partial class Log
     {
-        public abstract partial class Target
-        {
-            /// <summary>
-            /// Immediately call write on new entry
-            /// </summary>
-            public bool Immediate { get; set; }
-
-            /// <summary>
-            /// Minimum entry log level for being accepted
-            /// </summary>
-            public Energy.Enumeration.LogLevel Minimum = Energy.Enumeration.LogLevel.None;
-
-            /// <summary>
-            /// Minimum entry log level for being accepted
-            /// </summary>
-            public Energy.Enumeration.LogLevel Maximum = Energy.Enumeration.LogLevel.None;
-
-            /// <summary>
-            /// Write list of entries
-            /// </summary>
-            /// <param name="log">List&lt;Entry&gt; - log</param>
-            /// <returns></returns>
-            public abstract bool Write(Energy.Base.Log.Entry[] log);
-
-            /// <summary>
-            /// Write single entry
-            /// </summary>
-            /// <param name="entry"></param>
-            /// <returns></returns>
-            public bool Write(Energy.Base.Log.Entry entry)
-            {
-                return Write(new Energy.Base.Log.Entry[] { entry });
-            }
-
-            /// <summary>
-            /// Check if entry is accepted by level requirements if any
-            /// </summary>
-            /// <param name="entry"></param>
-            /// <returns></returns>
-            public bool Accept(Energy.Base.Log.Entry entry)
-            {
-                if (Minimum != Energy.Enumeration.LogLevel.None && entry.Level < Minimum)
-                    return false;
-                if (Maximum != Energy.Enumeration.LogLevel.None && entry.Level > Maximum)
-                    return false;
-                return true;
-            }
-        }
-    }
-
-    #endregion
-
-    #region Target
-
-    public partial class Log
-    {
         public partial class Target
         {
             #region Trace
 
-            public class Trace : Target
+            /// <summary>
+            /// Trace log target
+            /// </summary>
+            public class Trace : Energy.Base.Log.Target
             {
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
@@ -288,7 +243,7 @@ namespace Energy.Core
                             continue;
                         if (Accept(log[i]))
                         {
-                            System.Diagnostics.Trace.Write(log[i].ToString() + Environment.NewLine);
+                            System.Diagnostics.Trace.WriteLine(log[i].ToString(true));
                         }
                         log[i].Store.Add(this);
                     }
@@ -301,17 +256,12 @@ namespace Energy.Core
 
             #region File
 
-            public class File : Target
+            public class File : Energy.Base.Log.Target
             {
                 /// <summary>
                 /// File path
                 /// </summary>
                 public string Path;
-
-                /// <summary>
-                /// Write all messages even not accepted
-                /// </summary>
-                public bool All;
 
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
@@ -320,8 +270,6 @@ namespace Energy.Core
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < log.Length; i++)
                     {
-                        if (!All && !Accept(log[i]))
-                            continue;
                         sb.AppendLine(log[i].ToString());
                     }
                     if (sb.Length != 0)
@@ -340,7 +288,8 @@ namespace Energy.Core
                     for (int i = 0; i < log.Length; i++)
                     {
                         log[i].Store.Add(this);
-                    }                 
+                    }
+                                
                     return true;
                 }
             }
@@ -349,14 +298,26 @@ namespace Energy.Core
 
             #region Console
 
-            public class Console : Target
+            public class Console : Energy.Base.Log.Target
             {
                 public Console()
                 {
                     Immediate = true;
                 }
 
-                public string Format = "{{TIME}} {{MESSAGE}}";
+                private string _Format = "{{TIME}} {{MESSAGE}}";
+
+                public string Format
+                {
+                    get
+                    {
+                        return _Format;
+                    }
+                    set
+                    {
+                        _Format = value;
+                    }
+                }
 
                 private static Console _Default;
 
@@ -390,12 +351,22 @@ namespace Energy.Core
 
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
-                    for (int i = 0; i < log.Length; i++)
+                    Energy.Core.Syntax syntax = new Energy.Core.Syntax(Format);
+                    syntax["Date"] = "2017-07-00";
+                    if (!Color)
                     {
-                        if (!Accept(log[i]))
-                            continue;
-                        System.Console.WriteLine(log[i].ToString(Format));
+                        for (int i = 0; i < log.Length; i++)
+                        {
+                            System.Console.WriteLine(log[i].ToString(Format));
+                        }
                     }
+                    else
+                    {
+                        syntax["Date"] = "2017-07-01";
+                        syntax["DATE"] = "2017-07-02";
+                        System.Console.WriteLine(string.Join("\n", syntax.ToArray(": ")));
+                    }
+
                     for (int i = 0; i < log.Length; i++)
                     {
                         log[i].Store.Add(this);
@@ -403,22 +374,6 @@ namespace Energy.Core
                     return true;
                 }
             }
-
-            #endregion
-        }
-    }
-
-    #endregion
-
-    #region Destination
-
-    public partial class Log
-    {
-        public class Manager : Energy.Base.Collection.Array<Target>
-        {
-            #region Constructor
-
-            public Manager() { }
 
             #endregion
         }

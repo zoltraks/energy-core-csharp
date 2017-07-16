@@ -7,6 +7,8 @@ namespace Energy.Base
 {
     public class Variant
     {
+        #region Union
+
         [StructLayout(LayoutKind.Explicit)]
         public struct Union
         {
@@ -54,10 +56,11 @@ namespace Energy.Base
 
             [FieldOffset(0)]
             public object Object;
-
-            [FieldOffset(0)]
-            public object[] Array;
         }
+
+        #endregion
+
+        #region Type
 
         public enum Type
         {
@@ -76,7 +79,39 @@ namespace Energy.Base
             Char,
             String,
             Object,
-            Array,
         }
+
+        #endregion
+
+        #region Value
+
+        public class Value
+        {
+            public Union Union;
+
+            public Type Type;
+        }
+
+        #endregion
+
+        #region Variable
+
+        public class Variable
+        {
+            public string Name;
+
+            public Value Value;
+        }
+
+        #endregion
+
+        #region Dictionary
+
+        public class Dictionary: System.Collections.Generic.Dictionary<string, Value>
+        {
+
+        }
+
+        #endregion
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Harmony
 {
-    public class IniFile : Dictionary<string, Energy.Base.Collection.KeyValueDictionary>
+    public class IniFile : Dictionary<string, Energy.Base.Collection.StringDictionary>
     {
         private bool _CaseSensitive = true;
 
@@ -127,7 +127,7 @@ namespace Energy.Harmony
         {
             if (base.ContainsKey(section))
                 return this[section];
-            Energy.Base.Collection.KeyValueDictionary list = new Energy.Base.Collection.KeyValueDictionary();
+            Energy.Base.Collection.StringDictionary list = new Energy.Base.Collection.StringDictionary();
             this.Add(section, list);
             return list;
         }

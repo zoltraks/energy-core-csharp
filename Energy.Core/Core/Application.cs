@@ -27,60 +27,76 @@ namespace Energy.Core
         /// <summary>
         /// Application syntax
         /// </summary>
-        public Variable Syntax { get; set; }
+        public Energy.Core.Syntax Syntax { get; set; }
 
-        private volatile Log _Log;
-        
-        public Log Log
-        { 
-            get
-            {
-                if (_Log == null)
-                {
-                    lock (typeof(Log))
-                    {
-                        if (_Log == null)
-                        {
-                            _Log = new Log();
-                        }
-                    }
-                }
-                return _Log;
-            }
-            private set 
-            {
-                _Log = value; 
-            } 
-        }
+        /// <summary>
+        /// Application logger
+        /// </summary>
+        public Energy.Core.Log Log { get; set; }
 
+        /// <summary>
+        /// Application configuration
+        /// </summary>
         public Energy.Core.Configuration Configuration { get; set; }
 
+        /// <summary>
+        /// Application connection
+        /// </summary>
         public Energy.Source.Connection Connection { get; set; }
 
+        /// <summary>
+        /// Application locale
+        /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
+        #region Constructor
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Application()
         {
             // create //
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
         public Application(string name)
         {
             Name = name;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="assembly"></param>
         public Application(System.Reflection.Assembly assembly)
         {
             Name = assembly.FullName;
             Directory = Information.GetAssemblyDirectory(assembly);
         }
 
-        public Application Create()
+        #endregion
+
+        #region Create
+
+        /// <summary>
+        /// Create
+        /// </summary>
+        /// <returns></returns>
+        public static Application Create()
         {
             Application application = new Application();
             return application;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Run
+        /// </summary>
         public void Run()
         {
             throw new NotImplementedException();

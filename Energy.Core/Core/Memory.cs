@@ -15,7 +15,9 @@ namespace Energy.Core
         /// <returns></returns>
         public static long GetCurrentMemoryUsage()
         {
-            return System.Environment.WorkingSet;
+            System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+            long memory = process.WorkingSet64;
+            return memory;
         }
     }
 }

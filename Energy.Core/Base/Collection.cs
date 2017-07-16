@@ -17,13 +17,14 @@ namespace Energy.Base
         /// <typeparam name="T"></typeparam>
         public class Array<T> : System.Collections.Generic.List<T>
         {
-            private readonly object Lock = new object();
-
             public T First
             {
                 get
                 {
-                    return Count == 0 ? default(T) : this[0];
+                    lock (this)
+                    {
+                        return base.Count == 0 ? default(T) : this[0];
+                    }
                 }
             }
 
@@ -31,31 +32,82 @@ namespace Energy.Base
             {
                 get
                 {
-                    return Count == 0 ? default(T) : this[Count - 1];
+                    lock (this)
+                    {
+                        return base.Count == 0 ? default(T) : this[base.Count - 1];
+                    }
                 }
             }
 
             public T New()
             {
-                T item = (T)Activator.CreateInstance(typeof(T));
-                base.Add(item);
-                return item;
+                lock (this)
+                {
+                    T item = (T)Activator.CreateInstance(typeof(T));
+                    base.Add(item);
+                    return item;
+                }
             }
 
             public bool Equals(Array<T> array)
             {
-                if (this.Count != array.Count)
+                lock (this)
                 {
-                    return false;
-                }
-                for (int i = 0; i < this.Count; i++)
-                {
-                    if (!this[i].Equals(array[i]))
+                    if (base.Count != array.Count)
                     {
                         return false;
                     }
+                    for (int i = 0; i < this.Count; i++)
+                    {
+                        if (!this[i].Equals(array[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
                 }
-                return true;
+            }
+
+            public new T Add(T item)
+            {
+                lock (this)
+                {
+                    base.Add(item);
+                    return item;
+                }
+            }
+
+            public new T Insert(int index, T item)
+            {
+                lock (this)
+                {
+                    base.Insert(index, item);
+                    return item;
+                }
+            }
+
+            public new void Remove(T item)
+            {
+                lock (this)
+                {
+                    base.Remove(item);
+                }
+            }
+
+            public new void RemoveAt(int index)
+            {
+                lock (this)
+                {
+                    base.RemoveAt(index);
+                }
+            }
+
+            public new void RemoveAll(Predicate<T> match)
+            {
+                lock (this)
+                {
+                    base.RemoveAll(match);
+                }
             }
         }
 
@@ -140,14 +192,20 @@ namespace Energy.Base
 
         #endregion
 
-        #region KeyValueDictionary
+        #region StringDictionary
 
-        public class KeyValueDictionary : Dictionary<string, string>
+        public class StringDictionary<T> : Dictionary<string, T>
         {
-            private bool _CaseSensitive = true;
-
+            /// <summary>
+            /// Index of keys for case insensitive option
+            /// </summary>
             public Dictionary<string, string> Index = null;
 
+            private bool _CaseSensitive = true;
+
+            /// <summary>
+            /// Should keys be case sensitive (default) or not
+            /// </summary>
             public bool CaseSensitive
             {
                 get
@@ -166,10 +224,10 @@ namespace Energy.Base
                 }
             }
 
-            public void RebuildIndex()
+            private void RebuildIndex()
             {
                 Index = new Dictionary<string, string>();
-                foreach (string key in this.Keys)
+                foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
                     if (!Index.ContainsKey(map))
@@ -177,22 +235,57 @@ namespace Energy.Base
                 }
             }
 
-            public void Set(string key, string value)
+            public new T this[string key]
             {
+                get
+                {
+                    return Get(key);
+                }
+                set
+                {
+                    Set(key, value);
+                }
+            }
+
+            public T Get(string key)
+            {
+                if (string.IsNullOrEmpty(key))
+                    return default(T);
                 if (CaseSensitive)
                 {
-                    this[key] = value;
+                    if (!base.ContainsKey(key))
+                        return default(T);
+                    return base[key];
+                }
+                string map = key.ToUpperInvariant();
+                if (Index == null || !Index.ContainsKey(map))
+                    return default(T);
+                return base[Index[map]];
+            }
+
+            public void Get(string key, out T value)
+            {
+                value = Get(key);
+            }
+
+            public void Set(string key, T value)
+            {
+                if (string.IsNullOrEmpty(key))
+                    return;
+                if (CaseSensitive)
+                {
+                    base[key] = value;
                     return;
                 }
                 string map = key.ToUpperInvariant();
                 if (Index != null && Index.ContainsKey(map))
                 {
                     string link = Index[map];
-                    this[link] = value;
+                    base[link] = value;
                 }
                 else
                 {
-                    this[key] = value;
+                    base[key] = value;
                     if (Index == null)
                         Index = new Dictionary<string, string>();
                     Index.Add(map, key);
@@ -202,12 +295,26 @@ namespace Energy.Base
             public string[] ToArray(string separator)
             {
                 List<string> list = new List<string>();
-                foreach (string key in this.Keys)
+                if (CaseSensitive)
                 {
-                    list.Add(string.Concat(key, separator, this[key]));
+                    foreach (string key in base.Keys)
+                    {
+                        list.Add(string.Concat(key, separator, Energy.Base.Cast.ObjectToString(base[key])));
+                    }
+                }
+                else
+                {
+                    foreach (string key in Index.Keys)
+                    {
+                        list.Add(string.Concat(Index[key], separator, Energy.Base.Cast.ObjectToString(base[Index[key]])));
+                    }
                 }
                 return list.ToArray();
             }
+        }
+
+        public class StringDictionary : StringDictionary<string>
+        {
         }
 
         #endregion
