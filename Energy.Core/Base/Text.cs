@@ -131,5 +131,31 @@ namespace Energy.Base
         {
             return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
         }
+
+        /// <summary>
+        /// Test function delegate
+        /// </summary>
+        public delegate string ConvertAction(string value);
+
+        public static string Convert(string value, ConvertAction action)
+        {
+            if (action == null)
+                return value;
+
+            return action(value);
+        }
+
+        public static string[] Convert(string[] array, ConvertAction action)
+        {
+            if (action == null)
+                return array;
+
+            List<string> a = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                a.Add(action(array[i]));
+            }
+            return a.ToArray();
+        }
     }
 }

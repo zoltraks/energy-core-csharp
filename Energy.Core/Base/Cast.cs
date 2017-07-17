@@ -12,6 +12,20 @@ namespace Energy.Base
     {
         #region As
 
+        public static T As<T>(object value)
+        {
+            Type r = typeof(T);
+            Type t = value.GetType();
+
+            if (t == r)
+                return (T)value;
+
+            if (r == typeof(string))
+                return (T)(object)(ObjectToString(value));
+
+            return default(T);
+        }
+
         /// <summary>
         /// Convert string to integer value without exception
         /// </summary>
@@ -91,6 +105,16 @@ namespace Energy.Base
         public static string AsString(DateTime? stamp)
         {
             return Energy.Base.Cast.DateTimeToString(stamp);
+        }
+
+        /// <summary>
+        /// Return as string using ObjectToString method
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static string AsString(object o)
+        {
+            return ObjectToString(o);
         }
 
         /// <summary>
