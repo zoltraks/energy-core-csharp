@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Base\Color.cs" />
+    <Compile Include="Base\Collection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
