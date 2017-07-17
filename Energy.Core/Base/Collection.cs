@@ -194,7 +194,7 @@ namespace Energy.Base
 
         #region StringDictionary
 
-        public class StringDictionary<T> : Dictionary<string, T>
+        public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
             /// <summary>
             /// Index of keys for case insensitive option
@@ -204,7 +204,8 @@ namespace Energy.Base
             private bool _CaseSensitive = true;
 
             /// <summary>
-            /// Should keys be case sensitive (default) or not
+            /// Should keys be case sensitive (default) or case insensitive.
+            /// When set to false lower key names will be treated as upper.
             /// </summary>
             public bool CaseSensitive
             {
@@ -223,6 +224,18 @@ namespace Energy.Base
                         RebuildIndex();
                 }
             }
+
+            private readonly object _Lock = new object();
+
+            private string _XmlParentSeparator = ".";
+            private readonly object _XmlParentSeparatorLock = new object();
+            /// <summary>XmlParentSeparator</summary>
+            public string XmlParentSeparator { get { lock (_XmlParentSeparatorLock) return _XmlParentSeparator; } set { lock (_XmlParentSeparatorLock) _XmlParentSeparator = value; } }
+
+            private string _XmlEscapeString = "_";
+            private readonly object _XmlSpecialCharacterLock = new object();
+            /// <summary>XmlSpecialCharacter</summary>
+            public string XmlEscapeString { get { lock (_XmlSpecialCharacterLock) return _XmlEscapeString; } set { lock (_XmlSpecialCharacterLock) _XmlEscapeString = value; } }
 
             private void RebuildIndex()
             {
@@ -251,20 +264,24 @@ namespace Energy.Base
             {
                 if (string.IsNullOrEmpty(key))
                     return default(T);
-                if (CaseSensitive)
+
+                lock (_Lock)
                 {
-                    if (!base.ContainsKey(key))
+                    if (CaseSensitive)
+                    {
+                        if (!base.ContainsKey(key))
+                            return default(T);
+                        return base[key];
+                    }
+                    string map = key.ToUpperInvariant();
+                    if (Index == null || !Index.ContainsKey(map))
                         return default(T);
-                    return base[key];
+                    return base[Index[map]];
                 }
-                string map = key.ToUpperInvariant();
-                if (Index == null || !Index.ContainsKey(map))
-                    return default(T);
-                return base[Index[map]];
             }
 
             public void Get(string key, out T value)
-            {
+            {                
                 value = Get(key);
             }
 
@@ -272,41 +289,132 @@ namespace Energy.Base
             {
                 if (string.IsNullOrEmpty(key))
                     return;
-                if (CaseSensitive)
+
+                lock (_Lock)
                 {
-                    base[key] = value;
-                    return;
-                }
-                string map = key.ToUpperInvariant();
-                if (Index != null && Index.ContainsKey(map))
-                {
-                    string link = Index[map];
-                    base[link] = value;
-                }
-                else
-                {
-                    base[key] = value;
-                    if (Index == null)
-                        Index = new Dictionary<string, string>();
-                    Index.Add(map, key);
+                    if (CaseSensitive)
+                    {
+                        base[key] = value;
+                        return;
+                    }
+                    string map = key.ToUpperInvariant();
+                    if (Index != null && Index.ContainsKey(map))
+                    {
+                        string link = Index[map];
+                        base[link] = value;
+                    }
+                    else
+                    {
+                        base[key] = value;
+                        if (Index == null)
+                            Index = new Dictionary<string, string>();
+                        Index.Add(map, key);
+                    }
                 }
             }
 
             public string[] ToArray(string separator)
             {
                 List<string> list = new List<string>();
+                lock (_Lock)
+                {
+                    if (CaseSensitive)
+                    {
+                        foreach (string key in base.Keys)
+                        {
+                            list.Add(string.Concat(key, separator, Energy.Base.Cast.ObjectToString(base[key])));
+                        }
+                    }
+                    else
+                    {
+                        foreach (string key in Index.Keys)
+                        {
+                            list.Add(string.Concat(Index[key], separator, Energy.Base.Cast.ObjectToString(base[Index[key]])));
+                        }
+                    }
+                    return list.ToArray();
+                }
+            }
+
+            public XmlSchema GetSchema()
+            {
+                return null;
+            }
+
+            public void ReadXml(XmlReader reader)
+            {
+                string xmlParentSeparator = XmlParentSeparator;
+                string xmlEscapeString = XmlEscapeString;
+                List<string> parentList = new List<string>();
+                string currentElement = null;
+                Dictionary<string, T> d = new Dictionary<string, T>();
+                while (reader.Read())
+                {
+                    switch (reader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            parentList.Add(currentElement);
+                            currentElement = reader.Name;
+                            break;
+
+                        case XmlNodeType.Text:
+                            string[] array = Energy.Base.Text.Convert(parentList.ToArray(), XmlEscapeName);
+                            string element = string.Join(_XmlParentSeparator, parentList.ToArray());
+                            
+                            this[currentElement] = Energy.Base.Cast.As<T>((object)reader.Value);
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            if (parentList.Count == 0)
+                                currentElement = null;
+                            else
+                            {
+                                int index = parentList.Count - 1;
+                                currentElement = parentList[index];
+                                parentList.RemoveAt(index);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            private string XmlEscapeName(string value)
+            {
+                if (value.Contains(_XmlParentSeparator))
+                    return value.Replace(_XmlParentSeparator, _XmlEscapeString);
+                return value;
+            }
+
+            public void WriteXml(XmlWriter writer)
+            {
+                string[] array = ToStringArray();
+                for (int i = 0; i < array.Length; i += 2)
+                {
+                    int v = i + 1;
+                    writer.WriteStartElement(XmlEscapeName(array[i]));
+                    if (array[v] != null)
+                        writer.WriteString(array[v]);
+                    writer.WriteEndElement();
+                }
+            }
+
+            private string[] ToStringArray()
+            {
+                List<string> list = new List<string>();
                 if (CaseSensitive)
                 {
-                    foreach (string key in base.Keys)
+                    foreach (KeyValuePair<string, T> e in this)
                     {
-                        list.Add(string.Concat(key, separator, Energy.Base.Cast.ObjectToString(base[key])));
+                        list.Add(e.Key);
+                        list.Add(Energy.Base.Cast.AsString((object)e.Value));
                     }
                 }
                 else
                 {
-                    foreach (string key in Index.Keys)
+                    foreach (KeyValuePair<string, string> x in this.Index)
                     {
-                        list.Add(string.Concat(Index[key], separator, Energy.Base.Cast.ObjectToString(base[Index[key]])));
+                        list.Add(x.Key);
+                        list.Add(Energy.Base.Cast.AsString((object)this[x.Value]));
                     }
                 }
                 return list.ToArray();

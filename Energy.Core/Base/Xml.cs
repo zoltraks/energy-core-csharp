@@ -275,5 +275,32 @@ namespace Energy.Base
             writer.WriteValue(value);
             writer.WriteEndElement();
         }
+
+        public static string GetXmlRoot(object _)
+        {
+            if (_ == null)
+                return null;
+
+            object rootObject = Energy.Base.Class.GetFieldOrPropertyValue(_, "Root", false, false);
+
+            if (rootObject != null && rootObject is string)
+                return (string)rootObject;
+
+            return GetXmlRoot(_.GetType());
+        }
+
+        public static string GetXmlRoot(Type type)
+        {
+            XmlRootAttribute xmlRootAttribute = (XmlRootAttribute)
+                Energy.Base.Class.GetClassAttribute(type, typeof(XmlRootAttribute));
+            if (xmlRootAttribute != null)
+                return xmlRootAttribute.ElementName;
+            Energy.Attribute.Data.ElementAttribute attributeElement = (Energy.Attribute.Data.ElementAttribute)
+                Energy.Base.Class.GetClassAttribute(type, typeof(Energy.Attribute.Data.ElementAttribute));
+            if (attributeElement != null)
+                return attributeElement.Name;
+
+            return "";
+        }
     }
 }

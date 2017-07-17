@@ -9,6 +9,29 @@ namespace Energy.Core
     /// </summary>
     public class Configuration : Energy.Interface.ILoadFromFile
     {
+        public abstract class File
+        {
+            private string _FileName = Energy.Core.Information.GetCurrentNamespace() + ".conf";
+            /// <summary>File</summary>
+            [System.Xml.Serialization.XmlIgnore]
+            public string FileName { get { return _FileName; } set { _FileName = value; } }
+
+            private DateTime _FileStamp;
+            /// <summary>Stamp</summary>
+            [System.Xml.Serialization.XmlIgnore]
+            public DateTime FileStamp { get { return _FileStamp; } set { _FileStamp = value; } }
+
+            private string _FilePath = "";
+            /// <summary>File</summary>
+            [System.Xml.Serialization.XmlIgnore]
+            public string FilePath { get { return _FilePath; } set { _FilePath = value; } }
+
+            private int _FileSize;
+            /// <summary>Size</summary>
+            [System.Xml.Serialization.XmlIgnore]
+            public int FileSize { get { return _FileSize; } set { _FileSize = value; } }
+        }
+
         public class Option
         {
             public string Name;
