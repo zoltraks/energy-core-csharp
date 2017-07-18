@@ -17,6 +17,24 @@ namespace Energy.Source
         {
         }
 
+        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
+        {
+            if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
+            {
+                throw new Exception("Vendor must derrive from DbConnection class");
+            }
+            this.Dialect = dialect;
+            this.Vendor = vendor;
+            this.ConnectionString = connectionString;
+        }
+
+        public Connection(Type vendor, Configuration configuration)
+        {
+            this.Vendor = vendor;
+            this.Dialect = configuration.Dialect;
+            this.ConnectionString = configuration.ConnectionString;
+        }
+
         #endregion
 
         private int _Repeat = 1;
@@ -107,26 +125,6 @@ namespace Energy.Source
                     _Vendor = value.GetType();
                 }
             }
-        }
-
-        private Configuration configuration;
-
-        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
-        {
-            if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
-            {
-                throw new Exception("Vendor must derrive from DbConnection class");
-            }
-            this.Dialect = dialect;
-            this.Vendor = vendor;
-            this.ConnectionString = connectionString;
-        }
-
-        public Connection(Type vendor, Configuration configuration)
-        {
-            this.Vendor = vendor;
-            this.Dialect = configuration.Dialect;
-            this.configuration = configuration;
         }
 
         public bool Active
@@ -568,9 +566,9 @@ namespace Energy.Source
             Vendor = typeof(T);
         }
 
-        public Connection(Energy.Enumeration.SqlDialect dialect)
-            : this()
+        public Connection(Energy.Enumeration.SqlDialect dialect)            
         {
+            Vendor = typeof(T);
             Dialect = dialect;
         }
     }

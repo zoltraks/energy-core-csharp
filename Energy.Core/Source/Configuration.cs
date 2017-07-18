@@ -15,7 +15,8 @@ namespace Energy.Source
     public class Configuration
     {     
         /// <summary>
-        /// Connection string type. This value is used for making connection string for any SQL server in exact form recognized by .
+        /// Connection string database dialect type.
+        /// This value is used for making connection string for any SQL server in exact form recognized by server of that dialect.
         /// </summary>
         public Energy.Enumeration.SqlDialect Dialect { get; set;  }
 
@@ -65,6 +66,17 @@ namespace Energy.Source
         /// Charset
         /// </summary>
         public string Charset { get; set; }
+
+        /// <summary>
+        /// Connection string property
+        /// </summary>
+        public string ConnectionString
+        {
+            get
+            {
+                return GetConnectionString();
+            }
+        }
 
         /// <summary>
         /// Represent configuration as connection string.
@@ -185,7 +197,15 @@ namespace Energy.Source
                     list.Add("charset=" + Charset);
             }
 
-            return String.Concat(prefix, ":", String.Join(";", list.ToArray()));
+            if (list.Count > 0)
+            {
+                string text = string.Join(";", list.ToArray());
+                if (!string.IsNullOrEmpty(prefix))
+                    text = string.Concat(prefix, ":", text);
+                return text;
+            }
+
+            return "";
         }
 
         private static readonly string[] hostArray = new string[] { "Data Source", "Host", "Server" };
