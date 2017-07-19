@@ -63,6 +63,7 @@
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Plain.cs" />
     <Compile Include="Base\Queue.cs" />
+    <Compile Include="Base\Random.cs" />
     <Compile Include="Base\Range.cs" />
     <Compile Include="Base\Time.cs" />
     <Compile Include="Base\Tree.cs" />

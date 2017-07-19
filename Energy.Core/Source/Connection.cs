@@ -13,24 +13,25 @@ namespace Energy.Source
     {
         #region Constructor
 
-        public Connection()
+        public Connection(Type vendor)
         {
-        }
-
-        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
-        {
-            if (vendor != null && !vendor.IsSubclassOf(typeof(DbConnection)))
+            if (vendor == null || !vendor.IsSubclassOf(typeof(DbConnection)))
             {
                 throw new Exception("Vendor must derrive from DbConnection class");
             }
-            this.Dialect = dialect;
             this.Vendor = vendor;
+        }
+
+        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
+            : this(vendor)
+        {
+            this.Dialect = dialect;
             this.ConnectionString = connectionString;
         }
 
         public Connection(Type vendor, Configuration configuration)
+            : this (vendor)
         {
-            this.Vendor = vendor;
             this.Dialect = configuration.Dialect;
             this.ConnectionString = configuration.ConnectionString;
         }
