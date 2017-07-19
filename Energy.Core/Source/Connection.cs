@@ -30,7 +30,7 @@ namespace Energy.Source
         }
 
         public Connection(Type vendor, Configuration configuration)
-            : this (vendor)
+            : this(vendor)
         {
             this.Dialect = configuration.Dialect;
             this.ConnectionString = configuration.ConnectionString;
@@ -567,7 +567,7 @@ namespace Energy.Source
             Vendor = typeof(T);
         }
 
-        public Connection(Energy.Enumeration.SqlDialect dialect)            
+        public Connection(Energy.Enumeration.SqlDialect dialect)
         {
             Vendor = typeof(T);
             Dialect = dialect;
