@@ -13,6 +13,8 @@ namespace Energy.Source
     {
         #region Constructor
 
+        public Connection() { }
+
         public Connection(Type vendor)
         {
             if (vendor == null || !vendor.IsSubclassOf(typeof(DbConnection)))

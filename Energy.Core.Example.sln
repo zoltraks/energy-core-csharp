@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringDictionary", "Energy.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Test", "Energy.Core.Test\Energy.Core.Test.csproj", "{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerConnection", "SqlServerConnection\SqlServerConnection.csproj", "{1A7BDE7D-1FC5-4603-BE18-161242A6482D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerConnection", "Energy.Core.Example\SqlServerConnection\SqlServerConnection.csproj", "{1A7BDE7D-1FC5-4603-BE18-161242A6482D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
