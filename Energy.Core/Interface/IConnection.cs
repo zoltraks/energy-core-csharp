@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Energy.Source.Interface
+namespace Energy.Interface
 {
     public interface IConnection
     {
@@ -26,7 +26,7 @@ namespace Energy.Source.Interface
         /// Execute SQL statement
         /// </summary>
         /// <param name="query">SQL query</param>
-        /// <returns>Return -1 on error or number of rows affected</returns>
+        /// <returns>Return negative error number (&lt;0) or number of rows affected (&gt;=0)</returns>
         int Execute(string query);
 
         /// <summary>
@@ -34,6 +34,10 @@ namespace Energy.Source.Interface
         /// </summary>
         /// <param name="query">SQL query</param>
         /// <returns></returns>
-        object Fetch(string query);
+        System.Data.DataTable Fetch(string query);
+
+        Energy.Base.Variant.Value Scalar(string query);
+
+        object Single(string query);
     }
 }

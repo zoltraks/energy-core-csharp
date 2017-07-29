@@ -38,6 +38,16 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Set product and compilation information
+        /// </summary>
+        /// <param name="assembly">System.Reflection.Assembly</param>
+        public void Set(Assembly assembly)
+        {
+            Product = GetProduct(assembly);
+            Compilation = GetCompilation(assembly);
+        }
+
         #region Static
 
         /// <summary>
@@ -75,18 +85,6 @@ namespace Energy.Core
             }
         }
 
-        #endregion
-
-        /// <summary>
-        /// Set product and compilation information
-        /// </summary>
-        /// <param name="assembly">System.Reflection.Assembly</param>
-        public void Set(Assembly assembly)
-        {
-            Product = GetProduct(assembly);
-            Compilation = GetCompilation(assembly);
-        }
-
         /// <summary>
         /// Compare two versions
         /// </summary>
@@ -120,6 +118,8 @@ namespace Energy.Core
         {
             return Compare(a, b, new char[] { '.', '-', '_' });
         }
+
+        #endregion
 
         #region Library version information
 

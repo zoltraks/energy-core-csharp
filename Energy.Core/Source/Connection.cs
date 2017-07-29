@@ -5,11 +5,10 @@ using System.Data;
 using System.Data.Common;
 using System.Xml.Serialization;
 using System.Threading;
-using Energy.Source.Interface;
 
 namespace Energy.Source
 {
-    public class Connection : IDisposable, Energy.Source.Interface.IConnection
+    public class Connection : IDisposable, Energy.Interface.IConnection
     {
         #region Constructor
 
@@ -40,21 +39,62 @@ namespace Energy.Source
 
         #endregion
 
-        private int _Repeat = 1;
+        private int _Repeat = 0;
         /// <summary>Repeat operation after recoverable error</summary>
         public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
 
-        private int _Timeout;
+        private int _Timeout = 30;
         /// <summary>Time limit in seconds for SQL operations</summary>
         public int Timeout { get { return _Timeout; } set { _Timeout = value; } }
 
-        /// <summary>
-        /// SQL dialect
-        /// </summary>
-        public Energy.Enumeration.SqlDialect Dialect { get; set; }
+        private bool _Pooling = true;
+        private readonly object _PoolingLock = new object();
+        /// <summary>Pooling</summary>
+        public bool Pooling { get { lock (_PoolingLock) return _Pooling; } set { lock (_PoolingLock) _Pooling = value; } }
+
+        private readonly object _PropertyLock = new object();
+
+        private Query.Dialect _Query;
+        /// <summary>Query</summary>
+        public Query.Dialect Query
+        {
+            get
+            {
+                lock (_PropertyLock)
+                {
+                    if (_Query == null && _Dialect != Enumeration.SqlDialect.None)
+                        _Query = new Source.Query.Dialect(_Dialect);
+                    return _Query;
+                }
+            }
+            set
+            {
+                lock (_PropertyLock)
+                    _Query = value;
+            }
+        }
+
+        private Energy.Enumeration.SqlDialect _Dialect;
+        private readonly object _DialectLock = new object();
+        /// <summary>Dialect</summary>
+        public Energy.Enumeration.SqlDialect Dialect
+        {
+            get
+            {
+                lock (_PropertyLock)
+                    return _Dialect;
+            }
+            set
+            {
+                lock (_PropertyLock)
+                {
+                    _Dialect = value;
+                }
+            }
+        }
 
         private System.Type _Vendor;
-
+        private readonly object _VendorLock = new object();
         /// <summary>
         /// DbConnection vendor class for SQL connection
         /// </summary>
@@ -62,17 +102,29 @@ namespace Energy.Source
         {
             get
             {
-                return _Vendor;
+                lock (_VendorLock)
+                    return _Vendor;
             }
             set
             {
-                if (value != _Vendor)
+                if (value != Vendor)
                 {
                     Close();
-                    _Vendor = value;
-                    _Driver = null;
+                    Clear();
                 }
+                lock (_VendorLock)
+                    _Vendor = value;
             }
+        }
+
+        private void Clear()
+        {
+            lock (_VendorLock)
+                _Vendor = null;
+            lock (_DriverLock)
+                _Driver = null;
+            lock (_PropertyLock)
+                _Query = null;
         }
 
         /// <summary>
@@ -91,7 +143,18 @@ namespace Energy.Source
         /// </summary>
         public Energy.Core.Configuration Configuration { get; set; }
 
+        private class LO
+        {
+            public LO()
+            {
+                Console.WriteLine("LO");
+            }
+        }
+
+
         private DbConnection _Driver;
+
+        private readonly LO _DriverLock = new LO();
 
         /// <summary>
         /// SQL connection driver class.
@@ -130,15 +193,26 @@ namespace Energy.Source
             }
         }
 
+        private int _ErrorNumber;
+        /// <summary>ErrorNumber</summary>
+        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } set { lock (_PropertyLock) _ErrorNumber = value; } }
+
+        private string _ErrorStatus;
+        /// <summary>ErrorStatus</summary>
+        public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } set { lock (_PropertyLock) _ErrorStatus = value; } }
+
         public bool Active
         {
             get
             {
-                if (_Driver == null)
-                    return false;
-                if (_Driver.State == ConnectionState.Broken || _Driver.State == ConnectionState.Closed)
-                    return false;
-                return true;
+                lock (_DriverLock)
+                {
+                    if (_Driver == null)
+                        return false;
+                    if (_Driver.State == ConnectionState.Broken || _Driver.State == ConnectionState.Closed)
+                        return false;
+                    return true;
+                }
             }
         }
 
@@ -146,20 +220,21 @@ namespace Energy.Source
         {
             get
             {
-                if (_Driver == null)
+                lock (_DriverLock)
+                {
+                    if (_Driver == null)
+                        return false;
+                    if (_Driver.State == ConnectionState.Connecting || _Driver.State == ConnectionState.Executing || _Driver.State == ConnectionState.Fetching)
+                        return true;
                     return false;
-                if (_Driver.State == ConnectionState.Connecting || _Driver.State == ConnectionState.Executing || _Driver.State == ConnectionState.Fetching)
-                    return true;
-                return false;
+                }
             }
         }
 
         public bool Open()
         {
             if (Active)
-            {
                 Close();
-            }
             try
             {
                 if (Log != null)
@@ -210,22 +285,27 @@ namespace Energy.Source
         /// <summary>
         /// Close connection
         /// </summary>
-        private void Close()
+        public void Close()
         {
-            if (_Driver == null) return;
-            try
+            DbException exception = null;
+            lock (_DriverLock)
             {
-                _Driver.Close();
-            }
-            catch (DbException x)
-            {
-                if (Log == null)
+                if (_Driver == null)
+                    return;
+                try
                 {
-                    throw;
+                    _Driver.Close();
                 }
-                Log.Add(x);
+                catch (DbException x)
+                {
+                    if (Log == null)
+                        throw;
+                    exception = x;
+                }
+                _Driver = null;
             }
-            _Driver = null;
+            if (exception != null && Log != null)
+                Log.Add(exception);
         }
 
         #region CatchResult
@@ -318,12 +398,10 @@ namespace Energy.Source
         /// </remarks>
         /// <param name="exception"></param>
         /// <param name="command"></param>
-        /// <returns></returns>
+        /// <returns>True if operation can be repeated</returns>
         private bool Catch(Exception exception, DbCommand command)
         {
             CatchResult result = new Energy.Source.Connection.CatchResult();
-
-            List<int> error = new List<int>();
 
             string message = exception.Message;
 
@@ -334,14 +412,7 @@ namespace Energy.Source
                 //}
             }
 
-            Exception e = exception;
-            while (e != null)
-            {
-                int _Number = Energy.Base.Cast.ObjectToInteger(Energy.Base.Class.GetFieldOrPropertyValue(e, "Number", true, false));
-                if (_Number > 0 && !error.Contains(_Number))
-                    error.Add(_Number);
-                e = e.InnerException;
-            }
+            int[] error = GetErrorNumber(exception);
 
             foreach (int number in error)
             {
@@ -405,7 +476,9 @@ namespace Energy.Source
             // Log
 
             if (Log != null)
+            {
                 Log.Add(result.ToString(), Enumeration.LogLevel.Trace);
+            }
 
             // Reaction
 
@@ -436,6 +509,20 @@ namespace Energy.Source
             return result.Timeout || result.Damage;
         }
 
+        private int[] GetErrorNumber(Exception exception)
+        {
+            List<int> error = new List<int>();
+            Exception e = exception;
+            while (e != null)
+            {
+                int _Number = Energy.Base.Cast.ObjectToInteger(Energy.Base.Class.GetFieldOrPropertyValue(e, "Number", true, false));
+                if (_Number > 0 && !error.Contains(_Number))
+                    error.Add(_Number);
+                e = e.InnerException;
+            }
+            return error.ToArray();
+        }
+
         public virtual DataSet Read(string query)
         {
             bool active = Active;
@@ -449,47 +536,97 @@ namespace Energy.Source
 
         public virtual DataTable Fetch(string query)
         {
-            for (int i = 0; i <= _Repeat; i++)
+            if (!Active && !Open())
+                return null;
+
+            ClearError();
+
+            try
             {
-                if (!Active && !Open())
+                using (DbCommand command = Prepare(query))
                 {
+                    for (int i = 0; i <= _Repeat; i++)
+                    {
+                        try
+                        {
+                            using (DbDataReader reader = command.ExecuteReader())
+                            {
+                                DataTable table = new DataTable();
+                                table.Load(reader);
+                                command.Cancel();
+                                reader.Close();
+                                return table;
+                            }
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            command.Cancel();
+                            if (Catch(x, command))
+                                continue;
+                        }
+                    }
+
                     return null;
                 }
-                DbCommand command = Driver.CreateCommand();
-                command.CommandText = query;
-                DbDataReader reader = null;
-                try
-                {
-                    Prepare(command);
-                    reader = command.ExecuteReader();
-                    return new DataTable();
-                }
-                catch { }
             }
-            return null;
-        }
-
-        private void Prepare(DbCommand command)
-        {
-            command.Connection = _Driver;
-            if (Timeout > 0)
+            finally
             {
-                command.CommandTimeout = Timeout;
+                if (Pooling)
+                    Close();
             }
         }
 
-        public virtual object Scalar(string query)
+        private void SetError(Exception x)
+        {
+            ErrorStatus = x.Message;
+
+            int[] error = GetErrorNumber(x);
+            if (error == null || error.Length == 0)
+                ErrorNumber = 0;
+            else
+            {
+                for (int i = 0; i < error.Length; i++)
+                {
+                    if (error[i] != 0)
+                    {
+                        ErrorNumber = error[i];
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void ClearError()
+        {
+            ErrorNumber = 0;
+            ErrorStatus = "";
+        }
+
+        public virtual object Single(string query)
+        {
+            return new object();
+        }
+
+        private DbCommand Prepare(string query)
+        {
+            DbCommand command = Driver.CreateCommand();
+            //command.Connection = _Driver;
+            command.CommandTimeout = Timeout;
+            command.CommandText = query;
+            return command;
+        }
+
+        public virtual Energy.Base.Variant.Value Scalar(string query)
         {
             if (!Active && !Open())
-            {
                 return null;
-            }
             DbCommand command = Driver.CreateCommand();
             command.CommandText = Parse(query);
             try
             {
                 object value = command.ExecuteScalar();
-                return value == DBNull.Value ? null : value;
+                return new Energy.Base.Variant.Value(value);
             }
             catch (DbException x)
             {
@@ -502,15 +639,21 @@ namespace Energy.Source
             }
         }
 
-        public virtual string Execute(string query)
+        public virtual int Execute(string query)
         {
             if (!Active && !Open())
-            {
-                return null;
+            {                
+                return GetNegativeErrorNumber();
             }
+            int count = 0;
             DbCommand command = Driver.CreateCommand();
             command.CommandText = Parse(query);
-            return null;
+            return count;
+        }
+
+        private int GetNegativeErrorNumber()
+        {
+            return ErrorNumber != 0 ? -Math.Abs(ErrorNumber) : -1;
         }
 
         public virtual string Parse(string query)
@@ -541,21 +684,6 @@ namespace Energy.Source
         {
             throw new NotImplementedException();
         }
-
-        int IConnection.Execute(string query)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IConnection.Close()
-        {
-            throw new NotImplementedException();
-        }
-
-        object IConnection.Fetch(string query)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     /// <summary>
@@ -566,13 +694,20 @@ namespace Energy.Source
     {
         public Connection()
         {
-            Vendor = typeof(T);
+            this.Vendor = typeof(T);
+            Dialect = Energy.Source.Query.Dialect.Guess(Vendor.Name, Vendor.FullName);
+        }
+
+        public Connection(string connectionString)
+            : this()
+        {
+            this.ConnectionString = connectionString;
         }
 
         public Connection(Energy.Enumeration.SqlDialect dialect)
         {
-            Vendor = typeof(T);
-            Dialect = dialect;
+            this.Vendor = typeof(T);
+            this.Dialect = dialect;
         }
     }
 }

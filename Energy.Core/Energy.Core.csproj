@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Application.ico</ApplicationIcon>
@@ -62,12 +64,14 @@
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Plain.cs" />
+    <Compile Include="Base\Query.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Random.cs" />
     <Compile Include="Base\Range.cs" />
     <Compile Include="Base\Time.cs" />
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Base\Variant.cs" />
+    <Compile Include="Base\Version.cs" />
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Core\Syntax.cs" />
@@ -78,7 +82,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Query\Dialect\ANSI.cs" />
-    <Compile Include="Source\Interface\IConnection.cs" />
+    <Compile Include="Query\Dialect\Generic.cs" />
+    <Compile Include="Interface\IConnection.cs" />
+    <Compile Include="Source\Query.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Url.cs" />

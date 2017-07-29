@@ -40,6 +40,17 @@ namespace Energy.Base
             return Energy.Base.Cast.StringToInteger(value.ToString());
         }
 
+        public static byte ObjectToByte(object value)
+        {
+            if (value == null)
+                return (byte)0;
+            if (value is byte)
+                return (byte)value;
+            if (value is string)
+                return StringToByte((string)value);
+            return (byte)(ObjectToInteger(value) % 256);
+        }
+
         /// <summary>
         /// Convert string to long integer value without exception
         /// </summary>
@@ -156,7 +167,8 @@ namespace Energy.Base
         // Possible solution: check if string is a numeric value and treat 0 as false.     
         public static bool StringToBool(string text)
         {
-            if (String.IsNullOrEmpty(text) || text == "0") return false;
+            if (string.IsNullOrEmpty(text) || text == "0")
+                return false;
             switch (text.Trim().ToUpper())
             {
                 case "":
@@ -247,6 +259,31 @@ namespace Energy.Base
                 return result;
             return 0;
         }
+
+        #endregion
+
+        #region Byte
+
+        /// <summary>
+        /// Convert string to byte value without exception
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
+        public static byte StringToByte(string value)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            byte result = 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            string trim = Energy.Base.Text.TrimWhite(value);
+            if (trim.Length == value.Length)
+                return 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            return 0;
+        }
+
 
         #endregion
 
@@ -665,6 +702,56 @@ namespace Energy.Base
                 return (long)d;
 
             return 0;
+        }
+
+        public static bool ObjectToBool(object value)
+        {
+            if (value == null)
+                return false;
+            if (value is int)
+                return (int)value != 0;
+            if (value is long)
+                return (long)value != 0;
+            if (value is string)
+                return StringToBool((string)value);
+            if (value is double)
+                return (double)value != 0;
+            if (value is byte)
+                return (byte)value != 0;
+            if (value is float)
+                return (float)value != 0;
+            if (value is char)
+                return CharToBool((char)value);
+            if (value is sbyte)
+                return (sbyte)value != 0;
+            if (value is double)
+                return (double) value != 0;
+            if (value is uint)
+                return (uint)value != 0;
+            if (value is ulong)
+                return (ulong)value != 0;
+            if (value is Int16)
+                return (Int16)value != 0;
+            if (value is UInt64)
+                return (UInt64)value != 0;
+            if (value is decimal)
+                return (decimal)value != 0;
+            if (value is DateTime)
+                return (DateTime)value != DateTime.MinValue;
+            if (value is TimeSpan)
+                return (TimeSpan)value != TimeSpan.MinValue;
+            if (value == DBNull.Value)
+                return false;
+            if (value.GetType().IsArray)
+                return ((object[])value).Length > 0;
+
+            return StringToBool(ObjectToString(value));
+        }
+
+        public static bool CharToBool(char value)
+        {
+            char _ = (char)value;
+            return _ != '\0' && _ != '0';
         }
 
         public static int ObjectToInteger(object value)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -290,6 +291,26 @@ namespace Energy.Base
                 }
             }
             return list.ToArray();
+        }
+
+        /// <summary>
+        /// Get list of objects of specified type from list.
+        /// </summary>
+        /// <param name="list">List of objects</param>
+        /// <param name="type">Type to filter</param>
+        /// <returns>List of filtered objects</returns>
+        public static IEnumerable GetObjectsOfType(IEnumerable list, Type type)
+        {
+            List<object> l = new List<object>();
+            foreach (object o in list)
+            {
+                Type t = o.GetType();
+                if (t == type || t.IsSubclassOf(type))
+                {
+                    l.Add(o);
+                }
+            }
+            return l;
         }
     }
 }

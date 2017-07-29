@@ -35,7 +35,7 @@ namespace Energy.Query
 
         #endregion
 
-        private Energy.Query.Format format;
+        private Energy.Source.Query.Format format;
 
         private Energy.Enumeration.SqlDialect dialect;
 

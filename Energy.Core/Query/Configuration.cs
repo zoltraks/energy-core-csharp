@@ -9,6 +9,7 @@ namespace Energy.Query
         #region Singleton
 
         private static Configuration _Default;
+        private readonly static object _DefaultLock = new object();
         /// <summary>Singleton</summary>
         public static Configuration Default
         {
@@ -16,7 +17,7 @@ namespace Energy.Query
             {
                 if (_Default == null)
                 {
-                    lock (typeof(Configuration))
+                    lock (_DefaultLock)
                     {
                         if (_Default == null)
                         {

@@ -5,28 +5,33 @@ using System.Text;
 namespace Energy.Core
 {
     /// <summary>
-    /// Thread worker base class for making threading even simpler
+    /// Thread worker base class for making threading even simpler.
     /// </summary>
     public class Worker<T>
     {
         private DateTime _LastStartTime;
         private readonly object _StartTimeLock = new object();
+
         /// <summary>Time of last start of execution</summary>
         public DateTime LastStartTime {
             get { lock (_StartTimeLock) return _LastStartTime; }
             private set { lock (_StartTimeLock) _LastStartTime = value; }
         }
 
+        private readonly object _IsRunningLock = new object();
         /// <summary>Is thread still running?</summary>
         public bool IsRunning
         {
             get
             {
-                if (_Thread == null)
+                lock (_IsRunningLock)
+                {
+                    if (_Thread == null)
+                        return false;
+                    if (_Thread.IsAlive)
+                        return true;
                     return false;
-                if (_Thread.IsAlive)
-                    return true;
-                return false;
+                }
             }
         }
 
@@ -38,11 +43,16 @@ namespace Energy.Core
             set { lock (_StateLock) _State = value; }
         }
 
-        private System.Threading.Thread _Thread;
+        private bool _Stopped = true;
+        private readonly object _StoppedLock = new object();
+        /// <summary>Stopped</summary>
+        public bool Stopped { get { lock (_StoppedLock) return _Stopped; } set { lock (_StoppedLock) _Stopped = value; } }
 
+        private System.Threading.Thread _Thread;
         /// <summary>Thread</summary>
         public System.Threading.Thread Thread {
             get { return _Thread; }
+            private set { _Thread = value; }
         }
 
         public Worker()
@@ -59,9 +69,83 @@ namespace Energy.Core
         {
             if (IsRunning)
                 return;
+            this.Stopped = false;
+            System.Threading.Thread thread = new System.Threading.Thread(Work);
+            thread.Start(this);
+            this.Thread = thread;
+        }
 
+        public void Stop()
+        {
+            Stopped = true;
+        }
+
+        public virtual void Work(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WaitForExit(int time)
+        {
+            return Worker.WaitForExit(_Thread, time);
         }
     }
 
-    public class Worker : Worker<object> { }
+    public class Worker : Worker<object>
+    {
+        public class Loop<T>: Worker<T>
+        {
+
+        }
+
+        /// <summary>
+        /// Wait for thread exit, return true if exited, false if still running.
+        /// </summary>
+        /// <param name="thread"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static bool WaitForExit(System.Threading.Thread thread, int time)
+        {
+            if (thread == null || !thread.IsAlive)
+                return true;
+            System.Threading.ManualResetEvent manualResetEvent = new System.Threading.ManualResetEvent(false);
+            WaitForExitParameter parameter = new Core.Worker.WaitForExitParameter()
+            {
+                ManualResetEvent = manualResetEvent,
+                Thread = thread,
+            };
+            System.Threading.Thread guardian = new System.Threading.Thread(WaitForExit);
+            guardian.Start(parameter);
+            bool success = manualResetEvent.WaitOne(time);
+            if (!success)
+            {
+                guardian.Abort();
+                return false;
+            }
+            return true;
+        }
+
+        private static void WaitForExit(object parameter)
+        {
+            WaitForExitParameter data = parameter as WaitForExitParameter;
+            try
+            {
+                data.Thread.Join();
+                data.Result = true;
+                data.ManualResetEvent.Set();
+            }
+            catch (System.Threading.ThreadAbortException)
+            {
+            }
+        }
+
+        private class WaitForExitParameter
+        {
+            public System.Threading.ManualResetEvent ManualResetEvent;
+
+            public System.Threading.Thread Thread;
+
+            public bool Result;
+        }
+    }
 }

@@ -4,8 +4,13 @@ using System.Text;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Various formatting functions
+    /// </summary>
     public class Format
     {
+        #region Text quotation format
+
         public class Quote
         {
             private string prefix;
@@ -53,6 +58,10 @@ namespace Energy.Base
 
             public string Bracket
             {
+                get
+                {
+                    return string.Concat(prefix, suffix);
+                }
                 set
                 {
                     if (value.Length % 2 == 0)
@@ -101,5 +110,7 @@ namespace Energy.Base
                 return Unescape(content.Substring((prefix ?? "").Length, content.Length - (prefix ?? "").Length - (suffix ?? "").Length));
             }
         }
+
+        #endregion
     }
 }
