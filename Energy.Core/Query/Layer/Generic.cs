@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Energy.Query.Dialect
+namespace Energy.Query.Layer
 {
     public class Generic
     {

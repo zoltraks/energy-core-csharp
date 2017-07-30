@@ -70,5 +70,10 @@ namespace Energy.Base
         /// URI pattern (scheme + user + password + host + port + path + query + fragment)
         /// </summary>
         public static readonly string Uri = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
+
+        /// <summary>
+        /// Matching for "VARCHAR(50) NOT NULL" or "DECIMAL(20, 3) NULL DEFAULT = '';"
+        /// </summary>
+        public static readonly string SqlColumnTypeSimple = @"(?<type>[\w_][\w\d_]*)\s*(?<parameter>\(\s*(?<length>[0-9][^\)]*)\))?(?:\s(?<null>(?:NOT\s+)?NULL))?";
     }
 }

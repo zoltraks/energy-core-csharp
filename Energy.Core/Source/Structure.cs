@@ -54,8 +54,26 @@ namespace Energy.Source
             [DefaultValue(false)]
             public bool Ignore { get; set; }
 
+            [DefaultValue(false)]
+            public bool Unique { get; set; }
+
+            [DefaultValue(false)]
+            public bool Unsigned { get; set; }
+
+            [DefaultValue(false)]
+            public bool NotNull { get; set; }
+
             [DefaultValue(0)]
             public int Length { get; set; }
+
+            [DefaultValue(0)]
+            public int Order { get; set; }
+
+            [DefaultValue(false)]
+            public bool Primary { get; set; }
+
+            [DefaultValue(false)]
+            public bool Index { get; set; }
 
             [DefaultValue(0)]
             public double Minimum { get; set; }
@@ -94,6 +112,30 @@ namespace Energy.Source
                     Add(item);
                     return item;
                 }
+
+                /// <summary>
+                /// Find first primary column
+                /// </summary>
+                /// <returns></returns>
+                public Column GetPrimary()
+                {
+                    List<Energy.Source.Structure.Column> list = new List<Energy.Source.Structure.Column>(this);
+                    list.Sort(delegate (Energy.Source.Structure.Column a, Energy.Source.Structure.Column b)
+                    {
+                        return a.Order.CompareTo(b.Order);
+                    });
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (list[i].Primary)
+                            return list[i];
+                    }
+                    return null;
+                }
+            }
+
+            public bool IsName(string name)
+            {
+                return 0 == string.Compare(this.Name, name, true);
             }
 
             public Column() { }
@@ -197,14 +239,31 @@ namespace Energy.Source
         [Serializable]
         public partial class Table
         {
+            /// <summary>
+            /// Table name
+            /// </summary>
             public string Name;
+
+            /// <summary>
+            /// Identity column for table
+            /// </summary>
             public string Identity;
+
+            /// <summary>
+            /// Table description
+            /// </summary>
             public string Description;
+
+            /// <summary>
+            /// Table engine (optional)
+            /// </summary>
+            public string Engine;
+
             [XmlElement("Column")]
             public Column.Array Columns = new Column.Array();
             [XmlElement("Index")]
             public Index.Array Indexes = new Index.Array();
-            [XmlElement("Keys")]
+            [XmlElement("Key")]
             public List<string> Keys = new List<string>();
 
             [XmlElement("Row")]
@@ -269,10 +328,37 @@ namespace Energy.Source
             public static Table Create(Type type)
             {
                 Table table = new Table();
+
+                Energy.Attribute.Data.TableAttribute attributeTable = (Energy.Attribute.Data.TableAttribute)
+                       Energy.Base.Class.GetClassAttribute(type, typeof(Energy.Attribute.Data.TableAttribute));
+
+                if (attributeTable != null)
+                {
+                    table.Name = attributeTable.Name;
+                    table.Description = attributeTable.Description;  
+                }
+
                 string[] fields = Energy.Base.Class.GetFieldsAndProperties(type);
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    table.Columns.New(fields[i]);
+                    Energy.Source.Structure.Column column = table.Columns.New(fields[i]);
+                    //typeof(Energy.Attribute.Data.PrimaryAttribute)
+                    Energy.Attribute.Data.PrimaryAttribute attributePrimary = (Energy.Attribute.Data.PrimaryAttribute)
+                        Energy.Base.Class.GetFieldOrPropertyAttribute(type, fields[i], typeof(Energy.Attribute.Data.PrimaryAttribute));
+                    if (attributePrimary != null)
+                        column.Primary = true;
+                    Energy.Attribute.Data.ColumnAttribute attributeColumn = (Energy.Attribute.Data.ColumnAttribute)
+                        Energy.Base.Class.GetFieldOrPropertyAttribute(type, fields[i], typeof(Energy.Attribute.Data.ColumnAttribute));
+                    if (attributeColumn != null)
+                    {
+                        column.Name = attributeColumn.Name;
+                    }
+                    Energy.Attribute.Data.TypeAttribute attributeType = (Energy.Attribute.Data.TypeAttribute)
+                        Energy.Base.Class.GetFieldOrPropertyAttribute(type, fields[i], typeof(Energy.Attribute.Data.TypeAttribute));
+                    if (attributeType != null)
+                    {
+                        column.Type = attributeType.Name;
+                    }
                 }
                 return table;
             }
@@ -291,6 +377,15 @@ namespace Energy.Source
                     return false;
                 return true;
             }
+        }
+
+        #endregion
+
+        #region Schema
+
+        public class Schema
+        {
+
         }
 
         #endregion

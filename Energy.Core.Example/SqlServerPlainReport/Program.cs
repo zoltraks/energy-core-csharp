@@ -26,12 +26,45 @@ namespace SqlServerPlainReport
             Console.ReadLine();
         }
 
+        private static Energy.Source.Connection<SqlConnection> db = null;
+
         private static void Go(string[] args)
         {
-            string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=BisSQL;Integrated Security=Yes;Connect Timeout=10;";
-            Energy.Source.Connection<SqlConnection> db = new Energy.Source.Connection<SqlConnection>(connectionString);
+            string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=platoon;Integrated Security=Yes;Connect Timeout=10;";
+            //connectionString = @"Data Source=W101-SQL01;Initial Catalog=BisSQL;Integrated Security=False;User ID=bissqluser;Password=B1sSqLP@ssW0rd;MultipleActiveResultSets=True;Connect Timeout=10";
+            //connectionString = @"Data Source=W103-FS02;Initial Catalog=BisSQLTest;Integrated Security=False;User ID=SZCbistestuser;Password=f4c!S7CzeCInSQLT3st!;MultipleActiveResultSets=True;Connect Timeout=30";
+            db = new Energy.Source.Connection<SqlConnection>(connectionString);
+
             Console.WriteLine(db.Scalar("SELECT GETDATE()"));
-            DataTable t1 = db.Fetch("SELECT * FROM shadow_user");
+
+            Test1();
+            Test2();
+        }
+
+        private static void Test1()
+        {
+            Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
+            string query;
+            query = Energy.Query.Script.Drop.Table(Energy.Enumeration.SqlDialect.MySQL, table.Name);
+            if (db.Execute(query) < 0)
+            {
+                Console.WriteLine(db.ErrorStatus);
+            }
+            Console.WriteLine(query);
+            query = Energy.Query.Script.Create.Table(Energy.Enumeration.SqlDialect.MySQL, table, null);
+            if (db.Execute(query) < 0)
+            {
+                Console.WriteLine(db.ErrorStatus);
+            }
+            Console.WriteLine(query);
+            Console.ReadLine();
+            
+        }
+
+        private static void Test2()
+        {
+
+            DataTable t1 = db.Fetch("SELECT * FROM UserTable");
             for (int j = 0; j < t1.Columns.Count; j++)
             {
                 Console.Write(t1.Columns[j].ColumnName);
@@ -47,6 +80,41 @@ namespace SqlServerPlainReport
                 }
                 Console.WriteLine();
             }
+
+            string query = "SELECT TOP 1000 * FROM LogTable ORDER BY id DESC";
+            Console.WriteLine();
+            Console.WriteLine("--- Benchmark 1 ---");
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Memory: {0}", Energy.Core.Memory.GetCurrentMemoryUsage());
+
+            Energy.Core.Benchmark.Result benchmark;
+            Console.WriteLine("Using FetchDataTable()");
+            benchmark = Energy.Core.Benchmark.Profile(() =>
+            {
+                DataTable t10 = db.FetchDataTableLoad(query);
+                if (t10 == null)
+                    Console.WriteLine(db.GetErrorText());
+                else
+                    Console.WriteLine(string.Format("Result count: {0}", t10.Rows.Count));
+            }, 3, 1, "FetchDataTableLoad");
+            Console.WriteLine(benchmark.ToString());
+
+            Console.WriteLine("Memory: {0}", Energy.Core.Memory.GetCurrentMemoryUsage());
+
+            Console.WriteLine("Using FetchDataTable2()");
+            benchmark = Energy.Core.Benchmark.Profile(() =>
+            {
+                DataTable t10 = db.FetchDataTableRead(query);
+                if (t10 == null)
+                    Console.WriteLine(db.GetErrorText());
+                else
+                    Console.WriteLine(string.Format("Result count: {0}", t10.Rows.Count));
+            }, 3, 1, "FetchDataTableRead");
+            Console.WriteLine(benchmark.ToString());
+
+            Console.WriteLine("Memory: {0}", Energy.Core.Memory.GetCurrentMemoryUsage());
         }
     }
 }

@@ -36,20 +36,37 @@ namespace Energy.Attribute
         /// </summary>
         public class TableAttribute : System.Attribute
         {
-            private string name;
+            public string Name;
+
+            public string Description;
+
+            public string Identity;
 
             /// <summary>
-            /// Name
+            /// Table name
             /// </summary>
-            public string Name { get { return name; } set { name = value; } }
-
-            /// <summary>
-            /// Column attribute with custom column name
-            /// </summary>
-            /// <param name="value"></param>
-            public TableAttribute(string value)
+            public TableAttribute()
             {
-                name = value;
+            }
+
+            /// <summary>
+            /// Table name
+            /// </summary>
+            /// <param name="name"></param>
+            public TableAttribute(string name)
+            {
+                this.Name = name;
+            }
+
+            /// <summary>
+            /// Table name with description
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="description"></param>
+            public TableAttribute(string name, string description)
+                : this(name)
+            {
+                this.Description = name;
             }
         }
 
@@ -124,6 +141,20 @@ namespace Energy.Attribute
         /// </summary>
         public class PrimaryAttribute : System.Attribute
         {
+        }
+
+        [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+        public class AttributeAttribute : System.Attribute
+        {
+            private string name;
+
+            private string value;
+
+            public AttributeAttribute(string name, string value)
+            {
+                this.name = name;
+                this.value = value;
+            }
         }
     }
 }

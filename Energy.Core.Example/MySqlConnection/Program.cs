@@ -9,10 +9,29 @@ namespace MySqlConnection
     {
         static void Main(string[] args)
         {
-            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> connection = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>(Energy.Enumeration.SqlDialect.MySQL);
-            connection.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
-            connection.Open();
-            Console.WriteLine(connection.Scalar("SELECT CURRENT_TIMESTAMP()"));
+            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>(Energy.Enumeration.SqlDialect.MySQL);
+            db.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
+            db.Open();
+            Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
+
+            db.ConnectionString = @"Server=127.0.0.1;Database=platoon;Uid=platoon;Pwd=platoon;";
+            db.Open();
+            Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
+
+            Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
+            string query;
+            query = Energy.Query.Script.Drop.Table(Energy.Enumeration.SqlDialect.MySQL, table.Name);
+            if (db.Execute(query) < 0)
+            {
+                Console.WriteLine(db.ErrorStatus);
+            }
+            Console.WriteLine(query);
+            query = Energy.Query.Script.Create.Table(Energy.Enumeration.SqlDialect.MySQL, table, null);
+            if (db.Execute(query) < 0)
+            {
+                Console.WriteLine(db.ErrorStatus);
+            }
+            Console.WriteLine(query);
             Console.ReadLine();
         }
     }

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Energy.Query.Dialect
+namespace Energy.Query
 {
-    public class ANSI
+    class Builder
     {
     }
 }

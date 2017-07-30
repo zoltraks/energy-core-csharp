@@ -36,6 +36,14 @@ namespace Energy.Interface
         /// <returns></returns>
         System.Data.DataTable Fetch(string query);
 
+        /// <summary>
+        /// Fetch query result
+        /// </summary>
+        /// <param name="query">SQL query</param>
+        /// <returns></returns>
+        System.Data.DataTable FetchDataTable(string query);
+
+
         Energy.Base.Variant.Value Scalar(string query);
 
         object Single(string query);

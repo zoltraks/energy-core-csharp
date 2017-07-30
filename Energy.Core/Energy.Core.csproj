@@ -81,9 +81,12 @@
     <Compile Include="Harmony\IniFile.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Query\Dialect\ANSI.cs" />
-    <Compile Include="Query\Dialect\Generic.cs" />
+    <Compile Include="Query\Builder.cs" />
+    <Compile Include="Query\Dialect.cs" />
+    <Compile Include="Query\Layer\ANSI.cs" />
+    <Compile Include="Query\Layer\Generic.cs" />
     <Compile Include="Interface\IConnection.cs" />
+    <Compile Include="Query\Type.cs" />
     <Compile Include="Source\Query.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
@@ -104,10 +107,10 @@
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Interface\IWork.cs" />
-    <Compile Include="Query\Dialect\SQLite.cs" />
+    <Compile Include="Query\Layer\SQLite.cs" />
     <Compile Include="Query\Format.cs" />
-    <Compile Include="Query\Dialect\MySQL.cs" />
-    <Compile Include="Query\Dialect\SqlServer.cs" />
+    <Compile Include="Query\Layer\MySQL.cs" />
+    <Compile Include="Query\Layer\SqlServer.cs" />
     <Compile Include="Query\Configuration.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Core\Application.cs" />

@@ -99,14 +99,18 @@ namespace Energy.Core
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
-        /// <param name="name"></param>
-        public static Result Profile(Action function, int iterations, string name)
+        /// <param name="warm"></param>
+        public static Result Profile(Action function, int iterations, int warm)
         {
-            Result result = new Result() { Name = name ?? function.Method.Name, Iterations = iterations };
+            Result result = new Result() { Name = function.Method.Name, Iterations = iterations };
 
             // warm up //
 
-            function();
+            while (warm-- > 0)
+            {
+                function();
+                iterations--;
+            }
 
             Stopwatch watch = new Stopwatch();
 
@@ -148,9 +152,38 @@ namespace Energy.Core
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
+        /// <param name="name"></param>
+        public static Result Profile(Action function, int iterations, string name)
+        {
+            Result result = Profile(function, iterations, 0);
+            if (!string.IsNullOrEmpty(name))
+                result.Name = name;
+            return result;
+        }
+
+        /// <summary>
+        /// Profile function
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="iterations"></param>
+        /// <param name="warm"></param>
+        /// <param name="name"></param>
+        public static Result Profile(Action function, int iterations, int warm, string name)
+        {
+            Result result = Profile(function, iterations, warm);
+            if (!string.IsNullOrEmpty(name))
+                result.Name = name;
+            return result;
+        }
+
+        /// <summary>
+        /// Profile function
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="iterations"></param>
         public static Result Profile(Action function, int iterations)
         {
-            return Profile(function, iterations, null);
+            return Profile(function, iterations, 0);
         }
 
         /// <summary>
@@ -159,7 +192,7 @@ namespace Energy.Core
         /// <param name="function"></param>
         public static Result Profile(Action function)
         {
-            return Profile(function, 1, null);
+            return Profile(function, 1, 0);
         }
 
         [System.AttributeUsage(System.AttributeTargets.Parameter)]

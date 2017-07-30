@@ -35,7 +35,7 @@ namespace Energy.Query
 
         #endregion
 
-        private Energy.Source.Query.Format format;
+        private Energy.Query.Format format;
 
         private Energy.Enumeration.SqlDialect dialect;
 
@@ -71,6 +71,8 @@ namespace Energy.Query
 
         public class Create
         {
+            private static Dialect format;
+
             /// <summary>
             /// Create table
             /// </summary>
@@ -86,11 +88,11 @@ namespace Energy.Query
                     case Enumeration.SqlDialect.None:
                         throw new Exception();
                     case Enumeration.SqlDialect.SqlServer:
-                        return (new Energy.Query.Dialect.SqlServer()).CreateTable(table);
+                        return (new Energy.Query.Layer.SqlServer()).CreateTable(table);
                     case Enumeration.SqlDialect.MySQL:
-                        return (new Energy.Query.Dialect.MySQL()).CreateTable(table);
+                        return (new Energy.Query.Layer.MySQL((Energy.Query.Dialect)dialect)).CreateTable(table, configuration);
                     case Enumeration.SqlDialect.SQLite:
-                        return (new Energy.Query.Dialect.SQLite()).CreateTable(table);
+                        return (new Energy.Query.Layer.SQLite()).CreateTable(table);
                 }
             }
 
@@ -181,8 +183,11 @@ namespace Energy.Query
         {
             public static string Table(Energy.Enumeration.SqlDialect dialect, string table)
             {
-                //if (Dialect)
-                //return "DROP TABLE "
+                switch (dialect)
+                {
+                    case Enumeration.SqlDialect.MySQL:
+                        return (new Energy.Query.Layer.MySQL((Energy.Query.Format)dialect)).DropTable(table);
+                }
                 return "";
             }
         }

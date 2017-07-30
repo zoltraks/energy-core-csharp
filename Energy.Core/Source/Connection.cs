@@ -54,25 +54,25 @@ namespace Energy.Source
 
         private readonly object _PropertyLock = new object();
 
-        private Query.Dialect _Query;
-        /// <summary>Query</summary>
-        public Query.Dialect Query
-        {
-            get
-            {
-                lock (_PropertyLock)
-                {
-                    if (_Query == null && _Dialect != Enumeration.SqlDialect.None)
-                        _Query = new Source.Query.Dialect(_Dialect);
-                    return _Query;
-                }
-            }
-            set
-            {
-                lock (_PropertyLock)
-                    _Query = value;
-            }
-        }
+        //private Query.Dialect _Query;
+        ///// <summary>Query</summary>
+        //public Query.Dialect Query
+        //{
+        //    get
+        //    {
+        //        lock (_PropertyLock)
+        //        {
+        //            if (_Query == null && _Dialect != Enumeration.SqlDialect.None)
+        //                _Query = new Source.Query.Dialect(_Dialect);
+        //            return _Query;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        lock (_PropertyLock)
+        //            _Query = value;
+        //    }
+        //}
 
         private Energy.Enumeration.SqlDialect _Dialect;
         private readonly object _DialectLock = new object();
@@ -123,8 +123,8 @@ namespace Energy.Source
                 _Vendor = null;
             lock (_DriverLock)
                 _Driver = null;
-            lock (_PropertyLock)
-                _Query = null;
+            //lock (_PropertyLock)
+            //    _Query = null;
         }
 
         /// <summary>
@@ -151,7 +151,6 @@ namespace Energy.Source
             }
         }
 
-
         private DbConnection _Driver;
 
         private readonly LO _DriverLock = new LO();
@@ -165,7 +164,7 @@ namespace Energy.Source
             {
                 if (_Driver == null)
                 {
-                    lock (this)
+                    lock (_DriverLock)
                     {
                         if (_Driver == null)
                         {
@@ -536,6 +535,16 @@ namespace Energy.Source
 
         public virtual DataTable Fetch(string query)
         {
+            return FetchDataTable(query);
+        }
+
+        public virtual DataTable FetchDataTable(string query)
+        {
+            return FetchDataTableRead(query);
+        }
+
+        public virtual DataTable FetchDataTableLoad(string query)
+        {
             if (!Active && !Open())
                 return null;
 
@@ -549,7 +558,8 @@ namespace Energy.Source
                     {
                         try
                         {
-                            using (DbDataReader reader = command.ExecuteReader())
+                            CommandBehavior behaviour = Pooling ? CommandBehavior.CloseConnection : CommandBehavior.Default;
+                            using (DbDataReader reader = command.ExecuteReader(behaviour))
                             {
                                 DataTable table = new DataTable();
                                 table.Load(reader);
@@ -575,6 +585,103 @@ namespace Energy.Source
                 if (Pooling)
                     Close();
             }
+        }
+
+
+        public virtual DataTable FetchDataTableRead(string query)
+        {
+            ClearError();
+
+            DataTable table = null;
+
+            for (int n = 0; n <= _Repeat; n++)
+            {
+                if (!Active && !Open())
+                    return null;
+
+                using (DbCommand command = Prepare(query))
+                {
+                    try
+                    {
+                        CommandBehavior behaviour = GetDefaultCommandBehaviour();
+                        DbDataReader reader = command.ExecuteReader(behaviour);
+                        
+                        DataTable schema = reader.GetSchemaTable();
+
+                        if (schema == null)
+                            break;
+
+                        table = new DataTable();
+
+                        List<DataColumn> list = new List<DataColumn>();
+                        foreach (DataRow row in schema.Rows)
+                        {
+                            string columnName = System.Convert.ToString(row["ColumnName"]);
+                            DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
+                            column.Unique = (bool)row["IsUnique"];
+                            column.AllowDBNull = (bool)row["AllowDBNull"];
+                            column.AutoIncrement = (bool)row["IsAutoIncrement"];
+                            list.Add(column);
+                            table.Columns.Add(column);
+                        }
+
+                        // Read rows from DataReader and populate the DataTable 
+
+                        while (reader.Read())
+                        {
+                            DataRow row = table.NewRow();
+                            for (int i = 0; i < list.Count; i++)
+                            {
+                                row[((DataColumn)list[i])] = reader[i];
+                            }
+                            table.Rows.Add(row);
+                        }
+
+                        command.Cancel();
+                        reader.Close();
+
+                        break;
+                    }
+                    catch (DbException x)
+                    {
+                        command.Cancel();
+                        SetError(x);
+                        if (Catch(x, command))
+                            continue;
+                        else
+                            return null;
+                    }
+                    catch (Exception x)
+                    {
+                        command.Cancel();
+                        SetError(x);
+                        if (Catch(x, command))
+                            continue;
+                        else
+                            return null;
+                    }
+                    finally
+                    {
+                        if (Pooling)
+                            Close();
+                    }
+                }
+            }
+
+            return table;
+        }
+
+        private CommandBehavior GetDefaultCommandBehaviour(CommandBehavior behaviour)
+        {
+            if (Pooling)
+                return behaviour | CommandBehavior.CloseConnection;
+            else
+                return behaviour | CommandBehavior.Default;
+        }
+
+        private CommandBehavior GetDefaultCommandBehaviour()
+        {
+            return GetDefaultCommandBehaviour(CommandBehavior.Default);
         }
 
         private void SetError(Exception x)
@@ -621,8 +728,8 @@ namespace Energy.Source
         {
             if (!Active && !Open())
                 return null;
-            DbCommand command = Driver.CreateCommand();
-            command.CommandText = Parse(query);
+            DbCommand command = Prepare(query);
+            DbException exception = null;
             try
             {
                 object value = command.ExecuteScalar();
@@ -630,25 +737,53 @@ namespace Energy.Source
             }
             catch (DbException x)
             {
+                command.Cancel();
                 if (Log == null)
-                {
                     throw;
-                }
-                Log.Write(x);
+                else
+                    exception = x;
                 return null;
+            }
+            finally
+            {
+                if (Pooling)
+                    Close();
+                if (exception != null)
+                    Log.Write(exception);
             }
         }
 
         public virtual int Execute(string query)
         {
             if (!Active && !Open())
-            {                
                 return GetNegativeErrorNumber();
-            }
+
             int count = 0;
-            DbCommand command = Driver.CreateCommand();
-            command.CommandText = Parse(query);
-            return count;
+            using (DbCommand command = Prepare(query))
+            {
+                try
+                {
+                    count = command.ExecuteNonQuery();
+                    return count;
+                }
+                catch (DbException x)
+                {
+                    command.Cancel();
+                    SetError(x);
+                    return GetNegativeErrorNumber();
+                }
+                catch (Exception x)
+                {
+                    command.Cancel();
+                    SetError(x);
+                    return GetNegativeErrorNumber();
+                }
+                finally
+                {
+                    if (Pooling)
+                        Close();
+                }
+            }
         }
 
         private int GetNegativeErrorNumber()
@@ -695,7 +830,7 @@ namespace Energy.Source
         public Connection()
         {
             this.Vendor = typeof(T);
-            Dialect = Energy.Source.Query.Dialect.Guess(Vendor.Name, Vendor.FullName);
+            Dialect = Energy.Query.Dialect.Guess(Vendor.Name, Vendor.FullName);
         }
 
         public Connection(string connectionString)
@@ -708,6 +843,16 @@ namespace Energy.Source
         {
             this.Vendor = typeof(T);
             this.Dialect = dialect;
+        }
+
+        public string GetErrorText()
+        {
+            List<string> list = new List<string>();
+            if (ErrorNumber != 0)
+                list.Add(ErrorNumber.ToString());
+            if (!string.IsNullOrEmpty(ErrorStatus))
+                list.Add(ErrorStatus);
+            return string.Join(" ", list.ToArray());
         }
     }
 }
