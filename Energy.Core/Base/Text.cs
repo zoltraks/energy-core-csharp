@@ -82,6 +82,22 @@ namespace Energy.Base
             return String.Concat(delimiter, value, delimiter);
         }
 
+        public static string Texture(string pattern, int size)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return pattern;
+            if (size == pattern.Length)
+                return pattern;
+            if (size < pattern.Length)
+                return pattern.Substring(0, size);
+            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            while (s.Length < size)
+                s.Append(s.Length == 0 ? pattern : s.ToString());
+            if (s.Length == size)
+                return s.ToString();
+            return s.ToString().Substring(0, size);
+        }
+
         /// <summary>
         /// Surround text with delimiters if contains delimiter itself or any of special characters
         /// </summary>

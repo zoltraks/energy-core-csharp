@@ -30,7 +30,7 @@ namespace Energy.Base
                 int d = 3;
                 for (int j = 0; j < d && j < count; j++)
                 {
-                    scan.Add(Energy.Base.Cast.ObjectToString(table.Rows[i][j]));
+                    scan.Add(Energy.Base.Cast.ObjectToString(table.Rows[j][i]));
                 }
                 int n = count - 2 * d;
                 if (n > 0)

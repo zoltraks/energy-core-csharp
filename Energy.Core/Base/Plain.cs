@@ -13,11 +13,27 @@ namespace Energy.Base
         public class TableFormat
         {
             public bool Header = true;
-            public string RowBegin = "";
-            public string RowTrail = "";
-            public string ColumnSeparator = " | ";
-            public string FrameBefore = "+-+";
-            public string FrameBetween = "+ -=- +";
+            public bool Data = true;
+            public string RowPrefix = "";
+            public string RowSuffix = "";
+            public string RowSeparator = " | ";
+            public bool Frame = false;
+            public bool Separator = true;
+            public string FrameBetweenPrefix = "";
+            public string FrameBetweenSuffix = "";
+            public string FrameBetweenSeparator = " + ";
+            public string FrameBetweenPattern = "=";
+        }
+
+        public class TableFormatFrame: TableFormat
+        {
+            public TableFormatFrame()
+            {
+                RowPrefix = " | ";
+                RowSuffix = " | ";
+                FrameBetweenPrefix = " + ";
+                FrameBetweenSuffix = " + ";
+            }
         }
 
         public static string DataTableToPlainText(DataTable t1, Energy.Base.Plain.TableFormat format)
@@ -30,53 +46,113 @@ namespace Energy.Base
 
             if (format.Header)
             {
-                s.Append(format.RowBegin);
+                s.Append(format.RowPrefix);
                 int n = columnDictionary.Count;
                 for (int i = 0; i < n; i++)
                 {
-                    s.Append(columnDictionary[i].Name.PadLeft(columnDictionary[i].Size));
+                    s.Append(columnDictionary[i].Name.PadRight(columnDictionary[i].Size));
                     bool last = i == n - 1;
                     if (!last)
-                        s.Append(format.ColumnSeparator);
+                        s.Append(format.RowSeparator);
                 }
-                s.Append(format.RowTrail);
+                s.Append(format.RowSuffix);
                 s.AppendLine();
             }
 
-            if (!string.IsNullOrEmpty(format.FrameBetween))
+            if (format.Separator)
             {
-                s.Append(format.RowBegin);
+                s.Append(format.FrameBetweenPrefix);
                 int n = columnDictionary.Count;
                 for (int i = 0; i < n; i++)
                 {
-                    s.Append(columnDictionary[i].Name.PadLeft(columnDictionary[i].Size));
+                    s.Append(Energy.Base.Text.Texture(format.FrameBetweenPattern, columnDictionary[i].Size));
                     bool last = i == n - 1;
                     if (!last)
-                        s.Append(format.ColumnSeparator);
+                        s.Append(format.FrameBetweenSeparator);
                 }
-                s.Append(format.RowTrail);
+                s.Append(format.FrameBetweenSuffix);
                 s.AppendLine();
             }
 
-            //Dictionary<int, string> columnNameDictionary = new Dictionary<int, string>();
-            //Dictionary<int, int> columnSizeDictionary = new Dictionary<int, int>();
-            //Dictionary<int, Energy.Enumeration.TextAlign> columnAlignDictionary = new Dictionary<int, Enumeration.TextAlign>();
-            //for (int i = 0; i < t1.Columns.Count; i++)
-            //{
-            //    DataColumn c = t1.Columns[i];
-            //    string name = null;
-            //    if (format.TableUseCaption && !string.IsNullOrEmpty(c.Caption))
-            //        name = c.Caption;
-            //    if (name == null && !string.IsNullOrEmpty(c.ColumnName))
-            //        name = c.ColumnName;
-            //    columnNameDictionary[i] = name;
+            if (format.Data)
+            {
+                for (int r = 0; r < t1.Rows.Count; r++)
+                {
+                    s.Append(format.RowPrefix);
+                    int n = columnDictionary.Count;
+                    for (int i = 0; i < n; i++)
+                    {
+                        string value = Energy.Base.Cast.ObjectToString(t1.Rows[r][i]) ?? "";
+                        value = value.PadLeft(columnDictionary[i].Size);
+                        s.Append(value);
+                        bool last = i == n - 1;
+                        if (!last)
+                            s.Append(format.RowSeparator);
+                    }
+                    s.Append(format.RowSuffix);
+                    s.AppendLine();
+                }
+            }            
 
-            //    // column scan
-            //    int size = 0;
-            //    t1.Rows[0][columnIndex]
-            //    columnSizeDictionary[i] = DataTableColumnLengthScan();
-            //}
             return s.ToString();
+        }
+
+        private static char GetMiddleStringPatternChar(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return '\0';
+            if (pattern.Length % 2 == 0)
+            {
+                return '\0';
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern[0];
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(length, 1)[0];
+            }
+        }
+
+        private static string GetMiddleStringPrefix(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return pattern;
+            if (pattern.Length % 2 == 0)
+            {
+                return pattern.Substring(0, pattern.Length / 2);
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern;
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(0, length);
+            }
+        }
+
+        private static string GetMiddleStringSuffix(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return pattern;
+            int half = pattern.Length / 2;
+            if (pattern.Length % 2 == 0)
+            {
+                return pattern.Substring(half, half);
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern;
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(half + 1, length);
+            }
         }
     }
 }

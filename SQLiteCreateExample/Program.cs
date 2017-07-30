@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -29,6 +30,8 @@ namespace SQLiteCreateExample
         {
             string connectionString = @"Data Source=:memory:;Version=3;New=True;";
             db = new Energy.Source.Connection<System.Data.SQLite.SQLiteConnection>(connectionString);
+            // needed for :memory: !!!
+            db.Pooling = false;
             Console.WriteLine(db.Scalar("select current_timestamp;"));
             Console.WriteLine(db.Scalar("select time(time(), 'localtime');"));
             Console.WriteLine(db.Scalar("SELECT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"));
@@ -46,15 +49,30 @@ namespace SQLiteCreateExample
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
 
-            query = "INSERT INTO UserTable ( Name , Phone ) VALUES ( 'List' , 1234 )";
+            query = "INSERT INTO " + script.Format.Object("UserTable") + " ( Name , Phone ) VALUES ( 'List' , 1234 )";
 
             Console.WriteLine(query);
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
 
-            query = "SELECT * FROM UserTable";
+            query = "INSERT INTO " + script.Format.Object("UserTable") + " ( Name , Phone ) VALUES ( 'Element numer 1' , 4143141414 )";
 
             Console.WriteLine(query);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
+
+            query = "INSERT INTO " + script.Format.Object("UserTable") + " ( Name ) VALUES ( 'Po prostu element' )";
+
+            Console.WriteLine(query);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
+
+            query = "SELECT * FROM " + script.Format.Object("UserTable");
+
+            Console.WriteLine(query);
+            DataTable dx1 = db.Fetch(query);
+            string text = Energy.Base.Plain.DataTableToPlainText(dx1, new Energy.Base.Plain.TableFormatFrame()); ;
+            Console.WriteLine(text);
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
 
