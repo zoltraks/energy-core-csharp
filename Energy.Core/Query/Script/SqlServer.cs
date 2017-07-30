@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using Energy.Source;
 
-namespace Energy.Query.Layer
+namespace Energy.Query
 {
     /// <summary>
     /// Microsoft SQL Server
     /// </summary>
-    public class SqlServer
+    public partial class Script
     {
-        public static class Create
+        public class SqlServer : Energy.Query.Script
         {
-            public static string Table(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
+            public override string CreateTable(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
             {
                 if (table == null || table.Columns.Count == 0) return "";
                 if (configuration == null) configuration = Energy.Query.Configuration.Default;
@@ -61,11 +61,40 @@ namespace Energy.Query.Layer
 
                 return String.Join(Environment.NewLine, script.ToArray());
             }
-        }
 
-        internal string CreateTable(Structure.Table table)
-        {
-            throw new NotImplementedException();
+            public override string CreateDescription(Energy.Source.Structure.Table table)
+            {
+                List<string> script = new List<string>();
+                string schema = "dbo";
+
+                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption' , @value=N'Klucz' , @level0type='SCHEMA' , @level0name='"
+                    + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
+                foreach (Energy.Source.Structure.Column column in table.Columns)
+                {
+                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'" + column.Label
+                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
+                        + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
+                }
+
+                script.Add("");
+                script.Add("GO");
+                script.Add("");
+
+                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'Klucz',@level0type='SCHEMA',@level0name='"
+                    + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
+                foreach (Energy.Source.Structure.Column column in table.Columns)
+                {
+                    string description = String.IsNullOrEmpty(column.Description) ? column.Label : column.Description;
+                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'" + description
+                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
+                        + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
+                }
+
+                script.Add("");
+                script.Add("GO");
+
+                return String.Join(Environment.NewLine, script.ToArray());
+            }
         }
     }
 }

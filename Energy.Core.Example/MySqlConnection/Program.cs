@@ -19,19 +19,26 @@ namespace MySqlConnection
             Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
 
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
+            Energy.Query.Script script = new Energy.Query.Script.MySQL();
+            
             string query;
-            query = Energy.Query.Script.Drop.Table(Energy.Enumeration.SqlDialect.MySQL, table.Name);
+
+            query = script.CreateDescription(table);
+            Console.WriteLine(query);
+
+            query = script.DropTable(table.Name);
             if (db.Execute(query) < 0)
             {
                 Console.WriteLine(db.ErrorStatus);
             }
             Console.WriteLine(query);
-            query = Energy.Query.Script.Create.Table(Energy.Enumeration.SqlDialect.MySQL, table, null);
+            query = script.CreateTable(table);
             if (db.Execute(query) < 0)
             {
                 Console.WriteLine(db.ErrorStatus);
             }
             Console.WriteLine(query);
+
             Console.ReadLine();
         }
     }

@@ -242,8 +242,10 @@ namespace Energy.Base
             {
                 switch (o.Type)
                 {
+                    case Type.String:
+                        return o.Union.String;
                     case Type.Char:
-                        return ((object)o).ToString();
+                        return o.Union.Char.ToString();
                     case Type.DateTime:
                         return Energy.Base.Cast.DateTimeToString(o.Union.DateTime);
                     default:

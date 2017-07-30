@@ -19,25 +19,37 @@ namespace Energy.Query
         public static implicit operator Format(Energy.Enumeration.SqlDialect dialect)
         {
             Format format = new Format();
-            if (false)
-            { }
-            else if (dialect == Energy.Enumeration.SqlDialect.SqlServer)
+            switch (dialect)
             {
-                format.LiteralQuote = "'";
-                format.ObjectQuote = "[]";
+                default:
+                    format.CurrentTimestamp = "CURRENT_TIMESTAMP";
+                    format.LiteralQuote = "'";
+                    format.ObjectQuote = "\"";
+                    break;
+
+                case Enumeration.SqlDialect.MySQL:
+                    format.LiteralQuote = "'";
+                    format.ObjectQuote = "`";
+                    format.CurrentTimestamp = "CURRENT_TIMESTAMP()";
+                    break;
+
+                case Enumeration.SqlDialect.SqlServer:
+                    format.LiteralQuote = "'";
+                    format.ObjectQuote = "[]";
+                    format.CurrentTimestamp = "GETDATE()";
+                    break;
+
+                case Enumeration.SqlDialect.SQLite:
+                    format.LiteralQuote = "'";
+                    format.ObjectQuote = "\"";
+                    format.CurrentTimestamp = "(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))";
+                    break;
             }
-            else if (dialect == Energy.Enumeration.SqlDialect.MySQL)
-            {
-                format.LiteralQuote = "'";
-                format.ObjectQuote = "`";
-            }
-            else
-            {
-                format.LiteralQuote = "'";
-                format.ObjectQuote = "\"";
-            }
+
             return format;
         }
+
+        public string CurrentTimestamp;
 
         /// <summary>
         /// Format as database object (table, column, ...).
@@ -47,6 +59,47 @@ namespace Energy.Query
         public string Object(string value)
         {
             return ObjectQuote.Surround(value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="schema"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string Object(string database, string schema, string name)
+        {
+            List<string> list = new List<string>();
+            if (!string.IsNullOrEmpty(database))
+            {
+                list.Add(Object(database));
+                if (!string.IsNullOrEmpty(schema))
+                    list.Add(Object(schema));
+                else
+                    list.Add("");
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(schema))
+                    list.Add(Object(schema));
+            }
+            list.Add(Object(name));
+            return string.Join(".", list.ToArray());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string Object(string schema, string name)
+        {
+            if (string.IsNullOrEmpty(schema))
+                return Object(name);
+            else
+                return string.Concat(Object(schema), ".", Object(name));
         }
 
         /// <summary>

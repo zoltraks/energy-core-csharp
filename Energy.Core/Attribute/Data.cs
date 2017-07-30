@@ -156,5 +156,47 @@ namespace Energy.Attribute
                 this.value = value;
             }
         }
+
+        public class LabelAttribute : System.Attribute
+        {
+            private string _Label;
+            /// <summary>Caption</summary>
+            public string Label { get { return _Label; } set { _Label = value; } }
+
+            public LabelAttribute() { }
+
+            public LabelAttribute(string caption)
+            {
+                this.Label = caption;
+            }
+        }
+
+        public class DescriptionAttribute : System.Attribute
+        {
+            private string _Description;
+            /// <summary>Description</summary>
+            public string Description { get { return _Description; } set { _Description = value; } }
+
+            public DescriptionAttribute() { }
+
+            public DescriptionAttribute(string description)
+            {
+                this.Description = description;
+            }
+        }
+
+        public class IncrementAttribute : System.Attribute
+        {
+            private int _Increment = 1;
+            /// <summary>Increment</summary>
+            public int Increment { get { return _Increment; } set { _Increment = value; } }
+
+            public IncrementAttribute() { }
+
+            public IncrementAttribute(int increment)
+            {
+                this.Increment = increment;
+            }
+        }
     }
 }

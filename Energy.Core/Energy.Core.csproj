@@ -10,8 +10,6 @@
     <AssemblyName>Energy.Core</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -68,6 +66,7 @@
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Random.cs" />
     <Compile Include="Base\Range.cs" />
+    <Compile Include="Base\Table.cs" />
     <Compile Include="Base\Time.cs" />
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Base\Variant.cs" />
@@ -83,8 +82,6 @@
     </Compile>
     <Compile Include="Query\Builder.cs" />
     <Compile Include="Query\Dialect.cs" />
-    <Compile Include="Query\Layer\ANSI.cs" />
-    <Compile Include="Query\Layer\Generic.cs" />
     <Compile Include="Interface\IConnection.cs" />
     <Compile Include="Query\Type.cs" />
     <Compile Include="Source\Query.cs" />
@@ -107,10 +104,7 @@
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Interface\IWork.cs" />
-    <Compile Include="Query\Layer\SQLite.cs" />
     <Compile Include="Query\Format.cs" />
-    <Compile Include="Query\Layer\MySQL.cs" />
-    <Compile Include="Query\Layer\SqlServer.cs" />
     <Compile Include="Query\Configuration.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Core\Application.cs" />
@@ -130,6 +124,11 @@
     <Compile Include="Source\Factory.cs" />
     <Compile Include="Source\Schema.cs" />
     <Compile Include="Base\Xml.cs" />
+    <Compile Include="Query\Script\ANSI.cs" />
+    <Compile Include="Query\Script\Generic.cs" />
+    <Compile Include="Query\Script\SQLite.cs" />
+    <Compile Include="Query\Script\MySQL.cs" />
+    <Compile Include="Query\Script\SqlServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Class\" />

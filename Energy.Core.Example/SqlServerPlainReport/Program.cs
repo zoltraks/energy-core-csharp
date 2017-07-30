@@ -31,6 +31,7 @@ namespace SqlServerPlainReport
         private static void Go(string[] args)
         {
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=platoon;Integrated Security=Yes;Connect Timeout=10;";
+			connectionString = @"Data Source=10.0.2.2;Initial Catalog=platoon;Integrated Security=No;User Id=platoon;Password=platoon;Connect Timeout=10;";
             //connectionString = @"Data Source=W101-SQL01;Initial Catalog=BisSQL;Integrated Security=False;User ID=bissqluser;Password=B1sSqLP@ssW0rd;MultipleActiveResultSets=True;Connect Timeout=10";
             //connectionString = @"Data Source=W103-FS02;Initial Catalog=BisSQLTest;Integrated Security=False;User ID=SZCbistestuser;Password=f4c!S7CzeCInSQLT3st!;MultipleActiveResultSets=True;Connect Timeout=30";
             db = new Energy.Source.Connection<SqlConnection>(connectionString);
@@ -45,13 +46,20 @@ namespace SqlServerPlainReport
         {
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
             string query;
-            query = Energy.Query.Script.Drop.Table(Energy.Enumeration.SqlDialect.MySQL, table.Name);
+            Energy.Query.Script script = new Energy.Query.Script.MySQL();
+            
+			query = script.DropTable(table.Name);
             if (db.Execute(query) < 0)
             {
                 Console.WriteLine(db.ErrorStatus);
             }
             Console.WriteLine(query);
-            query = Energy.Query.Script.Create.Table(Energy.Enumeration.SqlDialect.MySQL, table, null);
+			Energy.Query.Script scriptBuilder = new Energy.Query.Script ();
+			scriptBuilder.Dialect = Energy.Enumeration.SqlDialect.SqlServer;
+
+			Energy.Query.Format format = Energy.Enumeration.SqlDialect.MySQL;
+
+			query = script.CreateTable(table, null);
             if (db.Execute(query) < 0)
             {
                 Console.WriteLine(db.ErrorStatus);
@@ -63,8 +71,9 @@ namespace SqlServerPlainReport
 
         private static void Test2()
         {
-
             DataTable t1 = db.Fetch("SELECT * FROM UserTable");
+            string text = Energy.Base.Plain.DataTableToPlainText(t1, null);
+
             for (int j = 0; j < t1.Columns.Count; j++)
             {
                 Console.Write(t1.Columns[j].ColumnName);

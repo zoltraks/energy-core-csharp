@@ -35,6 +35,11 @@ namespace Energy.Base
             return null;
         }
 
+        internal static string Select(string identity, object getPrimaryName)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Surround text with delimiters if contains delimiter itself or any of special characters
         /// </summary>

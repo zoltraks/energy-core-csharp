@@ -80,6 +80,9 @@ namespace Energy.Source
             [DefaultValue(0)]
             public double Maximum { get; set; }
 
+            [DefaultValue(0)]
+            public int Increment { get; set; }
+
             #endregion
 
             #region Array
@@ -130,6 +133,18 @@ namespace Energy.Source
                             return list[i];
                     }
                     return null;
+                }
+
+                /// <summary>
+                /// Get first primary column name
+                /// </summary>
+                /// <returns></returns>
+                public string GetPrimaryName()
+                {
+                    Column column = GetPrimary();
+                    if (column == null)
+                        return null;
+                    return column.Name;
                 }
             }
 
@@ -245,6 +260,11 @@ namespace Energy.Source
             public string Name;
 
             /// <summary>
+            /// Table name
+            /// </summary>
+            public string Schema;
+
+            /// <summary>
             /// Identity column for table
             /// </summary>
             public string Identity;
@@ -358,6 +378,18 @@ namespace Energy.Source
                     if (attributeType != null)
                     {
                         column.Type = attributeType.Name;
+                    }
+                    Energy.Attribute.Data.LabelAttribute attributeLabel = (Energy.Attribute.Data.LabelAttribute)
+                        Energy.Base.Class.GetFieldOrPropertyAttribute(type, fields[i], typeof(Energy.Attribute.Data.LabelAttribute));
+                    if (attributeLabel != null)
+                    {
+                        column.Label = attributeLabel.Label;
+                    }
+                    Energy.Attribute.Data.DescriptionAttribute attributeDescription = (Energy.Attribute.Data.DescriptionAttribute)
+                        Energy.Base.Class.GetFieldOrPropertyAttribute(type, fields[i], typeof(Energy.Attribute.Data.DescriptionAttribute));
+                    if (attributeDescription != null)
+                    {
+                        column.Description = attributeDescription.Description;
                     }
                 }
                 return table;

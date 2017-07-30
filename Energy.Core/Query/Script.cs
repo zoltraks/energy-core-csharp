@@ -6,19 +6,19 @@ using System.Diagnostics;
 
 namespace Energy.Query
 {
-    public class Script
+    public partial class Script
     {
         #region Constructor
 
         public Script()
         {
-            Debug.Write("Energy.Query.Script created");
+            Debug.WriteLine("Energy.Query.Script created");
         }
 
         public Script(Energy.Enumeration.SqlDialect dialect)
         {
             Dialect = dialect;
-            Debug.Write(String.Format("Energy.Query.Script created for {0} dialect", dialect.ToString()));
+            Debug.WriteLine(String.Format("Energy.Query.Script created for {0} dialect", dialect.ToString()));
         }
 
         public static implicit operator Script(Energy.Enumeration.SqlDialect dialect)
@@ -35,168 +35,69 @@ namespace Energy.Query
 
         #endregion
 
-        private Energy.Query.Format format;
-
-        private Energy.Enumeration.SqlDialect dialect;
+        private Energy.Enumeration.SqlDialect _Dialect;
 
         public Energy.Enumeration.SqlDialect Dialect
         {
             get
             {
-                return dialect;
+				return _Dialect;
             }
             set
             {
-                dialect = value;
-                format = value;
+				_Dialect = value;
             }
         }
 
+		private Energy.Query.Format _Format;
+				
+		public Energy.Query.Format Format {
+			get {
+				if (_Format == null)
+					_Format = (Energy.Query.Format)Dialect;
+				return _Format;
+			}
+			set {
+				_Format = value;
+			}
+		}
+			
         #region CREATE
 
-        public string CreateTable(Energy.Source.Structure.Table table)
+        public virtual string CreateTable(Energy.Source.Structure.Table table)
         {
-            return Create.Table(dialect, table, null);
+            return CreateTable(table, null);
         }
 
-        public string CreateDescription(Energy.Source.Structure.Table table)
+        public virtual string CreateTable(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
         {
-            return Create.Description(dialect, table);
+            throw new NotImplementedException();
         }
 
-        public string CreateIndex(Energy.Source.Structure.Table table)
+        public virtual string CreateDescription(Energy.Source.Structure.Table table)
         {
-            return Create.Index(dialect, table);
+			throw new NotImplementedException ();
         }
 
-        public class Create
+        public virtual string CreateIndex(Energy.Source.Structure.Table table)
         {
-            private static Dialect format;
-
-            /// <summary>
-            /// Create table
-            /// </summary>
-            /// <param name="dialect"></param>
-            /// <param name="table"></param>
-            /// <param name="configuration"></param>
-            /// <returns></returns>
-            public static string Table(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
-            {
-                switch (dialect)
-                {
-                    default:
-                    case Enumeration.SqlDialect.None:
-                        throw new Exception();
-                    case Enumeration.SqlDialect.SqlServer:
-                        return (new Energy.Query.Layer.SqlServer()).CreateTable(table);
-                    case Enumeration.SqlDialect.MySQL:
-                        return (new Energy.Query.Layer.MySQL((Energy.Query.Dialect)dialect)).CreateTable(table, configuration);
-                    case Enumeration.SqlDialect.SQLite:
-                        return (new Energy.Query.Layer.SQLite()).CreateTable(table);
-                }
-            }
-
-            public static string Description(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table)
-            {
-                List<string> script = new List<string>();
-                string schema = "dbo";
-
-                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption' , @value=N'Klucz' , @level0type='SCHEMA' , @level0name='"
-                    + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
-                foreach (Energy.Source.Structure.Column column in table.Columns)
-                {
-                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Caption',@value=N'" + column.Label
-                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
-                        + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
-                }
-
-                script.Add("");
-                script.Add("GO");
-                script.Add("");
-
-                script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'Klucz',@level0type='SCHEMA',@level0name='"
-                    + schema + "',@level1type='TABLE',@level1name='" + table.Name + "',@level2type='COLUMN',@level2name='id'");
-                foreach (Energy.Source.Structure.Column column in table.Columns)
-                {
-                    string description = String.IsNullOrEmpty(column.Description) ? column.Label : column.Description;
-                    script.Add("EXEC sys.sp_addextendedproperty @name=N'MS_Description',@value=N'" + description
-                        + "',@level0type='SCHEMA',@level0name='" + schema + "',@level1type='TABLE',@level1name='" + table.Name
-                        + "',@level2type='COLUMN',@level2name='" + column.Name + "'");
-                }
-
-                script.Add("");
-                script.Add("GO");
-
-                return String.Join(Environment.NewLine, script.ToArray());
-            }
-
-            public static string Index(Energy.Enumeration.SqlDialect dialect, Energy.Source.Structure.Table table)
-            {
-                List<string> script = new List<string>();
-                string tableName = "[" + table.Name + "]";
-                foreach (Energy.Source.Structure.Index index in table.Indexes)
-                {
-                    string indexName = "[" + index.Name + "]";
-                    script.Add("--BEGIN TRY DROP INDEX " + indexName + " ON " + tableName + " END TRY BEGIN CATCH END CATCH");
-                    script.Add("");
-                    script.Add("BEGIN TRY");
-                    script.Add("");
-                    script.Add("CREATE NONCLUSTERED INDEX " + indexName + " ON " + tableName);
-                    script.Add("(");
-                    List<string> list;
-                    list = new List<string>();
-                    foreach (Energy.Source.Structure.Column column in index.Columns)
-                    {
-                        list.Add("[" + column.Name + "]");
-                    }
-                    script.Add("\t" + String.Join(" , ", list.ToArray()));
-                    script.Add(")");
-                    if (index.Includes.Count > 0)
-                    {
-                        script.Add("INCLUDE");
-                        script.Add("(");
-                        list = new List<string>();
-                        foreach (Energy.Source.Structure.Column column in index.Includes)
-                        {
-                            list.Add("[" + column.Name + "]");
-                        }
-                        script.Add("\t" + String.Join(" , ", list.ToArray()));
-                        script.Add(")");
-                    }
-                    script.Add("");
-                    script.Add("END TRY");
-                    script.Add("BEGIN CATCH");
-                    script.Add("END CATCH");
-                    script.Add("");
-                    script.Add("GO");
-                }
-
-                return String.Join(Environment.NewLine, script.ToArray());
-            }
-        }
+			throw new NotImplementedException ();
+        }        
 
         #endregion
 
         #region DROP
 
-        public class Drop
-        {
-            public static string Table(Energy.Enumeration.SqlDialect dialect, string table)
-            {
-                switch (dialect)
-                {
-                    case Enumeration.SqlDialect.MySQL:
-                        return (new Energy.Query.Layer.MySQL((Energy.Query.Format)dialect)).DropTable(table);
-                }
-                return "";
-            }
-        }
+		public virtual string DropTable(string table)
+		{
+			throw new NotImplementedException ();
+		}
 
         #endregion
 
         public string Merge(Energy.Source.Structure.Table table, bool compact)
         {
-            string name = "[" + table.Name + "]";
+            string name = Format.Object(table.Name);
             StringBuilder script = new StringBuilder();
             for (int i = 0; i < table.Rows.Count; i++)
             {
@@ -237,6 +138,11 @@ namespace Energy.Query
             }
 
             return script.ToString().Trim();
+        }
+
+        public virtual string CurrentTimestamp()
+        {
+            return "CURRENT_TIMESTAMP";
         }
 
         public string Merge(Energy.Source.Structure.Table table)

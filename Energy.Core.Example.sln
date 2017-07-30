@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerConnection", "Ener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerPlainReport", "Energy.Core.Example\SqlServerPlainReport\SqlServerPlainReport.csproj", "{AEBA97A5-64ED-4403-88C2-197395CBFC74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLiteCreateExample", "SQLiteCreateExample\SQLiteCreateExample.csproj", "{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{AEBA97A5-64ED-4403-88C2-197395CBFC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEBA97A5-64ED-4403-88C2-197395CBFC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEBA97A5-64ED-4403-88C2-197395CBFC74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
