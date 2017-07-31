@@ -58,7 +58,10 @@ namespace Energy.Query
         /// <returns></returns>
         public string Object(string value)
         {
-            return ObjectQuote.Surround(value);
+            if (string.IsNullOrEmpty(value))
+                return value;
+            else
+                return ObjectQuote.Surround(value);
         }
 
         /// <summary>

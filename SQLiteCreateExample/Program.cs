@@ -12,6 +12,11 @@ namespace SQLiteCreateExample
         {
             try
             {
+                db = Test.ConnectToMemoryDatabase();
+                Test.CreateSeveralTables();
+                //Console.ReadLine();
+                db.Close();
+
                 Test1(args);
             }
             catch (Exception x)
@@ -66,13 +71,25 @@ namespace SQLiteCreateExample
             Console.WriteLine(query);
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
+
+            query = "INSERT INTO " + script.Format.Object("UserTable") + " ( Name , Description ) VALUES ( '===' , 'ĄćęłńóśćżŹ' )";
+
+            Console.WriteLine(query);
+            if (db.Execute(query) < 0)
+                Console.WriteLine(db.ErrorStatus);
 
             query = "SELECT * FROM " + script.Format.Object("UserTable");
 
             Console.WriteLine(query);
             DataTable dx1 = db.Fetch(query);
-            string text = Energy.Base.Plain.DataTableToPlainText(dx1, new Energy.Base.Plain.TableFormatFrame()); ;
-            Console.WriteLine(text);
+            string text = Energy.Base.Table.DataTableToPlainText(dx1, new Energy.Base.Table.PlainFormat.FullFrame() { Tilde = true }); ;
+            Energy.Core.Tilde.WriteLine(text);
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
 

@@ -192,13 +192,13 @@ namespace Energy.Source
             }
         }
 
-        private int _ErrorNumber;
+        private int _ErrorNumber = 0;
         /// <summary>ErrorNumber</summary>
-        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } set { lock (_PropertyLock) _ErrorNumber = value; } }
+        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } private set { lock (_PropertyLock) _ErrorNumber = value; } }
 
-        private string _ErrorStatus;
+        private string _ErrorStatus = "";
         /// <summary>ErrorStatus</summary>
-        public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } set { lock (_PropertyLock) _ErrorStatus = value; } }
+        public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } private set { lock (_PropertyLock) _ErrorStatus = value; } }
 
         public bool Active
         {
@@ -295,13 +295,20 @@ namespace Energy.Source
                 {
                     _Driver.Close();
                 }
+                catch (ObjectDisposedException x)
+                {
+                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.ExceptionMessage(x, true));
+                }
                 catch (DbException x)
                 {
                     if (Log == null)
                         throw;
                     exception = x;
                 }
-                _Driver = null;
+                finally
+                {
+                    _Driver = null;
+                }
             }
             if (exception != null && Log != null)
                 Log.Add(exception);
@@ -784,6 +791,11 @@ namespace Energy.Source
                         Close();
                 }
             }
+        }
+
+        public virtual bool Bool(string query)
+        {
+            return Energy.Base.Cast.StringToBool((string)Scalar(query));
         }
 
         private int GetNegativeErrorNumber()

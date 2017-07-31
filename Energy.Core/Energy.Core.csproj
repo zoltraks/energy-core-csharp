@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attribute\Command.cs" />
     <Compile Include="Attribute\Data.cs" />
     <Compile Include="Base\Array.cs" />
     <Compile Include="Base\Byte.cs" />
@@ -61,7 +62,6 @@
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Pattern.cs" />
-    <Compile Include="Base\Plain.cs" />
     <Compile Include="Base\Query.cs" />
     <Compile Include="Base\Queue.cs" />
     <Compile Include="Base\Random.cs" />

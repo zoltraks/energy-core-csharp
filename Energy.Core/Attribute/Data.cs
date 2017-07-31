@@ -198,5 +198,13 @@ namespace Energy.Attribute
                 this.Increment = increment;
             }
         }
+
+        /// <summary>
+        /// Used for marking item as abstract that cannot have implementation.
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property)]
+        public class AbstractAttribute : System.Attribute
+        {
+        }
     }
 }

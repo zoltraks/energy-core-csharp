@@ -35,11 +35,6 @@ namespace Energy.Base
             return null;
         }
 
-        internal static string Select(string identity, object getPrimaryName)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Surround text with delimiters if contains delimiter itself or any of special characters
         /// </summary>
@@ -82,6 +77,17 @@ namespace Energy.Base
             return String.Concat(delimiter, value, delimiter);
         }
 
+        /// <summary>
+        /// Surround text with delimiters if contains delimiter itself or any of special characters
+        /// </summary>
+        /// <param name="value">Text value</param>
+        /// <param name="delimiter">Delimiter like ' or "</param>
+        /// <returns></returns>
+        public static string Surround(string value, string delimiter)
+        {
+            return Surround(value, delimiter, null);
+        }
+
         public static string Texture(string pattern, int size)
         {
             if (string.IsNullOrEmpty(pattern))
@@ -96,17 +102,6 @@ namespace Energy.Base
             if (s.Length == size)
                 return s.ToString();
             return s.ToString().Substring(0, size);
-        }
-
-        /// <summary>
-        /// Surround text with delimiters if contains delimiter itself or any of special characters
-        /// </summary>
-        /// <param name="value">Text value</param>
-        /// <param name="delimiter">Delimiter like ' or "</param>
-        /// <returns></returns>
-        public static string Surround(string value, string delimiter)
-        {
-            return Surround(value, delimiter, null);
         }
 
         /// <summary>
@@ -177,6 +172,69 @@ namespace Energy.Base
                 a.Add(action(array[i]));
             }
             return a.ToArray();
+        }
+
+        private static char GetMiddleStringPatternChar(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return '\0';
+            if (pattern.Length % 2 == 0)
+            {
+                return '\0';
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern[0];
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(length, 1)[0];
+            }
+        }
+
+        private static string GetMiddleStringPrefix(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return pattern;
+            if (pattern.Length % 2 == 0)
+            {
+                return pattern.Substring(0, pattern.Length / 2);
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern;
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(0, length);
+            }
+        }
+
+        /// <summary>
+        /// Return character or two characters string from the middle of text.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        private static string GetMiddleStringSuffix(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+                return pattern;
+            int half = pattern.Length / 2;
+            if (pattern.Length % 2 == 0)
+            {
+                return pattern.Substring(half, half);
+            }
+            else if (pattern.Length == 1)
+            {
+                return pattern;
+            }
+            else
+            {
+                int length = pattern.Length / 2;
+                return pattern.Substring(half + 1, length);
+            }
         }
     }
 }

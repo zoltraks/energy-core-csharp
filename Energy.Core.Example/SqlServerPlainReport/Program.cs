@@ -72,7 +72,7 @@ namespace SqlServerPlainReport
         private static void Test2()
         {
             DataTable t1 = db.Fetch("SELECT * FROM UserTable");
-            string text = Energy.Base.Plain.DataTableToPlainText(t1, null);
+            string text = Energy.Base.Table.DataTableToPlainText(t1, null);
 
             for (int j = 0; j < t1.Columns.Count; j++)
             {
