@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerConnection", "Ener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerPlainReport", "Energy.Core.Example\SqlServerPlainReport\SqlServerPlainReport.csproj", "{AEBA97A5-64ED-4403-88C2-197395CBFC74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLiteCreateExample", "SQLiteCreateExample\SQLiteCreateExample.csproj", "{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLiteCreateExample", "Energy.Core.Example\SQLiteCreateExample\SQLiteCreateExample.csproj", "{EA62A0D7-D2AC-47AB-A58B-655F6C9D2809}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
