@@ -154,6 +154,25 @@ namespace Energy.Base
 
         #endregion
 
+        #region Class
+
+        private static string RemoveNumericalDifferences(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+            if (value.Contains(" "))
+                value = value.Replace(" ", null);
+            if (value.Contains("_"))
+                value = value.Replace("_", null);
+            if (value.Contains("'"))
+                value = value.Replace("'", null);
+            if (value.Contains("’"))
+                value = value.Replace("'", null);
+            return value;
+        }
+
+        #endregion
+
         #region Boolean
 
         /// <summary>
@@ -241,7 +260,7 @@ namespace Energy.Base
         #region Integer
 
         /// <summary>
-        /// Convert string to integer value without exception
+        /// Convert string to integer value without exception.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
@@ -260,12 +279,22 @@ namespace Energy.Base
             return 0;
         }
 
+        public static int StringToIntegerSmart(string value)
+        {
+            return StringToInteger(RemoveNumericalDifferences(value));
+        }
+
+        public static string IntegerToString(int value)
+        {
+            return value.ToString();
+        }
+
         #endregion
 
         #region Byte
 
         /// <summary>
-        /// Convert string to byte value without exception
+        /// Convert string to byte value without exception.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
@@ -290,7 +319,7 @@ namespace Energy.Base
         #region Long
 
         /// <summary>
-        /// Convert string to long integer value without exception
+        /// Convert string to long integer value without exception.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Long number</returns>
@@ -307,6 +336,21 @@ namespace Energy.Base
             if (long.TryParse(value, out result))
                 return result;
             return 0;
+        }
+
+        public static long StringToLongSmart(string value)
+        {
+            return StringToLong(RemoveNumericalDifferences(value));
+        }
+
+        /// <summary>
+        /// Convert long to string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string LongToString(long value)
+        {
+            return value.ToString();
         }
 
         #endregion
@@ -329,6 +373,11 @@ namespace Energy.Base
             return 0;
         }
 
+        public static decimal StringToDecimalSmart(string value)
+        {
+            return StringToDecimal(RemoveNumericalDifferences(value));
+        }
+
         #endregion
 
         #region Double
@@ -343,9 +392,7 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             double result = 0;
-            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            if (value.Contains(" ")) value = value.Replace(" ", null);
-            if (value.Contains("_")) value = value.Replace("_", null);
+            value = Energy.Base.Text.TrimWhite(value);
             if (!double.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
                 , out result))
@@ -360,22 +407,12 @@ namespace Energy.Base
 
         /// <summary>
         /// Smart convert string to double value without exception.
-        /// 
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>double</returns>
         public static double StringToDoubleSmart(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            if (value.Contains(" "))
-                value = value.Replace(" ", null);
-            if (value.Contains("_"))
-                value = value.Replace("_", null);
-            if (value.Contains("'"))
-                value = value.Replace("'", null);
-            return StringToDouble(value);
+            return StringToDouble(RemoveNumericalDifferences(value));
         }
 
         /// <summary>
@@ -433,6 +470,96 @@ namespace Energy.Base
 
         #endregion
 
+        #region Float
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>double</returns>
+        public static float StringToFloat(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+            float result = 0;
+            value = Energy.Base.Text.TrimWhite(value);
+            if (!float.TryParse(value, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.InvariantCulture
+                , out result))
+            {
+                float.TryParse(value, System.Globalization.NumberStyles.Float
+                    , System.Globalization.CultureInfo.CurrentCulture
+                    , out result);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Smart convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>double</returns>
+        public static float StringToFloatSmart(string value)
+        {
+            return StringToFloat(RemoveNumericalDifferences(value));
+        }
+
+        /// <summary>
+        /// Convert floating value to invariant string.
+        /// </summary>
+        /// <param name="value">double</param>
+        /// <returns>string</returns>
+        public static string FloatToString(float value)
+        {
+            return value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Convert numeric text to invariant string.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>string</returns>
+        public static string FloatToString(string value)
+        {
+            return StringToFloat(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
+        public static string FloatToString(float value, int precision, System.Globalization.CultureInfo culture)
+        {
+            // HACK: Missing "??=" operator :-)
+            //culture ??= System.Globalization.CultureInfo.InvariantCulture;
+            culture = culture ?? System.Globalization.CultureInfo.InvariantCulture;
+            if (precision < 1)
+            {
+                return value.ToString(culture);
+            }
+            else
+            {
+                return value.ToString("0." + new String('0', precision), culture);
+            }
+        }
+
+        /// <summary>
+        /// Convert float value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <returns>String</returns>
+        public static string FloatToString(float value, int precision)
+        {
+            return FloatToString(value, precision, null);
+        }
+
+        #endregion
+
         #region Text
 
         /// <summary>
@@ -451,13 +578,25 @@ namespace Energy.Base
         #region DateTime
 
         /// <summary>
-        /// Convert stamp text to DateTime
+        /// Convert stamp text to DateTime.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>DateTime</returns>
         public static DateTime StringToDateTime(string text)
         {
             return Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Convert stamp text to DateTime.
+        /// If stamp was not recognized null will be returned.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>DateTime or null</returns>
+        public static DateTime? StringToDateTimeSmart(string text)
+        {
+            DateTime d = Clock.Parse(text);
+            return d != DateTime.MinValue ? d : (DateTime?)null;
         }
 
         /// <summary>
@@ -774,6 +913,17 @@ namespace Energy.Base
             if (String.IsNullOrEmpty(value))
                 return 0;
             string[] names = Enum.GetNames(type);
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (String.Compare(value, names[i], true) == 0)
+                {
+                    return Enum.Parse(type, value, true);
+                }
+            }
+            int length = value.Length;
+            value = Energy.Base.Text.TrimWhite(value);
+            if (value.Length == length)
+                return 0;
             for (int i = 0; i < names.Length; i++)
             {
                 if (String.Compare(value, names[i], true) == 0)

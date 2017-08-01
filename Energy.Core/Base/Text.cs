@@ -112,9 +112,7 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string TrimWhite(string value)
         {
-            if (value == null)
-                return null;
-            return value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
 
         /// <summary>
