@@ -29,6 +29,11 @@ namespace Energy.Base
             [DefaultValue(0)]
             public double Altitude;
 
+            public static Point Create(string location)
+            {
+                return (Point)location;
+            }
+
             public double GetDistance(Point location)
             {
                 return Geo.GetDistance(this, location);

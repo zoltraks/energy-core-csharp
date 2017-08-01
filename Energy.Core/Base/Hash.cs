@@ -79,5 +79,33 @@ namespace Energy.Base
             }
             return h;
         }
+
+        /// <summary>
+        /// Return MD5 for a string.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>string</returns>
+        public static string MD5(string text)
+        {
+            System.Security.Cryptography.MD5CryptoServiceProvider md5 = 
+                new System.Security.Cryptography.MD5CryptoServiceProvider();
+            byte[] array = md5.ComputeHash(Encoding.ASCII.GetBytes(text));
+            return Energy.Base.Hex.ByteArrayToHex(array);
+        }
+
+        /// <summary>
+        /// Return SHA1 for a string.
+        /// </summary>
+        /// <param name="text">Source string</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA1(string text)
+        {
+            if (text == null) return null;
+            byte[] array = ASCIIEncoding.ASCII.GetBytes(text);
+            System.Security.Cryptography.SHA1 sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            array = sha.ComputeHash(array);
+            return Energy.Base.Hex.ByteArrayToHex(array);
+        }
+
     }
 }

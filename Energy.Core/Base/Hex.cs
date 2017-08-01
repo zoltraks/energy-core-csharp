@@ -104,40 +104,6 @@ namespace Energy.Base
                 }
             }
 
-            /// <summary>
-            /// Represent bytes as hexadecimal string
-            /// </summary>
-            /// <param name="array"></param>
-            /// <returns></returns>
-            public static string ByteArrayToHex(byte[] array)
-            {
-                if (array == null) return null;
-                if (array.Length == 0) return "";
-                return BitConverter.ToString(array).Replace("-", "").ToLower();
-            }
-
-            /// <summary>
-            /// Convert hex to byte array
-            /// </summary>
-            /// <param name="hex"></param>
-            /// <returns></returns>
-            public static byte[] HexToByteArray(string hex)
-            {
-                if (hex == null) return null;
-                hex = Regex.Replace(hex, @"\s", "");
-                if (hex.Length < 2) return new byte[] { };
-                int count = hex.Length / 2;
-                byte[] data = new byte[count];
-                for (int i = 0; i < count; i++)
-                {
-                    data[i] = (byte)(
-                       "0123456789ABCDEF".IndexOf(hex.Substring(i * 2, 1), StringComparison.InvariantCultureIgnoreCase) * 16 +
-                       "0123456789ABCDEF".IndexOf(hex.Substring(1 + i * 2, 1), StringComparison.InvariantCultureIgnoreCase)
-                    );
-                }
-                return data;
-            }
-
             public static implicit operator ByteArray(string hex)
             {
                 ByteArray o = new ByteArray();
@@ -232,6 +198,40 @@ namespace Energy.Base
         public static string ByteToHex(byte value)
         {
             return value.ToString("X2");
+        }
+
+        /// <summary>
+        /// Represent bytes as hexadecimal string
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string ByteArrayToHex(byte[] array)
+        {
+            if (array == null) return null;
+            if (array.Length == 0) return "";
+            return BitConverter.ToString(array).Replace("-", "").ToLower();
+        }
+
+        /// <summary>
+        /// Convert hex to byte array
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static byte[] HexToByteArray(string hex)
+        {
+            if (hex == null) return null;
+            hex = Regex.Replace(hex, @"\s", "");
+            if (hex.Length < 2) return new byte[] { };
+            int count = hex.Length / 2;
+            byte[] data = new byte[count];
+            for (int i = 0; i < count; i++)
+            {
+                data[i] = (byte)(
+                   "0123456789ABCDEF".IndexOf(hex.Substring(i * 2, 1), StringComparison.InvariantCultureIgnoreCase) * 16 +
+                   "0123456789ABCDEF".IndexOf(hex.Substring(1 + i * 2, 1), StringComparison.InvariantCultureIgnoreCase)
+                );
+            }
+            return data;
         }
 
         /// <summary>
