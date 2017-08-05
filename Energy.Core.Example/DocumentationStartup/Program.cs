@@ -15,6 +15,7 @@ namespace DocumentationStartup
             Test.Test4();
             Test.Test5();
             Test.Test6();
+            Test.Test7();
             Console.ReadLine();
         }
     }

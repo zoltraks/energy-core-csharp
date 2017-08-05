@@ -312,5 +312,172 @@ namespace Energy.Base
             }
             return l;
         }
+
+
+        #region Object class information
+
+        /// <summary>
+        /// Object class information.
+        /// </summary>
+        public class Information: List<Information.Field>
+        {
+            public Type Type { get; set; }
+
+            public string Name { get; set; }
+
+            private object[] _Attributes;
+
+            public object[] Attributes
+            {
+                get
+                {
+                    if (_Attributes == null)
+                    {
+                        _Attributes = Type.GetCustomAttributes(true);
+                    }
+                    return _Attributes;
+                }
+                set
+                {
+                    _Attributes = value;
+                }
+            }
+
+            private Dictionary<string, Information.Field> _Index = new Dictionary<string, Field>();
+            /// <summary>Index</summary>
+            public Dictionary<string, Information.Field> Index { get { return _Index; } set { _Index = value; } }
+
+            #region Class field information
+
+            /// <summary>
+            /// Class field information
+            /// </summary>
+            public class Field
+            {
+                public string Name { get { return GetName(); } }
+
+                public object Object { get; set; }
+
+                public Type Type { get; set; }
+
+                private object[] _Attributes;
+
+                public object[] Attributes
+                {
+                    get
+                    {
+                        if (_Attributes == null)
+                        {
+                            _Attributes = Type.GetCustomAttributes(true);
+                        }
+                        return _Attributes;
+                    }
+                    set
+                    {
+                        _Attributes = value;
+                    }
+                }
+
+                public override string ToString()
+                {
+                    return string.Concat(Type, " ", Name).Trim();
+                }
+
+                public string GetName()
+                {
+                    if (Object == null)
+                        return null;
+                    if (Object is FieldInfo)
+                        return ((FieldInfo)Object).Name;
+                    if (Object is PropertyInfo)
+                        return ((PropertyInfo)Object).Name;
+                    return null;
+                }
+            }
+
+            #endregion
+
+            #region Override
+
+            public new void Add(Information.Field field)
+            {
+                base.Add(field);
+                Index[field.Name] = field;
+            }
+
+            public new void Remove(Information.Field field)
+            {
+                Index.Remove(field.Name);
+                base.Remove(field);
+            }
+
+            public new void RemoveAt(int index)
+            {
+                Index.Remove(this[index].Name);
+                base.RemoveAt(index);
+            }
+
+            public new void Clear()
+            {
+                Index.Clear();
+                base.Clear();
+            }
+
+            #endregion
+
+            public Information.Field this[string field]
+            {
+                get
+                {
+                    if (!Index.ContainsKey(field))
+                        return null;
+                    return Index[field];
+                }
+            }
+
+            /// <summary>
+            /// Create class information from type.
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            public static Energy.Base.Class.Information Create(Type type)
+            {
+                Energy.Base.Class.Information information = new Energy.Base.Class.Information();
+                information.Name = type.Name;
+                information.Type = type;
+                FieldInfo[] fa = type.GetFields();
+                for (int i = 0; i < fa.Length; i++)
+                {
+                    Energy.Base.Class.Information.Field field = new Energy.Base.Class.Information.Field();
+                    field.Object = fa[i];
+                    field.Type = fa[i].FieldType;
+                    information.Add(field);
+                }
+                BindingFlags bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+                PropertyInfo[] pa = type.GetProperties(bf);
+                for (int i = 0; i < pa.Length; i++)
+                {
+                    Energy.Base.Class.Information.Field field = new Energy.Base.Class.Information.Field();
+                    field.Object = pa[i];
+                    field.Type = pa[i].PropertyType;                    
+                    information.Add(field);
+                }
+                return information;
+            }
+
+            /// <summary>
+            /// Create class information from existing object.
+            /// </summary>
+            /// <param name="o"></param>
+            /// <returns></returns>
+            public static Energy.Base.Class.Information Create(object o)
+            {
+                if (o == null)
+                    return null;
+                return Create(o.GetType());
+            }
+        }
+
+        #endregion
     }
 }
