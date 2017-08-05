@@ -2,6 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 using System.IO;
+using System.Diagnostics;
 
 namespace Energy.Core
 {
@@ -69,9 +70,58 @@ namespace Energy.Core
         /// <summary>
         /// DES
         /// </summary>
-        public class DES : Method
+        public class DES : Method, IDisposable
         {
-            public string Secret { private get; set; }
+            private string _Secret;
+
+            public string Secret
+            {
+                private get
+                {
+                    return _Secret;
+                }
+                set
+                {
+                    _Secret = value;
+                    _Encryptor = null;
+                    _Decryptor = null;
+                }
+            }
+
+            private ICryptoTransform _Encryptor;
+
+            private ICryptoTransform Encryptor
+            {
+                get
+                {
+                    if (_Encryptor == null)
+                    {
+                        _Encryptor = CreateProviderAlgorithm(true);
+                    }
+                    return _Encryptor;
+                }
+            }
+
+            private ICryptoTransform _Decryptor;
+
+            private ICryptoTransform Decryptor
+            {
+                get
+                {
+                    if (_Decryptor == null)
+                    {
+                        _Decryptor = CreateProviderAlgorithm(false);
+                    }
+                    return _Decryptor;
+                }
+            }
+
+            public DES() { }
+
+            public DES(string secret)
+            {
+                this.Secret = secret;
+            }
 
             /// <summary>
             /// Encrypt a string using DES algorithm
@@ -80,9 +130,10 @@ namespace Energy.Core
             /// <returns>Encrypted string</returns>
             public override string Encrypt(string text)
             {
-                if (String.IsNullOrEmpty(text)) return "";
+                if (String.IsNullOrEmpty(text))
+                    return "";
 
-                ICryptoTransform algorithm = CreateAlgorithm();
+                ICryptoTransform algorithm = Encryptor;
 
                 MemoryStream memory = new MemoryStream();
                 CryptoStream crypto = new CryptoStream(memory, algorithm, CryptoStreamMode.Write);
@@ -101,24 +152,32 @@ namespace Energy.Core
             /// <returns>Decrypted string</returns>
             public override string Decrypt(string text)
             {
-                if (String.IsNullOrEmpty(text)) return "";
+                if (string.IsNullOrEmpty(text))
+                    return "";
 
-                ICryptoTransform algorithm = CreateAlgorithm();
+                ICryptoTransform algorithm = Decryptor;
 
                 MemoryStream memory = new MemoryStream(System.Convert.FromBase64String(text));
                 CryptoStream crypto = new CryptoStream(memory, algorithm, CryptoStreamMode.Read);
-
                 StreamReader reader = new StreamReader(crypto);
-                return reader.ReadToEnd();
+                try
+                {
+                    return reader.ReadToEnd();
+                }
+                catch (CryptographicException x)
+                {
+                    Debug.WriteLine(x.Message);
+                    return null;
+                }
             }
 
-            private ICryptoTransform CreateAlgorithm()
+            private ICryptoTransform CreateProviderAlgorithm(bool encryptor)
             {
                 DESCryptoServiceProvider provider = new DESCryptoServiceProvider();
 
                 byte[] key, vector;
 
-                if (Secret == null)
+                if (string.IsNullOrEmpty(Secret))
                 {
                     //// Use DES secret key and initialization vector
                     key = provider.Key;
@@ -129,14 +188,23 @@ namespace Energy.Core
                     // Use secret text as key and vector
                     string secret = Secret;
 
-                    while (secret.Length < 8) secret = secret + secret;
-                    if (secret.Length > 8) secret = secret.Substring(0, 8);
+                    while (secret.Length < 8)
+                        secret = secret + secret;
+                    if (secret.Length > 8)
+                        secret = secret.Substring(0, 8);
 
-                    key = ASCIIEncoding.ASCII.GetBytes(secret);
+                    key = ASCIIEncoding.UTF8.GetBytes(secret);
                     vector = key;
                 }
 
-                return provider.CreateEncryptor(key, vector);
+                return encryptor ? provider.CreateEncryptor(key, vector) : provider.CreateDecryptor(key, vector);
+            }
+
+            public void Dispose()
+            {
+                _Secret = null;
+                _Encryptor = null;
+                _Decryptor = null;
             }
         }
     }

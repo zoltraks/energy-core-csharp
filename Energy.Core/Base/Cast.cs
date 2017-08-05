@@ -963,5 +963,31 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Base64
+
+        /// <summary>
+        /// Convert UTF-8 string to Base64 text.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string StringToBase64(string input)
+        {
+            byte[] data = ASCIIEncoding.UTF8.GetBytes(input);
+            return System.Convert.ToBase64String(data);
+        }
+
+        /// <summary>
+        /// Convert Base64 input to UTF-8 string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string Base64ToString(string input)
+        {
+            byte[] data = System.Convert.FromBase64String(input);
+            return ASCIIEncoding.UTF8.GetString(data);
+        }
+
+        #endregion
     }
 }
