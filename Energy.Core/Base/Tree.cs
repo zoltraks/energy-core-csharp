@@ -167,7 +167,7 @@ namespace Energy.Base
         /// <summary>
         ///
         /// </summary>
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             if (parent != null) parent.Children.Remove(this);
         }

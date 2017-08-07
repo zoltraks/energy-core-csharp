@@ -120,6 +120,7 @@ namespace Energy.Base
         /// </summary>
         /// <typeparam name="T">Value type</typeparam>
         [XmlRoot]
+        [Serializable]
         public class Associative<T> : Dictionary<string, T>, IXmlSerializable
         {
             #region IXmlSerializable Members
@@ -194,6 +195,8 @@ namespace Energy.Base
 
         #region StringDictionary
 
+        [XmlRoot]
+        [Serializable]
         public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
             /// <summary>

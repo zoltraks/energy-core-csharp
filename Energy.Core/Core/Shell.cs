@@ -36,6 +36,11 @@ namespace Energy.Core
             public bool Equal = false;
 
             /// <summary>
+            /// Option without any prefix. Name should be considered "as is" in argument list.
+            /// </summary>
+            public bool Pure = false;
+
+            /// <summary>
             /// Check if parameter is an option with command line settings.
             /// </summary>
             /// <param name="parameter"></param>

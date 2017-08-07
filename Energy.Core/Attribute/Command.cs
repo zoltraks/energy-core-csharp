@@ -107,6 +107,7 @@ namespace Energy.Attribute
         /// <summary>
         /// Attribute for command line option.
         /// </summary>
+        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
         public class OptionAttribute : System.Attribute
         {
             public string Name;

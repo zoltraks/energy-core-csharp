@@ -149,6 +149,52 @@ namespace Energy.Base
         /// </summary>
         /// <param name="type"></param>
         /// <param name="field"></param>
+        /// <param name="inherit"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static T[] GetFieldOrPropertyAttributes<T>(Type type, string field, bool inherit, bool ignoreCase)
+        {
+            Type filter = typeof(T);
+            List<T> list = new List<T>();
+            foreach (FieldInfo _ in type.GetFields())
+            {
+                if (0 != string.Compare(_.Name, field, ignoreCase))
+                    continue;
+                object[] a = _.GetCustomAttributes(inherit);
+                foreach (object x in a)
+                {
+                    if (filter != null)
+                    {
+                        if (x.GetType() != filter)
+                            continue;
+                    }
+                    list.Add((T)x);
+                }
+            }
+            BindingFlags bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(bf))
+            {
+                if (0 != string.Compare(_.Name, field, ignoreCase))
+                    continue;
+                object[] a = _.GetCustomAttributes(inherit);
+                foreach (object x in a)
+                {
+                    if (filter != null)
+                    {
+                        if (x.GetType() != filter)
+                            continue;
+                    }
+                    list.Add((T)x);
+                }
+            }
+            return list.Count == 0 ? null : list.ToArray();
+        }
+
+        /// <summary>
+        /// Get custom attributes of field or property of a class.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="field"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         public static object[] GetFieldOrPropertyAttributes(Type type, string field, Type filter)

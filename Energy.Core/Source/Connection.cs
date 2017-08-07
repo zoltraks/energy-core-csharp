@@ -808,7 +808,7 @@ namespace Energy.Source
             return query;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             Close();
         }

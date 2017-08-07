@@ -216,6 +216,8 @@ namespace Energy.Base
 
         #endregion
 
+        private static readonly object _RegexLock = new object();
+
         private static Regex _DateRegex;
         /// <summary>Singleton</summary>
         public static Regex DateRegex
@@ -224,7 +226,7 @@ namespace Energy.Base
             {
                 if (_DateRegex == null)
                 {
-                    lock (typeof(Regex))
+                    lock (_RegexLock)
                     {
                         if (_DateRegex == null)
                         {
@@ -244,7 +246,7 @@ namespace Energy.Base
             {
                 if (_TimeRegex == null)
                 {
-                    lock (typeof(Regex))
+                    lock (_RegexLock)
                     {
                         if (_TimeRegex == null)
                         {

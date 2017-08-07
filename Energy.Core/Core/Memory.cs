@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using System.Text;
 
 namespace Energy.Core
@@ -13,6 +14,7 @@ namespace Energy.Core
         /// Get current memory usage
         /// </summary>
         /// <returns></returns>
+        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public static long GetCurrentMemoryUsage()
         {
             System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();

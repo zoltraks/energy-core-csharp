@@ -138,9 +138,8 @@ namespace Energy.Core
             string[] a = Energy.Base.Class.GetFieldsAndProperties(type, true);
             foreach (string f in a)
             {
-                object[] x = Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Data.AttributeAttribute), true, false);
                 Energy.Attribute.Command.OptionAttribute[] optionAttributes = (Energy.Attribute.Command.OptionAttribute[])
-                    Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Command.OptionAttribute), true, false);
+                    Energy.Base.Class.GetFieldOrPropertyAttributes<Energy.Attribute.Command.OptionAttribute>(type, f, true, false);
                 if (optionAttributes != null && optionAttributes.Length > 0)
                 {
                     foreach (Energy.Attribute.Command.OptionAttribute optionAttribute in optionAttributes)
