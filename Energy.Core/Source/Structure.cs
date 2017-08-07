@@ -87,6 +87,7 @@ namespace Energy.Source
 
             #region Array
 
+            [Serializable]
             public class Array : Energy.Base.Collection.Array<Column>
             {
                 public Column Get(string name)
@@ -192,6 +193,7 @@ namespace Energy.Source
 
             #region Array
 
+            [Serializable]
             public class Array : List<Index>
             {
                 public Index Get(string name)
@@ -218,6 +220,7 @@ namespace Energy.Source
 
         #region Row
 
+        [Serializable]
         public partial class Row : Dictionary<string, object>, IXmlSerializable
         {
             public XmlSchema GetSchema()
@@ -240,6 +243,7 @@ namespace Energy.Source
 
             #region Array
 
+            [Serializable]
             public class Array : Energy.Base.Collection.Array<Row>
             {
             }

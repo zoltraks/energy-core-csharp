@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Energy.Core
 {
+    [Serializable]
     public class Syntax: Energy.Base.Collection.StringDictionary
     {
         private string _Text;

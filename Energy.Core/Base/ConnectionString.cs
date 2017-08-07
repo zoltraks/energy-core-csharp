@@ -12,6 +12,7 @@ namespace Energy.Base
     /// <summary>
     /// ODBC style connection string
     /// </summary>
+    [Serializable]
     public class ConnectionString : Dictionary<string, string>
     {
         /// <summary>

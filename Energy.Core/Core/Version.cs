@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Diagnostics;
+using System.Security.Permissions;
 
 namespace Energy.Core
 {
@@ -42,6 +43,7 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
+        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public void Set(Assembly assembly)
         {
             Product = GetProduct(assembly);
@@ -55,6 +57,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
         /// <returns>string</returns>
+        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public static string GetProduct(Assembly assembly)
         {
             try
@@ -127,6 +130,7 @@ namespace Energy.Core
         /// <summary>Library version</summary>
         public static string LibraryVersion
         {
+            [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
             get
             {
                 if (_LibraryProduct == null)

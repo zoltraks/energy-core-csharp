@@ -15,6 +15,7 @@ namespace Energy.Base
         /// Thread safe array of objects
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        [Serializable]
         public class Array<T> : System.Collections.Generic.List<T>
         {
             public T First
@@ -424,6 +425,7 @@ namespace Energy.Base
             }
         }
 
+        [Serializable]
         public class StringDictionary : StringDictionary<string>
         {
         }

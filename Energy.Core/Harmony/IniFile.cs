@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Energy.Harmony
 {
+    [Serializable]
     public class IniFile : Dictionary<string, Energy.Base.Collection.StringDictionary>
     {
         private bool _CaseSensitive = true;

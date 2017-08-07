@@ -114,7 +114,7 @@ namespace Energy.Core
                 ManualResetEvent = manualResetEvent,
                 Thread = thread,
             };
-            System.Threading.Thread guardian = new System.Threading.Thread(WaitForExit);
+            System.Threading.Thread guardian = new System.Threading.Thread(WaitForParameter);
             guardian.Start(parameter);
             bool success = manualResetEvent.WaitOne(time);
             if (!success)
@@ -125,7 +125,7 @@ namespace Energy.Core
             return true;
         }
 
-        private static void WaitForExit(object parameter)
+        private static void WaitForParameter(object parameter)
         {
             WaitForExitParameter data = parameter as WaitForExitParameter;
             try

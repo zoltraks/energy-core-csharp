@@ -571,16 +571,24 @@ namespace Energy.Source
                                 DataTable table = new DataTable();
                                 table.Load(reader);
                                 command.Cancel();
-                                reader.Close();
+                                //reader.Close(); // Reader will be closed in Dispose() so it is not needed in using section
                                 return table;
                             }
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
                             command.Cancel();
+                            SetError(x);
                             if (Catch(x, command))
                                 continue;
+                            else
+                            {
+                                if (Log != null)
+                                    Log.Write(x);
+                                else
+                                    throw;
+                                return null;
+                            }
                         }
                     }
 
@@ -601,80 +609,79 @@ namespace Energy.Source
 
             DataTable table = null;
 
-            for (int n = 0; n <= _Repeat; n++)
+            try
             {
-                if (!Active && !Open())
-                    return null;
-
-                using (DbCommand command = Prepare(query))
+                for (int n = 0; n <= _Repeat; n++)
                 {
-                    try
+                    if (!Active && !Open())
+                        return null;
+
+                    using (DbCommand command = Prepare(query))
                     {
-                        CommandBehavior behaviour = GetDefaultCommandBehaviour();
-                        DbDataReader reader = command.ExecuteReader(behaviour);
-                        
-                        DataTable schema = reader.GetSchemaTable();
-
-                        if (schema == null)
-                            break;
-
-                        table = new DataTable();
-
-                        List<DataColumn> list = new List<DataColumn>();
-                        foreach (DataRow row in schema.Rows)
+                        try
                         {
-                            string columnName = System.Convert.ToString(row["ColumnName"]);
-                            DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
-                            column.Unique = (bool)row["IsUnique"];
-                            column.AllowDBNull = (bool)row["AllowDBNull"];
-                            column.AutoIncrement = (bool)row["IsAutoIncrement"];
-                            list.Add(column);
-                            table.Columns.Add(column);
-                        }
+                            CommandBehavior behaviour = GetDefaultCommandBehaviour();
+                            DbDataReader reader = command.ExecuteReader(behaviour);
 
-                        // Read rows from DataReader and populate the DataTable 
+                            DataTable schema = reader.GetSchemaTable();
 
-                        while (reader.Read())
-                        {
-                            DataRow row = table.NewRow();
-                            for (int i = 0; i < list.Count; i++)
+                            if (schema == null)
+                                break;
+
+                            table = new DataTable();
+
+                            List<DataColumn> list = new List<DataColumn>();
+                            foreach (DataRow row in schema.Rows)
                             {
-                                row[((DataColumn)list[i])] = reader[i];
+                                string columnName = System.Convert.ToString(row["ColumnName"]);
+                                DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
+                                column.Unique = (bool)row["IsUnique"];
+                                column.AllowDBNull = (bool)row["AllowDBNull"];
+                                column.AutoIncrement = (bool)row["IsAutoIncrement"];
+                                list.Add(column);
+                                table.Columns.Add(column);
                             }
-                            table.Rows.Add(row);
+
+                            // Read rows from DataReader and populate the DataTable 
+
+                            while (reader.Read())
+                            {
+                                DataRow row = table.NewRow();
+                                for (int i = 0; i < list.Count; i++)
+                                {
+                                    row[((DataColumn)list[i])] = reader[i];
+                                }
+                                table.Rows.Add(row);
+                            }
+
+                            command.Cancel();
+                            reader.Close();
+
+                            break;
                         }
-
-                        command.Cancel();
-                        reader.Close();
-
-                        break;
-                    }
-                    catch (DbException x)
-                    {
-                        command.Cancel();
-                        SetError(x);
-                        if (Catch(x, command))
-                            continue;
-                        else
-                            return null;
-                    }
-                    catch (Exception x)
-                    {
-                        command.Cancel();
-                        SetError(x);
-                        if (Catch(x, command))
-                            continue;
-                        else
-                            return null;
-                    }
-                    finally
-                    {
-                        if (Pooling)
-                            Close();
+                        catch (Exception x)
+                        {
+                            command.Cancel();
+                            SetError(x);
+                            if (Catch(x, command))
+                                continue;
+                            else
+                            {
+                                if (Log != null)
+                                    Log.Write(x);
+                                else
+                                    throw;
+                                return null;
+                            }
+                        }
                     }
                 }
             }
-
+            finally
+            {
+                if (Pooling)
+                    Close();
+            }
             return table;
         }
 
@@ -722,6 +729,7 @@ namespace Energy.Source
             return new object();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private DbCommand Prepare(string query)
         {
             DbCommand command = Driver.CreateCommand();
@@ -810,7 +818,16 @@ namespace Energy.Source
 
         public void Dispose()
         {
-            Close();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Close();
+            }
         }
 
         public virtual object Scalar(DbCommand command)
@@ -821,7 +838,8 @@ namespace Energy.Source
             }
             catch (Exception x)
             {
-                if (Log == null) throw x;
+                if (Log == null)
+                    throw;
                 Log.Add(x);
                 return null;
             }
