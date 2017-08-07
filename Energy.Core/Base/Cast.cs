@@ -289,6 +289,21 @@ namespace Energy.Base
             return value.ToString();
         }
 
+        /// <summary>
+        /// Convert int to short without exception.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static short IntegerToShort(int value)
+        {
+            return (short)value;
+        }
+
+        public static byte IntegerToByte(int value)
+        {
+            return (byte)value;
+        }
+
         #endregion
 
         #region Byte

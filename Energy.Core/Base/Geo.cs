@@ -17,11 +17,11 @@ namespace Energy.Base
         /// </summary>
         public class Point
         {
-            [XmlElement("X")]
+            [XmlElement("Y")]
             [DefaultValue(0)]
             public double Latitude;
 
-            [XmlElement("Y")]
+            [XmlElement("X")]
             [DefaultValue(0)]
             public double Longitude;
 
@@ -42,6 +42,30 @@ namespace Energy.Base
             public override string ToString()
             {
                 return base.ToString();
+            }
+
+            public static implicit operator Point(decimal[] array)
+            {
+                if (array == null || array.Length < 2)
+                    return null;
+                Point _ = new Point();
+                _.Latitude = (double)array[0];
+                _.Longitude = (double)array[1];
+                if (array.Length > 2)
+                    _.Altitude = (double)array[2];
+                return _;
+            }
+
+            public static implicit operator Point(double[] array)
+            {
+                if (array == null || array.Length < 2)
+                    return null;
+                Point _ = new Point();
+                _.Latitude = array[0];
+                _.Longitude = array[1];
+                if (array.Length > 2)
+                    _.Altitude = array[2];
+                return _;
             }
 
             /// <summary>
@@ -80,7 +104,7 @@ namespace Energy.Base
             /// Represent location coordinates as latitude/longitude string
             /// </summary>
             /// <returns></returns>
-            public string ToLatLong()
+            public string ToLatLng()
             {
                 string latitude = Energy.Base.Cast.DoubleToString(Latitude, 6, true, null);
                 string longitude = Energy.Base.Cast.DoubleToString(Longitude, 6, true, null);

@@ -11,22 +11,54 @@ namespace Energy.Base
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
         /// </summary>
+        /// <param name="type"></param>
+        /// <param name="includePrivate"></param>
+        /// <param name="includePublic"></param>
+        /// <returns></returns>
+        public static string[] GetFieldsAndProperties(Type type, bool includePrivate, bool includePublic)
+        {
+            List<string> list = new List<string>();
+
+            foreach (FieldInfo _ in type.GetFields())
+            {
+                if (!includePrivate && _.IsPrivate)
+                    continue;
+                if (!includePublic && _.IsPublic)
+                    continue;
+                list.Add(_.Name);
+            }
+            BindingFlags f = BindingFlags.Instance;
+            if (includePrivate)
+                f |= BindingFlags.NonPublic;
+            if (includePublic)
+                f |= BindingFlags.Public;
+            foreach (PropertyInfo _ in type.GetProperties(f))
+            {
+                list.Add(_.Name);
+            }
+
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Get list of names of all fields and propeties for specified class type.
+        /// </summary>
         /// <param name="type">Class type</param>
         /// <returns>Array of string</returns>
         public static string[] GetFieldsAndProperties(Type type)
         {
-            System.Collections.Generic.List<string> field = new System.Collections.Generic.List<string>();
-            // Class properties //
-            foreach (PropertyInfo _ in type.GetProperties())
-            {
-                field.Add(_.Name);
-            }
-            // Class fields //
-            foreach (FieldInfo _ in type.GetFields())
-            {
-                field.Add(_.Name);
-            }
-            return field.ToArray();
+            return GetFieldsAndProperties(type, true, true);
+        }
+
+        /// <summary>
+        /// Get list of names of all fields and propeties for specified class type.
+        /// </summary>
+        /// <param name="type">Class type</param>
+        /// <param name="includePrivate"></param>
+        /// <returns>Array of string</returns>
+        public static string[] GetFieldsAndProperties(Type type, bool includePrivate)
+        {
+            return GetFieldsAndProperties(type, includePrivate, true);
         }
 
         /// <summary>
@@ -38,18 +70,6 @@ namespace Energy.Base
         /// <returns>Attribute or null if not found</returns>
         public static object GetFieldOrPropertyAttribute(Type type, string name, Type attribute)
         {
-            foreach (PropertyInfo _ in type.GetProperties())
-            {
-                if (_.Name != name) continue;
-                object[] a = _.GetCustomAttributes(true);
-                foreach (object x in a)
-                {
-                    if (x.GetType() == attribute)
-                    {
-                        return x;
-                    }
-                }
-            }
             foreach (FieldInfo _ in type.GetFields())
             {
                 if (_.Name != name) continue;
@@ -62,7 +82,78 @@ namespace Energy.Base
                     }
                 }
             }
+            BindingFlags bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(bf))
+            {
+                if (_.Name != name) continue;
+                object[] a = _.GetCustomAttributes(true);
+                foreach (object x in a)
+                {
+                    if (x.GetType() == attribute)
+                    {
+                        return x;
+                    }
+                }
+            } 
             return null;
+        }
+
+        /// <summary>
+        /// Get custom attributes of field or property of a class.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="field"></param>
+        /// <param name="filter"></param>
+        /// <param name="inherit"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static object[] GetFieldOrPropertyAttributes(Type type, string field, Type filter, bool inherit, bool ignoreCase)
+        {
+            List<object> list = new List<object>();
+            foreach (FieldInfo _ in type.GetFields())
+            {
+                if (0 != string.Compare(_.Name, field, ignoreCase))
+                    continue;
+                object[] a = _.GetCustomAttributes(inherit);
+                foreach (object x in a)
+                {
+                    if (filter != null)
+                    {
+                        if (x.GetType() != filter)
+                            continue;
+                    }
+                    list.Add(x);
+                }
+            }
+            BindingFlags bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(bf))
+            {
+                if (0 != string.Compare(_.Name, field, ignoreCase))
+                    continue;
+                object[] a = _.GetCustomAttributes(inherit);
+                foreach (object x in a)
+                {
+                    if (filter != null)
+                    {
+                        if (x.GetType() != filter)
+                            continue;
+                    }
+                    list.Add(x);
+                }
+            }
+            return list.Count == 0 ? null : list.ToArray();
+        }
+
+        /// <summary>
+        /// Get custom attributes of field or property of a class.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="field"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static object[] GetFieldOrPropertyAttributes(Type type, string field, Type filter)
+        {
+            return GetFieldOrPropertyAttributes(type, field, filter, true, false);
         }
 
         /// <summary>
@@ -314,7 +405,7 @@ namespace Energy.Base
         }
 
 
-        #region Object class information
+        #region Class information
 
         /// <summary>
         /// Object class information.
@@ -475,6 +566,31 @@ namespace Energy.Base
                 if (o == null)
                     return null;
                 return Create(o.GetType());
+            }
+        }
+
+        #endregion
+
+        #region Class information repository
+
+        /// <summary>
+        /// Class information repository
+        /// </summary>
+        public class Repository
+        {
+            private Dictionary<System.Type, Energy.Base.Class.Information> _Information;
+            /// <summary>Information</summary>
+            public Dictionary<System.Type, Energy.Base.Class.Information> Information { get { return _Information; } set { _Information = value; } }
+
+            public Repository()
+            {
+                _Information = new Dictionary<System.Type, Energy.Base.Class.Information>();
+            }
+
+            public void Scan(System.Type type)
+            {
+                Energy.Base.Class.Information information = Energy.Base.Class.Information.Create(type);
+                _Information[type] = information;
             }
         }
 

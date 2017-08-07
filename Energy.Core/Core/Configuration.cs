@@ -8,7 +8,7 @@ namespace Energy.Core
     /// Configuration
     /// </summary>
     public class Configuration : Energy.Interface.ILoadFromFile
-    {
+    {        
         public abstract class File
         {
             private string _FileName = Energy.Core.Information.GetCurrentNamespace() + ".conf";
@@ -58,11 +58,6 @@ namespace Energy.Core
             }
         }
 
-        public void Parse(string[] args)
-        {
-            throw new NotImplementedException();
-        }
-
         private Option.List _Options = new Option.List();
         /// <summary>Arguments</summary>
         public Option.List Options { get { return _Options; } set { _Options = value; } }
@@ -87,6 +82,11 @@ namespace Energy.Core
             return true;            
         }
 
+        public void Parse(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         public Element this[string key]
         {
             get
@@ -105,5 +105,69 @@ namespace Energy.Core
             }
             return null;
         }
+
+
+        #region Static
+
+        /// <summary>
+        /// Create configuration object from command line arguments
+        /// using Energy.Attribute.Command attributes.
+        /// </summary>
+        /// <param name="args">Command line options</param>
+        /// <param name="type">Configuration class type</param>
+        /// <param name="style">Command line option style settings</param>
+        /// <returns>Configuration object</returns>
+        public static object Create(string[] args, System.Type type, Energy.Core.Shell.CommandLineStyle style)
+        {
+            System.Collections.Generic.List<string> optList = new System.Collections.Generic.List<string>();
+            System.Collections.Generic.List<string> argList = new System.Collections.Generic.List<string>();
+
+            foreach (string arg in args)
+            {
+                if (style.IsOption(arg))
+                    optList.Add(arg);
+                else
+                    argList.Add(arg);
+            }
+
+            System.Collections.Generic.Dictionary<string, List<string>> optionDictionary
+                = new System.Collections.Generic.Dictionary<string, List<string>>();
+            System.Collections.Generic.Dictionary<string, Energy.Attribute.Command.OptionAttribute> attributeDictionary
+                = new System.Collections.Generic.Dictionary<string, Energy.Attribute.Command.OptionAttribute>();
+
+            string[] a = Energy.Base.Class.GetFieldsAndProperties(type, true);
+            foreach (string f in a)
+            {
+                object[] x = Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Data.AttributeAttribute), true, false);
+                Energy.Attribute.Command.OptionAttribute[] optionAttributes = (Energy.Attribute.Command.OptionAttribute[])
+                    Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Command.OptionAttribute), true, false);
+                if (optionAttributes != null && optionAttributes.Length > 0)
+                {
+                    foreach (Energy.Attribute.Command.OptionAttribute optionAttribute in optionAttributes)
+                    {
+                        System.Collections.Generic.List<string> synonym = new System.Collections.Generic.List<string>();
+                        synonym.Add(optionAttribute.Name);
+                        synonym.Add(optionAttribute.Short);
+                        synonym.Add(optionAttribute.Long);
+                        if (optionAttribute.Alternatives != null)
+                            synonym.AddRange(optionAttribute.Alternatives);
+                        foreach (string name in synonym)
+                        {
+                            if (string.IsNullOrEmpty(name))
+                                continue;
+                            if (!optionDictionary.ContainsKey(name))
+                                optionDictionary[name] = new List<string>();
+                            optionDictionary[name].Add(f);
+                        }
+
+                    }
+                }
+                Energy.Attribute.Command.ParameterAttribute[] parameterAttributes = (Energy.Attribute.Command.ParameterAttribute[])
+                    Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Command.ParameterAttribute), true, false);
+            }
+            return null;
+        }
+
+        #endregion
     }
 }

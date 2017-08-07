@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Base
 {
-    public struct Time
+    public class Time
     {
     }
 }
