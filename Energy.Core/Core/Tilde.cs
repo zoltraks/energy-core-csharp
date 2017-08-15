@@ -540,7 +540,7 @@ namespace Energy.Core
             if (trace)
             {
                 string comment = (new Regex(@"^\s*\w+\s*", RegexOptions.Multiline).Replace(exception.StackTrace, ""));
-                string[] split = Energy.Base.Text.SplitByNewLine(comment);
+                string[] split = Energy.Base.Text.SplitNewLine(comment);
                 List<string> stack = new List<string>();
                 for (int i = split.Length - 1; i >= 0; i--)
                 {

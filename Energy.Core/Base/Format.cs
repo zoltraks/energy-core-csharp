@@ -107,6 +107,10 @@ namespace Energy.Base
 
             public string Lose(string content)
             {
+                if (string.IsNullOrEmpty(content))
+                    return content;
+                if (!string.IsNullOrEmpty(prefix) && !content.StartsWith(prefix))
+                    return content;
                 return Unescape(content.Substring((prefix ?? "").Length, content.Length - (prefix ?? "").Length - (suffix ?? "").Length));
             }
         }

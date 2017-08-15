@@ -30,7 +30,7 @@ namespace WorkerCreateSimple
 
         public class MyState
         {
-            public bool Modify;
+            //public bool Modify;
         }
 
         public class MyThread

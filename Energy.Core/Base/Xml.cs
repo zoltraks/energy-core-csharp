@@ -12,6 +12,8 @@ namespace Energy.Base
     /// </summary>
     public class Xml
     {
+        private static readonly object _XmlLock = new object();
+
         /// <summary>
         /// Serialize object to XML
         /// <para>
@@ -30,17 +32,20 @@ namespace Energy.Base
             string xml = null;
             try
             {
-                XmlRootAttribute xra = new XmlRootAttribute(root);
-                xra.Namespace = space;
-                XmlSerializer xs = new XmlSerializer(data.GetType(), xra);
-                StringBuilder sb = new StringBuilder();
-                XmlWriterSettings xws = new XmlWriterSettings() { OmitXmlDeclaration = true };
-                xws.Indent = true;
-                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-                ns.Add("", space);
-                XmlWriter xw = XmlWriter.Create(sb, xws);
-                xs.Serialize(xw, data, ns);
-                xml = sb.ToString();
+                lock (_XmlLock)
+                {
+                    XmlRootAttribute xra = new XmlRootAttribute(root);
+                    xra.Namespace = space;
+                    XmlSerializer xs = new XmlSerializer(data.GetType(), xra);
+                    StringBuilder sb = new StringBuilder();
+                    XmlWriterSettings xws = new XmlWriterSettings() { OmitXmlDeclaration = true };
+                    xws.Indent = true;
+                    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                    ns.Add("", space);
+                    XmlWriter xw = XmlWriter.Create(sb, xws);
+                    xs.Serialize(xw, data, ns);
+                    xml = sb.ToString();
+                }
             }
             catch (Exception x)
             {
@@ -103,12 +108,15 @@ namespace Energy.Base
             }
             try
             {
-                XmlSerializer serializer = new XmlSerializer(type);
-                StringReader stream = new StringReader(content);
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.CheckCharacters = false;
-                XmlReader reader = XmlReader.Create(stream, settings);
-                return serializer.Deserialize(reader);
+                lock (_XmlLock)
+                {
+                    XmlSerializer serializer = new XmlSerializer(type);
+                    StringReader stream = new StringReader(content);
+                    XmlReaderSettings settings = new XmlReaderSettings();
+                    settings.CheckCharacters = false;
+                    XmlReader reader = XmlReader.Create(stream, settings);
+                    return serializer.Deserialize(reader);
+                }
             }
             catch (InvalidOperationException)
             {
@@ -133,13 +141,16 @@ namespace Energy.Base
         {
             try
             {
-                XmlRootAttribute attribute = new XmlRootAttribute(root) { Namespace = space };
-                XmlSerializer serializer = new XmlSerializer(type, attribute);
-                StringReader stream = new StringReader(content);
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.CheckCharacters = false;
-                XmlReader reader = XmlReader.Create(stream, settings);
-                return serializer.Deserialize(reader);
+                lock (_XmlLock)
+                {
+                    XmlRootAttribute attribute = new XmlRootAttribute(root) { Namespace = space };
+                    XmlSerializer serializer = new XmlSerializer(type, attribute);
+                    StringReader stream = new StringReader(content);
+                    XmlReaderSettings settings = new XmlReaderSettings();
+                    settings.CheckCharacters = false;
+                    XmlReader reader = XmlReader.Create(stream, settings);
+                    return serializer.Deserialize(reader);
+                }
             }
             catch
             {                
@@ -173,14 +184,17 @@ namespace Energy.Base
             {
                 try
                 {
-                    XmlRootAttribute attribute = new XmlRootAttribute(element);
-                    attribute.Namespace = space;
-                    XmlSerializer serializer = new XmlSerializer(type, attribute);
-                    StringReader stream = new StringReader(content);
-                    XmlReaderSettings settings = new XmlReaderSettings();
-                    settings.CheckCharacters = false;
-                    XmlReader reader = XmlReader.Create(stream, settings);
-                    return serializer.Deserialize(reader);
+                    lock (_XmlLock)
+                    {
+                        XmlRootAttribute attribute = new XmlRootAttribute(element);
+                        attribute.Namespace = space;
+                        XmlSerializer serializer = new XmlSerializer(type, attribute);
+                        StringReader stream = new StringReader(content);
+                        XmlReaderSettings settings = new XmlReaderSettings();
+                        settings.CheckCharacters = false;
+                        XmlReader reader = XmlReader.Create(stream, settings);
+                        return serializer.Deserialize(reader);
+                    }
                 }
                 catch
                 {

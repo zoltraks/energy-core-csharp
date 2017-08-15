@@ -430,5 +430,14 @@ namespace Energy.Base
         {
             return !(c1 == c2);
         }
+
+        #region Dictionary
+
+        public class Dictionary: System.Collections.Generic.Dictionary<string, Currency>
+        {
+
+        }
+
+        #endregion
     }
 }

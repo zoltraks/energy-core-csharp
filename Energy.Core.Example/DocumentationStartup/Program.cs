@@ -7,7 +7,7 @@ namespace DocumentationStartup
 {
     class Program
     {
-        static bool Test17 = false;
+        static bool Test17 = true;
 
         static void Main(string[] args)
         {
@@ -21,7 +21,8 @@ namespace DocumentationStartup
                 Test.Test6();
                 Test.Test7();
             }
-            Test.Test8(args);
+            //Test.Test8(args);
+            Test.Test9();
             Console.ReadLine();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -141,9 +142,45 @@ namespace Energy.Base
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static string[] SplitByNewLine(string content)
+        public static string[] SplitNewLine(string content)
         {
             return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+        }
+
+        /// <summary>
+        /// Split string by new line
+        /// </summary>
+        /// <returns></returns>
+        public static string[] SplitList(string text, string commas, string[] quotes)
+        {
+            List<string> l1 = new List<string>();
+            if (quotes != null /* !string.IsNullOrEmpty(quotes) */)
+            {
+                foreach (string q in quotes)
+                {
+                    Energy.Base.Format.Quote quote = q;
+                    string q1 = quote.Prefix;
+                    string q2 = quote.Suffix;
+                    string q3 = quote.Escape(quote.Suffix);
+                    q1 = Regex.Escape(q1);
+                    q2 = Regex.Escape(q2);
+                    q3 = Regex.Escape(q3);
+                    l1.Add(string.Concat("(?:", q1, "(?:", q3, "|[^", q2, "])*", q1, ")"));
+                }
+            }
+            l1.Add(@"([a-zA-Z_0-9]+)");
+            return l1.ToArray();
+
+        }
+
+        /// <summary>
+        /// Split string by new line
+        /// </summary>
+        /// <returns></returns>
+        public static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
+        {
+            //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+            return null;
         }
 
         /// <summary>

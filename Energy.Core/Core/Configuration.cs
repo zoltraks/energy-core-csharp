@@ -57,7 +57,7 @@ namespace Energy.Core
                 }
             }
         }
-
+       
         private Option.List _Options = new Option.List();
         /// <summary>Arguments</summary>
         public Option.List Options { get { return _Options; } set { _Options = value; } }
@@ -117,7 +117,7 @@ namespace Energy.Core
         /// <param name="type">Configuration class type</param>
         /// <param name="style">Command line option style settings</param>
         /// <returns>Configuration object</returns>
-        public static object Create(string[] args, System.Type type, Energy.Core.Shell.CommandLineStyle style)
+        public static object Create(string[] args, System.Type type, Energy.Core.Shell.OptionStyle style)
         {
             System.Collections.Generic.List<string> optList = new System.Collections.Generic.List<string>();
             System.Collections.Generic.List<string> argList = new System.Collections.Generic.List<string>();

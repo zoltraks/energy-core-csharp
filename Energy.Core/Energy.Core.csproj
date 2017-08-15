@@ -53,6 +53,7 @@
     <Compile Include="Base\Date.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
+    <Compile Include="Base\Anonymous.cs" />
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Log.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Query\Dialect.cs" />
     <Compile Include="Interface\IConnection.cs" />
     <Compile Include="Query\Type.cs" />
+    <Compile Include="Source\Context.cs" />
     <Compile Include="Source\Query.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Base\Text.cs" />
