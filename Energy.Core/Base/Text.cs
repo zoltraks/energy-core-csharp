@@ -138,7 +138,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Split string by new line
+        /// Split string by new line.
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
@@ -148,29 +148,64 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Split string by new line
+        /// Split string to array by separators with optional quoted elements.
+        /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special'".
         /// </summary>
         /// <returns></returns>
-        public static string[] SplitList(string text, string commas, string[] quotes)
+        public static string[] SplitList(string text, string commas, string quotes)
         {
-            List<string> l1 = new List<string>();
-            if (quotes != null /* !string.IsNullOrEmpty(quotes) */)
+            List<string> list = new List<string>();
+            if (!string.IsNullOrEmpty(quotes))
             {
-                foreach (string q in quotes)
+                foreach (char c in quotes.ToCharArray())
                 {
-                    Energy.Base.Format.Quote quote = q;
-                    string q1 = quote.Prefix;
-                    string q2 = quote.Suffix;
-                    string q3 = quote.Escape(quote.Suffix);
-                    q1 = Regex.Escape(q1);
-                    q2 = Regex.Escape(q2);
-                    q3 = Regex.Escape(q3);
-                    l1.Add(string.Concat("(?:", q1, "(?:", q3, "|[^", q2, "])*", q1, ")"));
+                    string quote = Regex.Escape(c.ToString()).Replace(@"\ ", @"\s");
+                    string escape = Regex.Escape(new string(c, 2)).Replace(@"\ ", @"\s");
+                    list.Add(string.Concat(quote, "(?:", escape, "|[^", quote, "])*", quote));
                 }
             }
-            l1.Add(@"([a-zA-Z_0-9]+)");
-            return l1.ToArray();
+            string separator = "";
+            if (string.IsNullOrEmpty(commas) || commas == " ")
+            {
+                list.Add(@"[^\s]+");
+                separator = @"(?:\s*)?";
+            }
+            else
+            {
+                string escape = Regex.Escape(commas).Replace(@"\ ", @"\s");
+                list.Add(string.Concat("[^", commas, "]+"));
+                separator = string.Concat(@"(?:\s*[", escape, @"]\s*)?");
+            }
+            string join = string.Join("|", list.ToArray());
+            string pattern = string.Concat(@"(?<1>", join, ")", separator);
 
+            list.Clear();
+
+            Match match;
+            Match next = Regex.Match(text, pattern);
+            while ((match = next).Success)
+            {
+                next = match.NextMatch();
+                string value = match.Groups[1].Value;
+                if (value == null)
+                    continue;
+                value = value.Trim();
+                if (value.Length == 0)
+                    continue;
+                if (!string.IsNullOrEmpty(quotes))
+                {
+                    foreach (char c in quotes.ToCharArray())
+                    {
+                        string quote = c.ToString();
+                        if (!value.StartsWith(quote) || !value.EndsWith(quote))
+                            continue;
+                        string escape = new string(c, 2);
+                        value = value.Substring(1, value.Length - 2).Replace(escape, quote);
+                    }
+                }
+                list.Add(value);
+            }
+            return list.ToArray();
         }
 
         /// <summary>
