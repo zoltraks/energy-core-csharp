@@ -306,5 +306,93 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        /// <summary>
+        /// Limit string to have maximum count of characters.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="limit">int</param>
+        /// <returns>string</returns>
+        public static string Limit(string text, int limit)
+        {
+            if (limit < 0)
+                return "";
+
+            if (string.IsNullOrEmpty(text) || limit == 0 || text.Length <= limit)
+            {
+                return text;
+            }
+            else
+            {
+                return text.Substring(0, limit);
+            }
+        }
+
+        /// <summary>
+        /// Limit string to have maximum count characters with optional suffix if it was cut off.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="limit">int</param>
+        /// <param name="suffix">string</param>
+        /// <returns>string</returns>
+        public static string Limit(string text, int limit, string suffix)
+        {
+            if (limit < 0)
+                return "";
+
+            if (string.IsNullOrEmpty(text) || limit == 0 || text.Length <= limit)
+            {
+                return text;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(suffix))
+                {
+                    text = text.Substring(0, limit);
+                }
+                else
+                {
+                    limit -= suffix.Length;
+                    text = string.Concat(text.Substring(0, limit), suffix);
+                }
+                return text;
+            }
+        }
+
+
+        /// <summary>
+        /// Limit string to have maximum count characters with optional prefix or suffix if it was cut off.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="limit">int</param>
+        /// <param name="prefix">string</param>
+        /// <param name="suffix">string</param>
+        /// <returns>string</returns>
+        public static string Limit(string text, int limit, string prefix, string suffix)
+        {
+            if (limit < 0)
+                return "";
+
+            if (string.IsNullOrEmpty(text) || limit == 0 || text.Length <= limit)
+            {
+                return text;
+            }
+            else
+            {
+                int length = limit;
+                int start = 0;
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    length -= prefix.Length;
+                    start += prefix.Length;
+                }
+                if (!string.IsNullOrEmpty(suffix))
+                {
+                    length -= suffix.Length;
+                }
+                text = string.Concat(prefix, text.Substring(start, length), suffix);
+                return text;
+            }
+        }
     }
 }

@@ -125,8 +125,8 @@ namespace Energy.Attribute
             public string[] Alternatives;
 
             /// <summary>
-            /// May be set to 1, 2 or more values to take values from argument list.
-            /// If set to 0 option is a flag.
+            /// May be set to 1, 2 or more values to take values from argument list (for parameters).
+            /// If set to 0 option is a flag (for switches).
             /// </summary>
             public int Count;
 
@@ -155,6 +155,29 @@ namespace Energy.Attribute
                 : this(name)
             {
                 this.Description = name;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="count"></param>
+            public OptionAttribute(string name, int count)
+                : this(name)
+            {
+                this.Count = count;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="description"></param>
+            /// <param name="count"></param>
+            public OptionAttribute(string name, string description, int count)
+                : this(name, description)
+            {
+                this.Count = count;
             }
         }
 

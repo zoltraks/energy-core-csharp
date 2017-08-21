@@ -210,7 +210,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string BoolToString(bool value)
         {
-            return value ? "X" : "";
+            return value ? "1" : "";
         }
 
         /// <summary>
@@ -351,6 +351,34 @@ namespace Energy.Base
             if (long.TryParse(value, out result))
                 return result;
             return 0;
+        }
+
+        public static bool IsInteger(string value, bool negative)
+        {
+            if (negative)
+            {
+                int useless;
+                return int.TryParse(value, out useless);
+            }
+            else
+            {
+                uint useless;
+                return uint.TryParse(value, out useless);
+            }
+        }
+
+        public static bool IsLong(string value, bool negative)
+        {
+            if (negative)
+            {
+                long useless;
+                return long.TryParse(value, out useless);
+            }
+            else
+            {
+                ulong useless;
+                return ulong.TryParse(value, out useless);
+            }
         }
 
         public static long StringToLongSmart(string value)

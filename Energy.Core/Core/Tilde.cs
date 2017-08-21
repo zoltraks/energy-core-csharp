@@ -83,7 +83,7 @@ namespace Energy.Core
             /// <summary>
             /// Cheat sheet for all colors defined by default
             /// </summary>
-            public readonly static string ExampleColorPalleteTildeString = ""
+            public static string ExampleColorPalleteTildeString = ""
                 + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
                 + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
                 + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
@@ -403,6 +403,26 @@ namespace Energy.Core
         #endregion
 
         #region Color
+
+        public class Color
+        {
+            public static string DarkBlue = "~1~";
+            public static string DarkGreen = "~2~";
+            public static string DarkCyan = "~3~";
+            public static string DarkRed = "~4~";
+            public static string DarkMagenta = "~5~";
+            public static string DarkYellow = "~6~";
+            public static string Gray = "~7~";
+            public static string DarkGray = "~8~";
+            public static string Blue = "~9~";
+            public static string green = "~10~";
+            public static string Cyan = "~11~";
+            public static string Red = "~12~";
+            public static string Magenta = "~13~";
+            public static string Yellow = "~14~";
+            public static string White = "~15~";
+            public static string Black = "~16~";
+        }
 
         public static string ConsoleColorToTildeColor(ConsoleColor color)
         {
