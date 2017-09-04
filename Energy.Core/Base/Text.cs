@@ -359,7 +359,6 @@ namespace Energy.Base
             }
         }
 
-
         /// <summary>
         /// Limit string to have maximum count characters with optional prefix or suffix if it was cut off.
         /// </summary>
@@ -393,6 +392,27 @@ namespace Energy.Base
                 text = string.Concat(prefix, text.Substring(start, length), suffix);
                 return text;
             }
+        }
+
+        /// <summary>
+        /// Convert text containing wild characters (?, *) to SQL like format (_, %).
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>string</returns>
+        public static string WildToLike(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            string[] replacement = new string[] 
+            {
+                "*", "%",
+                "?", "_",
+            };
+            for (int i = 0; i < replacement.Length; i++)
+            {
+                text = text.Replace(replacement[i], replacement[i++ + 1]);
+            }
+            return text;
         }
     }
 }

@@ -9,120 +9,147 @@ namespace Energy.Attribute
     /// </summary>
     public class Command
     {
-        /// <summary>
-        /// Switch attribute for options without values like flags, i.e. /help or --verbose.
-        /// </summary>
-        public class SwitchAttribute : System.Attribute
-        {
-            public string Name;
+        ///// <summary>
+        ///// Switch attribute for options without values like flags, i.e. /help or --verbose.
+        ///// </summary>
+        //public class SwitchAttribute : System.Attribute
+        //{
+        //    public string Name;
 
-            public string Short;
+        //    public string Short;
 
-            public string Long;
+        //    public string Long;
 
-            public string Description;
+        //    public string Description;
 
-            public string[] Alternatives;
+        //    public string[] Alternatives;
             
-            /// <summary>
-            /// Table name
-            /// </summary>
-            public SwitchAttribute()
-            {
-            }
+        //    /// <summary>
+        //    /// Table name
+        //    /// </summary>
+        //    public SwitchAttribute()
+        //    {
+        //    }
 
-            /// <summary>
-            /// Table name
-            /// </summary>
-            /// <param name="name"></param>
-            public SwitchAttribute(string name)
-            {
-                this.Name = name;
-            }
+        //    /// <summary>
+        //    /// Table name
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    public SwitchAttribute(string name)
+        //    {
+        //        this.Name = name;
+        //    }
 
-            /// <summary>
-            /// Table name with description
-            /// </summary>
-            /// <param name="name"></param>
-            /// <param name="description"></param>
-            public SwitchAttribute(string name, string description)
-                : this(name)
-            {
-                this.Description = name;
-            }
-        }
+        //    /// <summary>
+        //    /// Table name with description
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    /// <param name="description"></param>
+        //    public SwitchAttribute(string name, string description)
+        //        : this(name)
+        //    {
+        //        this.Description = name;
+        //    }
+        //}
 
-        /// <summary>
-        /// Parameter attribute for options with one or more attributes.
-        /// </summary>
-        public class ParameterAttribute : System.Attribute
-        {
-            public string Name;
+        ///// <summary>
+        ///// Parameter attribute for options with one or more attributes.
+        ///// </summary>
+        //public class ParameterAttribute : System.Attribute
+        //{
+        //    public string Name;
 
-            public string Short;
+        //    public string Short;
 
-            public string Long;
+        //    public string Long;
 
-            public string Description;
+        //    public string Description;
 
-            public string Help;
+        //    public string Help;
 
-            public string Example;
+        //    public string Example;
 
-            public string[] Alternatives;
+        //    public string[] Alternatives;
 
-            /// <summary>
-            /// May be set to 2 or more values to take from argument list.
-            /// </summary>
-            public int Count;
+        //    /// <summary>
+        //    /// May be set to 2 or more values to take from argument list.
+        //    /// </summary>
+        //    public int Count;
 
-            /// <summary>
-            /// Parameter
-            /// </summary>
-            public ParameterAttribute()
-            {
-            }
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    public ParameterAttribute()
+        //    {
+        //    }
 
-            /// <summary>
-            /// Parameter
-            /// </summary>
-            /// <param name="name"></param>
-            public ParameterAttribute(string name)
-            {
-                this.Name = name;
-            }
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    public ParameterAttribute(string name)
+        //    {
+        //        this.Name = name;
+        //    }
 
-            /// <summary>
-            /// Parameter
-            /// </summary>
-            /// <param name="name"></param>
-            /// <param name="description"></param>
-            public ParameterAttribute(string name, string description)
-                : this(name)
-            {
-                this.Description = name;
-            }
-        }
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    /// <param name="description"></param>
+        //    public ParameterAttribute(string name, string description)
+        //        : this(name)
+        //    {
+        //        this.Description = name;
+        //    }
+        //}
 
         /// <summary>
         /// Attribute for command line option.
+        /// Options may have additional one or more arguments and becomes program parameters.
+        /// Default options with Count not specified will be treaten as program switches
+        /// with corresponding boolean value - true if were set.
         /// </summary>
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
         public class OptionAttribute : System.Attribute
         {
             public string Name;
 
+            /// <summary>
+            /// Option single letter alternative, i.e. "?".
+            /// </summary>
             public string Short;
 
+            /// <summary>
+            /// Option long name, i.e. "help".
+            /// </summary>
             public string Long;
 
+            /// <summary>
+            /// Option description, prefered one line text or string identifier, i.e. "@HelpOptionDescription".
+            /// </summary>
             public string Description;
 
+            /// <summary>
+            /// Option help text, used in manual.
+            /// </summary>
             public string Help;
 
+            /// <summary>
+            /// Option usage example.
+            /// </summary>
             public string Example;
 
+            /// <summary>
+            /// TODO Not sure if should be covered. Usage may be little bit confusing.
+            /// </summary>
             public string[] Alternatives;
+
+            /// <summary>
+            /// Concatenate multiple options with specified char, i.e. "+".
+            /// Otherwise last value will be taken or error may occur.
+            /// </summary>
+            public string Concat;
 
             /// <summary>
             /// May be set to 1, 2 or more values to take values from argument list (for parameters).

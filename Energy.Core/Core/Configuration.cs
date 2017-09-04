@@ -8,7 +8,7 @@ namespace Energy.Core
     /// Configuration
     /// </summary>
     public class Configuration : Energy.Interface.ILoadFromFile
-    {        
+    {
         public abstract class File
         {
             private string _FileName = Energy.Core.Information.GetCurrentNamespace() + ".conf";
@@ -49,7 +49,7 @@ namespace Energy.Core
                 {
                     Option item = Find(x => x.Name == name);
                     if (item == null)
-                    {                        
+                    {
                         item = new Core.Configuration.Option() { Name = name };
                         base.Add(item);
                     }
@@ -57,7 +57,7 @@ namespace Energy.Core
                 }
             }
         }
-       
+
         private Option.List _Options = new Option.List();
         /// <summary>Arguments</summary>
         public Option.List Options { get { return _Options; } set { _Options = value; } }
@@ -79,7 +79,7 @@ namespace Energy.Core
         {
             //connection.Fetch(connection.Query.Create(table));
             //Configuration configuration = new Configuration();
-            return true;            
+            return true;
         }
 
         public void Parse(string[] args)
@@ -111,7 +111,8 @@ namespace Energy.Core
 
         /// <summary>
         /// Create configuration object from command line arguments
-        /// using Energy.Attribute.Command attributes.
+        /// and type with fields decorated Energy.Attribute.Command.Option attributes
+        /// using specified shell option style.
         /// </summary>
         /// <param name="args">Command line options</param>
         /// <param name="type">Configuration class type</param>
@@ -161,10 +162,23 @@ namespace Energy.Core
 
                     }
                 }
-                Energy.Attribute.Command.ParameterAttribute[] parameterAttributes = (Energy.Attribute.Command.ParameterAttribute[])
-                    Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Command.ParameterAttribute), true, false);
+                Energy.Attribute.Command.OptionAttribute[] parameterAttributes = (Energy.Attribute.Command.OptionAttribute[])
+                    Energy.Base.Class.GetFieldOrPropertyAttributes(type, f, typeof(Energy.Attribute.Command.OptionAttribute), true, false);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Create configuration object from command line arguments
+        /// and type with fields decorated Energy.Attribute.Command.Option attributes
+        /// using default command option style.
+        /// </summary>
+        /// <param name="args">Command line options</param>
+        /// <param name="type">Configuration class type</param>
+        /// <returns>Configuration object</returns>
+        public static object Create(string[] args, System.Type type)
+        {
+            return Create(args, type, Energy.Core.Shell.OptionStyle.Default);
         }
 
         #endregion
