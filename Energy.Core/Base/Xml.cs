@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Energy.Base
 {
     /// <summary>
-    /// XML
+    /// XML support
     /// </summary>
     public class Xml
     {

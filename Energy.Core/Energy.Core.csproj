@@ -57,6 +57,7 @@
     <Compile Include="Base\Anonymous.cs" />
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\History.cs" />
+    <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Nibble.cs" />
@@ -74,13 +75,15 @@
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Base\Variant.cs" />
     <Compile Include="Base\Version.cs" />
+    <Compile Include="Base\Yaml.cs" />
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Core\Syntax.cs" />
+    <Compile Include="Core\Web.cs" />
     <Compile Include="Core\Worker.cs" />
     <Compile Include="Enumeration\InputOutput.cs" />
     <Compile Include="Enumeration\LogLevel.cs" />
-    <Compile Include="Harmony\IniFile.cs">
+    <Compile Include="Base\Ini.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Query\Builder.cs" />
