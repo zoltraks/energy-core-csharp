@@ -11,127 +11,7 @@ namespace Energy.Base
     /// </summary>
     public class File
     {
-        /// <summary>
-        /// Get directory name from file path. Returns path itself if it looks like directory.
-        /// </summary>
-        /// <param name="path">File path</param>
-        /// <returns>Directory name</returns>
-        public static string GetDirectory(string path)
-        {
-            if (String.IsNullOrEmpty(path)) return "";
-            if (IsDirectory(path)) return path;
-            try
-            {
-                return System.IO.Path.GetDirectoryName(path);
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// Return unique name for file by checking it's not exists.
-        /// This method may create empty file if reserve option is set true and it is 
-        /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="path">string</param>
-        /// <param name="reserve">bool</param>
-        /// <returns>string</returns>
-        public static string FileUniqueIdentity(string file, string path, bool reserve)
-        {
-            if (String.IsNullOrEmpty(path)) return null;
-            if (!System.IO.Directory.Exists(path)) return null;
-
-            string extension = System.IO.Path.GetExtension(file);
-            string simple = System.IO.Path.GetFileNameWithoutExtension(file);
-            string iterator, unique;
-
-            int n = 0;
-            do
-            {
-                iterator = n < 1 ? "" : n.ToString();
-                unique = System.IO.Path.Combine(path, simple + iterator + extension);
-                n++;
-            }
-            while (System.IO.File.Exists(unique));
-
-            if (reserve)
-            {
-                try
-                {
-                    System.IO.File.Create(unique).Close();
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            return unique;
-        }
-
-        /// <summary>
-        /// Return true if file name does not contain expteions
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public static bool HasNoExtension(string file)
-        {
-            string name = System.IO.Path.GetFileName(file);
-            int index = name.IndexOf('.');
-            return index <= 0 || index == name.Length - 1;
-        }
-
-        /// <summary>
-        /// Return unique name for file
-        /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="path">string</param>
-        /// <returns>string</returns>
-        public static string FileUniqueIdentity(string file, string path)
-        {
-            return FileUniqueIdentity(file, path, false);
-        }
-
-        /// <summary>
-        /// Return unique name for file
-        /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="reserve">bool</param>
-        /// <returns>string</returns>
-        public static string FileUniqueIdentity(string file, bool reserve)
-        {
-            return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), reserve);
-        }
-
-        /// <summary>
-        /// Return unique name for file
-        /// </summary>
-        /// <param name="file">string</param>
-        /// <returns>string</returns>
-        public static string FileUniqueIdentity(string file)
-        {
-            return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), false);
-        }
-
-        /// <summary>
-        /// Check if path is directory
-        /// </summary>
-        /// <param name="file">string</param>
-        /// <returns>bool</returns>
-        public static bool IsDirectory(string file)
-        {
-            try
-            {
-                System.IO.FileAttributes attributes = System.IO.File.GetAttributes(file);
-                return (attributes & System.IO.FileAttributes.Directory) == System.IO.FileAttributes.Directory;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        #region Filename
 
         /// <summary>
         /// Include traling path directory separator if needed
@@ -184,6 +64,132 @@ namespace Energy.Base
                 return path.Substring(0, path.Length - System.IO.Path.DirectorySeparatorChar.ToString().Length);
             }
             return path;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Get directory name from file path. Returns path itself if it looks like directory.
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <returns>Directory name</returns>
+        public static string GetDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return "";
+            if (Energy.Base.File.IsDirectory(path))
+                return path;
+            try
+            {
+                return System.IO.Path.GetDirectoryName(path);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Return unique name for file by checking it's not exists.
+        /// This method may create empty file if reserve option is set true and it is 
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <param name="path">string</param>
+        /// <param name="reserve">bool</param>
+        /// <returns>string</returns>
+        public static string FileUniqueIdentity(string file, string path, bool reserve)
+        {
+            if (String.IsNullOrEmpty(path)) return null;
+            if (!System.IO.Directory.Exists(path)) return null;
+
+            string extension = System.IO.Path.GetExtension(file);
+            string simple = System.IO.Path.GetFileNameWithoutExtension(file);
+            string iterator, unique;
+
+            int n = 0;
+            do
+            {
+                iterator = n < 1 ? "" : n.ToString();
+                unique = System.IO.Path.Combine(path, simple + iterator + extension);
+                n++;
+            }
+            while (System.IO.File.Exists(unique));
+
+            if (reserve)
+            {
+                try
+                {
+                    System.IO.File.Create(unique).Close();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            return unique;
+        }
+
+        /// <summary>
+        /// Return unique name for file
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <param name="path">string</param>
+        /// <returns>string</returns>
+        public static string FileUniqueIdentity(string file, string path)
+        {
+            return FileUniqueIdentity(file, path, false);
+        }
+
+        /// <summary>
+        /// Return unique name for file
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <param name="reserve">bool</param>
+        /// <returns>string</returns>
+        public static string FileUniqueIdentity(string file, bool reserve)
+        {
+            return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), reserve);
+        }
+
+        /// <summary>
+        /// Return unique name for file
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <returns>string</returns>
+        public static string FileUniqueIdentity(string file)
+        {
+            return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), false);
+        }
+
+        /// <summary>
+        /// Return true if file name does not contain expteions
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static bool HasNoExtension(string file)
+        {
+            string name = System.IO.Path.GetFileName(file);
+            int index = name.IndexOf('.');
+            return index <= 0 || index == name.Length - 1;
+        }
+
+        /// <summary>
+        /// Check if path is directory
+        /// </summary>
+        /// <param name="file">string</param>
+        /// <returns>bool</returns>
+        public static bool IsDirectory(string file)
+        {
+            try
+            {
+                System.IO.FileAttributes attributes = System.IO.File.GetAttributes(file);
+                return (attributes & System.IO.FileAttributes.Directory) == System.IO.FileAttributes.Directory;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
