@@ -86,6 +86,8 @@
     <Compile Include="Base\Ini.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Interface\IStrip.cs" />
+    <Compile Include="Interface\IEscape.cs" />
     <Compile Include="Query\Builder.cs" />
     <Compile Include="Query\Dialect.cs" />
     <Compile Include="Interface\IConnection.cs" />

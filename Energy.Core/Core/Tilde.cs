@@ -8,6 +8,9 @@ namespace Energy.Core
     /// <summary>
     /// Simple elegant text coloring engine for console programs.
     /// Based on Empty Page #0 color engine.
+    /// Color may be changed by value surrounded by tilde ~ character.
+    /// One tilde followed by other than letter or number or 
+    /// more than one tilde chars is left as is.
     /// </summary>
     /// <remarks>
     /// List of available colors:
@@ -32,7 +35,7 @@ namespace Energy.Core
     /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
     /// </table>
     /// </remarks>
-    public class Tilde
+    public static class Tilde
     {
         #region Class
 
@@ -531,6 +534,24 @@ namespace Energy.Core
                 case "~k~":
                     return System.ConsoleColor.Black;
             }
+        }
+
+        #endregion
+
+        #region Escape
+
+        public static string Escape(string text)
+        {
+            return text;
+        }
+
+        #endregion
+
+        #region Strip
+
+        public static string Strip(string text)
+        {
+            return text;
         }
 
         #endregion
