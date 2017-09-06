@@ -8,6 +8,5 @@ namespace TildeLineDimension
 {
     internal class Example1
     {
-        Energy.Core.Tilde
     }
 }
