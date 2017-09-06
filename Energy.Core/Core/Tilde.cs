@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Energy.Enumeration;
+using System.Text;
 
 namespace Energy.Core
 {
@@ -233,7 +234,7 @@ namespace Energy.Core
         #region Break
 
         /// <summary>
-        /// Break with new lines and set default text color
+        /// Break with new lines and set default text color.
         /// </summary>
         /// <param name="count"></param>
         public static void Break(int count)
@@ -250,11 +251,26 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break one line and set default text color
+        /// Break one line and set default text color.
         /// </summary>
         public static void Break()
         {
             Break(1);
+        }
+
+        /// <summary>
+        /// Break with one or more padding lines and ruler line. 
+        /// </summary>
+        /// <param name="padding"></param>
+        /// <param name="line"></param>
+        public static void Break(int padding, string line)
+        {
+            StringBuilder s = new StringBuilder();
+            for (int i = 0; i < padding; i++)
+                s.AppendLine();
+            string x = s.ToString();
+            string t = string.Concat(x, line, x, Environment.NewLine);
+            Write(t);
         }
 
         #endregion
@@ -397,10 +413,136 @@ namespace Energy.Core
         ///     Energy.Console.Tilde.WriteLine("~lightgreen~Hello ~white~World~lightred~!");
         /// </code>
         /// </example>
+        /// <param name="format"></param>
+        /// <param name="value"></param>
+        public static void Write(string format, params object[] value)
+        {
+            Write(string.Format(format, value));
+        }
+
+        /// <summary>
+        /// <para>
+        /// Write color text with line ending containing modifiers like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
+        /// </para>
+        /// <para>
+        /// <code>
+        ///     Energy.Core.Tilde.WriteLine("~red~Breaking: ~white~Hell, ~yellow~yea.");
+        /// </code>
+        /// </para>
+        /// <para>List of available console colors:</para>
+        /// <para>~0~, ~default~ = Default color</para>
+        /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
+        /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
+        /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
+        /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
+        /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
+        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~10~, ~green~, ~g~, Black</para>
+        /// <para>~11~, ~cyan~, ~c~, Cyan</para>
+        /// <para>~12~, ~red~, ~r~, Red</para>
+        /// <para>~13~, ~magenta~, ~m~, Magenta</para>
+        /// <para>~14~, ~yellow~, ~y~, Yellow</para>
+        /// <para>~15~, ~white~, ~w~, White</para>
+        /// <para>~16~, ~black~, ~k~, Black / Carbon</para>
+        /// </summary>
+        /// <remarks>
+        /// List of available colors:
+        /// <br/>
+        /// <table>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// </table>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        ///     Energy.Console.Tilde.WriteLine("~lightgreen~Hello ~white~World~lightred~!");
+        /// </code>
+        /// </example>
+        /// <param name="format"></param>
+        /// <param name="value"></param>
+        public static void WriteLine(string format, params object[] value)
+        {
+            Write(string.Concat(string.Format(format, value), Environment.NewLine));
+        }
+
+        /// <summary>
+        /// <para>
+        /// Write color text with line ending containing modifiers like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
+        /// </para>
+        /// <para>
+        /// <code>
+        ///     Energy.Core.Tilde.WriteLine("~red~Breaking: ~white~Hell, ~yellow~yea.");
+        /// </code>
+        /// </para>
+        /// <para>List of available console colors:</para>
+        /// <para>~0~, ~default~ = Default color</para>
+        /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
+        /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
+        /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
+        /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
+        /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
+        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~10~, ~green~, ~g~, Black</para>
+        /// <para>~11~, ~cyan~, ~c~, Cyan</para>
+        /// <para>~12~, ~red~, ~r~, Red</para>
+        /// <para>~13~, ~magenta~, ~m~, Magenta</para>
+        /// <para>~14~, ~yellow~, ~y~, Yellow</para>
+        /// <para>~15~, ~white~, ~w~, White</para>
+        /// <para>~16~, ~black~, ~k~, Black / Carbon</para>
+        /// </summary>
+        /// <remarks>
+        /// List of available colors:
+        /// <br/>
+        /// <table>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// </table>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        ///     Energy.Console.Tilde.WriteLine("~lightgreen~Hello ~white~World~lightred~!");
+        /// </code>
+        /// </example>
         /// <param name="value"></param>
         public static void WriteLine(string value)
         {
-            Write(value + Environment.NewLine);
+            Write(string.Concat(value, Environment.NewLine));
         }
 
         #endregion

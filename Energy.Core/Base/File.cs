@@ -11,7 +11,104 @@ namespace Energy.Base
     /// </summary>
     public class File
     {
-        #region Filename
+        #region Naming
+
+        /// <summary>
+        /// Get filename without leading directory path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetName(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+            int position = path.LastIndexOfAny(new char[] { '\\', '/' });
+            if (position >= 0)
+                path = path.Substring(position + 1);
+            return path;
+        }
+
+        /// <summary>
+        /// Get filename extension. Will return with suffix like ".xml" except
+        /// for names starting with dot like ".gitignore" where function will
+        /// result with empty string.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetExtension(string path)
+        {
+            path = GetName(path);
+            if (string.IsNullOrEmpty(path))
+                return path;
+            int dot = path.LastIndexOf('.');
+            if (dot <= 0)
+                return "";
+            path = path.Substring(dot);
+            return path;
+        }
+
+        /// <summary>
+        /// Get file root path. Works also with UNC and protocol paths.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetRoot(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            // check for drive / protocol //
+            Match matchDrive = Regex.Match(path, @"(^[A-Za-z][A-Za-z0-9]*:(?:[\\/]+)?)");
+            if (matchDrive.Success)
+                return matchDrive.Value;
+            // check for UNC //
+            Match matchUNC = Regex.Match(path, @"(^(?:\\\\)[^\\/]*(?:[\\/]+)?)");
+            if (matchUNC.Success)
+                return matchUNC.Value;
+            // check if starts with separator //
+            Match matchRoot = Regex.Match(path, @"^[\\/]+");
+            if (matchRoot.Success)
+                return matchRoot.Value;
+            // empty root otherwise //
+            return "";
+        }
+
+        /// <summary>
+        /// Get directory name from file path. Returns path itself if it looks like directory.
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <returns>Directory name</returns>
+        public static string GetDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return "";
+            if (Energy.Base.File.IsDirectory(path))
+                return path;
+            try
+            {
+                return System.IO.Path.GetDirectoryName(path);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Get filename without extension.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetNameWithoutExtension(string path)
+        {
+            path = GetName(path);
+            if (string.IsNullOrEmpty(path))
+                return path;
+            int dot = path.LastIndexOf('.');
+            if (dot <= 0)
+                return path;
+            path = path.Substring(0, dot);
+            return path;
+        }
 
         /// <summary>
         /// Include traling path directory separator if needed
@@ -30,6 +127,62 @@ namespace Energy.Base
                 path += System.IO.Path.DirectorySeparatorChar;
             }
             return path;
+        }
+
+        /// <summary>
+        /// Exclude leading path root.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ExcludeRoot(string path)
+        {
+            string root = GetRoot(path);
+            if (string.IsNullOrEmpty(root))
+                return path;
+            return path.Substring(root.Length);
+        }
+
+        /// <summary>
+        /// Strip quotation from file path.
+        /// Converts C:\"Program Files"\"Dir" into C:\Program Files\Dir.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string StripQuotation(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("\""))
+                return path;
+            return path.Replace("\"", null);
+        }
+
+        /// <summary>
+        /// Converts DOS backslashes into UNIX slashes in path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ToDosPath(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("/"))
+                return path;
+            return path.Replace("/", "\\");
+        }
+
+        /// <summary>
+        /// Convert UNIX slashes into DOS backslashes in path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ToUnixPath(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("\\"))
+                return path;
+            return path.Replace("\\", "/");
         }
 
         /// <summary>
@@ -67,27 +220,6 @@ namespace Energy.Base
         }
 
         #endregion
-
-        /// <summary>
-        /// Get directory name from file path. Returns path itself if it looks like directory.
-        /// </summary>
-        /// <param name="path">File path</param>
-        /// <returns>Directory name</returns>
-        public static string GetDirectory(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return "";
-            if (Energy.Base.File.IsDirectory(path))
-                return path;
-            try
-            {
-                return System.IO.Path.GetDirectoryName(path);
-            }
-            catch
-            {
-                return "";
-            }
-        }
 
         /// <summary>
         /// Return unique name for file by checking it's not exists.
