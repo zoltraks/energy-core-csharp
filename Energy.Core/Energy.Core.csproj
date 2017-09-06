@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="Attribute\Command.cs" />
     <Compile Include="Attribute\Data.cs" />
-    <Compile Include="Base\Array.cs" />
     <Compile Include="Base\Byte.cs" />
     <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Class.cs" />
@@ -88,6 +87,7 @@
     </Compile>
     <Compile Include="Interface\IStrip.cs" />
     <Compile Include="Interface\IEscape.cs" />
+    <Compile Include="Base\Path.cs" />
     <Compile Include="Query\Builder.cs" />
     <Compile Include="Query\Dialect.cs" />
     <Compile Include="Interface\IConnection.cs" />

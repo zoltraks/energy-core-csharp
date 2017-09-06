@@ -24,7 +24,8 @@ namespace Energy.Base
         /// 51,5074 N 0,1278 W
         /// -51,5074 -0,1278
         /// </summary>
-        public static readonly string LatitudeAndLongitude = @"(?:(?<latitude_name>[A-Za-z][^:]*):\s*)?
+        public static readonly string LatitudeAndLongitude = @"
+(?:(?<latitude_name>[A-Za-z][^:]*):\s*)?
 (?:
 (?:
 (?<latitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*°\s*
@@ -49,7 +50,8 @@ namespace Energy.Base
 (?:
 (?<longitude_degree>[-+]?\d+(?:[.,]\d+)?)\s*
 )
-)";
+)
+";
 
         /// <summary>
         /// Date pattern (year + month + day)
@@ -80,5 +82,23 @@ namespace Energy.Base
         /// Matching for elements of list "10 20 30" or "1,2, 3|4|5" or with description like "flower (Rose), fruit (Banana)"
         /// </summary>
         public static readonly string StringListOfValuesWithDescription = "(?<1>[a-zA-Z_0-9]+)\\s*(?:\\((?<2>(?:\\)\\)|[^\\)])*)\\))?\\s*[,|]?\\s*";
+
+        /// <summary>
+        /// Expression for splitting path into segments
+        /// </summary>
+        public static readonly string PathSplitCapture = @"
+^
+(
+(?:[A-Za-z][A-Za-z0-9]*:(?:[\\/]+)?)
+|
+(?:\\\\[A-Za-z][A-Za-z0-9]*(?:[\\/]+)?)
+|
+(?:[\\/]+)
+)?
+(
+(?:[^\\/\r\n\v]+(?:[\\/]+)?)
+)
++
+";
     }
 }

@@ -29,5 +29,22 @@ namespace FileNameFunctionsDemo
             Console.WriteLine(string.Format("Plain: {0}", plain));
             //string p = Energy.Base.File.IncludeLeadingRoot()
         }
+
+        public static void PathSplit(string path)
+        {
+            string[] a = Energy.Base.Path.Split(path);
+            Console.WriteLine(string.Join(" + ", a));
+        }
+
+        public static void PathShorten(string path)
+        {
+            Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 30, "..."));
+            Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 30, "..."));
+            Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 30, "..."));
+            Energy.Core.Tilde.WriteLine("~b~= = = = =");
+            Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 10, "..."));
+            Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 10, "..."));
+            Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 10, "..."));
+        }
     }
 }

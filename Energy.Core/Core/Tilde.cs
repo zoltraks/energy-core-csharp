@@ -297,7 +297,7 @@ namespace Energy.Core
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
         /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
         /// <para>~9~, ~blue~, ~b~, Black</para>
-        /// <para>~10~, ~green~, ~g~, Black</para>
+        /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
         /// <para>~13~, ~magenta~, ~m~, Magenta</para>
@@ -377,7 +377,7 @@ namespace Energy.Core
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
         /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
         /// <para>~9~, ~blue~, ~b~, Black</para>
-        /// <para>~10~, ~green~, ~g~, Black</para>
+        /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
         /// <para>~13~, ~magenta~, ~m~, Magenta</para>
@@ -440,7 +440,7 @@ namespace Energy.Core
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
         /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
         /// <para>~9~, ~blue~, ~b~, Black</para>
-        /// <para>~10~, ~green~, ~g~, Black</para>
+        /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
         /// <para>~13~, ~magenta~, ~m~, Magenta</para>

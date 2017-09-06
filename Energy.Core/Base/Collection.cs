@@ -194,6 +194,37 @@ namespace Energy.Base
 
         #endregion
 
+        #region StringArray
+
+        public class StringArray
+        {
+            private string[] array;
+
+            public int TotalLength
+            {
+                get
+                {
+                    return GetTotalLength(array);
+                }
+            }
+
+            public static int GetTotalLength(string[] array)
+            {
+                if (array == null || array.Length == 0)
+                    return 0;
+                int length = 0;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array[i] == null)
+                        continue;
+                    length += array[i].Length;
+                }
+                return length;
+            }
+        }
+
+        #endregion
+
         #region StringDictionary
 
         [XmlRoot]
@@ -428,6 +459,35 @@ namespace Energy.Base
         [Serializable]
         public class StringDictionary : StringDictionary<string>
         {
+        }
+
+        #endregion
+
+        #region StringList
+
+        public class StringList: System.Collections.Generic.List<string>
+        {            
+            public int TotalLength
+            {
+                get
+                {
+                    return GetTotalLength(this);
+                }
+            }
+
+            public static int GetTotalLength(System.Collections.Generic.List<string> list)
+            {
+                if (list == null || list.Count == 0)
+                    return 0;
+                int length = 0;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i] == null)
+                        continue;
+                    length += list[i].Length;
+                }
+                return length;
+            }
         }
 
         #endregion
