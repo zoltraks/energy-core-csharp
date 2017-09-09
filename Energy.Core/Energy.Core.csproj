@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attribute\Markdown.cs" />
     <Compile Include="Attribute\Command.cs" />
     <Compile Include="Attribute\Data.cs" />
     <Compile Include="Base\Byte.cs" />

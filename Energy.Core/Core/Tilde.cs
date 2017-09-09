@@ -69,45 +69,41 @@ namespace Energy.Core
         private static readonly object _ConsoleLock = new object();
 
         private static ConsoleColor? _Foreground;
+        /// <summary>
+        /// Foreground color
+        /// </summary>
+        public static ConsoleColor? Foreground { get { return _Foreground; } set { _Foreground = value; } }
 
-        public static ConsoleColor? Foreground
-        {
-            get
-            {
-                return _Foreground;
-            }
-            set
-            {
-                _Foreground = value;
-            }
-        }
+        private static bool _NoColor;
+        /// <summary>Disable console colors</summary>
+        public static bool NoColor { get { return _NoColor; } set { _NoColor = value; } }
 
-        public class Default
-        {
-            /// <summary>
-            /// Cheat sheet for all colors defined by default
-            /// </summary>
-            public static string ExampleColorPalleteTildeString = ""
-                + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
-                + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
-                + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
-                + "~darkred~ ~ darkred ~  ~ 4 ~    "
-                + "~darkmagenta~ ~ darkmagenta ~  ~ 5 ~    "
-                + "~darkyellow~ ~ darkyellow ~  ~ 6 ~    "
-                + "~gray~ ~ gray ~  ~ 7 ~    "
-                + "~darkgray~ ~ darkgray ~  ~ 8 ~    "
-                + "~blue~ ~ blue ~  ~ 9 ~    "
-                + "~green~ ~ green ~  ~ 10 ~    "
-                + "~cyan~ ~ cyan ~  ~ 11 ~    "
-                + "~red~ ~ red ~  ~ 12 ~    "
-                + "~magenta~ ~ magenta ~  ~ 13 ~    "
-                + "~yellow~ ~ yellow ~  ~ 14 ~    "
-                + "~white~ ~ white ~  ~ 15 ~    "
-                + "~black~ ~ black ~  ~ 16 ~    "
-                ;
+        private static string _PauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
+        /// <summary>DefaultPauseText</summary>
+        public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
 
-            public static readonly string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
-        }
+        private static string _ExampleColorPalleteTildeString = ""
+            + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
+            + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
+            + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
+            + "~darkred~ ~ darkred ~  ~ 4 ~    "
+            + "~darkmagenta~ ~ darkmagenta ~  ~ 5 ~    "
+            + "~darkyellow~ ~ darkyellow ~  ~ 6 ~    "
+            + "~gray~ ~ gray ~  ~ 7 ~    "
+            + "~darkgray~ ~ darkgray ~  ~ 8 ~    "
+            + "~blue~ ~ blue ~  ~ 9 ~    "
+            + "~green~ ~ green ~  ~ 10 ~    "
+            + "~cyan~ ~ cyan ~  ~ 11 ~    "
+            + "~red~ ~ red ~  ~ 12 ~    "
+            + "~magenta~ ~ magenta ~  ~ 13 ~    "
+            + "~yellow~ ~ yellow ~  ~ 14 ~    "
+            + "~white~ ~ white ~  ~ 15 ~    "
+            + "~black~ ~ black ~  ~ 16 ~    "
+            ;
+        /// <summary>
+        /// Cheat sheet for all colors defined by default
+        /// </summary>
+        public static string ExampleColorPalleteTildeString { get { return _ExampleColorPalleteTildeString; } set { _ExampleColorPalleteTildeString = value; } }
 
         #endregion
 
@@ -345,6 +341,7 @@ namespace Energy.Core
             {
                 // TODO Fix new lines :)
                 // TODO Optionally wrap words?
+                // TODO Check security
                 System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
                 System.ConsoleColor defaultForegroundColor = _Foreground != null ? (ConsoleColor)_Foreground : previousForegroundColor;                
                 for (int i = 0; i < list.Count; i++)
@@ -745,10 +742,6 @@ namespace Energy.Core
         {
             Exception(exception, false);
         }
-
-        private static string _PauseText = Default.DefaultPauseText;
-        /// <summary>PauseText</summary>
-        public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
 
         /// <summary>
         /// Pause execution
