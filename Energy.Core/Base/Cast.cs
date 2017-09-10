@@ -216,7 +216,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string BoolToString(bool value)
         {
-            return value ? "1" : "";
+            return value ? "1" : "0";
         }
 
         /// <summary>
@@ -237,6 +237,30 @@ namespace Energy.Base
                 return value ? yes : no;
             }
             throw new NotSupportedException();
+        }
+
+        private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+
+        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
+        {
+            if (sizeInBytes <= 0)
+                return "0 " + _MemorySizeSuffix[0];
+            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
+            double number = sizeInBytes / Math.Pow(1024, exponent);
+            int p = 1;
+            for (int i = 0; i < decimalPlaces; i++)
+            {
+                p *= 10;
+            }
+            if (numberCeiling)
+                number = Math.Ceiling(number * p);
+            else
+                number = Math.Floor(number * p);
+
+            number /= p;
+
+            return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
+                , _MemorySizeSuffix[exponent]);
         }
 
         /// <summary>
