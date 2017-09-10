@@ -82,7 +82,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static implicit operator Color(uint value)
+        public static implicit operator Energy.Base.Color(uint value)
         {            
             return new Color(value);
         }
@@ -92,7 +92,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Color text</param>
         /// <returns></returns>
-        public static implicit operator Color(string value)
+        public static implicit operator Energy.Base.Color(string value)
         {
             if (value == null) return null;
             value = value.Trim();
@@ -109,7 +109,7 @@ namespace Energy.Base
 
         #region Explicit
 
-        public static explicit operator string(Color value)
+        public static explicit operator string(Energy.Base.Color value)
         {
             return value.ToString();
         }
@@ -144,7 +144,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="hex">333, #ebebeb, etc.</param>
         /// <returns>System.Drawing.Color equivalent</returns>
-        public static Color HexToColor(string hex)
+        public static Energy.Base.Color HexToColor(string hex)
         {
             Regex r = new Regex("\\#?(?:(?<r>[a-fA-F0-9]{2})(?<g>[a-fA-F0-9]{2})(?<b>[a-fA-F0-9]{2})|(?<r>[a-fA-F0-9])(?<g>[a-fA-F0-9])(?<b>[a-fA-F0-9]))");
             Match m = r.Match(hex);
@@ -156,7 +156,7 @@ namespace Energy.Base
             if (G.Length == 1) G = new string(G[0], 2);
             if (B.Length == 1) B = new string(B[0], 2);
             byte[] b = Hex.HexToArray(R + G + B);
-            return new Color(b[0], b[1], b[2]);
+            return new Energy.Base.Color(b[0], b[1], b[2]);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="color">Color</param>
         /// <returns>CSS string</returns>
-        public static string ColorToHtml(Color color)
+        public static string ColorToHtml(Energy.Base.Color color)
         {
             byte[] rgb = new byte[3] { color.R, color.G, color.B };
             return "#" + Hex.ArrayToHex(rgb).ToLower();

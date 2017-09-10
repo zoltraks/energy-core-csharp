@@ -12,6 +12,12 @@ namespace Energy.Base
     {
         #region As
 
+        /// <summary>
+        /// Generic conversion from one type to another.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T As<T>(object value)
         {
             Type r = typeof(T);

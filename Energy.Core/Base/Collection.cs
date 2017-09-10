@@ -198,13 +198,20 @@ namespace Energy.Base
 
         public class StringArray
         {
-            private string[] array;
+            private string[] _Array;
+
+            public StringArray() { }
+
+            public StringArray(string[] array)
+            {
+                _Array = array;
+            }
 
             public int TotalLength
             {
                 get
                 {
-                    return GetTotalLength(array);
+                    return GetTotalLength(_Array);
                 }
             }
 

@@ -36,10 +36,19 @@ namespace Energy.Attribute
         /// </summary>
         public class TableAttribute : System.Attribute
         {
+            /// <summary>
+            /// Table name.
+            /// </summary>
             public string Name;
 
+            /// <summary>
+            /// Table description.
+            /// </summary>
             public string Description;
 
+            /// <summary>
+            /// Identity column.
+            /// </summary>
             public string Identity;
 
             /// <summary>

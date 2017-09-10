@@ -418,18 +418,20 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove empty lines from string. If paragraph parameter is set to true,
-        /// two or more empty lines will be left as single new line.
+        /// Remove empty lines from string.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="paragraph"></param>
         /// <returns></returns>
-        public static string RemoveEmptyLines(string text, bool paragraph)
+        public static string RemoveEmptyLines(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
-            List<string> list = new List<string>(SplitNewLine(text));
-            return text;
+            bool eol = text.EndsWith("\r\n") || text.EndsWith("\n") || text.EndsWith("\r");
+            string pattern = @"^[\s\t\v\ ]*(?:\r\n|\n|\r)+";
+            string result = Regex.Replace(text, pattern, "", RegexOptions.Multiline);
+            if (eol)
+                result += Environment.NewLine;
+            return result;
         }
     }
 }

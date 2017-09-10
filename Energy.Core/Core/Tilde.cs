@@ -74,25 +74,29 @@ namespace Energy.Core
         /// </summary>
         public static ConsoleColor? Foreground { get { return _Foreground; } set { _Foreground = value; } }
 
-        private static bool _NoColor;
+        private static bool _Colorless;
         /// <summary>Disable console colors</summary>
-        public static bool NoColor
+        public static bool Colorless
         {
             get
             {
-                return _NoColor;
+                return _Colorless;
             }
             set
             {
-                if (value == _NoColor)
+                if (value == _Colorless)
                     return;
-                SetNoColor(value);
+                SetColorless(value);
             }
         }
 
-        public static void SetNoColor(bool value)
+        /// <summary>
+        /// Set Colorless property value.
+        /// </summary>
+        /// <param name="value"></param>
+        public static void SetColorless(bool value)
         {
-            _NoColor = value;
+            _Colorless = value;
         }
 
         private static string _PauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
@@ -363,11 +367,24 @@ namespace Energy.Core
                 System.ConsoleColor defaultForegroundColor = _Foreground != null ? (ConsoleColor)_Foreground : previousForegroundColor;                
                 for (int i = 0; i < list.Count; i++)
                 {
-                    System.ConsoleColor foregroundColor = list[i].Color != null ? (ConsoleColor)list[i].Color : defaultForegroundColor;
-                    System.Console.ForegroundColor = foregroundColor;
+                    if (!_Colorless)
+                    {
+                        System.ConsoleColor foregroundColor = list[i].Color != null ? (ConsoleColor)list[i].Color : defaultForegroundColor;
+                        try
+                        {
+                            System.Console.ForegroundColor = foregroundColor;
+                        }
+                        catch (System.Security.SecurityException)
+                        {
+                            _Colorless = true;
+                        }
+                    }
                     System.Console.Write(list[i].Text);
                 }
-                System.Console.ForegroundColor = previousForegroundColor;
+                if (!_Colorless)
+                {
+                    System.Console.ForegroundColor = previousForegroundColor;
+                }
             }
         }
 

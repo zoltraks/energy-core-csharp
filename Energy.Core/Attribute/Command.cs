@@ -113,6 +113,9 @@ namespace Energy.Attribute
         [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
         public class OptionAttribute : System.Attribute
         {
+            /// <summary>
+            /// Option name
+            /// </summary>
             public string Name;
 
             /// <summary>
