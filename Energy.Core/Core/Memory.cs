@@ -17,9 +17,16 @@ namespace Energy.Core
         [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public static long GetCurrentMemoryUsage()
         {
-            System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
-            long memory = process.WorkingSet64;
-            return memory;
+            try
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                long memory = process.WorkingSet64;
+                return memory;
+            }
+            catch (System.Security.SecurityException)
+            {
+                return 0;
+            }
         }
     }
 }

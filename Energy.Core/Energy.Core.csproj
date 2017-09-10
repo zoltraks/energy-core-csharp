@@ -66,6 +66,7 @@
     <Compile Include="Base\Directory.cs" />
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Hex.cs" />
+    <Compile Include="Base\Number.cs" />
     <Compile Include="Base\Pattern.cs" />
     <Compile Include="Base\Query.cs" />
     <Compile Include="Base\Queue.cs" />
@@ -78,7 +79,9 @@
     <Compile Include="Base\Variant.cs" />
     <Compile Include="Base\Version.cs" />
     <Compile Include="Base\Yaml.cs" />
+    <Compile Include="Core\Access.cs" />
     <Compile Include="Core\Bug.cs" />
+    <Compile Include="Core\Permission.cs" />
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Core\Syntax.cs" />
     <Compile Include="Core\Web.cs" />
