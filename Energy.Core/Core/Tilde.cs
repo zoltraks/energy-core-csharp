@@ -76,7 +76,24 @@ namespace Energy.Core
 
         private static bool _NoColor;
         /// <summary>Disable console colors</summary>
-        public static bool NoColor { get { return _NoColor; } set { _NoColor = value; } }
+        public static bool NoColor
+        {
+            get
+            {
+                return _NoColor;
+            }
+            set
+            {
+                if (value == _NoColor)
+                    return;
+                SetNoColor(value);
+            }
+        }
+
+        public static void SetNoColor(bool value)
+        {
+            _NoColor = value;
+        }
 
         private static string _PauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
         /// <summary>DefaultPauseText</summary>

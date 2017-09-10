@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Base
 {
-    public class Queue<T>: IDisposable
+    public class Queue<T>: IDisposable, Energy.Interface.IQueue<T>
     {
         private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
 

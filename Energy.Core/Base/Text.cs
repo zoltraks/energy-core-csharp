@@ -137,19 +137,21 @@ namespace Energy.Base
             return String.Join(with, list.ToArray());
         }
 
+        private static readonly string[] _NewLine = new string[] { "\r\n", "\n\r", "\n" };
+
         /// <summary>
-        /// Split string by new line.
+        /// Split string to array by new line characters. Elements will not include new line itself.
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
         public static string[] SplitNewLine(string content)
         {
-            return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+            return content.Split(_NewLine, StringSplitOptions.None);
         }
 
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
-        /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special'".
+        /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special | New'|Other value".
         /// </summary>
         /// <returns></returns>
         public static string[] SplitList(string text, string commas, string quotes)
@@ -412,6 +414,21 @@ namespace Energy.Base
             {
                 text = text.Replace(replacement[i], replacement[i++ + 1]);
             }
+            return text;
+        }
+
+        /// <summary>
+        /// Remove empty lines from string. If paragraph parameter is set to true,
+        /// two or more empty lines will be left as single new line.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="paragraph"></param>
+        /// <returns></returns>
+        public static string RemoveEmptyLines(string text, bool paragraph)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            List<string> list = new List<string>(SplitNewLine(text));
             return text;
         }
     }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileNameFunctionsDemo", "Energy.Core.Example\FileNameFunctionsDemo\FileNameFunctionsDemo.csproj", "{50AD38C6-8813-4981-B719-6B026C3DD50B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TildeLineDimension", "Energy.Core.Example\TildeLineDimension\TildeLineDimension.csproj", "{6C4EBA25-753D-48C3-8D68-38F36D34E89B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteArrayBenchmark", "Energy.Core.Example\ByteArrayBenchmark\ByteArrayBenchmark.csproj", "{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,8 +89,15 @@ Global
 		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}
 	EndGlobalSection
 EndGlobal
