@@ -13,7 +13,7 @@ namespace FileNameFunctionsDemo
             Console.WriteLine(string.Format("Strip: {0}", strip));
             string dos = Energy.Base.File.ToDosPath(filename);
             Console.WriteLine(string.Format("DOS path: {0}", dos));
-            string unix = Energy.Base.File.ToUnixPath(filename);
+            string unix = Energy.Base.File.ToUnixPath(strip);
             Console.WriteLine(string.Format("UNIX path: {0}", unix));
             string file = Energy.Base.File.GetName(filename);
             Console.WriteLine(string.Format("Filename: {0}", file));

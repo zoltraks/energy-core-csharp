@@ -87,7 +87,7 @@ namespace SQLiteCreateExample
 
             Console.WriteLine(query);
             DataTable dx1 = db.Fetch(query);
-            string text = Energy.Base.Table.DataTableToPlainText(dx1, new Energy.Base.Table.PlainFormat.FullFrame() { Tilde = true }); ;
+            string text = Energy.Base.Table.DataTableToPlainText(dx1, new Energy.Base.Table.PlainFormat.FullFrame() { Tilde = true });
             Energy.Core.Tilde.WriteLine(text);
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorStatus);
