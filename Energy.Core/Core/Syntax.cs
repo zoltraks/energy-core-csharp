@@ -13,17 +13,95 @@ namespace Energy.Core
 
         private string _Prefix;
         /// <summary>Prefix</summary>
-        public string Prefix { get { return _Prefix; } set { _Prefix = value; } }
+        public string Prefix
+        {
+            get
+            {
+                return _Prefix;
+            }
+            set
+            {
+                if (value == null)
+                    value = "";
+                if (0 == string.Compare(_Prefix, value))
+                    return;
+                _Prefix = value;
+                _Bracket = null;
+            }
+        }
 
         private string _Suffix;
         /// <summary>Suffix</summary>
-        public string Suffix { get { return _Suffix; } set { _Suffix = value; } }
+        public string Suffix
+        {
+            get
+            {
+                return _Suffix;
+            }
+            set
+            {
+                if (value == null)
+                    value = "";
+                if (0 == string.Compare(_Suffix, value))
+                    return;
+                _Suffix = value;
+                _Bracket = null;
+            }
+        }
+
+        private string _Bracket;
+        /// <summary>Suffix</summary>
+        public string Bracket
+        {
+            get
+            {
+                if (_Bracket == null)
+                {
+                    if (0 == string.Compare(_Prefix, _Suffix))
+                        _Bracket = _Prefix;
+                    string prefix = (_Prefix ?? "");
+                    string suffix = (_Suffix ?? "");
+                    int pad = prefix.Length;
+                    if (pad < suffix.Length)
+                        pad = suffix.Length;
+                    if (prefix.Length < pad)
+                        prefix = prefix.PadRight(pad, '\0');
+                    if (suffix.Length < pad)
+                        suffix = suffix.PadRight(pad, '\0');                    
+                    _Bracket = string.Concat(prefix, suffix);
+                }
+                return _Bracket;
+            }
+            set
+            {
+                if (_Bracket != null && 0 == string.Compare(_Bracket, value))
+                    return;
+                if (value == null || value == string.Empty)
+                {
+                    _Prefix = _Suffix = "";
+                    return;
+                }
+                bool even = 0 == value.Length % 2;
+                if (even)
+                {
+                    int m = value.Length / 2;
+                    string prefix = value.Substring(0, m);
+                    string suffix = value.Substring(m, m);
+                }
+                else
+                {
+                    _Bracket = _Prefix = _Suffix;
+                }
+            }
+        }
 
         #region Constructor
 
         public Syntax()
         {
             this.CaseSensitive = false;
+            this.Prefix = "{{";
+            this.Suffix = "}}";
         }
 
         public Syntax(string text)
