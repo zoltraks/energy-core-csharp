@@ -10,6 +10,30 @@ namespace Energy.Base
     /// </summary>
     public class Bracket
     {
+        #region Constructor
+
+        public Bracket() { }
+        
+        public Bracket(string enclosure)
+        {
+            Enclosure = enclosure;
+        }
+
+        public Bracket(string prefix, string suffix)
+        {
+            _Prefix = prefix;
+            _Suffix = suffix;
+        }
+
+        public Bracket(string prefix, string suffix, string characterClass)
+        {
+            _Prefix = prefix;
+            _Suffix = suffix;
+            _CharacterClass = characterClass;
+        }
+
+        #endregion
+
         private string _Prefix = "";
         /// <summary>Prefix</summary>
         public string Prefix
@@ -100,6 +124,26 @@ namespace Energy.Base
             }
         }
 
+        private string _CharacterClass = @"^\s";
+        /// <summary>
+        /// Character class for single prefixed or suffixed values. 
+        /// Default is everything but not whitespace.
+        /// </summary>
+        public string CharacterClass
+        {
+            get
+            {
+                return _CharacterClass;
+            }
+            set
+            {
+                if (0 == string.Compare(value, _CharacterClass))
+                    return;
+                _CharacterClass = value;
+                MatchExpression = null;
+            }
+        }
+
         private string _Include;
         /// <summary>
         /// Optionally include special sequence to include suffix
@@ -154,6 +198,7 @@ namespace Energy.Base
         public string GetMatchExpression()
         {            
             List<string> list = new List<string>();
+            bool allowEmpty = true;
             if (!string.IsNullOrEmpty(_Prefix))
                 list.Add(Energy.Base.Text.EscapeExpression(_Prefix));
             list.Add("(");
@@ -170,14 +215,18 @@ namespace Energy.Base
                 list.Add(Energy.Base.Text.EscapeExpression(_Suffix[0].ToString()));
                 list.Add("]");
             }
-            if (!string.IsNullOrEmpty(include))
-            {
-                list.Add(")*");
-            }
             else
             {
-                list.Add("*");
+                list.Add("[");
+                list.Add(_CharacterClass);
+                list.Add("]");
+                allowEmpty = false;
             }
+            if (!string.IsNullOrEmpty(include))
+            {
+                list.Add(")");
+            }
+            list.Add(allowEmpty ? "*" : "+");
             list.Add(")");
             if (!string.IsNullOrEmpty(_Suffix))
                 list.Add(Energy.Base.Text.EscapeExpression(_Suffix));
@@ -186,7 +235,7 @@ namespace Energy.Base
         }
 
         private Regex _MatchRegex = null;
-
+        
         private Regex MatchRegex
         {
             get
@@ -197,11 +246,21 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Find all values in brackets.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public string[] FindArray(string input)
         {
             return new List<string>(Find(input)).ToArray();
         }
 
+        /// <summary>
+        /// Find all values in brackets.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public IEnumerable<string> Find(string input)
         {
             List<string> list = new List<string>();
@@ -212,6 +271,53 @@ namespace Energy.Base
                 string v = m.Groups[0].Value;
                 m = m.NextMatch();
                 yield return v;
+            }
+        }
+
+        /// <summary>
+        /// Find all values in brackets.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public IEnumerable<SearchResult> Search(string input)
+        {
+            List<string> list = new List<string>();
+            Regex r = MatchRegex;
+            Match m = r.Match(input);
+            while (m.Success)
+            {
+                string v = m.Groups[0].Value;
+                int i = m.Index;
+                m = m.NextMatch();
+                yield return new SearchResult()
+                {
+                    Position = i,
+                    Length = v.Length,
+                    Value = v,
+                };
+            }
+        }
+        
+        public class SearchResult
+        {
+            /// <summary>
+            /// Position in searched text
+            /// </summary>
+            public int Position;
+
+            /// <summary>
+            /// Length of found text
+            /// </summary>
+            public int Length;
+
+            /// <summary>
+            /// Search value
+            /// </summary>
+            public string Value;
+
+            public override string ToString()
+            {
+                return Value;
             }
         }
     }

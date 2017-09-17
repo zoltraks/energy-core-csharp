@@ -4,7 +4,10 @@ using System.Text;
 
 namespace Energy.Query
 {
-    class Builder
+    /// <summary>
+    /// Query builder class.
+    /// </summary>
+    public class Builder
     {
     }
 }

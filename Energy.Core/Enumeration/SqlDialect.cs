@@ -11,6 +11,8 @@ namespace Energy.Enumeration
     {
         /// <summary>Dialect not specified</summary>
         None,
+        /// <summary>Generic SQL</summary>
+        Generic,
         /// <summary>ANSI SQL-92 standard. Probably will not work with Microsoft SQL Server.</summary>
         ANSI,
         /// <summary>Transact-SQL (T-SQL) for Microsoft SQL Server (2008 and later)</summary>

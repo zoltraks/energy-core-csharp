@@ -23,8 +23,9 @@ namespace DocumentationStartup
             }
             //Test.Test8(args);
             Test.Test9();
-            Test.Test10();
-            Test.Test11();
+            //Test.Test10();
+            //Test.Test11();
+            Test.Test12();
             Console.ReadLine();
         }
     }

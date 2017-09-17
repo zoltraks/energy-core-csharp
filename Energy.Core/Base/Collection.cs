@@ -355,6 +355,11 @@ namespace Energy.Base
                 }
             }
 
+            public new void Add(string key, T value)
+            {
+                Set(key, value);
+            }
+
             public string[] ToArray(string separator)
             {
                 List<string> list = new List<string>();
@@ -460,6 +465,19 @@ namespace Energy.Base
                     }
                 }
                 return list.ToArray();
+            }
+
+            public new bool ContainsKey(string key)
+            {
+                lock (_Lock)
+                {
+                    if (CaseSensitive)
+                        return base.ContainsKey(key);
+                    if (Index == null)
+                        return false;
+                    string map = key.ToUpperInvariant();
+                    return Index.ContainsKey(map);
+                }
             }
         }
 

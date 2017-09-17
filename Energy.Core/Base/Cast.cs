@@ -46,17 +46,6 @@ namespace Energy.Base
             return Energy.Base.Cast.StringToInteger(value.ToString());
         }
 
-        public static byte ObjectToByte(object value)
-        {
-            if (value == null)
-                return (byte)0;
-            if (value is byte)
-                return (byte)value;
-            if (value is string)
-                return StringToByte((string)value);
-            return (byte)(ObjectToInteger(value) % 256);
-        }
-
         /// <summary>
         /// Convert string to long integer value without exception
         /// </summary>
@@ -125,13 +114,23 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return as string using ObjectToString method
+        /// Return as string using ObjectToString method.
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
         public static string AsString(object o)
         {
             return ObjectToString(o);
+        }
+
+        /// <summary>
+        /// Return as DateTime using ObjectToDateTime method.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(object o)
+        {
+            return ObjectToDateTime(o);
         }
 
         /// <summary>
@@ -811,29 +810,22 @@ namespace Energy.Base
         /// <returns>String representation</returns>
         public static string ObjectToString(object value)
         {
-            // treat DBNull as empty string
+            // treat DBNull as empty string //
             if (value == null || value is System.DBNull)
-            {
                 return "";
-            }
+            // maybe it is already string? //
+            if (value is string)
+                return (string)value;
             // what about bool numbers //
             if (value is bool)
-            {
-                return (bool)value ? "X" : "";
-            }
+                return (bool)value ? "1" : "0";
             // convert to culture invariant form //
             if (value is double)
-            {
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
             if (value is decimal)
-            {
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
             if (value is float)
-            {
                 return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            }
             // works with nullable version DateTime? //
             if (value is DateTime)
             {
@@ -960,15 +952,30 @@ namespace Energy.Base
             return StringToBool(ObjectToString(value));
         }
 
-        public static bool CharToBool(char value)
-        {
-            char _ = (char)value;
-            return _ != '\0' && _ != '0';
-        }
-
         public static int ObjectToInteger(object value)
         {
             return (int)ObjectToLong(value);
+        }
+
+        public static byte ObjectToByte(object value)
+        {
+            if (value == null)
+                return (byte)0;
+            if (value is byte)
+                return (byte)value;
+            if (value is string)
+                return StringToByte((string)value);
+            return (byte)(ObjectToInteger(value) % 256);
+        }
+
+        public static DateTime ObjectToDateTime(object value)
+        {
+            if (value == null)
+                return DateTime.MinValue;
+            if (value is DateTime)
+                return (DateTime)value;
+            string text = value is string ? (string)value : value.ToString();
+            return Energy.Base.Clock.Parse(text);
         }
 
         #endregion
@@ -1005,6 +1012,16 @@ namespace Energy.Base
                 }
             }
             return 0;
+        }
+
+        #endregion
+
+        #region Char
+
+        public static bool CharToBool(char value)
+        {
+            char _ = (char)value;
+            return _ != '\0' && _ != '0';
         }
 
         #endregion

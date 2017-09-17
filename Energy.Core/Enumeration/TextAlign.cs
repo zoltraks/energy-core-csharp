@@ -4,14 +4,13 @@ using System.Text;
 
 namespace Energy.Enumeration
 {
-
     /// <summary>
     /// Style of representing boolean values
     /// </summary>
     public enum TextAlign
     {
         /// <summary>
-        /// Allign left
+        /// Align left
         /// </summary>
         Left,
 

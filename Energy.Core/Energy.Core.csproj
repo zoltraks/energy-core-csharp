@@ -112,6 +112,7 @@
     <Compile Include="Core\Worker.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
+    <Compile Include="Enumeration\FormatType.cs" />
     <Compile Include="Enumeration\FormMode.cs" />
     <Compile Include="Enumeration\InputOutput.cs" />
     <Compile Include="Enumeration\LogLevel.cs" />
@@ -137,15 +138,20 @@
     <Compile Include="Query\Script\MySQL.cs" />
     <Compile Include="Query\Script\SQLite.cs" />
     <Compile Include="Query\Script\SqlServer.cs" />
+    <Compile Include="Query\Standard\Dialect\SqlServer.cs" />
     <Compile Include="Query\Type.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Source\Connection.cs" />
     <Compile Include="Source\Context.cs" />
     <Compile Include="Source\Factory.cs" />
-    <Compile Include="Source\Query.cs" />
+    <Compile Include="Source\Map.cs" />
+    <Compile Include="Query\Parameter.cs" />
     <Compile Include="Source\Schema.cs" />
     <Compile Include="Source\Structure.cs" />
     <Compile Include="Support\Win32.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Query\Virtual\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,12 +10,48 @@ namespace Energy.Query
     /// </summary>
     public class Dialect
     {
-        public Query.Format Format { get; set; }
+        public Energy.Query.Format Format { get; set; }
+
+        public System.Collections.Generic.List<string> Special = new List<string>();
+
+        #region Constructor
 
         public Dialect(Energy.Enumeration.SqlDialect dialect)
         {
-            this.Format = (Format)dialect;
+            this.Format = (Energy.Query.Format)dialect;
         }
+
+        public Dialect()
+        {
+            this.Format = (Energy.Query.Format)Energy.Enumeration.SqlDialect.Generic;
+        }
+
+        #endregion
+
+        #region Singleton
+
+        private static Energy.Query.Dialect _Default;
+        private static readonly object _DefaultLock = new object();
+        /// <summary>Singleton</summary>
+        public static Energy.Query.Dialect Default
+        {
+            get
+            {
+                if (_Default == null)
+                {
+                    lock (_DefaultLock)
+                    {
+                        if (_Default == null)
+                        {
+                            _Default = new Energy.Query.Dialect();
+                        }
+                    }
+                }
+                return _Default;
+            }
+        }
+
+        #endregion
 
         public static Energy.Enumeration.SqlDialect Guess(string name, string full)
         {
