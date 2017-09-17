@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var appUrl = @"app";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,19 +13,15 @@
 			text-align: center;
 		}
 
+        body.div {
+            border: 3px solid #933e3e;
+        }
 	</style>
 
 </head>
 <body>
-	<img src="~/Content/nancy-logo.png" alt="Nancy logo" /><br />
-	This view was rendered using the Nancy Razor view engine
-@{
-    var greeting = "Welcome to our site!";
-    var weekDay = DateTime.Now.DayOfWeek;
-    var greetingMessage = greeting + " Here in Huston it is: " + weekDay;
-}
     <div>
-        <b>@greetingMessage</b>
+        <iframe src="@appUrl"></iframe>
     </div>
 </body>
 </html>

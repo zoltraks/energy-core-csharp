@@ -433,5 +433,75 @@ namespace Energy.Base
                 result += Environment.NewLine;
             return result;
         }
+
+        private static string[] _EscapeExpressionStringArray;
+
+        private static string[] EscapeExpressionStringArray
+        {
+            get
+            {
+                if (_EscapeExpressionStringArray == null)
+                {
+                    _EscapeExpressionStringArray = new string[]
+                    {                                    
+                        ".", "$", "^", "{", "[", "(", "|", ")", "*", "+", "?", "|", "\\",
+                    };
+                }
+                return _EscapeExpressionStringArray;
+            }
+        }
+
+        private static Dictionary<string, string> _EscapeExpressionStringDictionary;
+
+        private static Dictionary<string, string> EscapeExpressionStringDictionary
+        {
+            get
+            {
+                if (_EscapeExpressionStringDictionary == null)
+                {
+                    _EscapeExpressionStringDictionary = new Dictionary<string, string>();
+                    _EscapeExpressionStringDictionary.Add("\\", @"\\");
+                    _EscapeExpressionStringDictionary.Add(".", @"\.");
+                    _EscapeExpressionStringDictionary.Add(" ", @"\ ");
+                    _EscapeExpressionStringDictionary.Add("\t", @"\t");
+                    _EscapeExpressionStringDictionary.Add("\r", @"\r");
+                    _EscapeExpressionStringDictionary.Add("\n", @"\n");
+                    _EscapeExpressionStringDictionary.Add("$", @"\$");
+                    _EscapeExpressionStringDictionary.Add("^", @"\^");
+                    _EscapeExpressionStringDictionary.Add("*", @"\*");
+                    _EscapeExpressionStringDictionary.Add("?", @"\?");
+                    _EscapeExpressionStringDictionary.Add("+", @"\+");
+                    _EscapeExpressionStringDictionary.Add("|", @"\+");
+                    _EscapeExpressionStringDictionary.Add("{", @"\{");
+                    _EscapeExpressionStringDictionary.Add("[", @"\[");
+                    _EscapeExpressionStringDictionary.Add("(", @"\(");
+                    _EscapeExpressionStringDictionary.Add("}", @"\}");
+                    _EscapeExpressionStringDictionary.Add("]", @"\]");
+                    _EscapeExpressionStringDictionary.Add(")", @"\)");
+                }
+                return _EscapeExpressionStringDictionary;
+            }
+        }
+
+        /// <summary>
+        /// Escape text for regular expression.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string EscapeExpression(string text)
+        {
+            System.Text.StringBuilder s = null;
+            foreach (KeyValuePair<string, string> _ in EscapeExpressionStringDictionary)
+            {
+                if (text.Contains(_.Key))
+                {
+                    if (s == null)
+                        s = new System.Text.StringBuilder(text);
+                    s.Replace(_.Key, _.Value);
+
+                }
+            }
+            return s == null ? text : s.ToString();
+        }
     }
 }
