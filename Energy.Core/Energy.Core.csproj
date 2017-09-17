@@ -120,6 +120,7 @@
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Enumeration\TextAlign.cs" />
     <Compile Include="Interface\IConnection.cs" />
+    <Compile Include="Interface\IEncapsulation.cs" />
     <Compile Include="Interface\IEscape.cs" />
     <Compile Include="Interface\ILoadFromFile.cs" />
     <Compile Include="Interface\IQueryDialect.cs" />

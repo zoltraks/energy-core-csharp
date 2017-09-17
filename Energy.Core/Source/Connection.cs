@@ -521,9 +521,16 @@ namespace Energy.Source
             Exception e = exception;
             while (e != null)
             {
-                int _Number = Energy.Base.Cast.ObjectToInteger(Energy.Base.Class.GetFieldOrPropertyValue(e, "Number", true, false));
-                if (_Number > 0 && !error.Contains(_Number))
-                    error.Add(_Number);
+                foreach (string field in new string[] {
+                    "Number", 
+                    "ErrorCode", 
+                })
+                {
+                    object value = Energy.Base.Class.GetFieldOrPropertyValue(e, field, true, false);
+                    int number = Energy.Base.Cast.ObjectToInteger(value);
+                    if (number != 0 && !error.Contains(number))
+                        error.Add(number);
+                }
                 e = e.InnerException;
             }
             return error.ToArray();
@@ -739,35 +746,6 @@ namespace Energy.Source
             return command;
         }
 
-        public virtual Energy.Base.Variant.Value Scalar(string query)
-        {
-            if (!Active && !Open())
-                return null;
-            DbCommand command = Prepare(query);
-            DbException exception = null;
-            try
-            {
-                object value = command.ExecuteScalar();
-                return new Energy.Base.Variant.Value(value);
-            }
-            catch (DbException x)
-            {
-                command.Cancel();
-                if (Log == null)
-                    throw;
-                else
-                    exception = x;
-                return null;
-            }
-            finally
-            {
-                if (Pooling)
-                    Close();
-                if (exception != null)
-                    Log.Write(exception);
-            }
-        }
-
         public virtual int Execute(string query)
         {
             if (!Active && !Open())
@@ -830,22 +808,54 @@ namespace Energy.Source
             }
         }
 
-        public virtual object Scalar(DbCommand command)
+        public virtual Energy.Base.Variant.Value Scalar(DbCommand command)
         {
-            try
+            ClearError();
+
+            DbException exception = null;
+
+            int repeat = Repeat;
+            while (true)
             {
-                return command.ExecuteScalar();
-            }
-            catch (Exception x)
-            {
-                if (Log == null)
-                    throw;
-                Log.Add(x);
-                return null;
+                if (!Active && !Open())
+                    return null;
+
+                try
+                {
+                    object value = command.ExecuteScalar();
+                    return new Energy.Base.Variant.Value(value);
+                }
+                catch (DbException x)
+                {
+                    command.Cancel();
+                    if (repeat-- > 0 && Catch(x, command))
+                        continue;
+                    SetError(x);
+                    if (Log == null)
+                        throw;
+                    else
+                        exception = x;
+                    return null;
+                }
+                finally
+                {
+                    if (Pooling)
+                        Close();
+                    if (exception != null)
+                        Log.Write(exception);
+                }
             }
         }
 
-        public void Kill()
+        public virtual Energy.Base.Variant.Value Scalar(string query)
+        {
+            using (DbCommand command = Prepare(query))
+            {
+                return Scalar(command);
+            }
+        }
+
+        public virtual void Kill()
         {
             throw new NotImplementedException();
         }

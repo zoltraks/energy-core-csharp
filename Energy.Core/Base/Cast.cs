@@ -850,6 +850,9 @@ namespace Energy.Base
         /// <returns></returns>
         public static long ObjectToLong(object value)
         {
+            if (value == null)
+                return 0;
+
             if (value is long)
                 return (long)(long)value;
             if (value is int)
