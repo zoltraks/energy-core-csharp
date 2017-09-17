@@ -26,7 +26,7 @@ namespace Energy.Base
                     return;
                 _Prefix = value;
                 _Enclosure = null;
-                _MatchExpression = null;
+                MatchExpression = null;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Energy.Base
                     return;
                 _Suffix = value;
                 _Enclosure = null;
-                _MatchExpression = null;
+                MatchExpression = null;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Energy.Base
             {
                 if (_Enclosure != null && 0 == string.Compare(_Enclosure, value))
                     return;
-                _MatchExpression = null;
+                MatchExpression = null;
                 if (value == null || value == string.Empty)
                 {
                     _Enclosure = _Prefix = _Suffix = "";
@@ -89,6 +89,9 @@ namespace Energy.Base
                     int m = value.Length / 2;
                     string prefix = value.Substring(0, m);
                     string suffix = value.Substring(m, m);
+                    _Prefix = prefix;
+                    _Suffix = suffix;
+                    _Enclosure = value;
                 }
                 else
                 {
@@ -121,7 +124,7 @@ namespace Energy.Base
                 if (0 == string.Compare(_Include, value))
                     return;
                 _Include = value;
-                _MatchExpression = null;
+                MatchExpression = null;
             }
         }
 
@@ -134,6 +137,13 @@ namespace Energy.Base
                 if (_MatchExpression == null)
                     _MatchExpression = GetMatchExpression();
                 return _MatchExpression;
+            }
+            set
+            {
+                if (0 == string.Compare(value, _MatchExpression))
+                    return;
+                _MatchExpression = value;
+                _MatchRegex = null;
             }
         }
 
@@ -187,18 +197,9 @@ namespace Energy.Base
             }
         }
 
-        public string[] FindAll(string input)
+        public string[] FindArray(string input)
         {
-            List<string> list = new List<string>();
-            Regex r = MatchRegex;
-            Match m = r.Match(input);
-            while (m.Success)
-            {
-                string v = m.Groups[0].Value;
-                list.Add(v);
-                m = m.NextMatch();
-            }
-            return list.ToArray();
+            return new List<string>(Find(input)).ToArray();
         }
 
         public IEnumerable<string> Find(string input)
