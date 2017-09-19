@@ -66,6 +66,10 @@
         private void MakeCurrencyRoute()
         {
             string[] names = Energy.Base.Class.GetFieldsAndProperties(typeof(Energy.Base.Currency.Manager), false);
+            Get["/currency"] = _ =>
+            {
+                return Response.AsJson<string[]>(names);
+            };
             foreach (string name in names)
             {
                 string route = "/currency/" + name;
