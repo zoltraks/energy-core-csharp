@@ -8,6 +8,15 @@
     {
         public ApiModule() : base("api")
         {
+            MakeRootRoute();
+
+            MakeEchoRoute();
+
+            MakeCurrencyRoute();
+        }
+
+        private void MakeRootRoute()
+        {
             Get["/"] = parameters =>
             {
                 return Response.AsJson<object>(new
@@ -16,7 +25,10 @@
                     orderBy = "sort_by",
                 });
             };
+        }
 
+        private void MakeEchoRoute()
+        {
             Get["/echo"] = _ =>
             {
                 try
@@ -49,6 +61,20 @@
                     });
                 }
             };
-        }            
+        }
+
+        private void MakeCurrencyRoute()
+        {
+            string[] names = Energy.Base.Class.GetFieldsAndProperties(typeof(Energy.Base.Currency.Manager), false);
+            foreach (string name in names)
+            {
+                string route = "/currency/" + name;
+                Get[route] = _ =>
+                {
+                    object o = Energy.Base.Class.GetFieldOrPropertyValue(Energy.Base.Currency.Manager.Default, name, false, false);
+                    return Response.AsJson<Energy.Base.Currency>(o as Energy.Base.Currency);
+                };
+            }
+        }
     }
 }
