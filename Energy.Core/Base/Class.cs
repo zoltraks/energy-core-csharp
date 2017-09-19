@@ -94,7 +94,7 @@ namespace Energy.Base
                         return x;
                     }
                 }
-            } 
+            }
             return null;
         }
 
@@ -311,6 +311,29 @@ namespace Energy.Base
             if (property != null)
                 return property.GetValue(o, null);
             return null;
+        }
+
+        /// <summary>
+        /// Get field or property value of object.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="name"></param>
+        /// <param name="includePrivate"></param>
+        /// <returns></returns>
+        public static object GetFieldOrPropertyValue(object o, string name, bool includePrivate)
+        {
+            return GetFieldOrPropertyValue(o, name, includePrivate, false);
+        }
+
+        /// <summary>
+        /// Get field or property value of object.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static object GetFieldOrPropertyValue(object o, string name)
+        {
+            return GetFieldOrPropertyValue(o, name, true, false);
         }
 
         /// <summary>
@@ -596,7 +619,7 @@ namespace Energy.Base
                 {
                     Energy.Base.Class.Information.Field field = new Energy.Base.Class.Information.Field();
                     field.Object = pa[i];
-                    field.Type = pa[i].PropertyType;                    
+                    field.Type = pa[i].PropertyType;
                     information.Add(field);
                 }
                 return information;

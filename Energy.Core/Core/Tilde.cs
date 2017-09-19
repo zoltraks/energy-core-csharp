@@ -10,8 +10,13 @@ namespace Energy.Core
     /// Simple elegant text coloring engine for console programs.
     /// Based on Empty Page #0 color engine.
     /// Color may be changed by value surrounded by tilde ~ character.
-    /// One tilde followed by other than letter or number or 
+    /// One tilde followed by other than letter or number or
     /// more than one tilde chars is left as is.
+    ///
+    /// When using tilde character as is, two ore more ~~~ will remain unchanged.
+    /// For escaping tilde text please use ~# ... #~.
+    /// For example ~#~color~#~ will be just ~color~.
+    /// You may optionally use double hash ## to include hash sign inside brackets ~# ## #~.
     /// </summary>
     /// <remarks>
     /// List of available colors:
@@ -19,7 +24,7 @@ namespace Energy.Core
     /// <table>
     /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
     /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-    /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+    /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
     /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
     /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
     /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
@@ -276,7 +281,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break with one or more padding lines and ruler line. 
+        /// Break with one or more padding lines and ruler line.
         /// </summary>
         /// <param name="padding"></param>
         /// <param name="line"></param>
@@ -306,7 +311,7 @@ namespace Energy.Core
         /// <para>List of available console colors:</para>
         /// <para>~0~, ~default~ = Default color</para>
         /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
-        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>
         /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
         /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
@@ -328,7 +333,7 @@ namespace Energy.Core
         /// <table>
         /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
         /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
         /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
         /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
         /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
@@ -364,12 +369,16 @@ namespace Energy.Core
                 // TODO Optionally wrap words?
                 // TODO Check security
                 System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
-                System.ConsoleColor defaultForegroundColor = _Foreground != null ? (ConsoleColor)_Foreground : previousForegroundColor;                
+                System.ConsoleColor defaultForegroundColor = _Foreground != null
+                    ? (ConsoleColor)_Foreground
+                    : previousForegroundColor;
                 for (int i = 0; i < list.Count; i++)
                 {
                     if (!_Colorless)
                     {
-                        System.ConsoleColor foregroundColor = list[i].Color != null ? (ConsoleColor)list[i].Color : defaultForegroundColor;
+                        System.ConsoleColor foregroundColor = list[i].Color != null
+                            ? (ConsoleColor)list[i].Color
+                            : defaultForegroundColor;
                         try
                         {
                             System.Console.ForegroundColor = foregroundColor;
@@ -400,7 +409,7 @@ namespace Energy.Core
         /// <para>List of available console colors:</para>
         /// <para>~0~, ~default~ = Default color</para>
         /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
-        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>
         /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
         /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
@@ -422,7 +431,7 @@ namespace Energy.Core
         /// <table>
         /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
         /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
         /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
         /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
         /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
@@ -463,7 +472,7 @@ namespace Energy.Core
         /// <para>List of available console colors:</para>
         /// <para>~0~, ~default~ = Default color</para>
         /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
-        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>
         /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
         /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
@@ -485,7 +494,7 @@ namespace Energy.Core
         /// <table>
         /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
         /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
         /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
         /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
         /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
@@ -526,7 +535,7 @@ namespace Energy.Core
         /// <para>List of available console colors:</para>
         /// <para>~0~, ~default~ = Default color</para>
         /// <para>~1~, ~darkblue~, ~db~ = Dark blue</para>
-        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>        
+        /// <para>~2~, ~darkgreen~, ~dg~, Dark green</para>
         /// <para>~3~, ~darkcyan~, ~dc~, Dark cyan</para>
         /// <para>~4~, ~darkred~, ~dr~, Dark red</para>
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
@@ -548,7 +557,7 @@ namespace Energy.Core
         /// <table>
         /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
         /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>        
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
         /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
         /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
         /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>

@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Enumeration
 {
     /// <summary>
-    /// Style of representing boolean values
+    /// Style of representing boolean values.
     /// </summary>
     public enum BooleanStyle
     {
+        /// <summary>
+        /// 0/1
+        /// </summary>
+        B,
         /// <summary>
         /// X for true
         /// </summary>
@@ -17,10 +19,6 @@ namespace Energy.Enumeration
         /// V for true
         /// </summary>
         V,
-        /// <summary>
-        /// 0/1
-        /// </summary>
-        B,
         /// <summary>
         /// Y/N
         /// </summary>

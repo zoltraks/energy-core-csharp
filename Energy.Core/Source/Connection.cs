@@ -8,6 +8,22 @@ using System.Threading;
 
 namespace Energy.Source
 {
+    /// <summary>
+    /// Database connection interface for application.
+    /// To create new connection you have to specify vendor class which implements
+    /// DbConnection compatible with ADO.NET.
+    /// </summary>
+    [Energy.Attribute.Markdown.Text(@"
+
+Persistent connections may be closed automatically when connection timeout is set.
+
+That requires system timer to be set and reset every operation.
+
+Even though persistent connections are not recommended, connection timeout might be a *must*
+in a situation when multiple instances of software may be run at the same time to avoid
+SQL server to run out of free connections.
+
+    ")]
     public class Connection : IDisposable, Energy.Interface.IConnection
     {
         #region Constructor
@@ -390,10 +406,10 @@ namespace Energy.Source
 
         /// <summary>
         /// Check exception from database connection.
-        /// 
+        ///
         /// True for timeout and damaged connections.
         /// False otherwise which probably may not have a chance to succeed.
-        /// 
+        ///
         /// If exception may be temporary and can disappear after repeat,
         /// this function results true. If result is false, operation like
         /// syntax error is final and exception cannot be "catched" by
@@ -509,7 +525,7 @@ namespace Energy.Source
             if (Log != null)
                 Log.Add(result.ToString(), Enumeration.LogLevel.Error);
 
-            // For timeout and damaged connection error result is true. 
+            // For timeout and damaged connection error result is true.
             // False otherwise which probably may not have a chance to succeed.
 
             return result.Timeout || result.Damage;
@@ -522,8 +538,8 @@ namespace Energy.Source
             while (e != null)
             {
                 foreach (string field in new string[] {
-                    "Number", 
-                    "ErrorCode", 
+                    "Number",
+                    "ErrorCode",
                 })
                 {
                     object value = Energy.Base.Class.GetFieldOrPropertyValue(e, field, true, false);
@@ -649,7 +665,7 @@ namespace Energy.Source
                                 table.Columns.Add(column);
                             }
 
-                            // Read rows from DataReader and populate the DataTable 
+                            // Read rows from DataReader and populate the DataTable
 
                             while (reader.Read())
                             {

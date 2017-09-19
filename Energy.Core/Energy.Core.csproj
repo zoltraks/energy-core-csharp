@@ -91,6 +91,7 @@
     <Compile Include="Base\Xml.cs" />
     <Compile Include="Base\Yaml.cs" />
     <Compile Include="Cast\As.cs" />
+    <Compile Include="Cast\Object.cs" />
     <Compile Include="Core\Access.cs" />
     <Compile Include="Core\Application.cs" />
     <Compile Include="Core\Benchmark.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Core\Version.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Core\Worker.cs" />
+    <Compile Include="Enumeration\SortOrder.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
     <Compile Include="Enumeration\FormatType.cs" />
