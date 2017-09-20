@@ -104,6 +104,7 @@
     <Compile Include="Core\Manager.cs" />
     <Compile Include="Core\Memory.cs" />
     <Compile Include="Core\Module.cs" />
+    <Compile Include="Core\Network.cs" />
     <Compile Include="Core\Permission.cs" />
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Core\Syntax.cs" />

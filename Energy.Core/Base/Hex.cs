@@ -234,6 +234,8 @@ namespace Energy.Base
             return data;
         }
 
+        #region Parse
+
         /// <summary>
         /// Parse hexadecimal string up to 64-bit value
         /// </summary>
@@ -263,6 +265,10 @@ namespace Energy.Base
             }
             return value;
         }
+
+        #endregion
+
+        #region Print
 
         /// <summary>
         /// Pretty print byte array in hexadecimal form
@@ -354,5 +360,30 @@ namespace Energy.Base
         {
             return Print(array, 16, 4, true);
         }
+
+        #endregion
+
+        #region Random
+
+        /// <summary>
+        /// Generate random hexadecimal number.
+        /// </summary>
+        /// <param name="length">Number of hexadecimal characters</param>
+        /// <returns></returns>
+        public static string GetRandomHex(int length)
+        {
+            return Energy.Base.Random.GetRandomHex(length);
+        }
+
+        /// <summary>
+        /// Generate random hexadecimal number.
+        /// </summary>        
+        /// <returns></returns>
+        public static string Random()
+        {
+            return Energy.Base.Random.GetRandomHex();
+        }
+
+        #endregion
     }
 }

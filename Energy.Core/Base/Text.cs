@@ -503,5 +503,26 @@ namespace Energy.Base
             }
             return s == null ? text : s.ToString();
         }
+
+        /// <summary>
+        /// Generate random text.
+        /// </summary>
+        /// <returns></returns>
+        public static string Random()
+        {
+            return Energy.Base.Random.GetRandomText();
+        }
+
+        /// <summary>
+        /// Generate random text.
+        /// </summary>
+        /// <param name="available">Available characters for generating random text</param>
+        /// <param name="minimum">Minimum number of characters</param>
+        /// <param name="maximum">Maximum number of characters</param>
+        /// <returns></returns>
+        private static string Random(string available, int minimum, int maximum)
+        {
+            return Energy.Base.Random.GetRandomText(available, minimum, maximum);
+        }
     }
 }

@@ -808,5 +808,46 @@ namespace Energy.Core
         }
 
         #endregion
+
+        #region Read
+
+        private static StringBuilder _ReadLineStringBuilder;
+
+        private static readonly object _ReadLineLock = new object();
+
+        /// <summary>
+        /// Read line from console if available. Does not wait for user to enter anything
+        /// so may be useful in loops. Thread safe. Returns null if user did not press Enter key.
+        /// </summary>
+        /// <returns></returns>
+        public static string ReadLine()
+        {
+            lock (_ReadLineLock)
+            {
+                while (System.Console.KeyAvailable)
+                {
+                    if (_ReadLineStringBuilder == null)
+                        _ReadLineStringBuilder = new StringBuilder();
+                    System.ConsoleKeyInfo key = System.Console.ReadKey();
+                    if (key.Key == System.ConsoleKey.Enter)
+                    {
+                        string result = _ReadLineStringBuilder.ToString();
+                        _ReadLineStringBuilder.Length = 0;
+                        return result;
+                    }
+                    if (key.Key == System.ConsoleKey.Backspace)
+                    {
+                        if (_ReadLineStringBuilder.Length > 0)
+                            _ReadLineStringBuilder.Length = _ReadLineStringBuilder.Length - 1;
+                        Console.Write(" \b");
+                        continue;
+                    }
+                    _ReadLineStringBuilder.Append(key.KeyChar);
+                }
+                return null;
+            }
+        }
+
+        #endregion
     }
 }
