@@ -35,9 +35,12 @@
     <NoWarn>bin</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Energy.Core, Version=2017.9.21.38868, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\Package\Energy.Core.17.09.3\lib\Energy.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -49,10 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Energy.Core\Energy.Core.csproj">
-      <Project>{C8A325C9-5193-4819-9668-03F70904C9B7}</Project>
-      <Name>Energy.Core</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
