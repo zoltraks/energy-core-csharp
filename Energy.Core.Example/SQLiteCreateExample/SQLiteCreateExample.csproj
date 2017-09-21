@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -37,11 +37,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\..\Package\System.Data.SQLite.Core.1.0.105.2\lib\net40\System.Data.SQLite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139">
+      <HintPath>..\..\Package\System.Data.SQLite.Core.1.0.105.2\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressRecord.cs" />
@@ -55,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Energy.Core\Energy.Core.csproj">
-      <Project>{c8a325c9-5193-4819-9668-03f70904c9b7}</Project>
+      <Project>{C8A325C9-5193-4819-9668-03F70904C9B7}</Project>
       <Name>Energy.Core</Name>
     </ProjectReference>
   </ItemGroup>

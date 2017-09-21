@@ -14,6 +14,8 @@ namespace Energy.Base
     {
         private static readonly object _XmlLock = new object();
 
+        #region Serialize
+
         /// <summary>
         /// Serialize object to XML
         /// <para>
@@ -91,87 +93,13 @@ namespace Energy.Base
             return Serialize(data, root, "");
         }
 
-        /// <summary>
-        /// Deserialize object from XML
-        /// </summary>
-        /// <code>
-        ///     MyDictionary x = (MyDictionary)Energy.Base.Xml.Deserialize(xml, typeof(MyDictionary));
-        /// </code>
-        /// <param name="content">string</param>
-        /// <param name="type">System.Type</param>
-        /// <returns>object</returns>
-        public static object Deserialize(string content, Type type)
-        {
-            if (content == null || content.Trim().Length == 0)
-            {
-                return null;
-            }
-            try
-            {
-                lock (_XmlLock)
-                {
-                    XmlSerializer serializer = new XmlSerializer(type);
-                    StringReader stream = new StringReader(content);
-                    XmlReaderSettings settings = new XmlReaderSettings();
-                    settings.CheckCharacters = false;
-                    XmlReader reader = XmlReader.Create(stream, settings);
-                    return serializer.Deserialize(reader);
-                }
-            }
-            catch (InvalidOperationException)
-            {
-                Debug.WriteLine("Invalid operation");
-                return null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        #endregion
+
+        #region Deserialize
+
 
         /// <summary>
-        /// Deserialize object from XML
-        /// </summary>
-        /// <param name="content">string</param>
-        /// <param name="type">System.Type</param>
-        /// <param name="root">string</param>
-        /// <param name="space">string</param>
-        /// <returns>object</returns>
-        public static object Deserialize(string content, Type type, string root, string space)
-        {
-            try
-            {
-                lock (_XmlLock)
-                {
-                    XmlRootAttribute attribute = new XmlRootAttribute(root) { Namespace = space };
-                    XmlSerializer serializer = new XmlSerializer(type, attribute);
-                    StringReader stream = new StringReader(content);
-                    XmlReaderSettings settings = new XmlReaderSettings();
-                    settings.CheckCharacters = false;
-                    XmlReader reader = XmlReader.Create(stream, settings);
-                    return serializer.Deserialize(reader);
-                }
-            }
-            catch
-            {                
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Deserialize object from XML
-        /// </summary>
-        /// <param name="content">string</param>
-        /// <param name="type">System.Type</param>
-        /// <param name="root">string</param>
-        /// <returns>object</returns>
-        public static object Deserialize(string content, Type type, string root)
-        {
-            return Deserialize(content, type, root, "");
-        }
-
-        /// <summary>
-        /// Deserialize object from XML, root alternatives allowed
+        /// Deserialize object from XML, root alternatives allowed.
         /// </summary>
         /// <param name="content">string</param>
         /// <param name="type">System.Type</param>
@@ -205,6 +133,56 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Generic XML deserialization method.
+        /// </summary>
+        /// <typeparam name="TDeserialize"></typeparam>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static TDeserialize Deserialize<TDeserialize>(string content)
+        {
+            return (TDeserialize)Deserialize(content, typeof(TDeserialize));
+        }
+
+        /// <summary>
+        /// Deserialize object from XML
+        /// </summary>
+        /// <code>
+        ///     MyDictionary x = (MyDictionary)Energy.Base.Xml.Deserialize(xml, typeof(MyDictionary));
+        /// </code>
+        /// <param name="content">string</param>
+        /// <param name="type">System.Type</param>
+        /// <returns>object</returns>
+        public static object Deserialize(string content, Type type)
+        {
+            return Deserialize(content, type, new string[] { "" }, "");
+        }
+
+        /// <summary>
+        /// Deserialize object from XML
+        /// </summary>
+        /// <param name="content">string</param>
+        /// <param name="type">System.Type</param>
+        /// <param name="root">string</param>
+        /// <param name="space">string</param>
+        /// <returns>object</returns>
+        public static object Deserialize(string content, Type type, string root, string space)
+        {
+            return Deserialize(content, type, new string[] { root }, space);
+        }
+
+        /// <summary>
+        /// Deserialize object from XML
+        /// </summary>
+        /// <param name="content">string</param>
+        /// <param name="type">System.Type</param>
+        /// <param name="root">string</param>
+        /// <returns>object</returns>
+        public static object Deserialize(string content, Type type, string root)
+        {
+            return Deserialize(content, type, new string[] { root }, "");
+        }
+
+        /// <summary>
         /// Deserialize object from XML, root alternatives allowed
         /// </summary>
         /// <param name="content">string</param>
@@ -215,6 +193,8 @@ namespace Energy.Base
         {
             return Deserialize(content, type, root, "");
         }
+
+        #endregion
 
         /// <summary>
         /// Read XML string element

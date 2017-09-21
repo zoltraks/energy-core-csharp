@@ -94,6 +94,8 @@ namespace Energy.Core
 
         #endregion
 
+        #region Run
+
         /// <summary>
         /// Run
         /// </summary>
@@ -101,5 +103,26 @@ namespace Energy.Core
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region Static
+
+        public static void SetLanguage(string culture)
+        {
+            try
+            {
+                System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+            }
+            catch
+            { }
+        }
+
+        public static void SetDefaultLanguage()
+        {
+            SetLanguage("en-US");
+        }
+
+        #endregion
     }
 }

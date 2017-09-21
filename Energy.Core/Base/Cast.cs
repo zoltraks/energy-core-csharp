@@ -981,6 +981,33 @@ namespace Energy.Base
             return Energy.Base.Clock.Parse(text);
         }
 
+        public static TStringToObject StringToObject<TStringToObject>(string input)
+        {
+            System.Type type = typeof(TStringToObject);
+            if (false)
+            { }
+            else if (type == typeof(string))
+                return (TStringToObject)(object)input;
+            else if (type == typeof(long))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToLong(input);
+            else if (type == typeof(int))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToInteger(input);
+            else if (type == typeof(bool))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToBool(input);
+            else if (type == typeof(double))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToDouble(input);
+            else if (type == typeof(decimal))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToDecimal(input);
+            else if (type == typeof(float))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToFloat(input);
+            else if (type == typeof(byte))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToByte(input);
+            else if (type == typeof(DateTime))
+                return (TStringToObject)(object)Energy.Base.Cast.StringToDateTime(input);
+            else
+                return (TStringToObject)(object)input;
+        }
+
         #endregion
 
         #region Enum

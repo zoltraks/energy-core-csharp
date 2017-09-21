@@ -21,7 +21,7 @@ namespace Energy.Interface
         /// Kill connection
         /// </summary>
         void Kill();
-        
+
         /// <summary>
         /// Execute SQL statement
         /// </summary>

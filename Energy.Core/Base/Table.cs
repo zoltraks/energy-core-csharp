@@ -82,7 +82,7 @@ namespace Energy.Base
         #endregion
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>

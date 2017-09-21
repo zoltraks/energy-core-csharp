@@ -234,8 +234,6 @@ namespace Energy.Base
 
         #region StringDictionary
 
-        [XmlRoot]
-        [Serializable]
         public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
             /// <summary>
@@ -323,7 +321,7 @@ namespace Energy.Base
             }
 
             public void Get(string key, out T value)
-            {                
+            {
                 value = Get(key);
             }
 
@@ -407,7 +405,7 @@ namespace Energy.Base
                         case XmlNodeType.Text:
                             string[] array = Energy.Base.Text.Convert(parentList.ToArray(), XmlEscapeName);
                             string element = string.Join(_XmlParentSeparator, parentList.ToArray());
-                            
+
                             this[currentElement] = Energy.Base.Cast.As<T>((object)reader.Value);
                             break;
 
@@ -453,7 +451,7 @@ namespace Energy.Base
                     foreach (KeyValuePair<string, T> e in this)
                     {
                         list.Add(e.Key);
-                        list.Add(Energy.Base.Cast.AsString((object)e.Value));
+                        list.Add(Energy.Base.Cast.ObjectToString((object)e.Value));
                     }
                 }
                 else
@@ -461,7 +459,7 @@ namespace Energy.Base
                     foreach (KeyValuePair<string, string> x in this.Index)
                     {
                         list.Add(x.Key);
-                        list.Add(Energy.Base.Cast.AsString((object)this[x.Value]));
+                        list.Add(Energy.Base.Cast.ObjectToString((object)this[x.Value]));
                     }
                 }
                 return list.ToArray();
@@ -490,8 +488,8 @@ namespace Energy.Base
 
         #region StringList
 
-        public class StringList: System.Collections.Generic.List<string>
-        {            
+        public class StringList : System.Collections.Generic.List<string>
+        {
             public int TotalLength
             {
                 get
@@ -512,6 +510,69 @@ namespace Energy.Base
                     length += list[i].Length;
                 }
                 return length;
+            }
+        }
+
+        #endregion
+
+        #region SerializableDictionary
+
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
+        {
+            public System.Xml.Schema.XmlSchema GetSchema()
+            {
+                return null;
+            }
+
+            public void ReadXml(System.Xml.XmlReader reader)
+            {
+                bool wasEmpty = reader.IsEmptyElement;
+                reader.Read();
+
+                if (wasEmpty)
+                    return;
+
+                while (reader.NodeType != System.Xml.XmlNodeType.EndElement)
+                {
+                    reader.ReadStartElement("Item");
+
+                    reader.ReadStartElement("Key");
+                    TKey key = Energy.Base.Cast.StringToObject<TKey>(reader.ReadString());
+                    reader.ReadEndElement();
+
+                    reader.ReadStartElement("Value");
+                    TValue value = Energy.Base.Cast.StringToObject<TValue>(reader.ReadString());
+                    reader.ReadEndElement();
+
+                    this.Add(key, value);
+
+                    reader.ReadEndElement();
+                    reader.MoveToContent();
+                }
+
+                reader.ReadEndElement();
+            }
+
+            public void WriteXml(System.Xml.XmlWriter writer)
+            {
+                XmlSerializer keySerializer = new XmlSerializer(typeof(TKey));
+                XmlSerializer valueSerializer = new XmlSerializer(typeof(TValue));
+
+                foreach (TKey key in this.Keys)
+                {
+                    writer.WriteStartElement("Item");
+
+                    writer.WriteStartElement("Key");
+                    writer.WriteString(Energy.Base.Cast.ObjectToString(key));
+                    writer.WriteEndElement();
+
+                    writer.WriteStartElement("Value");
+                    TValue value = this[key];
+                    writer.WriteString(Energy.Base.Cast.ObjectToString(value));
+                    writer.WriteEndElement();
+
+                    writer.WriteEndElement();
+                }
             }
         }
 

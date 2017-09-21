@@ -122,6 +122,7 @@
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Enumeration\TextAlign.cs" />
+    <Compile Include="Interface\IXmlSerializable.cs" />
     <Compile Include="Interface\IConnection.cs" />
     <Compile Include="Interface\IEncapsulation.cs" />
     <Compile Include="Interface\IEscape.cs" />

@@ -849,5 +849,33 @@ namespace Energy.Core
         }
 
         #endregion
+
+        #region Input
+
+        public static string Input(string message, string defaultValue)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+            }
+            else
+            {
+                if (message.Contains("{0}"))
+                    message = string.Format(message, defaultValue);
+            }
+            Energy.Core.Tilde.Write(message);
+            string input = Console.ReadLine();
+            if (string.IsNullOrEmpty(input))
+                input = defaultValue;
+            return input;
+        }
+
+        public static TInput Input<TInput>(string message, object defaultValue)
+        {
+            string defaultString = Energy.Base.Cast.ObjectToString(defaultValue);
+            string input = Energy.Core.Tilde.Input(message, defaultString);
+            return Energy.Base.Cast.StringToObject<TInput>(input);
+        }
+
+        #endregion
     }
 }
