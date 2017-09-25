@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Diagnostics;
-using System.Security.Permissions;
 
 namespace Energy.Core
 {
@@ -43,7 +42,9 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
+#if (!NETCOREAPP2_0)
+        [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
+#endif
         public void Set(Assembly assembly)
         {
             Product = GetProduct(assembly);
@@ -52,12 +53,14 @@ namespace Energy.Core
 
         #region Static
 
-        /// <summary>
-        /// Get product version for assembly
-        /// </summary>
-        /// <param name="assembly">System.Reflection.Assembly</param>
-        /// <returns>string</returns>
-        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
+/// <summary>
+/// Get product version for assembly
+/// </summary>
+/// <param name="assembly">System.Reflection.Assembly</param>
+/// <returns>string</returns>
+#if (!NETCOREAPP2_0)
+        [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
+#endif
         public static string GetProduct(Assembly assembly)
         {
             try
@@ -122,7 +125,7 @@ namespace Energy.Core
             return Compare(a, b, new char[] { '.', '-', '_' });
         }
 
-        #endregion
+#endregion
 
         #region Library version information
 
@@ -130,7 +133,9 @@ namespace Energy.Core
         /// <summary>Library version</summary>
         public static string LibraryVersion
         {
-            [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
+#if (!NETCOREAPP2_0)
+            [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
+#endif
             get
             {
                 if (_LibraryProduct == null)
@@ -163,6 +168,6 @@ namespace Energy.Core
             }
         }
 
-        #endregion
+#endregion
     }
 }

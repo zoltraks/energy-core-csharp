@@ -8,7 +8,7 @@ namespace Energy.Query
     /// <summary>
     /// Query language dialect settings
     /// </summary>
-    public class Dialect
+    public partial class Dialect
     {
         public Energy.Query.Format Format { get; set; }
 
@@ -53,6 +53,12 @@ namespace Energy.Query
 
         #endregion
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="full"></param>
+        /// <returns></returns>
         public static Energy.Enumeration.SqlDialect Guess(string name, string full)
         {
             if (!string.IsNullOrEmpty(full))

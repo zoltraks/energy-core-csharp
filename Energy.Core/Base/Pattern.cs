@@ -7,8 +7,8 @@ namespace Energy.Base
     /// <summary>
     /// Regular expression pattern constants
     /// </summary>
-    public static class Pattern
-    {        
+    public static partial class Pattern
+    {
         /// <summary>
         /// Connection string pattern
         /// </summary>
@@ -16,7 +16,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Geolocation string containg longitude and latitude values.
-        /// 
+        ///
         /// Allows matching several standards:
         /// 66° 33′ 39″ N 0° 0′ 0″
         /// 51.5074° N, 0.1278° W
@@ -100,5 +100,10 @@ namespace Energy.Base
 )
 +
 ";
+
+        /// <summary>
+        /// Expression for finding root element in XML.
+        /// </summary>
+        public static readonly string XmlRootName = @"(?:<\?[xX][mM][lL][^>]*>\s*)?(?:<\s*([a-zA-Z_][^\s>]*))";
     }
 }

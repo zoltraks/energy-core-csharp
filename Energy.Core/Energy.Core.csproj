@@ -70,6 +70,7 @@
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Ini.cs" />
     <Compile Include="Base\Json.cs" />
+    <Compile Include="Base\Lock.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Money.cs" />
     <Compile Include="Base\Nibble.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Enumeration\MatchStyle.cs" />
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Enumeration\TextAlign.cs" />
+    <Compile Include="Interface\ICopy.cs" />
     <Compile Include="Interface\IXmlSerializable.cs" />
     <Compile Include="Interface\IConnection.cs" />
     <Compile Include="Interface\IEncapsulation.cs" />

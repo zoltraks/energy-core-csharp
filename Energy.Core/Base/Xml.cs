@@ -4,6 +4,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -295,6 +296,20 @@ namespace Energy.Base
                 return attributeElement.Name;
 
             return "";
+        }
+
+        /// <summary>
+        /// Extract root element from XML.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static string ExtractRoot(string xml)
+        {
+            Match match = Regex.Match(xml, Energy.Base.Pattern.XmlRootName);
+            if (!match.Success)
+                return "";
+            else
+                return match.Groups[1].Value;
         }
     }
 }

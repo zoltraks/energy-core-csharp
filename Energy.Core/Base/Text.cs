@@ -405,7 +405,7 @@ namespace Energy.Base
         {
             if (string.IsNullOrEmpty(text))
                 return text;
-            string[] replacement = new string[] 
+            string[] replacement = new string[]
             {
                 "*", "%",
                 "?", "_",
@@ -443,7 +443,7 @@ namespace Energy.Base
                 if (_EscapeExpressionStringArray == null)
                 {
                     _EscapeExpressionStringArray = new string[]
-                    {                                    
+                    {
                         ".", "$", "^", "{", "[", "(", "|", ")", "*", "+", "?", "|", "\\",
                     };
                 }
@@ -524,5 +524,91 @@ namespace Energy.Base
         {
             return Energy.Base.Random.GetRandomText(available, minimum, maximum);
         }
+
+        #region Naming convention
+
+        /// <summary>
+        /// Capitalize string by uppercasing the first letter,
+        /// remaining the rest unchanged
+        /// </summary>
+        /// <remarks>
+        /// You will want to call String.ToLower() before
+        /// calling this method
+        /// </remarks>
+        /// <param name="word">Word</param>
+        /// <returns>Word</returns>
+        public static string UppercaseFirst(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return word;
+            if (word.Length == 0)
+                return char.ToUpperInvariant(word[0]).ToString();
+            return string.Concat(char.ToUpperInvariant(word[0])
+                , word.Substring(1).ToLowerInvariant());
+        }
+
+        /// <summary>
+        /// Return words as a string separated with hyphen character
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string HyphenCase(string[] words)
+        {
+            return string.Join("-", words);
+        }
+
+        /// <summary>
+        /// Return words as a string separated with underscore character
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string UnderscoreCase(string[] words)
+        {
+            return string.Join("_", words);
+        }
+
+        /// <summary>
+        /// Return words using medial capitalization
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string PascalCase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return "";
+            for (int i = 0; i < words.Length; i++)
+            {
+                words[i] = UppercaseFirst(words[i]);
+            }
+            return string.Join("", words);
+        }
+
+        /// <summary>
+        /// Return words using medial capitalization in optional java
+        /// style of camel case
+        /// </summary>
+        /// <remarks>
+        /// Example of getting "camelGoesFirst" word
+        /// <pre>
+        ///     string[] words = { "Camel", "gOES", "fIrSt" };
+        ///     MessageBox.Show(Core.Transform.CamelCase(words, true));
+        /// </pre>
+        /// </remarks>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string CamelCase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return "";
+            words[0] = words[0].ToLowerInvariant();
+            for (int i = 1; i < words.Length; i++)
+            {
+                    words[i] = UppercaseFirst(words[i]);
+            }
+            return string.Join("", words);
+        }
+
+        #endregion
+
     }
 }

@@ -18,11 +18,6 @@ namespace Energy.Interface
         void Close();
 
         /// <summary>
-        /// Kill connection
-        /// </summary>
-        void Kill();
-
-        /// <summary>
         /// Execute SQL statement
         /// </summary>
         /// <param name="query">SQL query</param>

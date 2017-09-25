@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Energy.Core
 {
@@ -49,6 +51,54 @@ namespace Energy.Core
             }
 
             return String.Join(Environment.NewLine, message.ToArray()).Trim();
+        }
+
+        /// <summary>
+        /// Return calling method name
+        /// </summary>
+        /// <param name="stack">int</param>
+        /// <returns>string</returns>
+        public static string CallingMethod(int stack)
+        {
+            try
+            {
+                string fullName = "";
+                StackTrace stackTrace = new StackTrace();
+                stack++;
+                do
+                {
+                    MethodBase method = stackTrace.GetFrame(stack).GetMethod();
+                    if (method == null)
+                        return "";
+                    if (method.Name == ".ctor")
+                    {
+                        fullName = method.ReflectedType.FullName;
+                    }
+                    else
+                    {
+                        fullName = string.Concat(method.ReflectedType.FullName, ".", method.Name);
+                        if (fullName == "Energy.Core.Bug.CallingMethod")
+                        {
+                            stack++;
+                            continue;
+                        }
+                    }
+                } while (false);
+                return fullName;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Return calling method name.
+        /// </summary>
+        /// <returns>string</returns>
+        public static string CallingMethod()
+        {
+            return CallingMethod(1);
         }
     }
 }

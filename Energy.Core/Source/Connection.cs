@@ -19,12 +19,13 @@ Persistent connections may be closed automatically when connection timeout is se
 
 That requires system timer to be set and reset every operation.
 
-Even though persistent connections are not recommended, connection timeout might be a *must*
+Even though ""static"" connections are not recommended, connection timeout might be a *must*
 in a situation when multiple instances of software may be run at the same time to avoid
 SQL server to run out of free connections.
 
     ")]
-    public class Connection : IDisposable, Energy.Interface.IConnection
+    public class Connection : Energy.Interface.IConnection, Energy.Interface.ICopy<Connection>
+        , ICloneable, IDisposable
     {
         #region Constructor
 
@@ -55,20 +56,51 @@ SQL server to run out of free connections.
 
         #endregion
 
-        private int _Repeat = 0;
+        #region Lock
+
+        private readonly static object _PropertyLock = new object();
+
+        #endregion
+
+        #region Property
+
+        private int _Repeat = 1;
         /// <summary>Repeat operation after recoverable error</summary>
-        public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
+        public int Repeat
+        {
+            get
+            {
+                lock (_PropertyLock)
+                    return _Repeat;
+            }
+            set
+            {
+                lock (_PropertyLock)
+                    _Repeat = value;
+            }
+        }
 
         private int _Timeout = 30;
         /// <summary>Time limit in seconds for SQL operations</summary>
-        public int Timeout { get { return _Timeout; } set { _Timeout = value; } }
+        public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
 
         private bool _Pooling = true;
-        private readonly object _PoolingLock = new object();
         /// <summary>Pooling</summary>
-        public bool Pooling { get { lock (_PoolingLock) return _Pooling; } set { lock (_PoolingLock) _Pooling = value; } }
+        public bool Pooling
+        {
+            get
+            {
+                lock (_PropertyLock)
+                    return _Pooling;
+            }
+            set
+            {
+                lock (_PropertyLock)
+                    _Pooling = value;
+            }
+        }
 
-        private readonly object _PropertyLock = new object();
+        #endregion
 
         //private Query.Dialect _Query;
         ///// <summary>Query</summary>
@@ -169,7 +201,7 @@ SQL server to run out of free connections.
 
         private DbConnection _Driver;
 
-        private readonly LO _DriverLock = new LO();
+        private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
 
         /// <summary>
         /// SQL connection driver class.
@@ -531,7 +563,7 @@ SQL server to run out of free connections.
             return result.Timeout || result.Damage;
         }
 
-        private int[] GetErrorNumber(Exception exception)
+        public int[] GetErrorNumber(Exception exception)
         {
             List<int> error = new List<int>();
             Exception e = exception;
@@ -764,6 +796,23 @@ SQL server to run out of free connections.
 
         public virtual int Execute(string query)
         {
+            //if (Pooling)
+            //{
+            //    using (IDbConnection connection = Open())
+            //    {
+            //        return Execute(connection, query);
+            //    }
+            //}
+            //else
+            //{
+            //    lock (_ShareLock)
+            //    {
+            //        if (_Connection == null)
+            //            _Connection = Open();
+            //        return Execute(_Connection, query);
+            //    }
+            //}
+
             if (!Active && !Open())
                 return GetNegativeErrorNumber();
 
@@ -875,6 +924,31 @@ SQL server to run out of free connections.
         {
             throw new NotImplementedException();
         }
+
+        public string GetErrorText()
+        {
+            List<string> list = new List<string>();
+            if (ErrorNumber != 0)
+                list.Add(ErrorNumber.ToString());
+            if (!string.IsNullOrEmpty(ErrorStatus))
+                list.Add(ErrorStatus);
+            return string.Join(" ", list.ToArray());
+        }
+
+        public Connection Copy()
+        {
+            return null;
+        //    Energy.Source.Connection clone = new Energy.Source.Connection();
+        //    clone.ConnectionString = this.ConnectionString;
+        //    clone.Vendor = this.Vendor;
+        //    clone.Dialect = this.Dialect;
+        //    return clone;
+        }
+
+        public object Clone()
+        {
+            return Copy();
+        }
     }
 
     /// <summary>
@@ -899,16 +973,6 @@ SQL server to run out of free connections.
         {
             this.Vendor = typeof(T);
             this.Dialect = dialect;
-        }
-
-        public string GetErrorText()
-        {
-            List<string> list = new List<string>();
-            if (ErrorNumber != 0)
-                list.Add(ErrorNumber.ToString());
-            if (!string.IsNullOrEmpty(ErrorStatus))
-                list.Add(ErrorStatus);
-            return string.Join(" ", list.ToArray());
         }
     }
 }

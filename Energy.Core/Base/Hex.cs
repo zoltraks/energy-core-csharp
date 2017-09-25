@@ -234,6 +234,22 @@ namespace Energy.Base
             return data;
         }
 
+        public static string IntegerToHex(int value)
+        {
+            string hex = value.ToString("X");
+            if (hex.Length < 8)
+                hex = hex.PadLeft(8, '0');
+            return hex;
+        }
+
+        public static string IntegerToHex(int value, int size)
+        {
+            string hex = value.ToString("X");
+            if (hex.Length < size)
+                hex = hex.PadLeft(size, '0');
+            return hex;
+        }
+
         #region Parse
 
         /// <summary>

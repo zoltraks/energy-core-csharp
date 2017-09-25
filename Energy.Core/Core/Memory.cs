@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Permissions;
 using System.Text;
 
 namespace Energy.Core
@@ -14,7 +13,9 @@ namespace Energy.Core
         /// Get current memory usage
         /// </summary>
         /// <returns></returns>
-        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
+#if (!NETCOREAPP2_0)
+        [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
+#endif
         public static long GetCurrentMemoryUsage()
         {
             try
