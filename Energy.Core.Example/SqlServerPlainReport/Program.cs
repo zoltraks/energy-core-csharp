@@ -11,7 +11,7 @@ namespace SqlServerPlainReport
     {
         static void Main(string[] args)
         {
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
+            Energy.Core.Application.SetDefaultLanguage();
             try
             {
                 Go(args);
