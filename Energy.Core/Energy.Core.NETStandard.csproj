@@ -21,14 +21,14 @@
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;RELEASE;NETSTANDARD;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>TRACE;RELEASE;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

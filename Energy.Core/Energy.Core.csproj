@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>17.09.3.2</Version>
-    <FileVersion>17.9.3.2</FileVersion>
+    <Version>17.09.3.3</Version>
+    <FileVersion>17.9.3.3</FileVersion>
     <AssemblyVersion>2017.09.27</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
-    <RootNamespace>Energy</RootNamespace>
     <ApplicationIcon>Application.ico</ApplicationIcon>
+    <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
@@ -21,14 +21,14 @@
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;RELEASE;NETSTANDARD;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>TRACE;RELEASE;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD;NETCOREAPP2_0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
