@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApplicationAspNetCoreExample.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Authentication")]
+    [Route("api/authentication")]
     public class AuthenticationController : Controller
     {
         // GET: api/Authentication

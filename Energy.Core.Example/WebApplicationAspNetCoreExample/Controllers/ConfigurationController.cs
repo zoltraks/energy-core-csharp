@@ -8,24 +8,33 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApplicationAspNetCoreExample.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Configuration")]
+    [Route("api/configuration")]
     public class ConfigurationController : Controller
     {
-        // GET: api/Configuration
+        /// <summary>
+        /// Get all configuration items
+        /// </summary>
+        /// <returns></returns>
+        // GET: api/configuration
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET: api/Configuration/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        /// <summary>
+        /// Get configuration item
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        // GET: api/configuration/key
+        [HttpGet("{key}")]
+        public string Get(string key)
         {
             return "value";
         }
 
-        // POST: api/Configuration
+        // POST: api/configuration
         [HttpPost]
         public void Post([FromBody]string value)
         {
