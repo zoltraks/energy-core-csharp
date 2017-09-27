@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Energy.Core</AssemblyName>
-    <Version>17.09.3.2</Version>
-    <FileVersion>17.9.3.2</FileVersion>
-    <AssemblyVersion>2017.09.27</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
-    <RootNamespace>Energy</RootNamespace>
     <ApplicationIcon>Application.ico</ApplicationIcon>
+    <RootNamespace>Energy</RootNamespace>
+    <AssemblyName>Energy.Core</AssemblyName>
+    <Version>17.09.4</Version>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
     <Description></Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
+    <AssemblyVersion>2017.09.26</AssemblyVersion>
+    <FileVersion>17.9.4</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 

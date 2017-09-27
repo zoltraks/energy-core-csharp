@@ -42,7 +42,7 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-#if (!NETCOREAPP2_0)
+#if (!NETSTANDARD)
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public void Set(Assembly assembly)
@@ -58,7 +58,7 @@ namespace Energy.Core
 /// </summary>
 /// <param name="assembly">System.Reflection.Assembly</param>
 /// <returns>string</returns>
-#if (!NETCOREAPP2_0)
+#if (!NETSTANDARD)
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public static string GetProduct(Assembly assembly)
@@ -133,7 +133,7 @@ namespace Energy.Core
         /// <summary>Library version</summary>
         public static string LibraryVersion
         {
-#if (!NETCOREAPP2_0)
+#if (!NETSTANDARD)
             [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
             get

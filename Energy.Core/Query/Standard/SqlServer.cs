@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Energy.Query.Standard.Dialect
+namespace Energy.Query.Standard
 {
     public class SqlServer: Energy.Query.Dialect
     {

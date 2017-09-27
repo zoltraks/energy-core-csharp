@@ -311,5 +311,18 @@ namespace Energy.Base
             else
                 return match.Groups[1].Value;
         }
+
+        /// <summary>
+        /// Extract root element without namespace from XML.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static string ExtractRootShort(string xml)
+        {
+            string root = ExtractRoot(xml);
+            if (string.IsNullOrEmpty(root) || !root.Contains(":"))
+                return root;
+            return root.Substring(root.LastIndexOf(":") + 1);
+        }
     }
 }

@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("Energy Core Library")]
 [assembly: AssemblyDescription("How much reality can you take?")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyConfiguration("Company")]
+[assembly: AssemblyCompany("Filip Golewski <f.golewski@gmail.com>")]
 [assembly: AssemblyProduct("Energy.Core")]
 [assembly: AssemblyCopyright("Filip Golewski <f.golewski@gmail.com>")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Company")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2017.09.23.0")]
+[assembly: AssemblyVersion("2017.09.23.*")]
 [assembly: AssemblyFileVersion("17.09.4")]

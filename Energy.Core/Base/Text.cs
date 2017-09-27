@@ -504,6 +504,8 @@ namespace Energy.Base
             return s == null ? text : s.ToString();
         }
 
+        #region Random
+
         /// <summary>
         /// Generate random text.
         /// </summary>
@@ -520,10 +522,47 @@ namespace Energy.Base
         /// <param name="minimum">Minimum number of characters</param>
         /// <param name="maximum">Maximum number of characters</param>
         /// <returns></returns>
-        private static string Random(string available, int minimum, int maximum)
+        public static string Random(string available, int minimum, int maximum)
         {
             return Energy.Base.Random.GetRandomText(available, minimum, maximum);
         }
+
+        #endregion
+
+        #region Join
+
+        public static string Join(string glue, string format, params object[][] array)
+        {
+            if (array == null)
+                return null;
+
+            int count = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null || array[i].Length == 0)
+                    continue;
+                if (array[i].Length > count)
+                    count = array[i].Length;
+            }
+
+            List<string> list = new List<string>();
+            List<string> args = new List<string>();
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = 0; j < array.Length; j++)
+                {
+                    if (array[j] != null && array[j].Length > i)
+                        args.Add(Energy.Base.Cast.ObjectToString(array[j][i]));
+                    else
+                        args.Add("");
+                }
+                list.Add(string.Format(format, args.ToArray()));
+                args.Clear();
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        #endregion
 
         #region Naming convention
 
@@ -609,6 +648,5 @@ namespace Energy.Base
         }
 
         #endregion
-
     }
 }

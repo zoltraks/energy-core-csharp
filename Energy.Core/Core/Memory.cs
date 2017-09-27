@@ -13,7 +13,7 @@ namespace Energy.Core
         /// Get current memory usage
         /// </summary>
         /// <returns></returns>
-#if (!NETCOREAPP2_0)
+#if (!NETSTANDARD)
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public static long GetCurrentMemoryUsage()
