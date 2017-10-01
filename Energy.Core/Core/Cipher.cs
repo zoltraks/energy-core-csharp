@@ -12,27 +12,9 @@ namespace Energy.Core
     public class Cipher
     {
         /// <summary>
-        /// Generic class for cipher algorithms with default behaviour of
-        /// throwing NotSupportedException if method is not implemented
-        /// </summary>
-        /// <exception cref="NotSupportedException">Thrown when method is not supported</exception>>
-        public abstract class Method
-        {
-            public virtual string Encrypt(string content)
-            {
-                throw new System.NotSupportedException();
-            }
-
-            public virtual string Decrypt(string content)
-            {
-                throw new System.NotSupportedException();
-            }
-        }
-
-        /// <summary>
         /// MD5
         /// </summary>
-        public class MD5 : Method
+        public class MD5 : Energy.Base.Cipher.Method
         {
             public override string Encrypt(string content)
             {
@@ -50,7 +32,7 @@ namespace Energy.Core
         /// <summary>
         /// SHA1
         /// </summary>
-        public class SHA1 : Method
+        public class SHA1 : Energy.Base.Cipher.Method
         {
             public override string Encrypt(string content)
             {
@@ -70,7 +52,7 @@ namespace Energy.Core
         /// <summary>
         /// DES
         /// </summary>
-        public class DES : Method, IDisposable
+        public class DES : Energy.Base.Cipher.Method, IDisposable
         {
             private string _Secret;
 
