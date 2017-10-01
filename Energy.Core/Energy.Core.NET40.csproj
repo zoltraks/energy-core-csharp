@@ -140,12 +140,6 @@
     <Compile Include="Query\Dialect.cs" />
     <Compile Include="Query\Format.cs" />
     <Compile Include="Query\Script.cs" />
-    <Compile Include="Query\Script\ANSI.cs" />
-    <Compile Include="Query\Script\Generic.cs" />
-    <Compile Include="Query\Script\MySQL.cs" />
-    <Compile Include="Query\Script\SQLite.cs" />
-    <Compile Include="Query\Script\SqlServer.cs" />
-    <Compile Include="Query\Standard\Dialect\SqlServer.cs" />
     <Compile Include="Query\Type.cs" />
     <Compile Include="Source\Configuration.cs" />
     <Compile Include="Source\Connection.cs" />
@@ -158,6 +152,7 @@
     <Compile Include="Support\Win32.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Query\Standard\" />
     <Folder Include="Query\Virtual\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

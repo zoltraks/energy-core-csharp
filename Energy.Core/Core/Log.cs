@@ -41,37 +41,37 @@ namespace Energy.Core
 
         #endregion
 
-        #region Static
+        #region Singleton
 
-        private static Log _Static = null;
+        private static Log _Default = null;
 
-        private static readonly object _StaticLock = new object();
+        private static readonly Energy.Base.Lock _DefaultLock = new Energy.Base.Lock();
 
         /// <summary>
         /// Singleton
         /// </summary>
-        public static Log Static
+        public static Log Default
         {
             get
             {
-                if (_Static == null)
+                if (_Default == null)
                 {
-                    lock (_StaticLock)
+                    lock (_DefaultLock)
                     {
-                        if (_Static == null)
+                        if (_Default == null)
                         {
-                            _Static = new Log();
+                            _Default = new Log();
                         }
                     }
                 }
 
-                return _Static;
+                return _Default;
             }
             set
             {
-                lock (_StaticLock)
+                lock (_DefaultLock)
                 {
-                    _Static = value;
+                    _Default = value;
                 }
             }
         }

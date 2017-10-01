@@ -9,7 +9,7 @@ namespace MySqlConnection
     {
         static void Main(string[] args)
         {
-            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>(Energy.Enumeration.SqlDialect.MySQL);
+            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>();
             db.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
             db.Open();
             Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
@@ -20,7 +20,7 @@ namespace MySqlConnection
 
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
             Energy.Query.Script script = new Energy.Query.Script.MySQL();
-            
+
             string query;
 
             query = script.CreateDescription(table);

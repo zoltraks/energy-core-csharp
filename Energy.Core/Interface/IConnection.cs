@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Data;
 
 namespace Energy.Interface
 {
+    /// <summary>
+    /// Common interface for database connection helper classes.
+    /// </summary>
     public interface IConnection
     {
         /// <summary>
-        /// Open connection
+        /// Connection string.
         /// </summary>
-        /// <returns></returns>
-        bool Open();
+        string ConnectionString { get; set; }
 
         /// <summary>
-        /// Close connection
+        /// DbConnection vendor class for database connection.
         /// </summary>
-        void Close();
+        Type Vendor { get; set; }
+
+        /// <summary>
+        /// Open new connection.
+        /// </summary>
+        /// <returns></returns>
+        IDbConnection Open();
 
         /// <summary>
         /// Execute SQL statement
@@ -24,22 +33,22 @@ namespace Energy.Interface
         /// <returns>Return negative error number (&lt;0) or number of rows affected (&gt;=0)</returns>
         int Execute(string query);
 
-        /// <summary>
-        /// Fetch query result
-        /// </summary>
-        /// <param name="query">SQL query</param>
-        /// <returns></returns>
-        System.Data.DataTable Fetch(string query);
+        ///// <summary>
+        ///// Fetch query result
+        ///// </summary>
+        ///// <param name="query">SQL query</param>
+        ///// <returns></returns>
+        //System.Data.DataTable Fetch(string query);
 
-        /// <summary>
-        /// Fetch query result
-        /// </summary>
-        /// <param name="query">SQL query</param>
-        /// <returns></returns>
-        System.Data.DataTable FetchDataTable(string query);
+        ///// <summary>
+        ///// Fetch query result
+        ///// </summary>
+        ///// <param name="query">SQL query</param>
+        ///// <returns></returns>
+        //System.Data.DataTable FetchDataTable(string query);
 
-        Energy.Base.Variant.Value Scalar(string query);
+        object Scalar(string query);
 
-        object Single(string query);
+        //object Single(string query);
     }
 }

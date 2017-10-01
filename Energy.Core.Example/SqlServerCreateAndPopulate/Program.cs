@@ -27,7 +27,7 @@ namespace SqlServerCreateAndPopulate
             string defaultConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Test;Integrated Security=Yes;Connect Timeout=10;";
             Console.WriteLine("Default connection string is {0}", defaultConnectionString);
             Console.Write("Connection string (enter \".\" to use default): ");
-            string connectionString = Console.ReadLine();
+            string connectionString = "."; // Console.ReadLine();
             if (connectionString == ".")
                 connectionString = defaultConnectionString;
             if (string.IsNullOrEmpty(connectionString))
@@ -41,9 +41,12 @@ namespace SqlServerCreateAndPopulate
                 {
                     if (c == null)
                         break;
+
+                    var outScalar = c.Scalar("SELECT * FROM logTable1");
+
                     //c.Pooling = true;
                     //if (c.Open() == null)
-                        //Console.WriteLine("Cannot open connection");
+                    //Console.WriteLine("Cannot open connection");
                 }
             } while (false);
 

@@ -13,7 +13,7 @@ namespace Energy.Source
     /// Data source configuration class
     /// </summary>
     public class Configuration
-    {     
+    {
         /// <summary>
         /// Connection string database dialect type.
         /// This value is used for making connection string for any SQL server in exact form recognized by server of that dialect.
@@ -135,7 +135,7 @@ namespace Energy.Source
         /// </summary>
         public string GetEntityConnectionString(string provider)
         {
-            return "metadata=res://*;provider=" + provider + ";provider connection string=\"" + GetConnectionString() + "\"";            
+            return "metadata=res://*;provider=" + provider + ";provider connection string=\"" + GetConnectionString() + "\"";
         }
 
         /// <summary>

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
 using System.Data.Common;
-using System.Xml.Serialization;
 using System.Threading;
 
 namespace Energy.Source
 {
+    #region Connection
+
     /// <summary>
     /// Database connection interface for application.
     /// To create new connection you have to specify vendor class which implements
@@ -15,7 +15,7 @@ namespace Energy.Source
     /// </summary>
     [Energy.Attribute.Markdown.Text(@"
 
-Persistent connections may be closed automatically when connection timeout is set.
+Connections may be closed automatically when connection timeout is set.
 
 That requires system timer to be set and reset every operation.
 
@@ -24,8 +24,9 @@ in a situation when multiple instances of software may be run at the same time t
 SQL server to run out of free connections.
 
     ")]
-    public class Connection : Energy.Interface.IConnection, Energy.Interface.ICopy<Connection>
-        , ICloneable, IDisposable
+    public partial class Connection : IDisposable, ICloneable
+    //, Energy.Interface.IConnection
+    //, Energy.Interface.ICopy<Connection>
     {
         #region Constructor
 
@@ -33,36 +34,98 @@ SQL server to run out of free connections.
 
         public Connection(Type vendor)
         {
-            if (vendor == null || !vendor.IsSubclassOf(typeof(DbConnection)))
-            {
-                throw new Exception("Vendor must derrive from DbConnection class");
-            }
             this.Vendor = vendor;
         }
 
-        public Connection(Type vendor, string connectionString, Energy.Enumeration.SqlDialect dialect)
+        public Connection(Type vendor, string connectionString)
             : this(vendor)
         {
-            this.Dialect = dialect;
             this.ConnectionString = connectionString;
         }
 
         public Connection(Type vendor, Configuration configuration)
             : this(vendor)
         {
-            this.Dialect = configuration.Dialect;
             this.ConnectionString = configuration.ConnectionString;
+        }
+
+        public Connection(DbConnection connection)
+        {
+            this.Vendor = connection.GetType();
+            this.ConnectionString = connection.ConnectionString;
+            this.Timeout = connection.ConnectionTimeout;
+        }
+
+        public Connection(Configuration configuration)
+        {
+            this.Configuration = configuration;
         }
 
         #endregion
 
         #region Lock
 
-        private readonly static object _PropertyLock = new object();
+        private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
+
+        private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
 
         #endregion
 
         #region Property
+
+        private string _ConnectionString;
+
+        /// <summary>
+        /// Connection string used for opening SQL connection.
+        /// Connection should be closed on change.
+        /// </summary>
+        public string ConnectionString
+        {
+            get
+            {
+                return _ConnectionString;
+            }
+            set
+            {
+                _ConnectionString = value;
+            }
+        }
+
+        private System.Type _Vendor;
+
+        /// <summary>
+        /// DbConnection vendor class for SQL connection.
+        /// </summary>
+        public System.Type Vendor
+        {
+            get
+            {
+                return _Vendor;
+            }
+            set
+            {
+                if (value == Vendor)
+                    return;
+                SetVendor(value);
+            }
+        }
+
+        private Energy.Source.Configuration _Configuration;
+
+        /// <summary>Configuration</summary>
+        public Energy.Source.Configuration Configuration
+        {
+            get
+            {
+                return _Configuration;
+            }
+            private set
+            {
+                if (_Configuration == value)
+                    return;
+                _Configuration = value;
+            }
+        }
 
         private int _Repeat = 1;
         /// <summary>Repeat operation after recoverable error</summary>
@@ -70,13 +133,13 @@ SQL server to run out of free connections.
         {
             get
             {
-                lock (_PropertyLock)
-                    return _Repeat;
+                return _Repeat;
             }
             set
             {
-                lock (_PropertyLock)
-                    _Repeat = value;
+                if (_Repeat == value)
+                    return;
+                _Repeat = value;
             }
         }
 
@@ -84,161 +147,40 @@ SQL server to run out of free connections.
         /// <summary>Time limit in seconds for SQL operations</summary>
         public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
 
-        private bool _Pooling = true;
-        /// <summary>Pooling</summary>
-        public bool Pooling
+        private Exception _ErrorException;
+        /// <summary>Repeat operation after recoverable error</summary>
+        public Exception ErrorException
         {
             get
             {
                 lock (_PropertyLock)
-                    return _Pooling;
+                    return _ErrorException;
             }
-            set
+            private set
             {
                 lock (_PropertyLock)
-                    _Pooling = value;
+                    _ErrorException = value;
             }
         }
 
         #endregion
 
-        //private Query.Dialect _Query;
-        ///// <summary>Query</summary>
-        //public Query.Dialect Query
-        //{
-        //    get
-        //    {
-        //        lock (_PropertyLock)
-        //        {
-        //            if (_Query == null && _Dialect != Enumeration.SqlDialect.None)
-        //                _Query = new Source.Query.Dialect(_Dialect);
-        //            return _Query;
-        //        }
-        //    }
-        //    set
-        //    {
-        //        lock (_PropertyLock)
-        //            _Query = value;
-        //    }
-        //}
-
-        private Energy.Enumeration.SqlDialect _Dialect;
-        private readonly object _DialectLock = new object();
-        /// <summary>Dialect</summary>
-        public Energy.Enumeration.SqlDialect Dialect
+        public void SetVendor(Type vendor)
         {
-            get
+            if (vendor == null)
+                throw new ArgumentNullException();
+            if (!vendor.IsSubclassOf(typeof(DbConnection)))
+                throw new Exception("Vendor must derrive from DbConnection class");
+            lock (_PropertyLock)
             {
-                lock (_PropertyLock)
-                    return _Dialect;
-            }
-            set
-            {
-                lock (_PropertyLock)
-                {
-                    _Dialect = value;
-                }
+                _Vendor = vendor;
             }
         }
-
-        private System.Type _Vendor;
-        private readonly object _VendorLock = new object();
-        /// <summary>
-        /// DbConnection vendor class for SQL connection
-        /// </summary>
-        public System.Type Vendor
-        {
-            get
-            {
-                lock (_VendorLock)
-                    return _Vendor;
-            }
-            set
-            {
-                if (value != Vendor)
-                {
-                    Close();
-                    Clear();
-                }
-                lock (_VendorLock)
-                    _Vendor = value;
-            }
-        }
-
-        private void Clear()
-        {
-            lock (_VendorLock)
-                _Vendor = null;
-            lock (_DriverLock)
-                _Driver = null;
-            //lock (_PropertyLock)
-            //    _Query = null;
-        }
-
-        /// <summary>
-        /// Connection string used for opening SQL connection.
-        /// Connection should be closed on change.
-        /// </summary>
-        public Energy.Base.ConnectionString ConnectionString { get; set; }
 
         /// <summary>
         /// Log
         /// </summary>
         public Energy.Core.Log Log { get; set; }
-
-        /// <summary>
-        /// Configuration
-        /// </summary>
-        public Energy.Core.Configuration Configuration { get; set; }
-
-        private class LO
-        {
-            public LO()
-            {
-                Console.WriteLine("LO");
-            }
-        }
-
-        private DbConnection _Driver;
-
-        private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
-
-        /// <summary>
-        /// SQL connection driver class.
-        /// </summary>
-        public DbConnection Driver
-        {
-            get
-            {
-                if (_Driver == null)
-                {
-                    lock (_DriverLock)
-                    {
-                        if (_Driver == null)
-                        {
-                            try
-                            {
-                                _Driver = (DbConnection)Activator.CreateInstance(_Vendor);
-                            }
-                            catch
-                            {
-                                throw;
-                            }
-                            _Driver.ConnectionString = ConnectionString.ToString();
-                        }
-                    }
-                }
-                return _Driver;
-            }
-            set
-            {
-                _Driver = value;
-                if (value != null)
-                {
-                    _Vendor = value.GetType();
-                }
-            }
-        }
 
         private int _ErrorNumber = 0;
         /// <summary>ErrorNumber</summary>
@@ -248,118 +190,106 @@ SQL server to run out of free connections.
         /// <summary>ErrorStatus</summary>
         public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } private set { lock (_PropertyLock) _ErrorStatus = value; } }
 
-        public bool Active
+        /// <summary>
+        /// Create connection object of vendor class.
+        /// Used by Open() to create DbConnection object.
+        /// </summary>
+        /// <returns></returns>
+        public DbConnection Create()
         {
-            get
-            {
-                lock (_DriverLock)
-                {
-                    if (_Driver == null)
-                        return false;
-                    if (_Driver.State == ConnectionState.Broken || _Driver.State == ConnectionState.Closed)
-                        return false;
-                    return true;
-                }
-            }
-        }
-
-        public bool Busy
-        {
-            get
-            {
-                lock (_DriverLock)
-                {
-                    if (_Driver == null)
-                        return false;
-                    if (_Driver.State == ConnectionState.Connecting || _Driver.State == ConnectionState.Executing || _Driver.State == ConnectionState.Fetching)
-                        return true;
-                    return false;
-                }
-            }
-        }
-
-        public bool Open()
-        {
-            if (Active)
-                Close();
+            Type vendor = Vendor;
+            DbConnection _ = null;
             try
             {
-                if (Log != null)
-                    Log.Write("Opening connection", Energy.Enumeration.LogLevel.Trace);
-
-                Driver.Open();
-
-                bool first = false;
-
-                while (Busy)
-                {
-                    if (first)
-                    {
-                        first = false;
-                        Thread.Sleep(0);
-                    }
-                    else
-                    {
-                        Thread.Sleep(1);
-                    }
-                }
-
-                return Active;
-            }
-            catch (DbException dbException)
-            {
-                if (Log == null)
-                    throw;
-                //Log.Write(dbException);
-                int code = 0;
-                Catch(dbException, null);
-                object _ = Energy.Base.Class.GetFieldOrPropertyValue(dbException, "Number", true, false);
-                if (_ != null && _ is int)
-                    code = (int)_;
-                Log.Write(dbException.Message, dbException.Source, code);
-                return false;
+                _ = (DbConnection)Activator.CreateInstance(vendor);
+                _.ConnectionString = ConnectionString;
             }
             catch (Exception x)
             {
-                if (Log == null)
+                if (!LogWrite(x))
                     throw;
-
-                Log.Write(x);
-                return false;
             }
+            finally
+            {
+            }
+            return _;
+        }
+
+        public DbConnection Open(DbConnection connection)
+        {
+            if (connection == null)
+                return null;
+
+            int timeout = Timeout;
+            if (timeout < 1 && connection.ConnectionTimeout > 0)
+                timeout = connection.ConnectionTimeout;
+            if (timeout < 1)
+                timeout = 5;
+
+            bool success = false;
+
+            // Open connection in separate thread
+            Thread thread = new Thread(delegate ()
+            {
+                try
+                {
+                    connection.Open();
+                    success = true;
+                }
+                catch (Exception x)
+                {
+                    ErrorException = x;
+                }
+            })
+            {
+                // Make sure it's marked as a background thread
+                // so it'll get cleaned up automatically
+                IsBackground = true,
+                CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
+            };
+            thread.Start();
+            thread.Join(timeout * 1000);
+
+            // If we didn't connect successfully, throw an exception
+            if (!success)
+            {
+                connection = null;
+            }
+
+            return connection;
+        }
+
+        public IDbConnection Open()
+        {
+            return Open(Create());
+        }
+
+        public static explicit operator Energy.Source.Connection(DbConnection connection)
+        {
+            Energy.Source.Connection _ = new Energy.Source.Connection(connection);
+            return _;
         }
 
         /// <summary>
-        /// Close connection
+        /// Check if database connection is active.
         /// </summary>
-        public void Close()
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        public static bool IsActive(DbConnection connection)
         {
-            DbException exception = null;
-            lock (_DriverLock)
+            if (connection == null)
+                return false;
+            switch (connection.State)
             {
-                if (_Driver == null)
-                    return;
-                try
-                {
-                    _Driver.Close();
-                }
-                catch (ObjectDisposedException x)
-                {
-                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.ExceptionMessage(x, true));
-                }
-                catch (DbException x)
-                {
-                    if (Log == null)
-                        throw;
-                    exception = x;
-                }
-                finally
-                {
-                    _Driver = null;
-                }
+                case ConnectionState.Open:
+                case ConnectionState.Executing:
+                case ConnectionState.Fetching:
+                    return true;
+                default:
+                case ConnectionState.Broken:
+                case ConnectionState.Closed:
+                    return false;
             }
-            if (exception != null && Log != null)
-                Log.Add(exception);
         }
 
         #region CatchResult
@@ -392,7 +322,7 @@ SQL server to run out of free connections.
 
             bool deadlock = false;
             /// <summary>
-            /// Connection damaged
+            /// Deadlock occured
             /// </summary>
             public bool Deadlock { get { return deadlock; } set { deadlock = value; } }
 
@@ -439,20 +369,19 @@ SQL server to run out of free connections.
         /// <summary>
         /// Check exception from database connection.
         ///
-        /// True for timeout and damaged connections.
-        /// False otherwise which probably may not have a chance to succeed.
+        /// True for timeout and damaged connections. They may be repeated.
+        /// False otherwise which means that operation may not have a chance to succeed.
         ///
         /// If exception may be temporary and can disappear after repeat,
         /// this function results true. If result is false, operation like
-        /// syntax error is final and exception cannot be "catched" by
-        /// repeating command.
+        /// syntax error is final and repeating command makes no sense.
         /// </summary>
         /// <remarks>
-        /// Returns true if operation can be repeated
+        /// Returns true if operation can be repeated.
         /// </remarks>
         /// <param name="exception"></param>
         /// <param name="command"></param>
-        /// <returns>True if operation can be repeated</returns>
+        /// <returns>True if operation can be repeated.</returns>
         private bool Catch(Exception exception, DbCommand command)
         {
             CatchResult result = new Energy.Source.Connection.CatchResult();
@@ -514,7 +443,7 @@ SQL server to run out of free connections.
                     case 297:   // The user does not have permission to perform this action
                         result.Access = true;
                         break;
-                    case -1: // Connection error, possibly reconnecting is required
+                    case -1:    // Connection error, possibly reconnecting is required
                         result.Damage = true;
                         break;
                     default:
@@ -528,6 +457,7 @@ SQL server to run out of free connections.
             }
 
             // Log
+            Core.Log log = Log ?? Core.Log.Default;
 
             if (Log != null)
             {
@@ -543,10 +473,6 @@ SQL server to run out of free connections.
                     command.Cancel();
                 }
                 catch { }
-
-                if (Configuration != null)
-                {
-                }
             }
 
             if (result.Damage)
@@ -557,8 +483,7 @@ SQL server to run out of free connections.
             if (Log != null)
                 Log.Add(result.ToString(), Enumeration.LogLevel.Error);
 
-            // For timeout and damaged connection error result is true.
-            // False otherwise which probably may not have a chance to succeed.
+            // For timeout and damaged connection result is true.
 
             return result.Timeout || result.Damage;
         }
@@ -584,173 +509,128 @@ SQL server to run out of free connections.
             return error.ToArray();
         }
 
-        public virtual DataSet Read(string query)
+        //public virtual DataTable Fetch(string query)
+        //{
+        //    return FetchDataTable(query);
+        //}
+
+        //public virtual DataTable FetchDataTable(string query)
+        //{
+        //    return FetchDataTableRead(query);
+        //}
+
+        public virtual DataTable Load(string query)
         {
-            bool active = Active;
+            ClearError();
 
-            if (!active && !Open()) return null;
+            using (IDbConnection connection = Open())
+            {
+                if (connection == null)
+                    return null;
+                return Load(connection, query);
+            }
+        }
 
-            if (!active) Close();
+        public DataTable Load(IDbConnection connection, string query)
+        {
+            using (IDbCommand command = Prepare(connection, query))
+            {
+                return Load(command);
+            }
+        }
 
-            return null;
+        private DataTable Load(IDbCommand command)
+        {
+            using (IDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection))
+            {
+                DataTable table = new DataTable();
+                table.Load(reader);
+                reader.Close();
+                return table;
+            }
+        }
+
+        private bool Catch(Exception x)
+        {
+            return Catch(x, null);
         }
 
         public virtual DataTable Fetch(string query)
         {
-            return FetchDataTable(query);
-        }
-
-        public virtual DataTable FetchDataTable(string query)
-        {
-            return FetchDataTableRead(query);
-        }
-
-        public virtual DataTable FetchDataTableLoad(string query)
-        {
-            if (!Active && !Open())
-                return null;
-
-            ClearError();
-
-            try
-            {
-                using (DbCommand command = Prepare(query))
-                {
-                    for (int i = 0; i <= _Repeat; i++)
-                    {
-                        try
-                        {
-                            CommandBehavior behaviour = Pooling ? CommandBehavior.CloseConnection : CommandBehavior.Default;
-                            using (DbDataReader reader = command.ExecuteReader(behaviour))
-                            {
-                                DataTable table = new DataTable();
-                                table.Load(reader);
-                                command.Cancel();
-                                //reader.Close(); // Reader will be closed in Dispose() so it is not needed in using section
-                                return table;
-                            }
-                        }
-                        catch (Exception x)
-                        {
-                            command.Cancel();
-                            SetError(x);
-                            if (Catch(x, command))
-                                continue;
-                            else
-                            {
-                                if (Log != null)
-                                    Log.Write(x);
-                                else
-                                    throw;
-                                return null;
-                            }
-                        }
-                    }
-
-                    return null;
-                }
-            }
-            finally
-            {
-                if (Pooling)
-                    Close();
-            }
-        }
-
-
-        public virtual DataTable FetchDataTableRead(string query)
-        {
-            ClearError();
+            //ClearError();
 
             DataTable table = null;
 
-            try
+            int repeat = _Repeat;
+            while (repeat-- >= 0)
             {
-                for (int n = 0; n <= _Repeat; n++)
+                using (IDbConnection connection = Open())
                 {
-                    if (!Active && !Open())
+                    if (connection == null)
                         return null;
-
-                    using (DbCommand command = Prepare(query))
+                    try
                     {
-                        try
-                        {
-                            CommandBehavior behaviour = GetDefaultCommandBehaviour();
-                            DbDataReader reader = command.ExecuteReader(behaviour);
+                        IDbCommand command = Prepare(connection, query);
+                        CommandBehavior behaviour = CommandBehavior.CloseConnection;
+                        IDataReader reader = command.ExecuteReader(behaviour);
 
-                            DataTable schema = reader.GetSchemaTable();
+                        DataTable schema = reader.GetSchemaTable();
 
-                            if (schema == null)
-                                break;
-
-                            table = new DataTable();
-
-                            List<DataColumn> list = new List<DataColumn>();
-                            foreach (DataRow row in schema.Rows)
-                            {
-                                string columnName = System.Convert.ToString(row["ColumnName"]);
-                                DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
-                                column.Unique = (bool)row["IsUnique"];
-                                column.AllowDBNull = (bool)row["AllowDBNull"];
-                                column.AutoIncrement = (bool)row["IsAutoIncrement"];
-                                list.Add(column);
-                                table.Columns.Add(column);
-                            }
-
-                            // Read rows from DataReader and populate the DataTable
-
-                            while (reader.Read())
-                            {
-                                DataRow row = table.NewRow();
-                                for (int i = 0; i < list.Count; i++)
-                                {
-                                    row[((DataColumn)list[i])] = reader[i];
-                                }
-                                table.Rows.Add(row);
-                            }
-
-                            command.Cancel();
-                            reader.Close();
-
+                        if (schema == null)
                             break;
-                        }
-                        catch (Exception x)
+
+                        table = new DataTable();
+
+                        List<DataColumn> list = new List<DataColumn>();
+                        foreach (DataRow row in schema.Rows)
                         {
-                            command.Cancel();
-                            SetError(x);
-                            if (Catch(x, command))
-                                continue;
-                            else
+                            string columnName = System.Convert.ToString(row["ColumnName"]);
+                            DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
+                            column.Unique = (bool)row["IsUnique"];
+                            column.AllowDBNull = (bool)row["AllowDBNull"];
+                            column.AutoIncrement = (bool)row["IsAutoIncrement"];
+                            list.Add(column);
+                            table.Columns.Add(column);
+                        }
+
+                        // Read rows from DataReader and populate the DataTable
+
+                        while (reader.Read())
+                        {
+                            DataRow row = table.NewRow();
+                            for (int i = 0; i < list.Count; i++)
                             {
-                                if (Log != null)
-                                    Log.Write(x);
-                                else
-                                    throw;
-                                return null;
+                                row[((DataColumn)list[i])] = reader[i];
                             }
+                            table.Rows.Add(row);
+                        }
+
+                        command.Cancel();
+                        reader.Close();
+
+                        break;
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (Catch(x))
+                            continue;
+                        else
+                        {
+                            if (!LogWrite(x))
+                                throw;
+                            return null;
                         }
                     }
                 }
-            }
-            finally
-            {
-                if (Pooling)
-                    Close();
             }
             return table;
         }
 
-        private CommandBehavior GetDefaultCommandBehaviour(CommandBehavior behaviour)
+        private bool LogWrite(Exception x)
         {
-            if (Pooling)
-                return behaviour | CommandBehavior.CloseConnection;
-            else
-                return behaviour | CommandBehavior.Default;
-        }
-
-        private CommandBehavior GetDefaultCommandBehaviour()
-        {
-            return GetDefaultCommandBehaviour(CommandBehavior.Default);
+            (Log ?? Energy.Core.Log.Default).Write(x);
+            return true;
         }
 
         private void SetError(Exception x)
@@ -775,8 +655,12 @@ SQL server to run out of free connections.
 
         private void ClearError()
         {
-            ErrorNumber = 0;
-            ErrorStatus = "";
+            lock (_PropertyLock)
+            {
+                _ErrorNumber = 0;
+                _ErrorStatus = "";
+                _ErrorException = null;
+            }
         }
 
         public virtual object Single(string query)
@@ -784,11 +668,9 @@ SQL server to run out of free connections.
             return new object();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
-        private DbCommand Prepare(string query)
+        public IDbCommand Prepare(IDbConnection connection, string query)
         {
-            DbCommand command = Driver.CreateCommand();
-            //command.Connection = _Driver;
+            IDbCommand command = connection.CreateCommand();
             command.CommandTimeout = Timeout;
             command.CommandText = query;
             return command;
@@ -796,52 +678,25 @@ SQL server to run out of free connections.
 
         public virtual int Execute(string query)
         {
-            //if (Pooling)
-            //{
-            //    using (IDbConnection connection = Open())
-            //    {
-            //        return Execute(connection, query);
-            //    }
-            //}
-            //else
-            //{
-            //    lock (_ShareLock)
-            //    {
-            //        if (_Connection == null)
-            //            _Connection = Open();
-            //        return Execute(_Connection, query);
-            //    }
-            //}
-
-            if (!Active && !Open())
-                return GetNegativeErrorNumber();
-
-            int count = 0;
-            using (DbCommand command = Prepare(query))
+            try
             {
-                try
+                using (IDbConnection connection = this.Open())
                 {
-                    count = command.ExecuteNonQuery();
-                    return count;
-                }
-                catch (DbException x)
-                {
-                    command.Cancel();
-                    SetError(x);
-                    return GetNegativeErrorNumber();
-                }
-                catch (Exception x)
-                {
-                    command.Cancel();
-                    SetError(x);
-                    return GetNegativeErrorNumber();
-                }
-                finally
-                {
-                    if (Pooling)
-                        Close();
+                    if (connection == null)
+                        return GetNegativeErrorNumber();
+                    return Execute(Prepare(connection, query));
                 }
             }
+            catch (Exception x)
+            {
+                LogWrite(x);
+            }
+            return -1;
+        }
+
+        public virtual int Execute(IDbCommand command)
+        {
+            return command.ExecuteNonQuery();
         }
 
         public virtual bool Bool(string query)
@@ -859,70 +714,50 @@ SQL server to run out of free connections.
             return query;
         }
 
+        public virtual string Parse(string query, Energy.Query.Parameter.Bag parameters)
+        {
+            return parameters.Parse(query);
+        }
+
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        public virtual object Scalar(IDbCommand command)
         {
-            if (disposing)
-            {
-                Close();
-            }
+            object value = command.ExecuteScalar();
+            return value;
         }
 
-        public virtual Energy.Base.Variant.Value Scalar(DbCommand command)
+        public virtual object Scalar(string query)
         {
-            ClearError();
-
-            DbException exception = null;
-
-            int repeat = Repeat;
-            while (true)
+            int repeat = _Repeat;
+            while (repeat-- >= 0)
             {
-                if (!Active && !Open())
-                    return null;
-
-                try
+                using (IDbConnection connection = Open())
                 {
-                    object value = command.ExecuteScalar();
-                    return new Energy.Base.Variant.Value(value);
-                }
-                catch (DbException x)
-                {
-                    command.Cancel();
-                    if (repeat-- > 0 && Catch(x, command))
-                        continue;
-                    SetError(x);
-                    if (Log == null)
-                        throw;
-                    else
-                        exception = x;
-                    return null;
-                }
-                finally
-                {
-                    if (Pooling)
-                        Close();
-                    if (exception != null)
-                        Log.Write(exception);
+                    if (connection == null)
+                        return null;
+                    try
+                    {
+                        return Scalar(connection, query);
+                    }
+                    catch (Exception x)
+                    {
+                        if (!Catch(x))
+                            return null;
+                    }
                 }
             }
+            return null;
         }
 
-        public virtual Energy.Base.Variant.Value Scalar(string query)
+        private object Scalar(IDbConnection connection, string query)
         {
-            using (DbCommand command = Prepare(query))
+            using (IDbCommand command = Prepare(connection, query))
             {
                 return Scalar(command);
             }
-        }
-
-        public virtual void Kill()
-        {
-            throw new NotImplementedException();
         }
 
         public string GetErrorText()
@@ -935,14 +770,24 @@ SQL server to run out of free connections.
             return string.Join(" ", list.ToArray());
         }
 
-        public Connection Copy()
+        public Energy.Source.Connection Copy()
         {
-            return null;
-        //    Energy.Source.Connection clone = new Energy.Source.Connection();
-        //    clone.ConnectionString = this.ConnectionString;
-        //    clone.Vendor = this.Vendor;
-        //    clone.Dialect = this.Dialect;
-        //    return clone;
+            Energy.Source.Connection copy = new Energy.Source.Connection();
+            lock (_PropertyLock)
+            {
+                if (!string.IsNullOrEmpty(_ConnectionString))
+                    copy.ConnectionString = _ConnectionString;
+                if (_Vendor != null)
+                    copy.Vendor = _Vendor;
+                if (_Configuration != null)
+                    copy.Configuration = _Configuration;
+            }
+            return copy;
+            //    Energy.Source.Connection clone = new Energy.Source.Connection();
+            //    clone.ConnectionString = this.ConnectionString;
+            //    clone.Vendor = this.Vendor;
+            //    clone.Dialect = this.Dialect;
+            //    return clone;
         }
 
         public object Clone()
@@ -950,6 +795,10 @@ SQL server to run out of free connections.
             return Copy();
         }
     }
+
+    #endregion
+
+    #region Generic
 
     /// <summary>
     /// Generic method with type of SQL connection driver class
@@ -960,19 +809,227 @@ SQL server to run out of free connections.
         public Connection()
         {
             this.Vendor = typeof(T);
-            Dialect = Energy.Query.Dialect.Guess(Vendor.Name, Vendor.FullName);
         }
 
         public Connection(string connectionString)
-            : this()
+            : base(typeof(T), connectionString)
         {
-            this.ConnectionString = connectionString;
-        }
-
-        public Connection(Energy.Enumeration.SqlDialect dialect)
-        {
-            this.Vendor = typeof(T);
-            this.Dialect = dialect;
         }
     }
+
+    #endregion
+
+    #region Static
+
+    public partial class Connection
+    {
+        /// <summary>
+        /// Persistent connection to database.
+        /// </summary>
+        public partial class Static : IDisposable
+        {
+            #region Lock
+
+            private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
+
+            private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
+
+            #endregion
+
+            #region Property
+
+            private DbConnection _Driver;
+
+            #region IDisposable Support
+
+            private bool disposedValue = false; // To detect redundant calls
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        // TODO: dispose managed state (managed objects).
+                    }
+
+                    // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                    // TODO: set large fields to null.
+
+                    disposedValue = true;
+                }
+            }
+
+            // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+            // ~Static() {
+            //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            //   Dispose(false);
+            // }
+
+            // This code added to correctly implement the disposable pattern.
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+                Dispose(true);
+                // TODO: uncomment the following line if the finalizer is overridden above.
+                // GC.SuppressFinalize(this);
+            }
+
+            #endregion
+
+            #endregion
+
+            #region Property
+
+            #endregion
+        }
+    }
+
+    #endregion
+
+    #region Base
+
+    public partial class Connection
+    {
+        public /*abstract*/ class DatabaseConnectionBase
+        {
+            private string _ConnectionString;
+
+            /// <summary>
+            /// Connection string used for opening SQL connection.
+            /// Connection should be closed on change.
+            /// </summary>
+            public string ConnectionString
+            {
+                get
+                {
+                    return _ConnectionString;
+                }
+                set
+                {
+                    if (value == _ConnectionString)
+                        return;
+                    _ConnectionString = value;
+                }
+            }
+
+            private System.Type _Vendor;
+
+            /// <summary>
+            /// DbConnection vendor class for SQL connection.
+            /// </summary>
+            public System.Type Vendor
+            {
+                get
+                {
+                    return _Vendor;
+                }
+                set
+                {
+                    if (value == _Vendor)
+                        return;
+                    _Vendor = value;
+                }
+            }
+
+            private int _Timeout = 30;
+            /// <summary>Time limit in seconds for SQL operations</summary>
+            public int Timeout
+            {
+                get
+                {
+                    return _Timeout;
+                }
+                set
+                {
+                    _Timeout = value;
+                }
+            }
+
+            /// <summary>
+            /// Create connection object of vendor class.
+            /// Used internally by Open() to create DbConnection object.
+            /// </summary>
+            /// <returns></returns>
+            public IDbConnection Create()
+            {
+                Type vendor = Vendor;
+                if (vendor == null)
+                    return null;
+                DbConnection _ = null;
+                try
+                {
+                    _ = (DbConnection)Activator.CreateInstance(vendor);
+                    _.ConnectionString = ConnectionString;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                }
+                return (IDbConnection)_;
+            }
+
+            public IDbCommand Prepare(IDbConnection connection, string query)
+            {
+                IDbCommand command = connection.CreateCommand();
+                command.CommandTimeout = Timeout;
+                command.CommandText = query;
+                return command;
+            }
+
+            public object Scalar(IDbCommand command)
+            {
+                object value = null;
+                try
+                {
+                    value = command.ExecuteScalar();
+                }
+                catch (Exception x)
+                {
+                    //Energy.Core.Bug.DebugWrite(x);
+                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.ExceptionMessage(x, true));
+                    throw;
+                }
+                return value;
+            }
+
+            public object Scalar(IDbConnection connection, string query)
+            {
+                return Scalar(Prepare(connection, query));
+            }
+
+            public object Scalar(string query)
+            {
+                using (IDbConnection connection = Create())
+                {
+                    if (connection == null)
+                        return null;
+                    try
+                    {
+                        connection.Open();
+                        try
+                        {
+                            return Scalar(connection, query);
+                        }
+                        finally
+                        {
+                            connection.Close();
+                        }
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                }
+                //return null;
+
+            }
+        }
+    }
+
+    #endregion
 }
+

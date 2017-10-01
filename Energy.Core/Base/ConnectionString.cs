@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace Energy.Base
 {
     /// <summary>
-    /// ODBC style connection string
+    /// ODBC style connection string.
     /// </summary>
     [Serializable]
     public class ConnectionString : Dictionary<string, string>
@@ -160,6 +160,6 @@ namespace Energy.Base
                 return value.Substring(1, value.Length - 2).Replace("''", "'");
             }
             return value;
-        }        
+        }
     }
 }
