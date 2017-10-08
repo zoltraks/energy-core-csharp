@@ -34,36 +34,39 @@ namespace Energy.Core
             request.Method = method;
             if (!string.IsNullOrEmpty(contentType))
                 request.ContentType = contentType;
+            //if (acceptType != null && acceptType.Length > 0)
+            //    request.Accept = acceptType[0];
             if (!string.IsNullOrEmpty(acceptType))
                 request.Accept = acceptType;
 
-            byte[] data = null;
-
-            if (string.IsNullOrEmpty(body))
+            if (!string.IsNullOrEmpty(body))
             {
-                request.ContentLength = 0;
-            }
-            else
-            {
-                data = encoding.GetBytes(body);
+                byte[] data = encoding.GetBytes(body);
                 request.ContentLength = data.Length;
+
+                using (Stream requestStream = request.GetRequestStream())
+                {
+                    if (requestStream == null)
+                        return null;
+
+                    requestStream.Write(data, 0, data.Length);
+                    requestStream.Flush();
+                    requestStream.Close();
+                }
             }
 
-            WebResponse webResponse;
-            webResponse = request.GetResponse();
-
-            using (Stream webStream = webResponse.GetResponseStream())
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
-                if (webStream == null)
-                    return null;
-
-                if (data != null)
-                    webStream.Write(data, 0, data.Length);
-
-                using (StreamReader responseReader = new StreamReader(webStream, encoding, detectEncodingFromByteOrderMarks))
+                using (Stream responseStream = response.GetResponseStream())
                 {
-                    string response = responseReader.ReadToEnd();
-                    return response;
+                    if (responseStream == null)
+                        return null;
+
+                    using (StreamReader responseReader = new StreamReader(responseStream, encoding, detectEncodingFromByteOrderMarks))
+                    {
+                        string responseText = responseReader.ReadToEnd();
+                        return responseText;
+                    }
                 }
             }
         }
@@ -72,11 +75,23 @@ namespace Energy.Core
         /// Perform GET and return string from URL.
         /// </summary>
         /// <param name="url"></param>
+        /// <param name="body"></param>
         /// <param name="acceptType"></param>
         /// <returns></returns>
-        public static string Get(string url, string acceptType)
+        public static string Get(string url, string body, string acceptType)
         {
-            return Rest("GET", url, null, null, acceptType, null, true);
+            return Rest("GET", url, body, null, acceptType, null, true);
+        }
+
+        /// <summary>
+        /// Perform GET and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static string Get(string url, string body)
+        {
+            return Rest("GET", url, body, null, null, null, true);
         }
 
         /// <summary>
@@ -87,6 +102,61 @@ namespace Energy.Core
         public static string Get(string url)
         {
             return Rest("GET", url, null, null, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform POST and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static string Post(string url, string body, string contentType)
+        {
+            return Rest("POST", url, body, contentType, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform POST and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static string Post(string url, string body)
+        {
+            return Rest("POST", url, body, null, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform POST and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string Post(string url)
+        {
+            return Rest("POST", url, null, null, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform PUT and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static string Put(string url, string body, string contentType)
+        {
+            return Rest("PUT", url, body, contentType, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform PUT and return string from URL.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static string Put(string url)
+        {
+            return Rest("PUT", url, null, null, null, null, true);
         }
     }
 }
