@@ -13,7 +13,7 @@ namespace Energy.Core
     public class Web
     {
         /// <summary>
-        /// Perform GET and return string from URL.
+        /// Perform GET and return string from URL
         /// </summary>
         /// <param name="method"></param>
         /// <param name="url"></param>
@@ -72,7 +72,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return string from URL.
+        /// Perform GET and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -84,7 +84,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return string from URL.
+        /// Perform GET and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -95,7 +95,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return string from URL.
+        /// Perform GET and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -105,7 +105,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return string from URL.
+        /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -117,7 +117,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return string from URL.
+        /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -128,7 +128,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return string from URL.
+        /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -138,7 +138,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return string from URL.
+        /// Perform PUT and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -150,13 +150,24 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return string from URL.
+        /// Perform PUT and return string from URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
         public static string Put(string url)
         {
             return Rest("PUT", url, null, null, null, null, true);
+        }
+
+        /// <summary>
+        /// Perform PUT and return string from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static string Put(string url, string body)
+        {
+            return Rest("PUT", url, body, null, null, null, true);
         }
     }
 }
