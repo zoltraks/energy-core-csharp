@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>17.09.4.1</Version>
+    <Version>17.10.1</Version>
     <FileVersion>17.9.4.1</FileVersion>
     <AssemblyVersion>2017.10.01</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
@@ -29,6 +29,10 @@
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DefineConstants>TRACE;DEBUG;NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

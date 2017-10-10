@@ -21,10 +21,16 @@ namespace Energy.Core
         /// <param name="contentType"></param>
         /// <param name="acceptType"></param>
         /// <param name="encoding"></param>
+        /// <param name="headerArray"></param>
         /// <param name="detectEncodingFromByteOrderMarks"></param>
         /// <returns></returns>
-        public static string Rest(string method, string url, string body, string contentType, string acceptType
-            , System.Text.Encoding encoding, bool detectEncodingFromByteOrderMarks)
+        public static string Rest(string method, string url
+            , string body
+            , string contentType
+            , string acceptType
+            , System.Text.Encoding encoding
+            , string[] headerArray
+            , bool detectEncodingFromByteOrderMarks)
         {
             if (encoding == null)
                 encoding = System.Text.Encoding.UTF8;
@@ -38,6 +44,14 @@ namespace Energy.Core
             //    request.Accept = acceptType[0];
             if (!string.IsNullOrEmpty(acceptType))
                 request.Accept = acceptType;
+
+            if (headerArray != null && headerArray.Length > 0)
+            {
+                for (int i = 0; i < headerArray.Length / 2; i++)
+                {
+                    request.Headers.Add(headerArray[i], headerArray[i + 1]);
+                }
+            }
 
             if (!string.IsNullOrEmpty(body))
             {
@@ -80,7 +94,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Get(string url, string body, string acceptType)
         {
-            return Rest("GET", url, body, null, acceptType, null, true);
+            return Rest("GET", url, body, null, acceptType, null, null, true);
         }
 
         /// <summary>
@@ -91,7 +105,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Get(string url, string body)
         {
-            return Rest("GET", url, body, null, null, null, true);
+            return Rest("GET", url, body, null, null, null, null, true);
         }
 
         /// <summary>
@@ -101,7 +115,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Get(string url)
         {
-            return Rest("GET", url, null, null, null, null, true);
+            return Rest("GET", url, null, null, null, null, null, true);
         }
 
         /// <summary>
@@ -113,7 +127,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Post(string url, string body, string contentType)
         {
-            return Rest("POST", url, body, contentType, null, null, true);
+            return Rest("POST", url, body, contentType, null, null, null, true);
         }
 
         /// <summary>
@@ -124,7 +138,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Post(string url, string body)
         {
-            return Rest("POST", url, body, null, null, null, true);
+            return Rest("POST", url, body, null, null, null, null, true);
         }
 
         /// <summary>
@@ -134,7 +148,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Post(string url)
         {
-            return Rest("POST", url, null, null, null, null, true);
+            return Rest("POST", url, null, null, null, null, null, true);
         }
 
         /// <summary>
@@ -146,7 +160,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Put(string url, string body, string contentType)
         {
-            return Rest("PUT", url, body, contentType, null, null, true);
+            return Rest("PUT", url, body, contentType, null, null, null, true);
         }
 
         /// <summary>
@@ -156,7 +170,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Put(string url)
         {
-            return Rest("PUT", url, null, null, null, null, true);
+            return Rest("PUT", url, null, null, null, null, null, true);
         }
 
         /// <summary>
@@ -167,7 +181,12 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Put(string url, string body)
         {
-            return Rest("PUT", url, body, null, null, null, true);
+            return Rest("PUT", url, body, null, null, null, null, true);
+        }
+
+        public static string Post(string url, string body, string contentType, string[] headerArray)
+        {
+            return Rest("POST", url, body, contentType, null, null, headerArray, true);
         }
     }
 }
