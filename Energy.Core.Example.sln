@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2010
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core", "Energy.Core\Energy.Core.csproj", "{C8A325C9-5193-4819-9668-03F70904C9B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Core", "Energy.Core\Energy.Core.csproj", "{C8A325C9-5193-4819-9668-03F70904C9B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySqlConnection", "Energy.Core.Example\MySqlConnection\MySqlConnection.csproj", "{C7F68FAF-C523-440E-969D-D0897FD8F98B}"
 EndProject
@@ -32,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlSerializationExample", "Energy.Core.Example\XmlSerializationExample\XmlSerializationExample.csproj", "{F70DC188-8A5B-496C-90B1-1F57012B824A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerCreateAndPopulate", "Energy.Core.Example\SqlServerCreateAndPopulate\SqlServerCreateAndPopulate.csproj", "{AA72D0D1-2A1F-4102-88C1-4A1DF3A7B08A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocateCommand", "Energy.Core.Example\LocateCommand\LocateCommand.csproj", "{65EDE8BC-E46E-41C2-87D9-821802EE9369}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +207,18 @@ Global
 		{AA72D0D1-2A1F-4102-88C1-4A1DF3A7B08A}.Release|Mixed Platforms.Build.0 = Release|x86
 		{AA72D0D1-2A1F-4102-88C1-4A1DF3A7B08A}.Release|x86.ActiveCfg = Release|x86
 		{AA72D0D1-2A1F-4102-88C1-4A1DF3A7B08A}.Release|x86.Build.0 = Release|x86
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Debug|x86.Build.0 = Debug|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|x86.ActiveCfg = Release|Any CPU
+		{65EDE8BC-E46E-41C2-87D9-821802EE9369}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

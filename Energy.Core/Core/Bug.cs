@@ -93,12 +93,21 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Return calling method name.
+        /// Return calling method name
         /// </summary>
         /// <returns>string</returns>
         public static string CallingMethod()
         {
             return CallingMethod(1);
+        }
+
+        /// <summary>
+        /// Handle exception
+        /// </summary>
+        /// <param name="exception"></param>
+        public static void Catch(Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine(ExceptionMessage(exception, true));
         }
     }
 }

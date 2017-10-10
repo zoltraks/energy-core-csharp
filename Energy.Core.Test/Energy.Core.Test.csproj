@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\File.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Base\Color.cs" />

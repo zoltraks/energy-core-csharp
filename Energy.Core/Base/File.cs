@@ -223,7 +223,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Return unique name for file by checking it's not exists.
-        /// This method may create empty file if reserve option is set true and it is 
+        /// This method may create empty file if reserve option is set true and it is
         /// </summary>
         /// <param name="file">string</param>
         /// <param name="path">string</param>
@@ -434,41 +434,125 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file
+        /// Locate command file
         /// </summary>
         /// <param name="command">string</param>
         /// <param name="search">string[]</param>
         /// <returns>string</returns>
         public static string Locate(string command, string[] search)
         {
-            if (System.IO.File.Exists(command)) return command;
-            if (search == null || search.Length == 0) return "";
-            bool extension = command.Contains(".");
-            string separator = System.IO.Path.DirectorySeparatorChar.ToString();
-            string[] executable = new string[] { ".exe", ".cmd", ".bat" };
-            string candidate;
-            foreach (string directory in search)
+            string[] executable = new string[] { "", ".exe", ".cmd", ".bat" };
+
+            return Locate(command, search, executable, Energy.Enumeration.LocateBehaviour.Default);
+        }
+
+        /// <summary>
+        /// Locate file with one of possible extensions in any directory and return full path to it
+        /// </summary>
+        /// <param name="file">File name with or without extension and leading path</param>
+        /// <param name="search">Directory search list</param>
+        /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
+        /// <returns>Empty string if file not found or full path to found one</returns>
+        public static string Locate(string file, string[] search, string[] extension)
+        {
+            return Locate(file, search, extension, Energy.Enumeration.LocateBehaviour.Default);
+        }
+
+        /// <summary>
+        /// Locate file with one of possible extensions in any directory and return full path to it
+        /// </summary>
+        /// <param name="file">File name with or without extension and leading path</param>
+        /// <param name="search">Directory search list</param>
+        /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
+        /// <param name="behaviour">Lookup behaviour (iterate over directories or extensions)</param>
+        /// <returns>Empty string if file not found or full path to found one</returns>
+        public static string Locate(string file, string[] search, string[] extension, Energy.Enumeration.LocateBehaviour behaviour)
+        {
+            if (string.IsNullOrEmpty(file))
+                return "";
+
+            if (search == null || search.Length == 0)
+                search = new string[] { "" };
+
+            if (extension == null || extension.Length == 0)
+                extension = new string[] { "" };
+
+            string fileExtension = System.IO.Path.GetExtension(file);
+
+            if (fileExtension.Length > 0)
             {
-                string path = directory;
-                if (!path.EndsWith(separator)) path += separator;
-                if (extension)
-                {
-                    if (System.IO.File.Exists(candidate = path + command))
+                string[] array = new string[extension.Length + 1];
+                array[0] = fileExtension;
+                Array.Copy(extension, 0, array, 1, extension.Length);
+                extension = array;
+            }
+
+            if (file.EndsWith("."))
+            {
+                file = file.Substring(0, file.Length - 1);
+                if (file.Length == 0)
+                    return "";
+            }
+
+            switch (behaviour)
+            {
+                case Energy.Enumeration.LocateBehaviour.Directories:
+
+                    for (int i = 0; i < search.Length; i++)
                     {
-                        return candidate;
-                    }
-                }
-                else
-                {
-                    foreach (string suffix in executable)
-                    {
-                        if (System.IO.File.Exists(candidate = path + command + suffix))
+                        string directory = search[i];
+
+                        if (string.IsNullOrEmpty(directory))
+                            directory = System.IO.Directory.GetCurrentDirectory();
+
+                        try
                         {
-                            return candidate;
+                            foreach (string ext in extension)
+                            {
+                                string candidate = System.IO.Path.Combine(directory, file);
+
+                                if (!string.IsNullOrEmpty(ext) && 0 != string.Compare(".", ext, false))
+                                    candidate = System.IO.Path.ChangeExtension(candidate, ext);
+
+                                if (System.IO.File.Exists(candidate))
+                                    return candidate;
+                            }
+                        }
+                        catch (Exception x)
+                        {
+                            Energy.Core.Bug.Catch(x);
                         }
                     }
-                }
+
+                    break;
+
+                case Energy.Enumeration.LocateBehaviour.Extensions:
+
+                    foreach (string ext in extension)
+                    {
+                        foreach (string directory in search)
+                        {
+                            try
+                            {
+                                string candidate = System.IO.Path.Combine(directory, file);
+
+                                if (!string.IsNullOrEmpty(ext) && 0 == string.Compare(".", ext, false))
+                                    candidate = System.IO.Path.ChangeExtension(candidate, ext);
+
+                                if (System.IO.File.Exists(candidate))
+                                    return candidate;
+                            }
+                            catch (Exception x)
+                            {
+                                Energy.Core.Bug.Catch(x);
+                            }
+                        }
+                    }
+
+                    break;
+
             }
+
             return "";
         }
 
