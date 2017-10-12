@@ -72,11 +72,12 @@ namespace Energy.Query
             public TypeDictionary Type = new TypeDictionary();
 
             private bool _Explicit;
-            
+
             /// <summary>
             /// Parameter names must be explicit.
             /// If set to false, parameters with single at sign (@var)
-            /// can be defined in shorter form ("var").</summary>
+            /// can be defined in shorter form ("var").
+            /// </summary>
             public bool Explicit { get { return _Explicit; } set { _Explicit = value; } }
 
             /// <summary>
@@ -96,7 +97,7 @@ namespace Energy.Query
                 int δ = 0;
                 foreach (Energy.Base.Bracket.SearchResult _ in Bracket.Search(input))
                 {
-                    string variable = _.Value;                   
+                    string variable = _.Value;
                     if (!this.ContainsKey(variable))
                     {
                         if (!_Explicit && variable.Length > 1 && variable.StartsWith("@") && variable[1] != '@')

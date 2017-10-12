@@ -477,6 +477,22 @@ namespace Energy.Base
                     return Index.ContainsKey(map);
                 }
             }
+
+            /// <summary>
+            /// Return array as multiline string containing key value pairs
+            /// concatenated with glue string.
+            /// </summary>
+            /// <param name="glue"></param>
+            /// <returns></returns>
+            public string ToString(string glue)
+            {
+                System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
+                foreach (KeyValuePair<string, T> e in this)
+                {
+                    list.Add(string.Concat(e.Key, glue, Energy.Base.Cast.ObjectToString(e.Value)));
+                }
+                return string.Join(Environment.NewLine, list.ToArray());
+            }
         }
 
         [Serializable]
