@@ -792,7 +792,10 @@ namespace Energy.Core
 
             message = string.Join(eol, list.ToArray());
 
-            Tilde.Write(message);
+            if (trace)
+                Tilde.WriteLine(message);
+            else
+                Tilde.Write(message);
         }
 
         /// <summary>

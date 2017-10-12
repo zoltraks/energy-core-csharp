@@ -9,17 +9,25 @@ namespace Energy.Query
     /// </summary>
     public class Parameter
     {
+        #region Bag
+
+        public class Bag : List { }
+
+        #endregion
+
+        #region List
+
         /// <summary>
         /// Parameter bag.
         /// Use it to define parameters for parametrized query and to parse it.
         /// </summary>
-        public class Bag : Energy.Base.Collection.StringDictionary<object>
+        public class List : Energy.Base.Collection.StringDictionary<object>
         {
             private Energy.Query.Format _Format;
             /// <summary>Format</summary>
             public Energy.Query.Format Format { get { return _Format; } set { _Format = value; } }
 
-            public Bag()
+            public List()
             {
                 this.CaseSensitive = false;
             }
@@ -71,14 +79,50 @@ namespace Energy.Query
 
             public TypeDictionary Type = new TypeDictionary();
 
-            private bool _Explicit;
+            private Option _Option;
+
+            /// <summary>
+            /// Parser options
+            /// </summary>
+            public Option Option { get { return _Option; } set { _Option = value; } }
 
             /// <summary>
             /// Parameter names must be explicit.
             /// If set to false, parameters with single at sign (@var)
             /// can be defined in shorter form ("var").
             /// </summary>
-            public bool Explicit { get { return _Explicit; } set { _Explicit = value; } }
+            public bool Explicit
+            {
+                get
+                {
+                    return (_Option & Option.Explicit) > 0;
+                }
+                set
+                {
+                    if (value)
+                        _Option |= Option.Explicit;
+                    else
+                        _Option &= ~Option.Explicit;
+                }
+            }
+
+            /// <summary>
+            /// Parse null values as zero when converting to number type.
+            /// </summary>
+            public bool NullAsZero
+            {
+                get
+                {
+                    return (_Option & Option.NullAsZero) > 0;
+                }
+                set
+                {
+                    if (value)
+                        _Option |= Option.NullAsZero;
+                    else
+                        _Option &= ~Option.NullAsZero;
+                }
+            }
 
             /// <summary>
             /// Parse parametrized query string.
@@ -100,7 +144,10 @@ namespace Energy.Query
                     string variable = _.Value;
                     if (!this.ContainsKey(variable))
                     {
-                        if (!_Explicit && variable.Length > 1 && variable.StartsWith("@") && variable[1] != '@')
+                        if (!Explicit
+                            && variable.Length > 1
+                            && variable.StartsWith("@")
+                            && variable[1] != '@')
                         {
                             variable = variable.Substring(1);
                             if (!this.ContainsKey(variable))
@@ -119,7 +166,7 @@ namespace Energy.Query
                             break;
 
                         case Energy.Enumeration.FormatType.Number:
-                            text = format.Number(value);
+                            text = format.Number(value, !NullAsZero);
                             break;
 
                         case Energy.Enumeration.FormatType.Date:
@@ -150,5 +197,24 @@ namespace Energy.Query
                 this.Type[key] = format;
             }
         }
+
+        #endregion
+
+        #region Option
+
+        /// <summary>
+        /// Parameter option
+        /// </summary>
+        [Flags]
+        public enum Option
+        {
+            Explicit = 1,
+
+            NullAsZero = 2,
+
+            ZeroAsNull = 4,
+        }
+
+        #endregion
     }
 }

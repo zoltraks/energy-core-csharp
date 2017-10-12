@@ -714,7 +714,7 @@ SQL server to run out of free connections.
             return query;
         }
 
-        public virtual string Parse(string query, Energy.Query.Parameter.Bag parameters)
+        public virtual string Parse(string query, Energy.Query.Parameter.List parameters)
         {
             return parameters.Parse(query);
         }
