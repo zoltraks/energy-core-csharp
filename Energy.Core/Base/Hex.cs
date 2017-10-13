@@ -130,7 +130,7 @@ namespace Energy.Base
         {
             if (b == 0 || b == 128 || b == 255) return ' ';
             if (b < 32) return '.';
-            if (b > 128) return '.';
+            if (b > 126) return '.';
             return (char)b;
         }
 

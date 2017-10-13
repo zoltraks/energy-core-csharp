@@ -104,7 +104,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Constructor
 
         /// <summary>
         /// Constructor
@@ -120,7 +120,8 @@ namespace Energy.Base
         /// <param name="data"></param>
         public ByteArrayBuilder(byte[] data)
         {
-            _Stream = new System.IO.MemoryStream(data);
+            _Stream = new System.IO.MemoryStream();
+            _Stream.Write(data, 0, data.Length);
         }
 
         #endregion
@@ -892,6 +893,19 @@ namespace Energy.Base
             int length = (int)_Stream.Length;
             byte[] data = new byte[length];
             Array.Copy(_Stream.GetBuffer(), data, length);
+            return data;
+        }
+
+        /// <summary>
+        /// Returns the builder as an array of bytes.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public byte[] ToArray(int position, int length)
+        {
+            byte[] data = new byte[length];
+            Array.Copy(_Stream.GetBuffer(), position, data, 0, length);
             return data;
         }
 
