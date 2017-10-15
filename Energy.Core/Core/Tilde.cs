@@ -659,7 +659,7 @@ namespace Energy.Core
         /// <param name="text"></param>
         public static void WriteLine(ConsoleColor color, string text)
         {
-            text = string.Concat(ConsoleColorToTildeColor(color), Strip(text));
+            text = string.Concat(ConsoleColorToTildeColor(color), Escape(Strip(text)));
             WriteLine(text);
         }
 
@@ -800,9 +800,18 @@ namespace Energy.Core
 
         #region Escape
 
+        /// <summary>
+        /// Escape string which may contain tilde character
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Escape(string text)
         {
-            return text;
+            if (string.IsNullOrEmpty(text))
+                return text;
+            if (text.IndexOf('~') < 0)
+                return text;
+            return string.Concat("~#", text.Replace("#", "##"), "#~");
         }
 
         #endregion
