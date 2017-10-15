@@ -102,8 +102,13 @@ namespace Energy.Base
 ";
 
         /// <summary>
-        /// Expression for finding root element in XML.
+        /// Expression for finding root element in XML
         /// </summary>
         public static readonly string XmlRootName = @"(?:<\?[xX][mM][lL][^>]*>\s*)?(?:<\s*([a-zA-Z_][^\s>]*))";
+
+        /// <summary>
+        /// Expression for matching tilde color text
+        /// </summary>
+        public static readonly string TildeText = @"~\#(?:\#\#|[^\#])*\#~|~\d+~|~[\w\d]+~|~+|[^~]+";
     }
 }

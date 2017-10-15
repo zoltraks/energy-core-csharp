@@ -102,7 +102,7 @@ namespace SqlServerPlainReport
             Console.WriteLine("Using FetchDataTable()");
             benchmark = Energy.Core.Benchmark.Profile(() =>
             {
-                DataTable t10 = db.FetchDataTableLoad(query);
+                DataTable t10 = db.FetchDataTable(query);
                 if (t10 == null)
                     Console.WriteLine(db.GetErrorText());
                 else

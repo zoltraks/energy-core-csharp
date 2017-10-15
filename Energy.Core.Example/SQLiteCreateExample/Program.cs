@@ -14,7 +14,7 @@ namespace SQLiteCreateExample
                 db = Test.ConnectToMemoryDatabase();
                 Test.CreateSeveralTables();
                 //Console.ReadLine();
-                db.Close();
+                //db.Close();
 
                 Test1(args);
             }

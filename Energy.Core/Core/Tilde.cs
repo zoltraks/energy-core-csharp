@@ -48,7 +48,7 @@ namespace Energy.Core
         /// <summary>
         /// List of texts with different coloring
         /// </summary>
-        public class TextList : List<TextList.Item>
+        public class ColorTextList : List<ColorTextList.Item>
         {
             /// <summary>
             /// Item
@@ -64,6 +64,50 @@ namespace Energy.Core
                 /// Text
                 /// </summary>
                 public string Text;
+            }
+
+            /// <summary>
+            /// Total count of characters
+            /// </summary>
+            public int TotalLength
+            {
+                get
+                {
+                    return GetTotalLength();
+                }
+            }
+
+            /// <summary>
+            /// Join list of string with glue
+            /// </summary>
+            /// <param name="glue"></param>
+            /// <returns></returns>
+            public string Join(string glue)
+            {
+                List<string> list = new List<string>();
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(this[i].Text))
+                        continue;
+                    list.Add(this[i].Text);
+                }
+                return string.Join(glue, list.ToArray());
+            }
+
+            /// <summary>
+            /// Get total length
+            /// </summary>
+            /// <returns></returns>
+            public int GetTotalLength()
+            {
+                int count = 0;
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (this[i].Text == null)
+                        continue;
+                    count += this[i].Text.Length;
+                }
+                return count;
             }
         }
 
@@ -109,23 +153,39 @@ namespace Energy.Core
         public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
 
         private static string _ExampleColorPalleteTildeString = ""
-            + "~darkblue~ ~ darkblue ~   ~ 1 ~   "
-            + "~darkgreen~ ~ darkgreen ~  ~ 2 ~   "
-            + "~darkcyan~ ~ darkcyan ~  ~ 3 ~    "
-            + "~darkred~ ~ darkred ~  ~ 4 ~    "
-            + "~darkmagenta~ ~ darkmagenta ~  ~ 5 ~    "
-            + "~darkyellow~ ~ darkyellow ~  ~ 6 ~    "
-            + "~gray~ ~ gray ~  ~ 7 ~    "
-            + "~darkgray~ ~ darkgray ~  ~ 8 ~    "
-            + "~blue~ ~ blue ~  ~ 9 ~    "
-            + "~green~ ~ green ~  ~ 10 ~    "
-            + "~cyan~ ~ cyan ~  ~ 11 ~    "
-            + "~red~ ~ red ~  ~ 12 ~    "
-            + "~magenta~ ~ magenta ~  ~ 13 ~    "
-            + "~yellow~ ~ yellow ~  ~ 14 ~    "
-            + "~white~ ~ white ~  ~ 15 ~    "
-            + "~black~ ~ black ~  ~ 16 ~    "
+            + "~darkblue~~#~1~#~\t~#~darkblue~#~"
+            + Environment.NewLine
+            + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
+            + Environment.NewLine
+            + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
+            + Environment.NewLine
+            + "~darkred~~#~4~#~\t~#~darkred~#~"
+            + Environment.NewLine
+            + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
+            + Environment.NewLine
+            + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
+            + Environment.NewLine
+            + "~gray~~#~7~#~\t~#~gray~#~"
+            + Environment.NewLine
+            + "~darkgray~~#~8~#~\t~#~darkgray~#~"
+            + Environment.NewLine
+            + "~blue~~#~9~#~\t~#~blue~#~"
+            + Environment.NewLine
+            + "~green~~#~10~#~\t~#~green~#~"
+            + Environment.NewLine
+            + "~cyan~~#~11~#~\t~#~cyan~#~"
+            + Environment.NewLine
+            + "~red~~#~12~#~\t~#~red~#~"
+            + Environment.NewLine
+            + "~magenta~~#~13~#~\t~#~magenta~#~"
+            + Environment.NewLine
+            + "~yellow~~#~14~#~\t~#~yellow~#~"
+            + Environment.NewLine
+            + "~white~~#~15~#~\t~#~white~#~"
+            + Environment.NewLine
+            + "~black~~#~16~#~\t~#~black~#~"
             ;
+
         /// <summary>
         /// Cheat sheet for all colors defined by default
         /// </summary>
@@ -140,22 +200,29 @@ namespace Energy.Core
         /// </summary>
         /// <param name="message">Text</param>
         /// <returns>List of texts</returns>
-        public static TextList Explode(string message)
+        public static ColorTextList Explode(string message)
         {
             if (message == null)
                 return null;
-            TextList list = new TextList();
-            Match m = Regex.Match(message, @"~\d+~|~[\w\d]+~|~+|[^~]+");
+            ColorTextList list = new ColorTextList();
+            Match m = Regex.Match(message, Energy.Base.Pattern.TildeText);
             System.ConsoleColor? current = null;
             while (m.Success)
             {
-                if (m.Value.StartsWith("~") && m.Value.EndsWith("~") && m.Value.Length > 2)
+                string value = m.Value;
+                if (value.Length >= 4 && value.StartsWith("~#") && value.EndsWith("#~"))
                 {
-                    current = TildeColorToConsoleColor(m.Value);
+                    list.Add(new ColorTextList.Item() { Color = current
+                        , Text = value.Substring(2, value.Length - 4).Replace("##", "#") });
+                }
+                else if (value.Length > 2 && value.StartsWith("~") && value.EndsWith("~") && value[1] != '~')
+                {
+                    current = TildeColorToConsoleColor(value);
                 }
                 else
                 {
-                    list.Add(new TextList.Item() { Color = current, Text = m.Value });
+                    list.Add(new ColorTextList.Item() { Color = current
+                        , Text = value });
                 }
                 m = m.NextMatch();
             }
@@ -360,7 +427,7 @@ namespace Energy.Core
         {
             if (string.IsNullOrEmpty(value))
                 return;
-            TextList list = Explode(value);
+            ColorTextList list = Explode(value);
             if (list.Count == 0)
                 return;
             lock (_ConsoleLock)
@@ -592,7 +659,7 @@ namespace Energy.Core
         /// <param name="text"></param>
         public static void WriteLine(ConsoleColor color, string text)
         {
-            text = string.Concat(ConsoleColorToTildeColor(color), text);
+            text = string.Concat(ConsoleColorToTildeColor(color), Strip(text));
             WriteLine(text);
         }
 
@@ -749,7 +816,8 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Strip(string text)
         {
-            return text;
+            ColorTextList list = Explode(text);
+            return list.Join("");
         }
 
         #endregion
@@ -911,6 +979,20 @@ namespace Energy.Core
             string defaultString = Energy.Base.Cast.ObjectToString(defaultValue);
             string input = Energy.Core.Tilde.Input(message, defaultString);
             return Energy.Base.Cast.StringToObject<TInput>(input);
+        }
+
+        #endregion
+
+        #region Length
+
+        /// <summary>
+        /// Return total length of tilde string
+        /// </summary>
+        /// <param name="example"></param>
+        /// <returns></returns>
+        public static int Length(string example)
+        {
+            return Explode(example).GetTotalLength();
         }
 
         #endregion
