@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
@@ -44,6 +44,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compression", "Compression", "{77D56EA4-03D6-45F7-B8F6-7E95B6B79CA7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompressionAlgorithmComparisation", "Energy.Core.Example\CompressionAlgorithmComparisation\CompressionAlgorithmComparisation.csproj", "{AED82932-9FE2-4408-85E0-2242A03E1261}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Filesystem", "Filesystem", "{451840B0-1450-40E9-8465-DB6D813F2CC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileLocate", "Energy.Core.Example\FileLocate\FileLocate.csproj", "{48CA6503-0251-4BB7-816D-05D029D5E33A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -251,6 +255,18 @@ Global
 		{AED82932-9FE2-4408-85E0-2242A03E1261}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AED82932-9FE2-4408-85E0-2242A03E1261}.Release|x86.ActiveCfg = Release|Any CPU
 		{AED82932-9FE2-4408-85E0-2242A03E1261}.Release|x86.Build.0 = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Debug|x86.Build.0 = Debug|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|x86.ActiveCfg = Release|Any CPU
+		{48CA6503-0251-4BB7-816D-05D029D5E33A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -258,6 +274,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{75A13B81-9D07-411A-8898-7FCA1407276D} = {F9446512-A7A6-4B1D-995A-9EEF1D41DB30}
 		{AED82932-9FE2-4408-85E0-2242A03E1261} = {77D56EA4-03D6-45F7-B8F6-7E95B6B79CA7}
+		{48CA6503-0251-4BB7-816D-05D029D5E33A} = {451840B0-1450-40E9-8465-DB6D813F2CC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

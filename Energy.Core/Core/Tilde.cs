@@ -585,6 +585,17 @@ namespace Energy.Core
             Write(string.Concat(value, Environment.NewLine));
         }
 
+        /// <summary>
+        /// Write text in color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="text"></param>
+        public static void WriteLine(ConsoleColor color, string text)
+        {
+            text = string.Concat(ConsoleColorToTildeColor(color), text);
+            WriteLine(text);
+        }
+
         #endregion
 
         #region Color
@@ -600,7 +611,7 @@ namespace Energy.Core
             public static string Gray = "~7~";
             public static string DarkGray = "~8~";
             public static string Blue = "~9~";
-            public static string green = "~10~";
+            public static string Green = "~10~";
             public static string Cyan = "~11~";
             public static string Red = "~12~";
             public static string Magenta = "~13~";
@@ -731,6 +742,11 @@ namespace Energy.Core
 
         #region Strip
 
+        /// <summary>
+        /// Strip tildes from text
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Strip(string text)
         {
             return text;
