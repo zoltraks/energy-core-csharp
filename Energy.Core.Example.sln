@@ -25,8 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessListSimple", "Energy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileNameFunctionsDemo", "Energy.Core.Example\FileNameFunctionsDemo\FileNameFunctionsDemo.csproj", "{50AD38C6-8813-4981-B719-6B026C3DD50B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TildeLineDimension", "Energy.Core.Example\TildeLineDimension\TildeLineDimension.csproj", "{6C4EBA25-753D-48C3-8D68-38F36D34E89B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteArrayBenchmark", "Energy.Core.Example\ByteArrayBenchmark\ByteArrayBenchmark.csproj", "{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemorySizeInKB", "Energy.Core.Example\MemorySizeInKB\MemorySizeInKB.csproj", "{042949F5-8E57-4ED2-8802-15DA102D66C5}"
@@ -173,16 +171,6 @@ Global
 		{50AD38C6-8813-4981-B719-6B026C3DD50B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{50AD38C6-8813-4981-B719-6B026C3DD50B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{50AD38C6-8813-4981-B719-6B026C3DD50B}.Release|x86.ActiveCfg = Release|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{6C4EBA25-753D-48C3-8D68-38F36D34E89B}.Release|x86.ActiveCfg = Release|Any CPU
 		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB3ECE96-28FF-457F-96A0-FDAEB6D9FA92}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
