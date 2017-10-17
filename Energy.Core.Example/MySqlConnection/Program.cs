@@ -11,9 +11,9 @@ namespace MySqlConnection
         {
             Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>();
             db.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
-            db.Open();
-            Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
-
+            Energy.Source.Connection conn1 = db.Copy();
+            Console.WriteLine(conn1.Scalar("SELECT CURRENT_TIMESTAMP()"));
+            Console.ReadLine();
             db.ConnectionString = @"Server=127.0.0.1;Database=platoon;Uid=platoon;Pwd=platoon;";
             db.Open();
             Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
