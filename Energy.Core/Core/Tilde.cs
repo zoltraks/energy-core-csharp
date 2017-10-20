@@ -205,7 +205,7 @@ namespace Energy.Core
             if (message == null)
                 return null;
             ColorTextList list = new ColorTextList();
-            Match m = Regex.Match(message, Energy.Base.Pattern.TildeText);
+            Match m = Regex.Match(message, Energy.Base.Expression.TildeText);
             System.ConsoleColor? current = null;
             while (m.Success)
             {

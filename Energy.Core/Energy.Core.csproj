@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>17.10.2.2</Version>
-    <FileVersion>17.10.2.2</FileVersion>
-    <AssemblyVersion>2017.10.15</AssemblyVersion>
+    <Version>17.10.2.3</Version>
+    <FileVersion>17.10.2.3</FileVersion>
+    <AssemblyVersion>2017.10.20</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
@@ -43,6 +43,11 @@
 
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Energy.Core.NET20.suo" />
+    <None Remove="Energy.Core.suo" />
   </ItemGroup>
 
   <ItemGroup>

@@ -305,7 +305,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string ExtractRoot(string xml)
         {
-            Match match = Regex.Match(xml, Energy.Base.Pattern.XmlRootName);
+            Match match = Regex.Match(xml, Energy.Base.Expression.XmlRootName);
             if (!match.Success)
                 return "";
             else

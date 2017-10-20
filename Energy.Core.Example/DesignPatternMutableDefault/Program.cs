@@ -13,28 +13,13 @@ namespace DesignPatternMutableDefault
             Console.ReadLine();
         }
 
-        public class Y : X<Y>
+        public class Y : Energy.Base.Pattern.DefaultProperty<Y>
         {
             public string Name;
 
             public override string ToString()
             {
                 return Name;
-            }
-        }
-
-        public class X<T>
-        {
-            private static T _Default;
-
-            public static T Default
-            {
-                get
-                {
-                    if (_Default == null)
-                        _Default = Activator.CreateInstance<T>();
-                    return _Default;
-                }
             }
         }
     }

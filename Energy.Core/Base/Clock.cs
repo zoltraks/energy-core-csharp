@@ -230,7 +230,7 @@ namespace Energy.Base
                     {
                         if (_DateRegex == null)
                         {
-                            _DateRegex = new Regex(Energy.Base.Pattern.Date, RegexOptions.Compiled);
+                            _DateRegex = new Regex(Energy.Base.Expression.Date, RegexOptions.Compiled);
                         }
                     }
                 }
@@ -250,7 +250,7 @@ namespace Energy.Base
                     {
                         if (_TimeRegex == null)
                         {
-                            _TimeRegex = new Regex(Energy.Base.Pattern.Time, RegexOptions.Compiled);
+                            _TimeRegex = new Regex(Energy.Base.Expression.Time, RegexOptions.Compiled);
                         }
                     }
                 }

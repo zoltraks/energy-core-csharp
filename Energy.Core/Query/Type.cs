@@ -81,7 +81,7 @@ namespace Energy.Query
         {
             if (string.IsNullOrEmpty(type))
                 return type;
-            Match match = Regex.Match(type, Energy.Base.Pattern.SqlColumnTypeSimple);
+            Match match = Regex.Match(type, Energy.Base.Expression.SqlColumnTypeSimple);
             if (!match.Success)
                 return type;
             string simple = match.Groups["type"].Value;

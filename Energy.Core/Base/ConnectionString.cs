@@ -62,7 +62,7 @@ namespace Energy.Base
         /// <param name="connectionString"></param>
         public ConnectionString(string connectionString)
         {
-            Regex regex = new Regex(Energy.Base.Pattern.ConnectionString);
+            Regex regex = new Regex(Energy.Base.Expression.ConnectionString);
             Match match = regex.Match(connectionString);
             while (true)
             {

@@ -109,5 +109,24 @@ namespace Energy.Core
         {
             System.Diagnostics.Debug.WriteLine(ExceptionMessage(exception, true));
         }
+
+        /// <summary>
+        /// Write debug message
+        /// </summary>
+        /// <param name="message"></param>
+        public static void Write(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        /// <summary>
+        /// Write debug message
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        public static void Write(string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static Url Explode(string url)
         {
-            string pattern = Energy.Base.Pattern.Url;
+            string pattern = Energy.Base.Expression.Url;
             Regex r = new Regex(pattern);
             Match m = r.Match(url);
             if (!m.Success)

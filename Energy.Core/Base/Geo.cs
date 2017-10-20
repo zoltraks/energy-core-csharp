@@ -74,7 +74,7 @@ namespace Energy.Base
             /// <param name="value"></param>
             public static implicit operator Point(string value)
             {
-                string pattern = Energy.Base.Pattern.LatitudeAndLongitude;
+                string pattern = Energy.Base.Expression.LatitudeAndLongitude;
                 Match m = Regex.Match(value, pattern, RegexOptions.IgnorePatternWhitespace);
 
                 double latitude_degree = Energy.Base.Cast.StringToDouble(m.Groups["latitude_degree"].Value);

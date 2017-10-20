@@ -20,7 +20,7 @@ namespace Energy.Base
                 return null;
             if (path.Length == 0)
                 return new string[] { };
-            Regex r = new Regex(Energy.Base.Pattern.PathSplitCapture, RegexOptions.IgnorePatternWhitespace);
+            Regex r = new Regex(Energy.Base.Expression.PathSplitCapture, RegexOptions.IgnorePatternWhitespace);
             Match m = r.Match(path);
             if (!m.Success)
                 return new string[] { };
