@@ -752,6 +752,12 @@ SQL server to run out of free connections.
             return null;
         }
 
+        public virtual T Scalar<T>(string query)
+        {
+            object value = Scalar(query);
+            return Energy.Base.Cast.As<T>(value);
+        }
+
         private object Scalar(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
