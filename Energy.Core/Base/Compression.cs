@@ -62,7 +62,7 @@ namespace Energy.Base
                             int length = decompressionStream.Read(buffer, 0, count);
                             if (length == 0)
                                 break;
-                            outputStream.Write(buffer, 0, count);
+                            outputStream.Write(buffer, 0, length);
                         }
                         return outputStream.ToArray();
                     }
@@ -126,7 +126,7 @@ namespace Energy.Base
                             int length = decompressionStream.Read(buffer, 0, count);
                             if (length == 0)
                                 break;
-                            outputStream.Write(buffer, 0, count);
+                            outputStream.Write(buffer, 0, length);
                         }
                         return outputStream.ToArray();
                     }

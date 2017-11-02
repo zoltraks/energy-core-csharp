@@ -238,7 +238,7 @@ SQL server to run out of free connections.
                 }
                 catch (Exception x)
                 {
-                    ErrorException = x;
+                    SetError(x);
                 }
             })
             {
@@ -635,6 +635,7 @@ SQL server to run out of free connections.
 
         private void SetError(Exception x)
         {
+            ErrorException = x;
             ErrorStatus = x.Message;
 
             int[] error = GetErrorNumber(x);
