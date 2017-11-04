@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Energy.Source
@@ -773,7 +774,7 @@ SQL server to run out of free connections.
             if (ErrorNumber != 0)
                 list.Add(ErrorNumber.ToString());
             if (!string.IsNullOrEmpty(ErrorStatus))
-                list.Add(ErrorStatus);
+                list.Add(Regex.Replace(ErrorStatus, @"(\r\n|\n|\r)+", " "));
             return string.Join(" ", list.ToArray());
         }
 
