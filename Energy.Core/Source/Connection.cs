@@ -229,54 +229,27 @@ SQL server to run out of free connections.
 
             bool success = false;
 
-            bool openOnBackgroundThread = true;
-            // MS Sqlite can't open on background thread.
-            if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
-                openOnBackgroundThread = false;
-
             // Open connection in separate thread
-            if (openOnBackgroundThread)
-            {
-                Thread thread = new Thread(delegate ()
-                {
-                    try
-                    {
-                        connection.Open();
-                        success = true;
-                    }
-                    catch (Exception x)
-                    {
-                        ErrorException = x;
-                    }
-                })
-                {
-                    // Make sure it's marked as a background thread
-                    // so it'll get cleaned up automatically
-                    IsBackground = true,
-                    CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
-                };
-                thread.Start();
-                thread.Join(timeout * 1000);
-            }
-            else
-            // Open connection in main thread
+            Thread thread = new Thread(delegate ()
             {
                 try
                 {
-#if NET20
                     connection.Open();
-#else
-                    //TODO Above NET20 we can use OpenAsync on background thread.
-                    //connection.OpenAsync().ConfigureAwait(false);
-                    connection.Open();
-#endif
                     success = true;
                 }
                 catch (Exception x)
                 {
                     SetError(x);
                 }
-            }
+            })
+            {
+                // Make sure it's marked as a background thread
+                // so it'll get cleaned up automatically
+                IsBackground = true,
+                CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
+            };
+            thread.Start();
+            thread.Join(timeout * 1000);
 
             // If we didn't connect successfully, throw an exception
             if (!success)
