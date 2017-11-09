@@ -8,7 +8,7 @@ namespace CompressionAlgorithmComparisation
     {
         static void Main(string[] args)
         {
-            int size = 4096;
+            int size = 30;
             byte[] buffer = new byte[size];
             Random random = new Random();
             for (int i = 0; i < size; i++)

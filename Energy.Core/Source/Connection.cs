@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Energy.Source
@@ -273,7 +274,7 @@ SQL server to run out of free connections.
                 }
                 catch (Exception x)
                 {
-                    ErrorException = x;
+                    SetError(x);
                 }
             }
 
@@ -662,6 +663,7 @@ SQL server to run out of free connections.
 
         private void SetError(Exception x)
         {
+            ErrorException = x;
             ErrorStatus = x.Message;
 
             int[] error = GetErrorNumber(x);
@@ -779,6 +781,12 @@ SQL server to run out of free connections.
             return null;
         }
 
+        public virtual T Scalar<T>(string query)
+        {
+            object value = Scalar(query);
+            return Energy.Base.Cast.As<T>(value);
+        }
+
         private object Scalar(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
@@ -793,7 +801,7 @@ SQL server to run out of free connections.
             if (ErrorNumber != 0)
                 list.Add(ErrorNumber.ToString());
             if (!string.IsNullOrEmpty(ErrorStatus))
-                list.Add(ErrorStatus);
+                list.Add(Regex.Replace(ErrorStatus, @"(\r\n|\n|\r)+", " "));
             return string.Join(" ", list.ToArray());
         }
 

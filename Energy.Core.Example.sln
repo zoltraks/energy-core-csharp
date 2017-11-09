@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
@@ -56,6 +56,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pattern", "Pattern", "{69C86F9D-C93D-4629-9BEC-26C67DB3E3D4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignPatternMutableDefault", "Energy.Core.Example\DesignPatternMutableDefault\DesignPatternMutableDefault.csproj", "{3BA5F425-8780-44A7-8C04-A04264F40998}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerConnection", "Energy.Core.Example\SqlServerConnection\SqlServerConnection.csproj", "{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexColorExample", "Energy.Core.Example\HexColorExample\HexColorExample.csproj", "{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -289,6 +293,30 @@ Global
 		{3BA5F425-8780-44A7-8C04-A04264F40998}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3BA5F425-8780-44A7-8C04-A04264F40998}.Release|x86.ActiveCfg = Release|Any CPU
 		{3BA5F425-8780-44A7-8C04-A04264F40998}.Release|x86.Build.0 = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Debug|x86.Build.0 = Debug|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|x86.ActiveCfg = Release|Any CPU
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4}.Release|x86.Build.0 = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Debug|x86.Build.0 = Debug|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|x86.ActiveCfg = Release|Any CPU
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -301,6 +329,8 @@ Global
 		{48CA6503-0251-4BB7-816D-05D029D5E33A} = {451840B0-1450-40E9-8465-DB6D813F2CC1}
 		{FD52E205-2F48-4777-A901-3071DC171130} = {417A257C-555A-4DC6-A76B-928A508CF136}
 		{3BA5F425-8780-44A7-8C04-A04264F40998} = {69C86F9D-C93D-4629-9BEC-26C67DB3E3D4}
+		{1C0CADAF-BF31-487D-A1BA-DC9028A67AF4} = {F9446512-A7A6-4B1D-995A-9EEF1D41DB30}
+		{CAA0753E-C79C-47D7-86C5-AD257BC9C69A} = {417A257C-555A-4DC6-A76B-928A508CF136}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

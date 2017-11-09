@@ -20,6 +20,9 @@ namespace Energy.Base
         /// <returns></returns>
         public static T As<T>(object value)
         {
+            if (value == null)
+                return default(T);
+
             Type r = typeof(T);
             Type t = value.GetType();
 
@@ -188,7 +191,7 @@ namespace Energy.Base
         /// <param name="text">string</param>
         /// <returns>bool</returns>
         // TODO: How to treat "0.0" which converted to integer and then to boolean be different?
-        // Possible solution: check if string is a numeric value and treat 0 as false.     
+        // Possible solution: check if string is a numeric value and treat 0 as false.
         public static bool StringToBool(string text)
         {
             if (string.IsNullOrEmpty(text) || text == "0")
@@ -694,6 +697,57 @@ namespace Energy.Base
         public static string DateTimeToString(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToString((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 date string yyyy-MM-dd (empty if default)
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <returns>Date string representation</returns>
+        public static string DateTimeToStringDate(DateTime stamp)
+        {
+            if (stamp == DateTime.MinValue)
+                return "";
+            return stamp.ToString("yyyy-MM-dd");
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 date string yyyy-MM-dd (empty if default or null)
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <returns>Date string representation</returns>
+        public static string DateTimeToStringDate(DateTime? stamp)
+        {
+            if (stamp == null)
+                return "";
+            if ((DateTime)stamp == DateTime.MinValue)
+                return "";
+            return ((DateTime)stamp).ToString("yyyy-MM-dd");
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 time string with milliseconds if not zero (empty if default)
+        /// </summary>
+        /// <param name="stamp">DateTime</param>
+        /// <returns>Time string representation</returns>
+        public static string DateTimeToStringTime(DateTime stamp)
+        {
+            if (stamp == DateTime.MinValue)
+                return "";
+            if (stamp.Millisecond != 0)
+                return stamp.ToString("HH:mm:ss.fff");
+            else
+                return stamp.ToString("HH:mm:ss");
+        }
+
+        /// <summary>
+        /// Return DateTime as ISO 8601 time string with milliseconds if not zero (empty if default or null)
+        /// </summary>
+        /// <param name="stamp">DateTime</param>
+        /// <returns>Time string representation</returns>
+        public static string DateTimeToStringTime(DateTime? stamp)
+        {
+            return stamp == null ? "" : DateTimeToStringTime((DateTime)stamp);
         }
 
         /// <summary>

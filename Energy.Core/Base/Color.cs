@@ -83,7 +83,7 @@ namespace Energy.Base
         /// <param name="value"></param>
         /// <returns></returns>
         public static implicit operator Energy.Base.Color(uint value)
-        {            
+        {
             return new Color(value);
         }
 
