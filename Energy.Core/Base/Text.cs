@@ -648,5 +648,33 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Unique
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string[] Unique(string[] array)
+        {
+            if (array == null || array.Length <= 1)
+                return array;
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>
+            {
+                array[0]
+            };
+            for (int i = 1; i < array.Length; i++)
+            {
+                int index = list.IndexOf(array[i]);
+                if (index >= 0)
+                    list[index] = array[i];
+                else
+                    list.Add(array[i]);
+            }
+            return list.ToArray();
+        }
+
+        #endregion
     }
 }
