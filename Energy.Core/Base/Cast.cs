@@ -303,7 +303,7 @@ namespace Energy.Base
             int result = 0;
             if (int.TryParse(value, out result))
                 return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
+            string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
             if (int.TryParse(value, out result))
@@ -352,7 +352,7 @@ namespace Energy.Base
             byte result = 0;
             if (byte.TryParse(value, out result))
                 return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
+            string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
             if (byte.TryParse(value, out result))
@@ -377,7 +377,7 @@ namespace Energy.Base
             long result = 0;
             if (long.TryParse(value, out result))
                 return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
+            string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
             if (long.TryParse(value, out result))
@@ -467,7 +467,7 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             double result = 0;
-            value = Energy.Base.Text.TrimWhite(value);
+            value = Energy.Base.Text.Trim(value);
             if (!double.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
                 , out result))
@@ -557,7 +557,7 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             float result = 0;
-            value = Energy.Base.Text.TrimWhite(value);
+            value = Energy.Base.Text.Trim(value);
             if (!float.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
                 , out result))
@@ -1085,7 +1085,7 @@ namespace Energy.Base
                 }
             }
             int length = value.Length;
-            value = Energy.Base.Text.TrimWhite(value);
+            value = Energy.Base.Text.Trim(value);
             if (value.Length == length)
                 return 0;
             for (int i = 0; i < names.Length; i++)

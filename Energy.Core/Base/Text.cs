@@ -111,25 +111,27 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Trimmed string</returns>
-        public static string TrimWhite(string value)
+        public static string Trim(string value)
         {
             return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
+
+        #region Join
 
         /// <summary>
         /// Join non empty strings into one list with separator
         /// </summary>
         /// <param name="with">Separator string</param>
-        /// <param name="parts">Parts to join</param>
+        /// <param name="array">Parts to join</param>
         /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string JoinWith(string with, params string[] parts)
+        public static string JoinWith(string with, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                if (String.IsNullOrEmpty(parts[i]))
+                if (String.IsNullOrEmpty(array[i]))
                     continue;
-                string trim = parts[i].Trim();
+                string trim = array[i].Trim();
                 if (trim.Length == 0)
                     continue;
                 list.Add(trim);
@@ -137,7 +139,32 @@ namespace Energy.Base
             return String.Join(with, list.ToArray());
         }
 
-        private static readonly string[] _NewLine = new string[] { "\r\n", "\n\r", "\n" };
+        #endregion
+
+        #region Each
+
+        public static IEnumerable<string> Each(string input)
+        {
+            if (input == null)
+            {
+                yield break;
+            }
+
+            using (System.IO.StringReader reader = new System.IO.StringReader(input))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Split
+
+        private static readonly string[] _NewLine = new string[] { "\r\n", "\n", "\r" };
 
         /// <summary>
         /// Split string to array by new line characters. Elements will not include new line itself.
@@ -148,6 +175,16 @@ namespace Energy.Base
         {
             return content.Split(_NewLine, StringSplitOptions.None);
         }
+
+        public static string[] Split(string input)
+        {
+            System.Collections.Generic.List<string> list = new List<string>();
+            foreach (string line in Each(input))
+                list.Add(line);
+            return list.ToArray();
+        }
+
+        #endregion
 
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
