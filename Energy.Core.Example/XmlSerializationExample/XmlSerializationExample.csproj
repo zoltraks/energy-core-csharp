@@ -35,9 +35,8 @@
     <NoWarn>bin</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Energy.Core, Version=2017.9.21.38868, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Package\Energy.Core.17.09.3\lib\Energy.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Energy.Core, Version=2017.11.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\Package\Energy.Core.17.11.0\lib\net40\Energy.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
