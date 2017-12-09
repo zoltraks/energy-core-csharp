@@ -241,30 +241,6 @@ namespace Energy.Base
             throw new NotSupportedException();
         }
 
-        private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-
-        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
-        {
-            if (sizeInBytes <= 0)
-                return "0 " + _MemorySizeSuffix[0];
-            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
-            double number = sizeInBytes / Math.Pow(1024, exponent);
-            int p = 1;
-            for (int i = 0; i < decimalPlaces; i++)
-            {
-                p *= 10;
-            }
-            if (numberCeiling)
-                number = Math.Ceiling(number * p);
-            else
-                number = Math.Floor(number * p);
-
-            number /= p;
-
-            return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
-                , _MemorySizeSuffix[exponent]);
-        }
-
         /// <summary>
         /// Convert bool to string
         /// </summary>
@@ -335,31 +311,6 @@ namespace Energy.Base
         {
             return (byte)value;
         }
-
-        #endregion
-
-        #region Byte
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByte(string value)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            byte result = 0;
-            if (byte.TryParse(value, out result))
-                return result;
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (byte.TryParse(value, out result))
-                return result;
-            return 0;
-        }
-
 
         #endregion
 
@@ -631,6 +582,74 @@ namespace Energy.Base
         public static string FloatToString(float value, int precision)
         {
             return FloatToString(value, precision, null);
+        }
+
+        #endregion
+
+        #region Byte
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
+        public static byte StringToByte(string value)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            byte result = 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length == value.Length)
+                return 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            return 0;
+        }
+
+        #endregion
+
+        #region Bcd
+
+        /// <summary>
+        /// Convert byte to BCD value
+        /// </summary>
+        /// <param name="value">Byte value</param>
+        /// <returns>BCD value</returns>
+        public static byte ByteToBcd(byte value)
+        {
+            return Energy.Base.Bcd.FromByte(value);
+        }
+
+        /// <summary>
+        /// Convert word to BCD value
+        /// </summary>
+        /// <param name="value">Byte value</param>
+        /// <returns>BCD value</returns>
+        public static ushort WordToBcd(ushort value)
+        {
+            return Energy.Base.Bcd.FromWord(value);
+        }
+
+        /// <summary>
+        /// Convert BCD value to byte
+        /// </summary>
+        /// <param name="value">BCD value</param>
+        /// <returns>Word value</returns>
+        public static ushort BcdToByte(byte value)
+        {
+            return Energy.Base.Bcd.ToByte(value);
+        }
+
+        /// <summary>
+        /// Convert BCD value to word
+        /// </summary>
+        /// <param name="value">BCD value</param>
+        /// <returns>Word value</returns>
+        public static ushort BcdToWord(ushort value)
+        {
+            return Energy.Base.Bcd.ToWord(value);
         }
 
         #endregion
@@ -1160,6 +1179,34 @@ namespace Energy.Base
         {
             byte[] data = System.Convert.FromBase64String(input);
             return ASCIIEncoding.UTF8.GetString(data);
+        }
+
+        #endregion
+
+        #region MemorySize
+
+        private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+
+        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
+        {
+            if (sizeInBytes <= 0)
+                return "0 " + _MemorySizeSuffix[0];
+            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
+            double number = sizeInBytes / Math.Pow(1024, exponent);
+            int p = 1;
+            for (int i = 0; i < decimalPlaces; i++)
+            {
+                p *= 10;
+            }
+            if (numberCeiling)
+                number = Math.Ceiling(number * p);
+            else
+                number = Math.Floor(number * p);
+
+            number /= p;
+
+            return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
+                , _MemorySizeSuffix[exponent]);
         }
 
         #endregion
