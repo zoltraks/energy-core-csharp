@@ -359,7 +359,7 @@ namespace Energy.Source
                 if (attributeTable != null)
                 {
                     table.Name = attributeTable.Name;
-                    table.Description = attributeTable.Description;  
+                    table.Description = attributeTable.Description;
                 }
 
                 string[] fields = Energy.Base.Class.GetFieldsAndProperties(type);
@@ -413,15 +413,6 @@ namespace Energy.Source
                     return false;
                 return true;
             }
-        }
-
-        #endregion
-
-        #region Schema
-
-        public class Schema
-        {
-
         }
 
         #endregion

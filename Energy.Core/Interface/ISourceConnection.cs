@@ -8,7 +8,7 @@ namespace Energy.Interface
     /// <summary>
     /// Common interface for database connection helper classes.
     /// </summary>
-    public interface IConnection
+    public interface ISourceConnection
     {
         /// <summary>
         /// Connection string.

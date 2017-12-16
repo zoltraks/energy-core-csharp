@@ -49,7 +49,7 @@ namespace ProcessListSimple
                     //}
                     try
                     {
-                        record["Process name"] = Energy.Support.Win32.GetProcessName(process.Id);
+                        record["Process name"] = Energy.Support.WinApi.GetProcessName(process.Id);
                     }
                     catch
                     {

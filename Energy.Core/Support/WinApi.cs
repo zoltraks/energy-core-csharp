@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Energy.Support
 {
-    public class Win32
+    public class WinApi
     {
         [DllImport("kernel32.dll")]
         public static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, int processId);

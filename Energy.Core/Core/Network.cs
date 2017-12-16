@@ -7,6 +7,8 @@ namespace Energy.Core
 {
     public class Network
     {
+        #region Configure
+
         public static void ConfigureTcpSocket(Socket socket, int bufferSize = 8192)
         {
             // Don't allow another socket to bind to this port.
@@ -95,5 +97,19 @@ namespace Energy.Core
         {
             ConfigureTcpClient(socket, 8192);
         }
+
+        #endregion
+
+        #region SocketClient
+
+        /// <summary>
+        /// Socket client
+        /// </summary>
+        public class SocketClient
+        {
+
+        }
+
+        #endregion
     }
 }
