@@ -8,9 +8,9 @@ namespace FileLocate
     {
         static void Main(string[] args)
         {
-            string helloMessage = "~w~File location example";
-            helloMessage = Energy.Core.Tilde.Strip(helloMessage);
-            Energy.Core.Tilde.WriteLine(ConsoleColor.Green, "~w~File location example");
+            Energy.Core.Tilde.WriteLine(ConsoleColor.Green, "File location example");
+            string input = Energy.Core.Tilde.Input("~w~Enter command to find: ~y~", "notepad");
+            Console.WriteLine(input);
             Console.ReadLine();
         }
     }

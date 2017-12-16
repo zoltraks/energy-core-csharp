@@ -659,7 +659,7 @@ namespace Energy.Core
         /// <param name="text"></param>
         public static void WriteLine(ConsoleColor color, string text)
         {
-            text = string.Concat(ConsoleColorToTildeColor(color), Escape(Strip(text)));
+            text = string.Concat(ConsoleColorToTildeColor(color), Escape(text));
             WriteLine(text);
         }
 
