@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
@@ -79,7 +79,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeConvertion", "Energy.Co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experimental", "Experimental", "{6D4F3502-1E02-420D-9772-F670D021CA4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TuppleSample", "Energy.Core.Example\TuppleSample\TuppleSample.csproj", "{E4E8A8CC-0E46-434E-9657-625BBD60C611}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TuppleSample", "Energy.Core.Example\TuppleSample\TuppleSample.csproj", "{E4E8A8CC-0E46-434E-9657-625BBD60C611}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lua", "Lua", "{8BD294C2-FE8E-4FFC-833E-A02BF46EF1C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaSimpleConsole", "Energy.Core.Example\LuaSimpleConsole\LuaSimpleConsole.csproj", "{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -373,6 +377,18 @@ Global
 		{E4E8A8CC-0E46-434E-9657-625BBD60C611}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E4E8A8CC-0E46-434E-9657-625BBD60C611}.Release|x86.ActiveCfg = Release|Any CPU
 		{E4E8A8CC-0E46-434E-9657-625BBD60C611}.Release|x86.Build.0 = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Debug|x86.Build.0 = Debug|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|x86.ActiveCfg = Release|Any CPU
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -404,6 +420,7 @@ Global
 		{16FEA07F-F2B4-4B61-9CBD-22C0A57A892B} = {43C70BAA-B55F-4C02-9AB8-1C7CB185F3D4}
 		{0A8EA724-7983-44A1-9CE9-789546EF29A3} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 		{E4E8A8CC-0E46-434E-9657-625BBD60C611} = {6D4F3502-1E02-420D-9772-F670D021CA4E}
+		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA} = {8BD294C2-FE8E-4FFC-833E-A02BF46EF1C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}
