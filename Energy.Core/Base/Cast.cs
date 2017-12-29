@@ -838,6 +838,102 @@ namespace Energy.Base
 
         #endregion
 
+        #region TimeSpan
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        {
+            int truncate = (int)seconds;
+            double fractional = seconds - truncate;
+            double milliseconds = fractional * 1000.0;
+            int s = truncate % 60;
+            truncate /= 60;
+            int m = truncate % 60;
+            truncate /= 60;
+            int h = truncate;
+            int ms = (int)milliseconds;
+
+            if (roundUp && ms == 0 && milliseconds - ms > 0)
+            {
+                ms = 1;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!omitZeroHours || h > 0)
+            {
+                sb.Append(h.ToString("00"));
+                sb.Append(":");
+            }
+
+            sb.Append(m.ToString("00"));
+            sb.Append(":");
+            sb.Append(s.ToString("00"));
+
+            if (!omitZeroMilliseconds || ms > 0)
+            {
+                sb.Append(".");
+                sb.Append(ms.ToString("000"));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        {
+            int truncate = (int)seconds;
+            double fractional = seconds - truncate;
+            double microseconds = fractional * 1000000.0;
+            int s = truncate % 60;
+            truncate /= 60;
+            int m = truncate % 60;
+            truncate /= 60;
+            int h = truncate;
+            int μ = (int)microseconds;
+
+            if (roundUp && μ == 0 && microseconds - μ > 0)
+            {
+                μ = 1;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!omitZeroHours || h > 0)
+            {
+                sb.Append(h.ToString("00"));
+                sb.Append(":");
+            }
+
+            sb.Append(m.ToString("00"));
+            sb.Append(":");
+            sb.Append(s.ToString("00"));
+
+            if (!omitZeroMicroseconds || μ > 0)
+            {
+                sb.Append(".");
+                sb.Append(μ.ToString("000000"));
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
+
         #region Dictionary
 
         /// <summary>
@@ -859,17 +955,43 @@ namespace Energy.Base
         /// <summary>
         /// Convert string dictionary to array containing key and value pairs one by another in one dimensional array.
         /// </summary>
-        /// <param name="dictionary">Dictionary&gt;string, string&lt;</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dictionary">Dictionary&gt;string, T&lt;</param>
         /// <returns></returns>
-        public static string[] LongDictionaryToStringArray(Dictionary<string, long> dictionary)
+        public static string[] StringDictionaryToStringArray<T>(Dictionary<string, T> dictionary)
         {
             List<string> list = new List<string>();
-            foreach (KeyValuePair<string, long> _ in dictionary)
+            foreach (KeyValuePair<string, T> _ in dictionary)
             {
                 list.Add(_.Key);
                 list.Add(_.Value.ToString());
             }
             return list.ToArray();
+        }
+
+        /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<string, string> StringArrayToStringDictionary(params string[] array)
+        {
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                string key = array[i];
+                if (key == null)
+                    continue;
+                string value = array[i + 1];
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                string key = array[array.Length - 1];
+                if (key != null)
+                    dictionary[key] = null;
+            }
+            return dictionary;
         }
 
         #endregion

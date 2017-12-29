@@ -17,7 +17,7 @@ namespace LuaSimpleConsole
 
                 string name = "test.lua";
                 state.DoChunk("message = 'Hello World!'", name); // create a variable in lua
-                state.DoChunk("message = 'Hello World 2!'", name); // create a variable in lua
+                state.DoChunk("message = 'Hello World 2!'", name); // modify a variable in lua
                 Console.WriteLine(state["message"]); // access a variable in c#
             }
 

@@ -53,15 +53,18 @@
     <Compile Include="Base\Byte.cs" />
     <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Cast.cs" />
+    <Compile Include="Base\Cipher.cs" />
     <Compile Include="Base\Class.cs" />
     <Compile Include="Base\Clock.cs" />
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Color.cs" />
+    <Compile Include="Base\Compression.cs" />
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\Csv.cs" />
     <Compile Include="Base\Currency.cs" />
     <Compile Include="Base\Date.cs" />
     <Compile Include="Base\Directory.cs" />
+    <Compile Include="Base\Expression.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Geo.cs" />
@@ -70,6 +73,7 @@
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Ini.cs" />
     <Compile Include="Base\Json.cs" />
+    <Compile Include="Base\Language.cs" />
     <Compile Include="Base\Lock.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Money.cs" />
@@ -113,6 +117,8 @@
     <Compile Include="Core\Version.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Core\Worker.cs" />
+    <Compile Include="Enumeration\GrammaticalGender.cs" />
+    <Compile Include="Enumeration\LocateBehaviour.cs" />
     <Compile Include="Enumeration\SortOrder.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
@@ -124,8 +130,9 @@
     <Compile Include="Enumeration\SqlDialect.cs" />
     <Compile Include="Enumeration\TextAlign.cs" />
     <Compile Include="Interface\ICopy.cs" />
+    <Compile Include="Interface\ISocketClient.cs" />
+    <Compile Include="Interface\ISourceConnection.cs" />
     <Compile Include="Interface\IXmlSerializable.cs" />
-    <Compile Include="Interface\IConnection.cs" />
     <Compile Include="Interface\IEncapsulation.cs" />
     <Compile Include="Interface\IEscape.cs" />
     <Compile Include="Interface\ILoadFromFile.cs" />
@@ -149,7 +156,7 @@
     <Compile Include="Query\Parameter.cs" />
     <Compile Include="Source\Schema.cs" />
     <Compile Include="Source\Structure.cs" />
-    <Compile Include="Support\Win32.cs" />
+    <Compile Include="Support\WinApi.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Query\Standard\" />
