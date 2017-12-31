@@ -16,7 +16,7 @@ namespace Energy.Core.Test.Base
             double num2 = Energy.Base.Cast.StringToDouble(str2);
             Assert.AreEqual(15.000000001, num2);
             string str3 = " - 1 ,234 ";
-            double num3 = Energy.Base.Cast.StringToDouble(str2);
+            double num3 = Energy.Base.Cast.StringToDouble(str3);
             Assert.AreEqual(-1.234, num3);
         }
     }
