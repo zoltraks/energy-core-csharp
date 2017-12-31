@@ -471,9 +471,39 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(file))
                 return "";
 
-            if (search == null || search.Length == 0)
-                search = new string[] { "" };
+            file = ChangeDirectorySeparatorToNative(file);
 
+            if (search == null || search.Length == 0)
+            {
+                search = new string[] { "" };
+            }
+            else
+            {
+                bool parse = false;
+                char[] separators = new char[] { ';', ':' };
+                for (int i = 0; i < search.Length; i++)
+                {
+                    if (search[i].IndexOfAny(separators) >= 0)
+                        parse = true;
+                }
+                if (parse)
+                {
+                    List<string> list = new List<string>();
+                    for (int i = 0; i < search.Length; i++)
+                    {
+                        list.AddRange(search[i].Split(separators));
+                    }
+                    search = list.ToArray();
+                }
+            }
+
+            if (search.Length > 0)
+            {
+                for (int i = 0; i < search.Length; i++)
+                {
+                    search[i] = ChangeDirectorySeparatorToNative(search[i]);
+                }
+            }
             if (extension == null || extension.Length == 0)
                 extension = new string[] { "" };
 
@@ -554,6 +584,32 @@ namespace Energy.Base
             }
 
             return "";
+        }
+
+        /// <summary>
+        /// Change any directory separator to native one for compatibility
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private static string ChangeDirectorySeparatorToNative(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return filePath;
+            if (System.IO.Path.DirectorySeparatorChar == '\\')
+            {
+                if (filePath.IndexOf('/') < 0)
+                    return filePath;
+                else
+                    return filePath.Replace('/', '\\');
+            }
+            if (System.IO.Path.DirectorySeparatorChar == '/')
+            {
+                if (filePath.IndexOf('\\') < 0)
+                    return filePath;
+                else
+                    return filePath.Replace('\\', '/');
+            }
+            return filePath;
         }
 
         /// <summary>

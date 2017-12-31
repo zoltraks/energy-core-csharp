@@ -10,17 +10,20 @@ namespace Energy.Core.Test.Base
         public void Decrement()
         {
             Energy.Base.Counter counter1 = new Energy.Base.Counter(1);
-            Assert.AreEqual(counter1.Value, 1);
+            Assert.AreEqual(1, counter1.Value);
             counter1.Decrement();
-            Assert.AreEqual(counter1.Value, 0);
-            counter1.Decrement();
-            Assert.AreEqual(counter1.Value, 0);
+            Assert.AreEqual(1, counter1.Value);
             Energy.Base.Counter counter2 = new Energy.Base.Counter(15, 30, 5);
-            counter2.Minimum = -15;
+            Assert.AreEqual(5, counter2.Value);
+            counter2.Decrement();
+            Assert.AreEqual(15, counter2.Value);
+            counter2.Minimum = 0;
             counter2.Maximum = 100;
             counter2.Decrement();
-            Assert.AreEqual(counter2.Value, (int)-1);
-            Assert.AreEqual(counter2.Value, (long)-1);
+            Assert.AreEqual(14, counter2.Value);
+            counter2.Value = 29;
+            counter2.Increment();
+            Assert.AreEqual(30, counter2.Value);
         }
 
         [TestMethod]

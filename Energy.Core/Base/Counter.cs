@@ -188,12 +188,24 @@ namespace Energy.Base
                             _Overflow = true;
                             return;
                         }
+                        if (_Value < 0)
+                        {
+                            _Overflow = true;
+                            _Value = 0;
+                            return;
+                        }
                     }
                     else
                     {
                         if (_Value == _Minimum)
                         {
                             _Overflow = true;
+                            return;
+                        }
+                        if (_Value < _Minimum)
+                        {
+                            _Overflow = true;
+                            _Value = _Minimum;
                             return;
                         }
                     }

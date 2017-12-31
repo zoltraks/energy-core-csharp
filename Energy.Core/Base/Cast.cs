@@ -393,6 +393,8 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            if (value.Contains(","))
+                value = value.Replace(",", ".");
             decimal result = 0;
             if (decimal.TryParse(value, out result))
                 return result;
@@ -417,17 +419,13 @@ namespace Energy.Base
         {
             if (string.IsNullOrEmpty(value))
                 return 0;
-            double result = 0;
             value = Energy.Base.Text.Trim(value);
-            if (!double.TryParse(value, System.Globalization.NumberStyles.Float
+            if (value.Contains(","))
+                value = value.Replace(",", ".");
+            double result = 0;
+            double.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
-                , out result))
-            {
-                double.TryParse(value, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture
-                    , out result);
-            }
-
+                , out result);
             return result;
         }
 
