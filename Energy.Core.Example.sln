@@ -87,6 +87,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaSimpleConsole", "Energy.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Test", "Energy.Core.Test\Energy.Core.Test.csproj", "{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CounterOverflow", "Energy.Core.Example\CounterOverflow\CounterOverflow.csproj", "{A26D82AC-6318-4008-9B74-FC1560C80512}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -403,6 +405,18 @@ Global
 		{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}.Release|x86.ActiveCfg = Release|Any CPU
 		{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}.Release|x86.Build.0 = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Debug|x86.Build.0 = Debug|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|x86.ActiveCfg = Release|Any CPU
+		{A26D82AC-6318-4008-9B74-FC1560C80512}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -436,6 +450,7 @@ Global
 		{E4E8A8CC-0E46-434E-9657-625BBD60C611} = {6D4F3502-1E02-420D-9772-F670D021CA4E}
 		{8BDC2BAC-ED42-4C80-AC69-3ACD3B28BEFA} = {8BD294C2-FE8E-4FFC-833E-A02BF46EF1C9}
 		{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255} = {B5DE1B89-F59F-4112-9DB3-F1DAFD3A5F1E}
+		{A26D82AC-6318-4008-9B74-FC1560C80512} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}
