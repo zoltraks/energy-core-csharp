@@ -49,11 +49,13 @@ namespace Energy.Source
         /// <summary>
         /// Encryption
         /// </summary>
+        [DefaultValue(false)]
         public bool Encryption { get; set; }
 
         /// <summary>
         /// Compression
         /// </summary>
+        [DefaultValue(false)]
         public bool Compression { get; set; }
 
         /// <summary>
