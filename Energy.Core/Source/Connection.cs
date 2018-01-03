@@ -50,7 +50,7 @@ SQL server to run out of free connections.
             this.ConnectionString = configuration.ConnectionString;
         }
 
-        public Connection(DbConnection connection)
+        public Connection(IDbConnection connection)
         {
             this.Vendor = connection.GetType();
             this.ConnectionString = connection.ConnectionString;
@@ -70,6 +70,8 @@ SQL server to run out of free connections.
 
         private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
 
+        private readonly Energy.Base.Lock _ConnectionLock = new Energy.Base.Lock();
+
         #endregion
 
         #region Property
@@ -78,7 +80,6 @@ SQL server to run out of free connections.
 
         /// <summary>
         /// Connection string used for opening SQL connection.
-        /// Connection should be closed on change.
         /// </summary>
         public string ConnectionString
         {
@@ -196,13 +197,13 @@ SQL server to run out of free connections.
         /// Used by Open() to create DbConnection object.
         /// </summary>
         /// <returns></returns>
-        public DbConnection Create()
+        public IDbConnection Create()
         {
             Type vendor = Vendor;
-            DbConnection _ = null;
+            IDbConnection _ = null;
             try
             {
-                _ = (DbConnection)Activator.CreateInstance(vendor);
+                _ = (IDbConnection)Activator.CreateInstance(vendor);
                 _.ConnectionString = ConnectionString;
             }
             catch (Exception x)
@@ -216,7 +217,7 @@ SQL server to run out of free connections.
             return _;
         }
 
-        public DbConnection Open(DbConnection connection)
+        public IDbConnection Open(IDbConnection connection)
         {
             if (connection == null)
                 return null;
@@ -276,7 +277,7 @@ SQL server to run out of free connections.
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static bool IsActive(DbConnection connection)
+        public static bool IsActive(IDbConnection connection)
         {
             if (connection == null)
                 return false;
@@ -383,18 +384,11 @@ SQL server to run out of free connections.
         /// <param name="exception"></param>
         /// <param name="command"></param>
         /// <returns>True if operation can be repeated.</returns>
-        private bool Catch(Exception exception, DbCommand command)
+        private bool Catch(Exception exception, IDbCommand command)
         {
             CatchResult result = new Energy.Source.Connection.CatchResult();
 
             string message = exception.Message;
-
-            if (exception is DbException)
-            {
-                //foreach (SqlError error in ((SqlException)exception).Errors)
-                //{
-                //}
-            }
 
             int[] error = GetErrorNumber(exception);
 
@@ -489,7 +483,12 @@ SQL server to run out of free connections.
             return result.Timeout || result.Damage;
         }
 
-        public int[] GetErrorNumber(Exception exception)
+        /// <summary>
+        /// Get array of error numbers from database exception.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        public static int[] GetErrorNumber(Exception exception)
         {
             List<int> error = new List<int>();
             Exception e = exception;
@@ -822,74 +821,6 @@ SQL server to run out of free connections.
         public Connection(string connectionString)
             : base(typeof(T), connectionString)
         {
-        }
-    }
-
-    #endregion
-
-    #region Static
-
-    public partial class Connection
-    {
-        /// <summary>
-        /// Persistent connection to database.
-        /// </summary>
-        public partial class Static : IDisposable
-        {
-            #region Lock
-
-            private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
-
-            private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
-
-            #endregion
-
-            #region Property
-
-            private DbConnection _Driver;
-
-            #region IDisposable Support
-
-            private bool disposedValue = false; // To detect redundant calls
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!disposedValue)
-                {
-                    if (disposing)
-                    {
-                        // TODO: dispose managed state (managed objects).
-                    }
-
-                    // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                    // TODO: set large fields to null.
-
-                    disposedValue = true;
-                }
-            }
-
-            // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-            // ~Static() {
-            //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            //   Dispose(false);
-            // }
-
-            // This code added to correctly implement the disposable pattern.
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-                Dispose(true);
-                // TODO: uncomment the following line if the finalizer is overridden above.
-                // GC.SuppressFinalize(this);
-            }
-
-            #endregion
-
-            #endregion
-
-            #region Property
-
-            #endregion
         }
     }
 

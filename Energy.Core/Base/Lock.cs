@@ -14,12 +14,12 @@ namespace Energy.Base
         /// <summary>Create stamp</summary>
         public DateTimeOffset CreateStamp { get { return _Create; } }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Lock()
         {
-            System.Diagnostics.Debug.WriteLine(string.Format("Lock object {0} created at {1}"
-                , Energy.Base.Hex.IntegerToHex(this.GetHashCode())
-                , Energy.Core.Bug.CallingMethod(1)
-                ));
+            Energy.Core.Bug.Write("Lock {0} created at {1}", this.GetHashCode(), Energy.Core.Bug.CallingMethod(1));
         }
     }
 }
