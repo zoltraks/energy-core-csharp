@@ -12,10 +12,6 @@ namespace Energy.Base
         /// <summary>Value</summary>
         public long Value { get { return GetValue(); } set { SetValue(value); } }
 
-        private ulong _Absolute;
-        /// <summary>Value</summary>
-        public ulong Absolute { get { return GetAbsolute(); } set { SetAbsolute(value); } }
-
         private long _Minimum;
         /// <summary>Minimum</summary>
         public long Minimum { get { return GetMinimum(); } set { SetMinimum(value); } }
@@ -25,6 +21,11 @@ namespace Energy.Base
         public long Maximum { get { return GetMaximum(); }  set { SetMaximum(value); } }
 
         private bool _Overflow;
+        /// <summary>Overflow</summary>
+        public bool Overflow { get { return GetOverflow(); } set { SetOverflow(value); } }
+
+        /// <summary>Value</summary>
+        public ulong Absolute { get { return GetAbsolute(); } set { SetAbsolute(value); } }
 
         public Counter()
         {
@@ -50,9 +51,6 @@ namespace Energy.Base
             _Maximum = maximum;
             _Value = value;
         }
-
-        /// <summary>Overflow</summary>
-        public bool Overflow { get { return GetOverflow(); } set { SetOverflow(value); } }
 
         public long GetValue()
         {

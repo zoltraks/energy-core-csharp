@@ -7,6 +7,27 @@ using System.Threading;
 
 namespace Energy.Source
 {
+    #region Template
+
+    /// <summary>
+    /// Generic method with type of SQL connection driver class
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Connection<T> : Connection
+    {
+        public Connection()
+        {
+            this.Vendor = typeof(T);
+        }
+
+        public Connection(string connectionString)
+            : base(typeof(T), connectionString)
+        {
+        }
+    }
+
+    #endregion
+
     #region Connection
 
     /// <summary>
@@ -57,11 +78,6 @@ SQL server to run out of free connections.
             this.Timeout = connection.ConnectionTimeout;
         }
 
-        public Connection(Configuration configuration)
-        {
-            this.Configuration = configuration;
-        }
-
         #endregion
 
         #region Lock
@@ -79,7 +95,7 @@ SQL server to run out of free connections.
         private string _ConnectionString;
 
         /// <summary>
-        /// Connection string used for opening SQL connection.
+        /// Connection string used for opening SQL database connection.
         /// </summary>
         public string ConnectionString
         {
@@ -109,23 +125,6 @@ SQL server to run out of free connections.
                 if (value == Vendor)
                     return;
                 SetVendor(value);
-            }
-        }
-
-        private Energy.Source.Configuration _Configuration;
-
-        /// <summary>Configuration</summary>
-        public Energy.Source.Configuration Configuration
-        {
-            get
-            {
-                return _Configuration;
-            }
-            private set
-            {
-                if (_Configuration == value)
-                    return;
-                _Configuration = value;
             }
         }
 
@@ -167,12 +166,21 @@ SQL server to run out of free connections.
 
         #endregion
 
-        public void SetVendor(Type vendor)
+        private Type GetVendor()
+        {
+            lock (_PropertyLock)
+            {
+                return _Vendor;
+            }
+        }
+
+        private void SetVendor(Type vendor)
         {
             if (vendor == null)
                 throw new ArgumentNullException();
-            if (!vendor.IsSubclassOf(typeof(DbConnection)))
-                throw new Exception("Vendor must derrive from DbConnection class");
+            if (!(vendor is IDbConnection))
+                throw new Exception("Vendor must implement IDbConnection interface");
+            //Close();
             lock (_PropertyLock)
             {
                 _Vendor = vendor;
@@ -199,12 +207,19 @@ SQL server to run out of free connections.
         /// <returns></returns>
         public IDbConnection Create()
         {
-            Type vendor = Vendor;
+            Type vendor;
+            string connectionString;
+
+            lock (_PropertyLock)
+            {
+                vendor = _Vendor;
+                connectionString = _ConnectionString;
+            }
             IDbConnection _ = null;
             try
             {
                 _ = (IDbConnection)Activator.CreateInstance(vendor);
-                _.ConnectionString = ConnectionString;
+                _.ConnectionString = connectionString;
             }
             catch (Exception x)
             {
@@ -396,11 +411,11 @@ SQL server to run out of free connections.
             {
                 switch (number)
                 {
-                    case 1042: // Unable to connect to any of the specified MySQL hosts.
+                    case 1042:  // Unable to connect to any of the specified MySQL hosts.
                         result.Connection = true;
                         result.Damage = true;
                         break;
-                    case 1045: // Access denied for user 'horizon'@'localhost' (using password: YES)
+                    case 1045:  // Access denied for user 'horizon'@'localhost' (using password: YES)
                         result.Access = true;
                         break;
                     case 53:
@@ -483,6 +498,11 @@ SQL server to run out of free connections.
             return result.Timeout || result.Damage;
         }
 
+        private bool Catch(Exception x)
+        {
+            return Catch(x, null);
+        }
+
         /// <summary>
         /// Get array of error numbers from database exception.
         /// </summary>
@@ -548,11 +568,6 @@ SQL server to run out of free connections.
                 reader.Close();
                 return table;
             }
-        }
-
-        private bool Catch(Exception x)
-        {
-            return Catch(x, null);
         }
 
         public virtual DataTable Fetch(string query)
@@ -635,22 +650,15 @@ SQL server to run out of free connections.
 
         private void SetError(Exception x)
         {
-            ErrorException = x;
-            ErrorStatus = x.Message;
-
+            int number = 0;
             int[] error = GetErrorNumber(x);
-            if (error == null || error.Length == 0)
-                ErrorNumber = 0;
-            else
+            if (error.Length > 0)
+                number = error[0];
+            lock (_PropertyLock)
             {
-                for (int i = 0; i < error.Length; i++)
-                {
-                    if (error[i] != 0)
-                    {
-                        ErrorNumber = error[i];
-                        break;
-                    }
-                }
+                _ErrorException = x;
+                _ErrorStatus = x.Message;
+                _ErrorNumber = number;
             }
         }
 
@@ -782,12 +790,11 @@ SQL server to run out of free connections.
             Energy.Source.Connection copy = new Energy.Source.Connection();
             lock (_PropertyLock)
             {
-                if (!string.IsNullOrEmpty(_ConnectionString))
-                    copy.ConnectionString = _ConnectionString;
-                if (_Vendor != null)
-                    copy.Vendor = _Vendor;
-                if (_Configuration != null)
-                    copy.Configuration = _Configuration;
+                copy.ConnectionString = _ConnectionString;
+                copy.Vendor = _Vendor;
+                copy.Timeout = _Timeout;
+                copy.Repeat = _Repeat;
+                copy.Log = this.Log;
             }
             return copy;
             //    Energy.Source.Connection clone = new Energy.Source.Connection();
@@ -800,27 +807,6 @@ SQL server to run out of free connections.
         public object Clone()
         {
             return Copy();
-        }
-    }
-
-    #endregion
-
-    #region Generic
-
-    /// <summary>
-    /// Generic method with type of SQL connection driver class
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Connection<T> : Connection
-    {
-        public Connection()
-        {
-            this.Vendor = typeof(T);
-        }
-
-        public Connection(string connectionString)
-            : base(typeof(T), connectionString)
-        {
         }
     }
 

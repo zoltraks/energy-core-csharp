@@ -45,9 +45,9 @@ namespace SqlServerConnection
             Console.WriteLine("Time from server: {0}", Energy.Base.Cast.DateTimeToString(stamp));
         }
 
-        private static void MakeTest1(Energy.Interface.ISourceConnection connection)
+        private static void MakeTest1(Energy.Source.Connection connection)
         {
-            connection.Open
+            Console.WriteLine(connection.Vendor.GetType().Name);
         }
     }
 }

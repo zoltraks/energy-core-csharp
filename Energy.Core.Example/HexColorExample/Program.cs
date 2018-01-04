@@ -33,6 +33,8 @@ namespace HexColorExample
             var html1 = x1.ToString();
             Console.Write("new Energy.Base.Color((uint)c.ToArgb()) = ");
             Console.WriteLine(html1);
+
+            Console.ReadLine();
         }
     }
 }
