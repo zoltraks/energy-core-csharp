@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Energy.Core, Version=2017.11.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Package\Energy.Core.17.11.0\lib\net20\Energy.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -45,6 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Energy.Core\Energy.Core.csproj">
+      <Project>{c8a325c9-5193-4819-9668-03f70904c9b7}</Project>
+      <Name>Energy.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
