@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByteMangleTest", "Energy.Core.Example\ByteMangleTest\ByteMangleTest.csproj", "{8F32143D-B4B1-4957-8FF9-4792C9D0C701}"
 EndProject
@@ -92,6 +92,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Base64UTF8Console", "Energy.Core.Example\Base64UTF8Console\Base64UTF8Console.csproj", "{A6FC7ECB-8C9B-4B4B-9CF0-2EE6E80BED6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfService", "Energy.Core.Example\WcfService\WcfService.csproj", "{BCBD5D68-FC10-48F4-9266-10360EB81137}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaExampleNLua", "Energy.Core.Example\LuaExampleNLua\LuaExampleNLua.csproj", "{F6B90A51-0463-43BE-831C-BB7C89538904}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xml", "Xml", "{6C2F6250-A5A4-46EB-A357-6B6EA1498ECF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -445,6 +449,18 @@ Global
 		{BCBD5D68-FC10-48F4-9266-10360EB81137}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BCBD5D68-FC10-48F4-9266-10360EB81137}.Release|x86.ActiveCfg = Release|Any CPU
 		{BCBD5D68-FC10-48F4-9266-10360EB81137}.Release|x86.Build.0 = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -481,6 +497,7 @@ Global
 		{A26D82AC-6318-4008-9B74-FC1560C80512} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 		{A6FC7ECB-8C9B-4B4B-9CF0-2EE6E80BED6B} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 		{BCBD5D68-FC10-48F4-9266-10360EB81137} = {43C70BAA-B55F-4C02-9AB8-1C7CB185F3D4}
+		{F6B90A51-0463-43BE-831C-BB7C89538904} = {8BD294C2-FE8E-4FFC-833E-A02BF46EF1C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

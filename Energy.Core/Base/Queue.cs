@@ -9,7 +9,7 @@ namespace Energy.Base
         private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
 
         public Queue()
-        {            
+        {
         }
 
         public Queue(T[] list)
@@ -52,7 +52,7 @@ namespace Energy.Base
         /// Put element at the end of queue.
         /// </summary>
         /// <param name="item">Element</param>
-        public void Put(T item)
+        public void Push(T item)
         {
             lock (_List)
             {
@@ -65,7 +65,7 @@ namespace Energy.Base
         /// </summary>
         /// <remarks>Using one element instead of array may be more efficient.</remarks>
         /// <param name="array">Array of elements</param>
-        public void Put(T[] array)
+        public void Push(T[] array)
         {
             lock (_List)
             {
@@ -90,7 +90,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Take a number of elements from queue, remove them and return array of elements taken. 
+        /// Take a number of elements from queue, remove them and return array of elements taken.
         /// Take(0) will return all elements from queue and empty it.
         /// </summary>
         /// <param name="count">Number of elements</param>
@@ -136,6 +136,43 @@ namespace Energy.Base
                 {
                     _List.Insert(i, list[i]);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Delete number of last elements from queue and return them.
+        /// </summary>
+        /// <param name="count">Number of elements</param>
+        /// <returns>Array of elements</returns>
+        public T[] Chop(int count)
+        {
+            lock (_List)
+            {
+                if (count > _List.Count)
+                    count = _List.Count;
+                if (count == 0)
+                    return new T[] { };
+                int first = _List.Count - count;
+                List<T> list = _List.GetRange(first, count);
+                _List.RemoveRange(first, count);
+                return list.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Delete last element from queue and return it.
+        /// </summary>
+        /// <returns>Element or default if queue was empty</returns>
+        public T Chop()
+        {
+            lock (_List)
+            {
+                if (_List.Count == 0)
+                    return default(T);
+                int n = _List.Count - 1;
+                T last = _List[n];
+                _List.RemoveAt(n);
+                return last;
             }
         }
     }

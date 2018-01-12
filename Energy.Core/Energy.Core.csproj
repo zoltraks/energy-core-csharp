@@ -4,7 +4,7 @@
     <AssemblyName>Energy.Core</AssemblyName>
     <Version>18.01.0</Version>
     <FileVersion>18.01.0</FileVersion>
-    <AssemblyVersion>2018.01.04</AssemblyVersion>
+    <AssemblyVersion>2018.01.12</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
