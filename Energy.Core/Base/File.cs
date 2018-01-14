@@ -391,39 +391,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove useless files from list (zero sized or files that not exist)
-        /// </summary>
-        /// <param name="files">string[]</param>
-        /// <returns>string[]</returns>
-        public static string[] FileRemoveUseless(string[] files)
-        {
-            if (files == null)
-            {
-                return null;
-            }
-
-            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                try
-                {
-                    if (System.IO.File.Exists(files[i]))
-                    {
-                        System.IO.FileInfo info = new System.IO.FileInfo(files[i]);
-                        if (info.Length > 0)
-                        {
-                            list.Add(files[i]);
-                        }
-                    }
-                }
-                catch { }
-            }
-
-            return list.ToArray();
-        }
-
-        /// <summary>
         /// Locate file
         /// </summary>
         /// <param name="command">string</param>
@@ -471,7 +438,7 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(file))
                 return "";
 
-            file = ChangeDirectorySeparatorToNative(file);
+            file = Energy.Base.Path.ChangeSeparator(file);
 
             if (search == null || search.Length == 0)
             {
@@ -501,7 +468,7 @@ namespace Energy.Base
             {
                 for (int i = 0; i < search.Length; i++)
                 {
-                    search[i] = ChangeDirectorySeparatorToNative(search[i]);
+                    search[i] = Energy.Base.Path.ChangeSeparator(search[i]);
                 }
             }
             if (extension == null || extension.Length == 0)
@@ -584,32 +551,6 @@ namespace Energy.Base
             }
 
             return "";
-        }
-
-        /// <summary>
-        /// Change any directory separator to native one for compatibility
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        private static string ChangeDirectorySeparatorToNative(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath))
-                return filePath;
-            if (System.IO.Path.DirectorySeparatorChar == '\\')
-            {
-                if (filePath.IndexOf('/') < 0)
-                    return filePath;
-                else
-                    return filePath.Replace('/', '\\');
-            }
-            if (System.IO.Path.DirectorySeparatorChar == '/')
-            {
-                if (filePath.IndexOf('\\') < 0)
-                    return filePath;
-                else
-                    return filePath.Replace('\\', '/');
-            }
-            return filePath;
         }
 
         /// <summary>

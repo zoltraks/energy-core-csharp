@@ -140,5 +140,35 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Separator
+
+        /// <summary>
+        /// Change any directory separator to native one for compatibility
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string ChangeSeparator(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+                return filePath;
+            if (System.IO.Path.DirectorySeparatorChar == '\\')
+            {
+                if (filePath.IndexOf('/') < 0)
+                    return filePath;
+                else
+                    return filePath.Replace('/', '\\');
+            }
+            if (System.IO.Path.DirectorySeparatorChar == '/')
+            {
+                if (filePath.IndexOf('\\') < 0)
+                    return filePath;
+                else
+                    return filePath.Replace('\\', '/');
+            }
+            return filePath;
+        }
+
+        #endregion
     }
 }
