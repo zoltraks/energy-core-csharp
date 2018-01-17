@@ -143,7 +143,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent date and time as ISO readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00". 
+        /// Represent date and time as ISO readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00".
         /// If day is not set (equal to "0001-01-01", only time will be returned. Milliseconds are optional.
         /// </summary>
         /// <param name="stamp">Date and time</param>
@@ -324,6 +324,8 @@ namespace Energy.Base
             return result;
         }
 
+        #region Leap
+
         /// <summary>
         /// Sample subroutine to calculate if a year is a leap year.
         /// </summary>
@@ -333,5 +335,95 @@ namespace Energy.Base
         {
             return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
         }
+
+        #endregion
+
+        #region Truncate
+
+        /// <summary>
+        /// Truncate DateTime to desired decimal precision of seconds
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <param name="precision"></param>
+        /// <returns></returns>
+        public static DateTime Truncate(DateTime dateTime, int precision)
+        {
+            TimeSpan time = Truncate(dateTime.TimeOfDay, precision);
+            return dateTime.Date.Add(time);
+        }
+
+        /// <summary>
+        /// Truncate DateTime to whole seconds
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime Truncate(DateTime dateTime)
+        {
+            return Truncate(dateTime, 0);
+        }
+
+        /// <summary>
+        /// Truncate TimeSpan to desired decimal precision of seconds
+        /// </summary>
+        /// <param name="timeSpan"></param>
+        /// <param name="precision"></param>
+        /// <returns></returns>
+        public static TimeSpan Truncate(TimeSpan timeSpan, int precision)
+        {
+            if (precision >= 7)
+                return timeSpan;
+            long ticks = timeSpan.Ticks;
+            long seconds = ticks / System.TimeSpan.TicksPerSecond;
+            if (precision < 1)
+                return new TimeSpan(seconds * System.TimeSpan.TicksPerSecond);
+            int fraction = (int)(ticks % System.TimeSpan.TicksPerSecond);
+            int factor = (int)Energy.Base.Number.Power10[7 - precision];
+            int reminder = factor * (int)(fraction / factor);
+            return new TimeSpan(ticks - fraction + reminder);
+        }
+
+        #endregion
+
+        #region Round
+
+        /// <summary>
+        /// Round DateTime to desired decimal precision of seconds
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <param name="precision"></param>
+        /// <returns></returns>
+        public static DateTime Round(DateTime dateTime, int precision)
+        {
+            TimeSpan time = Round(dateTime.TimeOfDay, precision);
+            return dateTime.Date.Add(time);
+        }
+
+        /// <summary>
+        /// Round DateTime to whole seconds
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime Round(DateTime dateTime)
+        {
+            return Round(dateTime, 0);
+        }
+
+        /// <summary>
+        /// Round TimeSpan to desired decimal precision of seconds
+        /// </summary>
+        /// <param name="timeSpan"></param>
+        /// <param name="precision"></param>
+        /// <returns></returns>
+        public static TimeSpan Round(TimeSpan timeSpan, int precision)
+        {
+            if (precision >= 7)
+                return timeSpan;
+            long ticks = timeSpan.Ticks;
+            double seconds = 1.0 * ticks / System.TimeSpan.TicksPerSecond;
+            double round = Math.Round(seconds, precision);
+            return new TimeSpan((long)(round * System.TimeSpan.TicksPerSecond));
+        }
+
+        #endregion
     }
 }

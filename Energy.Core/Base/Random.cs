@@ -6,7 +6,19 @@ namespace Energy.Base
 {
     public class Random
     {
+        #region Private
+
         private static readonly object _GetRandomGuidLock = new object();
+
+        private static System.Random _RandomObject;
+
+        private static readonly object _RandomObjectLock = new object();
+
+        private static readonly string _DefaultRandomTextCharacterList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+        #endregion
+
+        #region Guid
 
         /// <summary>
         /// Get random GUID identifier
@@ -20,9 +32,9 @@ namespace Energy.Base
             }
         }
 
-        private static System.Random _RandomObject;
+        #endregion
 
-        private static readonly object _RandomObjectLock = new object();
+        #region Integer
 
         public static int GetNextInteger(int minimum, int maximum)
         {
@@ -44,14 +56,9 @@ namespace Energy.Base
             return GetNextInteger(0, count - 1);
         }
 
-        /// <summary>
-        /// Generate random text.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetRandomText()
-        {
-            return GetRandomText("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 3, 10);
-        }
+        #endregion
+
+        #region Text
 
         /// <summary>
         /// Generate random text.
@@ -72,6 +79,40 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Generate random text.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetRandomText()
+        {
+            return GetRandomText(_DefaultRandomTextCharacterList, 3, 10);
+        }
+
+        /// <summary>
+        /// Generate random text.
+        /// </summary>
+        /// <param name="minimum">Minimum number of characters</param>
+        /// <param name="maximum">Maximum number of characters</param>
+        /// <returns></returns>
+        public static string GetRandomText(int minimum, int maximum)
+        {
+            return GetRandomText(_DefaultRandomTextCharacterList, minimum, maximum);
+        }
+
+        /// <summary>
+        /// Generate random text.
+        /// </summary>
+        /// <param name="length">Number of characters</param>
+        /// <returns></returns>
+        public static string GetRandomText(int length)
+        {
+            return GetRandomText(_DefaultRandomTextCharacterList, length, length);
+        }
+
+        #endregion
+
+        #region Hex
+
+        /// <summary>
         /// Generate random hexadecimal number.
         /// </summary>
         /// <param name="length">Number of hexadecimal characters</param>
@@ -89,11 +130,13 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random hexadecimal number.
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public static string GetRandomHex()
         {
             return GetRandomHex(8);
         }
+
+        #endregion
     }
 }

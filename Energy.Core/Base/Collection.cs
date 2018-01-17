@@ -251,17 +251,23 @@ namespace Energy.Base
             {
                 get
                 {
-                    return _CaseSensitive;
+                    lock (_Lock)
+                    {
+                        return _CaseSensitive;
+                    }
                 }
                 set
                 {
-                    if (_CaseSensitive == value)
-                        return;
-                    _CaseSensitive = value;
-                    if (value)
-                        Index = null;
-                    else
-                        RebuildIndex();
+                    lock (_Lock)
+                    {
+                        if (_CaseSensitive == value)
+                            return;
+                        _CaseSensitive = value;
+                        if (value)
+                            Index = null;
+                        else
+                            RebuildIndex();
+                    }
                 }
             }
 
@@ -375,6 +381,31 @@ namespace Energy.Base
                         foreach (string key in Index.Keys)
                         {
                             list.Add(string.Concat(Index[key], separator, Energy.Base.Cast.ObjectToString(base[Index[key]])));
+                        }
+                    }
+                    return list.ToArray();
+                }
+            }
+
+            public string[] ToArray()
+            {
+                List<string> list = new List<string>();
+                lock (_Lock)
+                {
+                    if (CaseSensitive)
+                    {
+                        foreach (string key in base.Keys)
+                        {
+                            list.Add(key);
+                            list.Add(Energy.Base.Cast.ObjectToString(base[key]));
+                        }
+                    }
+                    else
+                    {
+                        foreach (string key in Index.Keys)
+                        {
+                            list.Add(Index[key]);
+                            list.Add(Energy.Base.Cast.ObjectToString(base[Index[key]]));
                         }
                     }
                     return list.ToArray();

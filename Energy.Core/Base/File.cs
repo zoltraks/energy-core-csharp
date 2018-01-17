@@ -143,49 +143,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip quotation from file path.
-        /// Converts C:\"Program Files"\"Dir" into C:\Program Files\Dir.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string StripQuotation(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("\""))
-                return path;
-            return path.Replace("\"", null);
-        }
-
-        /// <summary>
-        /// Converts DOS backslashes into UNIX slashes in path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string ToDosPath(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("/"))
-                return path;
-            return path.Replace("/", "\\");
-        }
-
-        /// <summary>
-        /// Convert UNIX slashes into DOS backslashes in path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string ToUnixPath(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("\\"))
-                return path;
-            return path.Replace("\\", "/");
-        }
-
-        /// <summary>
         /// Include leading root directory to the path if not specified
         /// </summary>
         /// <param name="path">string</param>
@@ -295,7 +252,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return true if file name does not contain expteions
+        /// Return true if file name does not contain extension
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -553,6 +510,8 @@ namespace Energy.Base
             return "";
         }
 
+        #region Make directory
+
         /// <summary>
         /// Create directory if not exists
         /// </summary>
@@ -573,10 +532,72 @@ namespace Energy.Base
                 System.IO.DirectoryInfo dir = System.IO.Directory.CreateDirectory(path);
                 return dir != null;
             }
-            catch
+            catch (Exception x)
             {
+                Energy.Core.Bug.Catch(x);
                 return false;
             }
         }
+
+        #endregion
+
+        #region Remove directory
+
+        /// <summary>
+        /// Remove directory if exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="recursive"></param>
+        /// <returns>True if directory was removed or not exists</returns>
+        public static bool RemoveDirectory(string path, bool recursive)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            try
+            {
+                if (!System.IO.Directory.Exists(path))
+                {
+                    return true;
+                }
+                System.IO.Directory.Delete(path, recursive);
+                return true;
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Remove directory if exists and is empty
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>True if directory was removed or not exists</returns>
+        public static bool RemoveDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            try
+            {
+                if (!System.IO.Directory.Exists(path))
+                {
+                    return true;
+                }
+                System.IO.Directory.Delete(path);
+                return true;
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+                return false;
+            }
+        }
+
+        #endregion
     }
 }

@@ -97,6 +97,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaExampleNLua", "Energy.Co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xml", "Xml", "{6C2F6250-A5A4-46EB-A357-6B6EA1498ECF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestBinaryGetPut", "Energy.Core.Example\RestBinaryGetPut\RestBinaryGetPut.csproj", "{71DCD053-3DFD-448F-9C8B-30273F058542}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -461,6 +463,18 @@ Global
 		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|x86.ActiveCfg = Release|Any CPU
 		{F6B90A51-0463-43BE-831C-BB7C89538904}.Release|x86.Build.0 = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Debug|x86.Build.0 = Debug|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|x86.ActiveCfg = Release|Any CPU
+		{71DCD053-3DFD-448F-9C8B-30273F058542}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -498,6 +512,7 @@ Global
 		{A6FC7ECB-8C9B-4B4B-9CF0-2EE6E80BED6B} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 		{BCBD5D68-FC10-48F4-9266-10360EB81137} = {43C70BAA-B55F-4C02-9AB8-1C7CB185F3D4}
 		{F6B90A51-0463-43BE-831C-BB7C89538904} = {8BD294C2-FE8E-4FFC-833E-A02BF46EF1C9}
+		{71DCD053-3DFD-448F-9C8B-30273F058542} = {43C70BAA-B55F-4C02-9AB8-1C7CB185F3D4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

@@ -292,6 +292,23 @@ namespace Energy.Base
         /// <param name="array">Byte array</param>
         /// <param name="size">Number of bytes in one line</param>
         /// <param name="divide">Put extra space between each division columns</param>
+        /// <param name="offset">Include offset with specified dimension in bytes or -1 for autosize</param>
+        /// <param name="group">Group bytes together 2 for words, 4 for double words, etc.</param>
+        /// <param name="representation">Include character representation</param>
+        /// <returns>Text representation</returns>
+        public static string Print(byte[] array, int size, int divide, int offset, int group, bool representation)
+        {
+            if (array == null || array.Length == 0)
+                return "";
+            return "";
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <param name="size">Number of bytes in one line</param>
+        /// <param name="divide">Put extra space between each division columns</param>
         /// <param name="representation">Character representation</param>
         /// <returns>Text representation</returns>
         public static string Print(byte[] array, int size, int divide, bool representation)
@@ -393,7 +410,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random hexadecimal number.
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public static string Random()
         {

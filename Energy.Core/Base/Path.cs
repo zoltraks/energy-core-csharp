@@ -169,6 +169,68 @@ namespace Energy.Base
             return filePath;
         }
 
+        /// <summary>
+        /// Convert UNIX slashes into DOS backslashes in path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ToDos(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("/"))
+                return path;
+            return path.Replace("/", "\\");
+        }
+
+        /// <summary>
+        /// Converts DOS backslashes into UNIX slashes in path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ToUnix(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("\\"))
+                return path;
+            return path.Replace("\\", "/");
+        }
+
+        /// <summary>
+        /// Include trailing path separator if not exists. Works with DOS and UNIX style.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string IncludeTrailingSeparator(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+            if (path.EndsWith("\\") || path.EndsWith("/"))
+                return path;
+            path = string.Concat(path, System.IO.Path.DirectorySeparatorChar);
+            return path;
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip quotation from file path.
+        /// Converts C:\"Program Files"\"Dir" into C:\Program Files\Dir.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string StripQuotation(string path)
+        {
+            if (path == null || path.Length == 0)
+                return path;
+            if (!path.Contains("\""))
+                return path;
+            return path.Replace("\"", null);
+        }
+
         #endregion
     }
 }
