@@ -102,7 +102,7 @@ namespace SqlServerPlainReport
             Console.WriteLine("Using FetchDataTable()");
             benchmark = Energy.Core.Benchmark.Profile(() =>
             {
-                DataTable t10 = db.FetchDataTable(query);
+                DataTable t10 = db.Fetch(query);
                 if (t10 == null)
                     Console.WriteLine(db.GetErrorText());
                 else
@@ -115,7 +115,7 @@ namespace SqlServerPlainReport
             Console.WriteLine("Using FetchDataTable2()");
             benchmark = Energy.Core.Benchmark.Profile(() =>
             {
-                DataTable t10 = db.FetchDataTableRead(query);
+                DataTable t10 = db.Fetch(query);
                 if (t10 == null)
                     Console.WriteLine(db.GetErrorText());
                 else

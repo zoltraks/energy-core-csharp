@@ -41,9 +41,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\Energy.Core\Energy.Core.csproj">
       <Project>{c8a325c9-5193-4819-9668-03f70904c9b7}</Project>
       <Name>Energy.Core</Name>
