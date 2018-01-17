@@ -51,7 +51,7 @@ namespace SqlServerPlainReport
 			query = script.DropTable(table.Name);
             if (db.Execute(query) < 0)
             {
-                Console.WriteLine(db.ErrorStatus);
+                Console.WriteLine(db.ErrorMessage);
             }
             Console.WriteLine(query);
 			Energy.Query.Script scriptBuilder = new Energy.Query.Script ();
@@ -62,7 +62,7 @@ namespace SqlServerPlainReport
 			query = script.CreateTable(table, null);
             if (db.Execute(query) < 0)
             {
-                Console.WriteLine(db.ErrorStatus);
+                Console.WriteLine(db.ErrorMessage);
             }
             Console.WriteLine(query);
             Console.ReadLine();

@@ -50,7 +50,7 @@ namespace Energy.Query
         }
 
 		private Energy.Query.Format _Format;
-				
+
 		public Energy.Query.Format Format {
 			get {
 				if (_Format == null)
@@ -61,7 +61,7 @@ namespace Energy.Query
 				_Format = value;
 			}
 		}
-			
+
         #region CREATE
 
         public virtual string CreateTable(Energy.Source.Structure.Table table)
@@ -82,7 +82,7 @@ namespace Energy.Query
         public virtual string CreateIndex(Energy.Source.Structure.Table table)
         {
 			throw new NotImplementedException ();
-        }        
+        }
 
         #endregion
 

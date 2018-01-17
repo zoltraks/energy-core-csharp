@@ -56,26 +56,26 @@ SQL server to run out of free connections.
 
         public Connection(Type vendor)
         {
-            this.Vendor = vendor;
+            _Vendor = vendor;
         }
 
         public Connection(Type vendor, string connectionString)
             : this(vendor)
         {
-            this.ConnectionString = connectionString;
+            _ConnectionString = connectionString;
         }
 
         public Connection(Type vendor, Configuration configuration)
             : this(vendor)
         {
-            this.ConnectionString = configuration.ConnectionString;
+            _ConnectionString = configuration.ConnectionString;
+            _Timeout = configuration.Timeout;
         }
 
         public Connection(IDbConnection connection)
         {
-            this.Vendor = connection.GetType();
-            this.ConnectionString = connection.ConnectionString;
-            this.Timeout = connection.ConnectionTimeout;
+            _Vendor = connection.GetType();
+            _ConnectionString = connection.ConnectionString;
         }
 
         public static explicit operator Energy.Source.Connection(DbConnection connection)
@@ -97,64 +97,96 @@ SQL server to run out of free connections.
         private string _ConnectionString;
 
         /// <summary>
-        /// Connection string used for opening SQL database connection.
+        /// Connection string used for opening database connection
         /// </summary>
-        public string ConnectionString
-        {
-            get
-            {
-                return _ConnectionString;
-            }
-            set
-            {
-                _ConnectionString = value;
-            }
-        }
+        public string ConnectionString { get { return GetConnectionString(); } set { SetConnectionString(value); } }
 
         private System.Type _Vendor;
 
         /// <summary>
-        /// DbConnection vendor class for SQL connection.
+        /// Connection vendor class for database connection
         /// </summary>
         public System.Type Vendor { get { return GetVendor(); } set { SetVendor(value); } }
 
+        private bool _Persistent;
+
+        /// <summary>
+        /// Persistent connection
+        /// </summary>
+        public bool Persistent { get { return GetPersistent(); } set { SetPersistent(value); } }
+
         private int _Repeat = 0;
-        /// <summary>Repeat operation after recoverable error</summary>
-        public int Repeat
-        {
-            get
-            {
-                return _Repeat;
-            }
-            set
-            {
-                if (_Repeat == value)
-                    return;
-                _Repeat = value;
-            }
-        }
+
+        /// <summary>
+        /// Repeat operation after recoverable error
+        /// </summary>
+        public int Repeat { get { lock (_Lock) return _Repeat; } set { lock (_Lock) _Repeat = value; } }
 
         private int _Timeout = 30;
-        /// <summary>Time limit in seconds for SQL operations</summary>
+
+        /// <summary>
+        /// Time limit in seconds for SQL operations
+        /// </summary>
         public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
 
+        private Energy.Core.Log _Log;
+
+        /// <summary>
+        /// Log
+        /// </summary>
+        public Energy.Core.Log Log { get { lock (_Lock) return _Log; } set { lock (_Lock) _Log = value; } }
+
+        private int _ErrorNumber = 0;
+
+        /// <summary>
+        /// Error error number
+        /// </summary>
+        public int ErrorNumber { get { lock (_Lock) return _ErrorNumber; } }
+
+        private string _ErrorMessage = "";
+
+        /// <summary>
+        /// Last error status
+        /// </summary>
+        public string ErrorMessage { get { lock (_Lock) return _ErrorMessage; } }
+
         private Exception _ErrorException;
-        /// <summary>Repeat operation after recoverable error</summary>
-        public Exception ErrorException
+
+        /// <summary>
+        /// Last error exception
+        /// </summary>
+        public Exception ErrorException { get { lock (_Lock) return _ErrorException; } }
+
+        private IDbConnection _Connection;
+
+        /// <summary>
+        /// True if connection is active
+        /// </summary>
+        public bool Active { get { return GetActive(); } }
+
+        private string GetConnectionString()
         {
-            get
+            lock (_Lock)
             {
-                lock (_Lock)
-                    return _ErrorException;
-            }
-            private set
-            {
-                lock (_Lock)
-                    _ErrorException = value;
+                return _ConnectionString;
             }
         }
 
-        #endregion
+        private void SetConnectionString(string connectionString)
+        {
+            lock (_Lock)
+            {
+                if (0 == string.Compare(connectionString, _ConnectionString, false))
+                {
+                    return;
+                }
+                if (0 != string.Compare(connectionString, _ConnectionString, true))
+                {
+                    Close();
+                }
+                _ConnectionString = connectionString;
+            }
+        }
 
         private Type GetVendor()
         {
@@ -179,30 +211,106 @@ SQL server to run out of free connections.
             }
         }
 
-        private void Close()
+        private bool GetPersistent()
         {
             lock (_Lock)
             {
+                return _Persistent;
             }
         }
 
+        private void SetPersistent(bool persistent)
+        {
+            lock (_Lock)
+            {
+                if (persistent == _Persistent)
+                    return;
+                if (!persistent)
+                    Close();
+                _Persistent = persistent;
+            }
+        }
+
+        private bool GetActive()
+        {
+            lock (_Lock)
+            {
+                if (_Connection == null)
+                    return false;
+                return IsActive(_Connection);
+            }
+        }
+
+        #endregion
+
+        #region Event
+
+        public event EventHandler OnCreate;
+
+        public event EventHandler OnOpen;
+
+        public event EventHandler OnClose;
+
+        #endregion
+
+        #region Error
+
+        private void SetError(Exception x)
+        {
+            int number = 0;
+            int[] error = Energy.Source.Error.GetErrorNumber(x);
+            if (error.Length > 0)
+                number = error[0];
+            lock (_Lock)
+            {
+                _ErrorNumber = number;
+                _ErrorMessage = x.Message;
+                _ErrorException = x;
+            }
+        }
+
+        private void ClearError()
+        {
+            lock (_Lock)
+            {
+                _ErrorNumber = 0;
+                _ErrorMessage = "";
+                _ErrorException = null;
+            }
+        }
+
+        private int GetNegativeErrorNumber()
+        {
+            int number = ErrorNumber;
+            if (number == 0)
+                return -1;
+            return number > 0 ? -number : number;
+        }
+
         /// <summary>
-        /// Log
+        /// Get error text
         /// </summary>
-        public Energy.Core.Log Log { get; set; }
+        /// <returns></returns>
+        public string GetErrorText()
+        {
+            List<string> list = new List<string>();
+            if (ErrorNumber != 0)
+                list.Add(ErrorNumber.ToString());
+            if (!string.IsNullOrEmpty(ErrorMessage))
+                list.Add(Regex.Replace(ErrorMessage, @"(\r\n|\n|\r)+", " "));
+            return string.Join(" ", list.ToArray());
+        }
 
-        private int _ErrorNumber = 0;
-        /// <summary>ErrorNumber</summary>
-        public int ErrorNumber { get { lock (_Lock) return _ErrorNumber; } private set { lock (_Lock) _ErrorNumber = value; } }
+        #endregion
 
-        private string _ErrorStatus = "";
-        /// <summary>ErrorStatus</summary>
-        public string ErrorStatus { get { lock (_Lock) return _ErrorStatus; } private set { lock (_Lock) _ErrorStatus = value; } }
+        #region Create
 
         /// <summary>
-        /// Create connection object of vendor class.
+        /// Create connection object of vendor class
+        /// </summary>
+        /// <remarks>
         /// Used by Open() to create DbConnection object.
-        /// </summary>
+        /// </remarks>
         /// <returns></returns>
         public IDbConnection Create()
         {
@@ -221,13 +329,20 @@ SQL server to run out of free connections.
             }
             catch (Exception x)
             {
+                SetError(x);
                 (Log ?? Energy.Core.Log.Default).Write(x);
             }
             finally
             {
+                if (OnCreate != null)
+                    OnCreate(this, null);
             }
             return _;
         }
+
+        #endregion
+
+        #region Open
 
         public IDbConnection Open(IDbConnection connection)
         {
@@ -264,19 +379,83 @@ SQL server to run out of free connections.
             thread.Start();
             thread.Join(timeout * 1000);
 
-            // If we didn't connect successfully, throw an exception
             if (!success)
-            {
                 connection = null;
-            }
+
+            if (OnOpen != null)
+                OnOpen(this, null);
 
             return connection;
         }
 
         public IDbConnection Open()
         {
+            lock (_Lock)
+            {
+                if (_Persistent)
+                {
+                    Close();
+                    _Connection = Open(Create());
+                    return _Connection;
+                }
+            }
+
             return Open(Create());
         }
+
+        #endregion
+
+        #region Close
+
+        /// <summary>
+        /// Close existing connection
+        /// </summary>
+        public void Close()
+        {
+            lock (_Lock)
+            {
+                if (_Connection == null)
+                    return;
+                try
+                {
+                    _Connection.Close();
+                }
+                catch (Exception x)
+                {
+                    SetError(x);
+                    (Log ?? Energy.Core.Log.Default).Write(x);
+                }
+                try
+                {
+                    _Connection.Dispose();
+                }
+                catch
+                {
+                    Energy.Core.Bug.Write("Exception during connection dispose...");
+                }
+                finally
+                {
+                    _Connection = null;
+                    if (OnClose != null)
+                        OnClose(this, null);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Test
+
+        /// <summary>
+        /// Test database connection
+        /// </summary>
+        /// <returns></returns>
+        public bool Test()
+        {
+            return Scalar<bool>("SELECT 1");
+        }
+
+        #endregion
 
         /// <summary>
         /// Check if database connection is active.
@@ -348,32 +527,6 @@ SQL server to run out of free connections.
         private bool Catch(Exception x)
         {
             return Catch(x, null);
-        }
-
-        /// <summary>
-        /// Get array of error numbers from database exception.
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <returns></returns>
-        public static int[] GetErrorNumber(Exception exception)
-        {
-            List<int> error = new List<int>();
-            Exception e = exception;
-            while (e != null)
-            {
-                foreach (string field in new string[] {
-                    "Number",
-                    "ErrorCode",
-                })
-                {
-                    object value = Energy.Base.Class.GetFieldOrPropertyValue(e, field, true, false);
-                    int number = Energy.Base.Cast.ObjectToInteger(value);
-                    if (number != 0 && !error.Contains(number))
-                        error.Add(number);
-                }
-                e = e.InnerException;
-            }
-            return error.ToArray();
         }
 
         //public virtual DataTable Fetch(string query)
@@ -495,30 +648,6 @@ SQL server to run out of free connections.
             return true;
         }
 
-        private void SetError(Exception x)
-        {
-            int number = 0;
-            int[] error = GetErrorNumber(x);
-            if (error.Length > 0)
-                number = error[0];
-            lock (_Lock)
-            {
-                _ErrorException = x;
-                _ErrorStatus = x.Message;
-                _ErrorNumber = number;
-            }
-        }
-
-        private void ClearError()
-        {
-            lock (_Lock)
-            {
-                _ErrorNumber = 0;
-                _ErrorStatus = "";
-                _ErrorException = null;
-            }
-        }
-
         public virtual object Single(string query)
         {
             return new object();
@@ -560,11 +689,6 @@ SQL server to run out of free connections.
             return Energy.Base.Cast.StringToBool((string)Scalar(query));
         }
 
-        private int GetNegativeErrorNumber()
-        {
-            return ErrorNumber != 0 ? -Math.Abs(ErrorNumber) : -1;
-        }
-
         public virtual string Parse(string query)
         {
             return query;
@@ -575,9 +699,14 @@ SQL server to run out of free connections.
             return parameters.Parse(query);
         }
 
+        #region Dispose
+
         public void Dispose()
         {
+            Close();
         }
+
+        #endregion
 
         public virtual object Scalar(IDbCommand command)
         {
@@ -587,21 +716,44 @@ SQL server to run out of free connections.
 
         public virtual object Scalar(string query)
         {
-            int repeat = _Repeat;
+            ClearError();
+            int repeat = Repeat;
             while (repeat-- >= 0)
             {
-                using (IDbConnection connection = Open())
+                if (Persistent)
                 {
-                    if (connection == null)
+                    if (!Active && Open() == null)
                         return null;
                     try
                     {
-                        return Scalar(connection, query);
+                        lock (_Lock)
+                        {
+                            return Scalar(_Connection, query);
+                        }
                     }
                     catch (Exception x)
                     {
+                        SetError(x);
                         if (!Catch(x))
                             return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Scalar(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
+                        }
                     }
                 }
             }
@@ -622,16 +774,6 @@ SQL server to run out of free connections.
             }
         }
 
-        public string GetErrorText()
-        {
-            List<string> list = new List<string>();
-            if (ErrorNumber != 0)
-                list.Add(ErrorNumber.ToString());
-            if (!string.IsNullOrEmpty(ErrorStatus))
-                list.Add(Regex.Replace(ErrorStatus, @"(\r\n|\n|\r)+", " "));
-            return string.Join(" ", list.ToArray());
-        }
-
         public Energy.Source.Connection Copy()
         {
             Energy.Source.Connection copy = new Energy.Source.Connection();
@@ -641,15 +783,12 @@ SQL server to run out of free connections.
                 copy.Vendor = _Vendor;
                 copy.Timeout = _Timeout;
                 copy.Repeat = _Repeat;
-                copy.Log = this.Log;
+                copy.Log = _Log;
+                copy.Persistent = _Persistent;
             }
             return copy;
-            //    Energy.Source.Connection clone = new Energy.Source.Connection();
-            //    clone.ConnectionString = this.ConnectionString;
-            //    clone.Vendor = this.Vendor;
-            //    clone.Dialect = this.Dialect;
-            //    return clone;
         }
+
 
         public object Clone()
         {
