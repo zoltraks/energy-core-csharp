@@ -47,7 +47,7 @@ namespace SqlServerPlainReport
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
             string query;
             Energy.Query.Script script = new Energy.Query.Script.MySQL();
-            
+
 			query = script.DropTable(table.Name);
             if (db.Execute(query) < 0)
             {
@@ -66,13 +66,12 @@ namespace SqlServerPlainReport
             }
             Console.WriteLine(query);
             Console.ReadLine();
-            
         }
 
         private static void Test2()
         {
-            DataTable t1 = db.Fetch("SELECT * FROM UserTable");
-            string text = Energy.Base.Table.DataTableToPlainText(t1, null);
+            DataTable t1 = db.Read("SELECT * FROM UserTable");
+            string text = Energy.Base.Plain.DataTableToPlainText(t1, null);
 
             for (int j = 0; j < t1.Columns.Count; j++)
             {
@@ -102,7 +101,7 @@ namespace SqlServerPlainReport
             Console.WriteLine("Using FetchDataTable()");
             benchmark = Energy.Core.Benchmark.Profile(() =>
             {
-                DataTable t10 = db.Fetch(query);
+                DataTable t10 = db.Read(query);
                 if (t10 == null)
                     Console.WriteLine(db.GetErrorText());
                 else
@@ -115,7 +114,7 @@ namespace SqlServerPlainReport
             Console.WriteLine("Using FetchDataTable2()");
             benchmark = Energy.Core.Benchmark.Profile(() =>
             {
-                DataTable t10 = db.Fetch(query);
+                DataTable t10 = db.Read(query);
                 if (t10 == null)
                     Console.WriteLine(db.GetErrorText());
                 else

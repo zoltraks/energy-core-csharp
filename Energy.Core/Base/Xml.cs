@@ -13,7 +13,11 @@ namespace Energy.Base
     /// </summary>
     public class Xml
     {
-        private static readonly object _XmlLock = new object();
+        #region Lock
+
+        private static readonly object _XmlLock = new Energy.Base.Lock();
+
+        #endregion
 
         #region Serialize
 

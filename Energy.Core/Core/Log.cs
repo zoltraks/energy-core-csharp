@@ -141,7 +141,7 @@ namespace Energy.Core
         public virtual void Save()
         {
             for (int n = 0; n < this.Count; n++)
-            {                
+            {
                 Energy.Base.Log.Entry entry = this[n];
                 for (int i = 0; i < Destination.Count; i++)
                 {
@@ -190,7 +190,7 @@ namespace Energy.Core
             }
         }
 
-        public void Write(string message, Energy.Enumeration.LogLevel level)        
+        public void Write(string message, Energy.Enumeration.LogLevel level)
         {
             Write(Add(message, level));
         }
@@ -251,7 +251,7 @@ namespace Energy.Core
                     return true;
                 }
             }
-            
+
             #endregion
 
             #region File
@@ -289,7 +289,7 @@ namespace Energy.Core
                     {
                         log[i].Store.Add(this);
                     }
-                                
+
                     return true;
                 }
             }

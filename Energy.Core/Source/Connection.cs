@@ -539,6 +539,76 @@ SQL server to run out of free connections.
         //    return FetchDataTableRead(query);
         //}
 
+        #region Fetch
+
+        public Energy.Base.Table Fetch(string query)
+        {
+            ClearError();
+
+            Energy.Base.Table table = null;
+
+            int repeat = Repeat;
+
+            while (repeat-- >= 0)
+            {
+                using (IDbConnection connection = Open())
+                {
+                    if (connection == null)
+                        return null;
+                    try
+                    {
+                        IDbCommand command = Prepare(connection, query);
+                        CommandBehavior behaviour = CommandBehavior.CloseConnection;
+                        IDataReader reader = command.ExecuteReader(behaviour);
+
+                        DataTable schema = reader.GetSchemaTable();
+
+                        if (schema == null)
+                            break;
+
+                        table = new Energy.Base.Table();
+
+                        List<string> columnList = new List<string>();
+                        foreach (DataRow row in schema.Rows)
+                        {
+                            string columnName = System.Convert.ToString(row["ColumnName"]);
+                            columnList.Add(columnName);
+                        }
+
+                        // Read rows from DataReader and populate the DataTable
+
+                        while (reader.Read())
+                        {
+                            Energy.Base.Record record = table.New();
+                            for (int i = 0; i < columnList.Count; i++)
+                            {
+                                record[columnList[i]] = reader[i];
+                            }
+                        }
+
+                        command.Cancel();
+                        reader.Close();
+
+                        break;
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (Catch(x))
+                            continue;
+                        else
+                        {
+                            (Log ?? Energy.Core.Log.Default).Write(x);
+                            return null;
+                        }
+                    }
+                }
+            }
+            return table;
+        }
+
+        #endregion
+
         public virtual DataTable Load(string query)
         {
             ClearError();
@@ -570,9 +640,11 @@ SQL server to run out of free connections.
             }
         }
 
-        public virtual DataTable Fetch(string query)
+        #region Read
+
+        public DataTable Read(string query)
         {
-            //ClearError();
+            ClearError();
 
             DataTable table = null;
 
@@ -632,8 +704,7 @@ SQL server to run out of free connections.
                             continue;
                         else
                         {
-                            if (!LogWrite(x))
-                                throw;
+                            (Log ?? Energy.Core.Log.Default).Write(x);
                             return null;
                         }
                     }
@@ -641,6 +712,8 @@ SQL server to run out of free connections.
             }
             return table;
         }
+
+        #endregion
 
         private bool LogWrite(Exception x)
         {

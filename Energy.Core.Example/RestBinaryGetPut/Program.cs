@@ -34,6 +34,13 @@ namespace RestBinaryGetPut
 
             url = "http://localhost:6000/api/storage/xyz/";
 
+            string[] responseHeaders;
+
+            Energy.Core.Web.Head(url, out responseHeaders);
+
+            Console.WriteLine(string.Join("\n", responseHeaders));
+            Console.ReadLine();
+
             //responseData = Energy.Core.Web.Put(url, array);
 
             Energy.Core.Web.Post(url, array, out responseString);

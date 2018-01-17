@@ -427,5 +427,52 @@ namespace Energy.Core
         }
 
         #endregion
+
+        #region HEAD
+
+        /// <summary>
+        /// Perform HEAD and return status from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="responseHeaders"></param>
+        /// <returns></returns>
+        public static int Head(string url, out string[] responseHeaders)
+        {
+            byte[] responseData;
+            int statusCode = Request("HEAD", url, null, null, null, null, out responseHeaders, out responseData);
+            return statusCode;
+        }
+
+        #endregion
+
+        #region DELETE
+
+        /// <summary>
+        /// Perform DELETE and return status from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="responseHeaders"></param>
+        /// <returns></returns>
+        public static int Delete(string url, out string[] responseHeaders)
+        {
+            byte[] responseData;
+            int statusCode = Request("DELETE", url, null, null, null, null, out responseHeaders, out responseData);
+            return statusCode;
+        }
+
+        /// <summary>
+        /// Perform DELETE and return string from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="responseData"></param>
+        /// <returns></returns>
+        public static int Delete(string url, out byte[] responseData)
+        {
+            string[] responseHeaders;
+            int statusCode = Request("DELETE", url, null, null, null, null, out responseHeaders, out responseData);
+            return statusCode;
+        }
+
+        #endregion
     }
 }

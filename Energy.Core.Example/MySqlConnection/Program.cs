@@ -12,11 +12,17 @@ namespace MySqlConnection
         {
             Energy.Core.Tilde.WriteLine("~y~MySQL ~w~connection example");
 
+            Energy.Core.Log.Default.Destination.Add(new Energy.Core.Log.Target.Console());
+
             Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>();
             db.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
 
             db.OnCreate += Db_OnCreate;
             db.OnClose += Db_OnClose;
+
+            string query = "SELECT * FROM INFORMATION_SCHEMA.PROCESSLIST";
+            //Console.WriteLine(db.Read))
+            Console.WriteLine(db.Fetch(query).ToPlain());
 
             Energy.Core.Tilde.WriteLine("~c~Using 3 threads to retreive current timestamp 3 times with delay of 1 second each");
             Energy.Core.Tilde.WriteLine("~y~Starting in persistent mode (one connection only)");
@@ -49,8 +55,6 @@ namespace MySqlConnection
 
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
             Energy.Query.Script script = new Energy.Query.Script.MySQL();
-
-            string query;
 
             query = script.CreateDescription(table);
             Console.WriteLine(query);
