@@ -24,7 +24,7 @@
         T Take();
 
         /// <summary>
-        /// Take a number of elements from queue, remove them and return array of elements taken. 
+        /// Take a number of elements from queue, remove them and return array of elements taken.
         /// Take(0) will return all elements from queue and empty it.
         /// </summary>
         /// <param name="count">Number of elements</param>
@@ -42,5 +42,18 @@
         /// </summary>
         /// <param name="list">Array of elements</param>
         void Back(T[] list);
+
+        /// <summary>
+        /// Delete last element from queue and return it.
+        /// </summary>
+        /// <returns>Element or default if queue was empty</returns>
+        T Chop();
+
+        /// <summary>
+        /// Delete number of last elements from queue and return them.
+        /// </summary>
+        /// <param name="count">Number of elements</param>
+        /// <returns>Array of elements</returns>
+        T[] Chop(int count);
     }
 }

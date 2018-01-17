@@ -140,6 +140,23 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Delete last element from queue and return it.
+        /// </summary>
+        /// <returns>Element or default if queue was empty</returns>
+        public T Chop()
+        {
+            lock (_List)
+            {
+                if (_List.Count == 0)
+                    return default(T);
+                int n = _List.Count - 1;
+                T last = _List[n];
+                _List.RemoveAt(n);
+                return last;
+            }
+        }
+
+        /// <summary>
         /// Delete number of last elements from queue and return them.
         /// </summary>
         /// <param name="count">Number of elements</param>
@@ -156,23 +173,6 @@ namespace Energy.Base
                 List<T> list = _List.GetRange(first, count);
                 _List.RemoveRange(first, count);
                 return list.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Delete last element from queue and return it.
-        /// </summary>
-        /// <returns>Element or default if queue was empty</returns>
-        public T Chop()
-        {
-            lock (_List)
-            {
-                if (_List.Count == 0)
-                    return default(T);
-                int n = _List.Count - 1;
-                T last = _List[n];
-                _List.RemoveAt(n);
-                return last;
             }
         }
     }

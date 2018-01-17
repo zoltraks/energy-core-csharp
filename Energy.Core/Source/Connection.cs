@@ -33,7 +33,7 @@ namespace Energy.Source
     /// <summary>
     /// Database connection interface for application.
     /// To create new connection you have to specify vendor class which implements
-    /// DbConnection compatible with ADO.NET.
+    /// IDbConnection compatible with ADO.NET.
     /// </summary>
     [Energy.Attribute.Markdown.Text(@"
 
@@ -47,8 +47,8 @@ SQL server to run out of free connections.
 
     ")]
     public partial class Connection : IDisposable, ICloneable
-    //, Energy.Interface.IConnection
-    //, Energy.Interface.ICopy<Connection>
+        , Energy.Interface.ICopy<Connection>
+        //, Energy.Interface.IConnection
     {
         #region Constructor
 
@@ -78,15 +78,17 @@ SQL server to run out of free connections.
             this.Timeout = connection.ConnectionTimeout;
         }
 
+        public static explicit operator Energy.Source.Connection(DbConnection connection)
+        {
+            Energy.Source.Connection _ = new Energy.Source.Connection(connection);
+            return _;
+        }
+
         #endregion
 
         #region Lock
 
-        private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
-
-        private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
-
-        private readonly Energy.Base.Lock _ConnectionLock = new Energy.Base.Lock();
+        private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
         #endregion
 
@@ -114,21 +116,9 @@ SQL server to run out of free connections.
         /// <summary>
         /// DbConnection vendor class for SQL connection.
         /// </summary>
-        public System.Type Vendor
-        {
-            get
-            {
-                return _Vendor;
-            }
-            set
-            {
-                if (value == Vendor)
-                    return;
-                SetVendor(value);
-            }
-        }
+        public System.Type Vendor { get { return GetVendor(); } set { SetVendor(value); } }
 
-        private int _Repeat = 1;
+        private int _Repeat = 0;
         /// <summary>Repeat operation after recoverable error</summary>
         public int Repeat
         {
@@ -146,7 +136,7 @@ SQL server to run out of free connections.
 
         private int _Timeout = 30;
         /// <summary>Time limit in seconds for SQL operations</summary>
-        public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
+        public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
 
         private Exception _ErrorException;
         /// <summary>Repeat operation after recoverable error</summary>
@@ -154,12 +144,12 @@ SQL server to run out of free connections.
         {
             get
             {
-                lock (_PropertyLock)
+                lock (_Lock)
                     return _ErrorException;
             }
             private set
             {
-                lock (_PropertyLock)
+                lock (_Lock)
                     _ErrorException = value;
             }
         }
@@ -168,7 +158,7 @@ SQL server to run out of free connections.
 
         private Type GetVendor()
         {
-            lock (_PropertyLock)
+            lock (_Lock)
             {
                 return _Vendor;
             }
@@ -178,12 +168,21 @@ SQL server to run out of free connections.
         {
             if (vendor == null)
                 throw new ArgumentNullException();
-            if (!(vendor is IDbConnection))
+            if (!typeof(IDbConnection).IsAssignableFrom(vendor))
                 throw new Exception("Vendor must implement IDbConnection interface");
-            //Close();
-            lock (_PropertyLock)
+            lock (_Lock)
             {
+                if (vendor == _Vendor)
+                    return;
+                Close();
                 _Vendor = vendor;
+            }
+        }
+
+        private void Close()
+        {
+            lock (_Lock)
+            {
             }
         }
 
@@ -194,11 +193,11 @@ SQL server to run out of free connections.
 
         private int _ErrorNumber = 0;
         /// <summary>ErrorNumber</summary>
-        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } private set { lock (_PropertyLock) _ErrorNumber = value; } }
+        public int ErrorNumber { get { lock (_Lock) return _ErrorNumber; } private set { lock (_Lock) _ErrorNumber = value; } }
 
         private string _ErrorStatus = "";
         /// <summary>ErrorStatus</summary>
-        public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } private set { lock (_PropertyLock) _ErrorStatus = value; } }
+        public string ErrorStatus { get { lock (_Lock) return _ErrorStatus; } private set { lock (_Lock) _ErrorStatus = value; } }
 
         /// <summary>
         /// Create connection object of vendor class.
@@ -209,8 +208,7 @@ SQL server to run out of free connections.
         {
             Type vendor;
             string connectionString;
-
-            lock (_PropertyLock)
+            lock (_Lock)
             {
                 vendor = _Vendor;
                 connectionString = _ConnectionString;
@@ -223,8 +221,7 @@ SQL server to run out of free connections.
             }
             catch (Exception x)
             {
-                if (!LogWrite(x))
-                    throw;
+                (Log ?? Energy.Core.Log.Default).Write(x);
             }
             finally
             {
@@ -281,12 +278,6 @@ SQL server to run out of free connections.
             return Open(Create());
         }
 
-        public static explicit operator Energy.Source.Connection(DbConnection connection)
-        {
-            Energy.Source.Connection _ = new Energy.Source.Connection(connection);
-            return _;
-        }
-
         /// <summary>
         /// Check if database connection is active.
         /// </summary>
@@ -309,80 +300,6 @@ SQL server to run out of free connections.
             }
         }
 
-        #region CatchResult
-
-        public class CatchResult
-        {
-            bool access = false;
-            /// <summary>
-            /// Access error
-            /// </summary>
-            public bool Access { get { return access; } set { access = value; } }
-
-            bool timeout = false;
-            /// <summary>
-            /// Timeout
-            /// </summary>
-            public bool Timeout { get { return timeout; } set { timeout = value; } }
-
-            bool damage = false;
-            /// <summary>
-            /// Connection damaged
-            /// </summary>
-            public bool Damage { get { return damage; } set { damage = value; } }
-
-            bool connection = false;
-            /// <summary>
-            /// Connection error
-            /// </summary>
-            public bool Connection { get { return connection; } set { connection = value; } }
-
-            bool deadlock = false;
-            /// <summary>
-            /// Deadlock occured
-            /// </summary>
-            public bool Deadlock { get { return deadlock; } set { deadlock = value; } }
-
-            bool syntax = false;
-            /// <summary>
-            /// Syntax error
-            /// </summary>
-            public bool Syntax { get { return syntax; } set { syntax = value; } }
-
-            bool miss = false;
-            /// <summary>
-            /// Object missing like not existing column
-            /// </summary>
-            public bool Miss { get { return miss; } set { miss = value; } }
-
-            bool operation = false;
-            /// <summary>
-            /// Operation error
-            /// </summary>
-            public bool Operation { get { return operation; } set { operation = value; } }
-
-            public override string ToString()
-            {
-                List<string> list = new List<string>();
-                if (connection)
-                    list.Add("Connection error");
-                if (access)
-                    list.Add("Access error");
-                if (Timeout)
-                    list.Add("Timeout");
-                if (miss)
-                    list.Add("Missing object");
-                if (syntax)
-                    list.Add("Syntax error");
-                if (operation)
-                    list.Add("Operation error");
-                string status = string.Join(" + ", list.ToArray());
-                return status;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Check exception from database connection.
         ///
@@ -401,78 +318,11 @@ SQL server to run out of free connections.
         /// <returns>True if operation can be repeated.</returns>
         private bool Catch(Exception exception, IDbCommand command)
         {
-            CatchResult result = new Energy.Source.Connection.CatchResult();
+            Energy.Source.Error.Result result = Energy.Source.Error.Catch(exception, command);
 
             string message = exception.Message;
 
-            int[] error = GetErrorNumber(exception);
-
-            foreach (int number in error)
-            {
-                switch (number)
-                {
-                    case 1042:  // Unable to connect to any of the specified MySQL hosts.
-                        result.Connection = true;
-                        result.Damage = true;
-                        break;
-                    case 1045:  // Access denied for user 'horizon'@'localhost' (using password: YES)
-                        result.Access = true;
-                        break;
-                    case 53:
-                    case 64:    // Wystąpił błąd poziomu transportu podczas odbierania wyników z serwera. (provider: Dostawca TCP, error: 0 - Określona nazwa sieciowa już jest niedostępna.
-                    case 10054:
-                        result.Damage = true;
-                        break;
-                    case 1205:  // Deadlock
-                        result.Damage = true;
-                        result.Deadlock = true;
-                        break;
-                    case -2:
-                        result.Timeout = true;
-                        break;
-                    case 207:   // Invalid column name
-                    case 208:   // Invalid object name
-                    case 2812:  // Cannot find stored procedure
-                    case 4121:  // Cannot find either column or the user-defined function or aggregate or the name is ambiguous
-                        result.Syntax = true;
-                        result.Miss = true;
-                        break;
-                    case 102:   // Incorrect syntax near '@'
-                    case 156:   // Incorrect syntax near the keyword 'FROM'
-                    case 245:   // Conversion failed when converting the varchar value to data type int
-                    case 1038:  // An object or column name is missing or empty
-                    case 2705:  // Column names in each table must be unique
-                    case 8152:  // String or binary data would be truncated
-                        result.Syntax = true;
-                        break;
-                    case 5074:  // The index is dependent on column
-                    case 8115:  // Arithmetic overflow error converting bigint to data type numeric
-                    case 15233: // Property cannot be added. Property already exists
-                        result.Operation = true;
-                        break;
-                    case 297:   // The user does not have permission to perform this action
-                        result.Access = true;
-                        break;
-                    case -1:    // Connection error, possibly reconnecting is required
-                        result.Damage = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (exception is InvalidOperationException)
-            {
-                result.Damage = true;
-            }
-
-            // Log
-            Core.Log log = Log ?? Core.Log.Default;
-
-            if (Log != null)
-            {
-                Log.Add(result.ToString(), Enumeration.LogLevel.Trace);
-            }
+            (Log ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
 
             // Reaction
 
@@ -489,9 +339,6 @@ SQL server to run out of free connections.
             {
                 //Kill(command);
             }
-
-            if (Log != null)
-                Log.Add(result.ToString(), Enumeration.LogLevel.Error);
 
             // For timeout and damaged connection result is true.
 
@@ -561,7 +408,7 @@ SQL server to run out of free connections.
 
         private DataTable Load(IDbCommand command)
         {
-            using (IDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection))
+            using (IDataReader reader = command.ExecuteReader())
             {
                 DataTable table = new DataTable();
                 table.Load(reader);
@@ -654,7 +501,7 @@ SQL server to run out of free connections.
             int[] error = GetErrorNumber(x);
             if (error.Length > 0)
                 number = error[0];
-            lock (_PropertyLock)
+            lock (_Lock)
             {
                 _ErrorException = x;
                 _ErrorStatus = x.Message;
@@ -664,7 +511,7 @@ SQL server to run out of free connections.
 
         private void ClearError()
         {
-            lock (_PropertyLock)
+            lock (_Lock)
             {
                 _ErrorNumber = 0;
                 _ErrorStatus = "";
@@ -788,7 +635,7 @@ SQL server to run out of free connections.
         public Energy.Source.Connection Copy()
         {
             Energy.Source.Connection copy = new Energy.Source.Connection();
-            lock (_PropertyLock)
+            lock (_Lock)
             {
                 copy.ConnectionString = _ConnectionString;
                 copy.Vendor = _Vendor;
@@ -812,11 +659,12 @@ SQL server to run out of free connections.
 
     #endregion
 
+/*
     #region Base
 
     public partial class Connection
     {
-        public /*abstract*/ class DatabaseConnectionBase
+        public abstract class DatabaseConnectionBase
         {
             private string _ConnectionString;
 
@@ -956,5 +804,5 @@ SQL server to run out of free connections.
     }
 
     #endregion
+*/
 }
-
