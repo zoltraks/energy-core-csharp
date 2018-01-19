@@ -212,8 +212,12 @@ namespace Energy.Core
                 string value = m.Value;
                 if (value.Length >= 4 && value.StartsWith("~#") && value.EndsWith("#~"))
                 {
-                    list.Add(new ColorTextList.Item() { Color = current
-                        , Text = value.Substring(2, value.Length - 4).Replace("##", "#") });
+                    list.Add(new ColorTextList.Item()
+                    {
+                        Color = current
+                        ,
+                        Text = value.Substring(2, value.Length - 4).Replace("##", "#")
+                    });
                 }
                 else if (value.Length > 2 && value.StartsWith("~") && value.EndsWith("~") && value[1] != '~')
                 {
@@ -221,8 +225,12 @@ namespace Energy.Core
                 }
                 else
                 {
-                    list.Add(new ColorTextList.Item() { Color = current
-                        , Text = value });
+                    list.Add(new ColorTextList.Item()
+                    {
+                        Color = current
+                        ,
+                        Text = value
+                    });
                 }
                 m = m.NextMatch();
             }
@@ -834,11 +842,11 @@ namespace Energy.Core
         #region Exception
 
         /// <summary>
-        /// Write out exception message.
+        /// Return formatted exception message
         /// </summary>
         /// <param name="exception"></param>
         /// <param name="trace">Write also stack trace</param>
-        public static void Exception(Exception exception, bool trace)
+        public static string GetExceptionMessage(Exception exception, bool trace)
         {
             List<string> list = new List<string>();
             string message = (exception.Message ?? "").Trim();
@@ -885,6 +893,17 @@ namespace Energy.Core
 
             message = string.Join(eol, list.ToArray());
 
+            return message;
+        }
+
+        /// <summary>
+        /// Write out exception message
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="trace">Write also stack trace</param>
+        public static void Exception(Exception exception, bool trace)
+        {
+            string message = GetExceptionMessage(exception, trace);
             if (trace)
                 Tilde.WriteLine(message);
             else
@@ -892,7 +911,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write out exception message.
+        /// Write out exception message
         /// </summary>
         /// <param name="exception"></param>
         public static void Exception(Exception exception)

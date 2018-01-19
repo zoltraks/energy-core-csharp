@@ -9,6 +9,20 @@ namespace RestBinaryGetPut
     {
         static void Main(string[] args)
         {
+            try
+            {
+                Energy.Core.Web.IgnoreCertificateValidation = true;
+                Console.WriteLine(Energy.Core.Web.Get("https://atom.alyx.pl/api/test/echo/XYZ"));
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Tilde.Exception(x, true);
+            }
+            finally
+            {
+                Console.ReadLine();
+            }
+
             string currentDirectory = System.IO.Directory.GetCurrentDirectory();
             currentDirectory = Energy.Base.Path.ToUnix(currentDirectory);
             Console.WriteLine($"Current directory: {currentDirectory}");

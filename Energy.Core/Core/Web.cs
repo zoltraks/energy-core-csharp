@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Energy.Core
@@ -31,6 +33,52 @@ namespace Energy.Core
                     throw;
                 }
                 return x.Response;
+            }
+        }
+
+        #endregion
+
+        #region Certificate validation
+
+        private static bool ServerIgnoreCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return (true);
+        }
+
+        private static readonly Energy.Base.Lock _IgnoreCertificateValidationLock = new Energy.Base.Lock();
+
+        private static bool _IgnoreCertificateValidation = false;
+
+        public static bool IgnoreCertificateValidation
+        {
+            get
+            {
+                return GetIgnoreCertificateValidation();
+            }
+            set
+            {
+                SetIgnoreCertificateValidation(value);
+            }
+        }
+
+        private static bool GetIgnoreCertificateValidation()
+        {
+            lock (_IgnoreCertificateValidationLock)
+            {
+                return _IgnoreCertificateValidation;
+            }
+        }
+
+        private static void SetIgnoreCertificateValidation(bool value)
+        {
+            lock (_IgnoreCertificateValidationLock)
+            {
+                ServicePointManager.ServerCertificateValidationCallback -= ServerIgnoreCertificateValidationCallback;
+                _IgnoreCertificateValidation = value;
+                if (value)
+                {
+                    ServicePointManager.ServerCertificateValidationCallback += ServerIgnoreCertificateValidationCallback;
+                }
             }
         }
 
@@ -71,8 +119,10 @@ namespace Energy.Core
                 encoding = System.Text.Encoding.UTF8;
 
             HttpWebRequest request;
-            request = (HttpWebRequest)WebRequest.Create(url);
+            Uri requestUri = new Uri(url);
+            request = (HttpWebRequest)WebRequest.Create(requestUri);
             request.Method = method;
+            ServicePoint servicePoint = ServicePointManager.FindServicePoint(requestUri);
             if (!string.IsNullOrEmpty(contentType))
                 request.ContentType = contentType;
             if (!string.IsNullOrEmpty(acceptType))
