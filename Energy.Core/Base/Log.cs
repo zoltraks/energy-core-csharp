@@ -249,6 +249,18 @@ namespace Energy.Base
             {
                 return base.Add(target);
             }
+
+            public static Destination operator +(Destination left, Target right)
+            {
+                left.Add(right);
+                return left;
+            }
+
+            public static Destination operator -(Destination left, Target right)
+            {
+                left.Remove(right);
+                return left;
+            }
         }
 
         #endregion

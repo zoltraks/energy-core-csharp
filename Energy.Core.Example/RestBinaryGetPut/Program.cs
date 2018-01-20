@@ -7,21 +7,17 @@ namespace RestBinaryGetPut
 {
     class Program
     {
-        public class X
-        {
-            public string Name;
-        }
-
-        public class Y : Energy.Base.Collection.Array<X> { }
-
         static void Main(string[] args)
         {
             Energy.Core.Log log = Energy.Core.Log.Default;
             log.Write("1");
-            Energy.Base.Collection.Array<X> x1 = new Energy.Base.Collection.Array<X>();
-            x1 += new X() { Name = "First" };
-            Y y = new Y();
-            y += new X() { Name = "First" };
+            log.Flush();
+            log.Write("2");
+            log.Destination += new Energy.Core.Log.Target.Console() { Color = false, Immediate = false };
+            log.Write("3");
+            log.Flush();
+            log.Write("4");
+            Console.ReadLine();
             try
             {
                 Energy.Core.Web.IgnoreCertificateValidation = true;
