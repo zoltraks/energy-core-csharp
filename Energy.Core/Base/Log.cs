@@ -24,7 +24,7 @@ namespace Energy.Base
             /// <summary>
             /// Log entry time
             /// </summary>
-            public DateTime Stamp;
+            public DateTime Stamp { get; set; }
 
             /// <summary>
             /// Log entry error code
@@ -86,8 +86,8 @@ namespace Energy.Base
             }
 
             public Entry(DateTime stamp, string message)
-                : this()
             {
+                Stamp = stamp;
                 Message = message;
             }
 
@@ -185,6 +185,11 @@ namespace Energy.Base
             /// Immediately call write on new entry
             /// </summary>
             public bool Immediate { get; set; }
+
+            /// <summary>
+            /// Work in background
+            /// </summary>
+            public bool Background { get; set; }
 
             /// <summary>
             /// Minimum entry log level for being accepted

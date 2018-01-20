@@ -18,11 +18,13 @@ namespace Energy.Base
         [Serializable]
         public class Array<T> : System.Collections.Generic.List<T>
         {
+            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
             public T First
             {
                 get
                 {
-                    lock (this)
+                    lock (_Lock)
                     {
                         return base.Count == 0 ? default(T) : this[0];
                     }
@@ -33,7 +35,7 @@ namespace Energy.Base
             {
                 get
                 {
-                    lock (this)
+                    lock (_Lock)
                     {
                         return base.Count == 0 ? default(T) : this[base.Count - 1];
                     }
@@ -42,7 +44,7 @@ namespace Energy.Base
 
             public T New()
             {
-                lock (this)
+                lock (_Lock)
                 {
                     T item = (T)Activator.CreateInstance(typeof(T));
                     base.Add(item);
@@ -52,7 +54,7 @@ namespace Energy.Base
 
             public bool Equals(Array<T> array)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     if (base.Count != array.Count)
                     {
@@ -71,7 +73,7 @@ namespace Energy.Base
 
             public new T Add(T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Add(item);
                     return item;
@@ -80,7 +82,7 @@ namespace Energy.Base
 
             public new T Insert(int index, T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Insert(index, item);
                     return item;
@@ -89,7 +91,7 @@ namespace Energy.Base
 
             public new void Remove(T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Remove(item);
                 }
@@ -97,7 +99,7 @@ namespace Energy.Base
 
             public new void RemoveAt(int index)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.RemoveAt(index);
                 }
@@ -105,10 +107,22 @@ namespace Energy.Base
 
             public new void RemoveAll(Predicate<T> match)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.RemoveAll(match);
                 }
+            }
+
+            public static Array<T> operator +(Array<T> left, T right)
+            {
+                left.Add(right);
+                return left;
+            }
+
+            public static Array<T> operator -(Array<T> left, T right)
+            {
+                left.Remove(right);
+                return left;
             }
         }
 

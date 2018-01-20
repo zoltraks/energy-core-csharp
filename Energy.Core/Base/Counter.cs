@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Counter class
+    /// </summary>
     public class Counter
     {
         private readonly object _Lock = new object();
@@ -248,6 +251,50 @@ namespace Energy.Base
                     _Value = _Minimum;
                 }
             }
+        }
+
+        public static long Increment(ref long value)
+        {
+            return value = value == long.MaxValue ? 0 : value + 1;
+        }
+
+        public static ulong Increment(ref ulong value)
+        {
+            return value = value == ulong.MaxValue ? 0 : value + 1;
+        }
+
+        public static int Increment(ref int value)
+        {
+            return value = value == int.MaxValue ? 0 : value + 1;
+        }
+
+        public static uint Increment(ref uint value)
+        {
+            return value = value == uint.MaxValue ? 0 : value + 1;
+        }
+
+        public static void Increment(ref byte value)
+        {
+            value = (byte)(value == byte.MaxValue ? 0 : value + 1);
+        }
+        public static void Increment(ref sbyte value)
+        {
+            value = (sbyte)(value == sbyte.MaxValue ? 0 : value + 1);
+        }
+
+        public static float Increment(ref float value)
+        {
+            return value = value > float.MaxValue - 1 ? 0 : value + 1.0F;
+        }
+
+        public static double Increment(ref double value)
+        {
+            return value = value > double.MaxValue - 1.0 ? 0 : value + 1.0;
+        }
+
+        public static decimal Increment(ref decimal value)
+        {
+            return value = value > decimal.MaxValue - 1.0M ? 0 : value + 1.0M;
         }
     }
 }
