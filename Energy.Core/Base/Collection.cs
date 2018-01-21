@@ -20,46 +20,136 @@ namespace Energy.Base
         {
             private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
+            /// <summary>
+            /// Gets or sets the element at the specified index
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
+            public new T this[int index]
+            {
+                get
+                {
+                    lock (_Lock)
+                    {
+                        return base[index];
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        base[index] = value;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Removes all elements from the list
+            /// </summary>
+            public new void Clear()
+            {
+                lock (_Lock)
+                {
+                    base.Clear();
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the number of elements
+            /// </summary>
+            /// <remarks>
+            /// When setting to number which is higher than current capacity, default elements will be added to list
+            /// </remarks>
+            public new int Count
+            {
+                get
+                {
+                    lock (_Lock)
+                    {
+                        return base.Count;
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (value == 0)
+                        {
+                            if (base.Count > 0)
+                            {
+                                base.Clear();
+                            }
+                            return;
+                        }
+                        if (value == base.Count)
+                        {
+                            return;
+                        }
+                        else if (value > base.Count)
+                        {
+                            while (value > base.Count)
+                            {
+                                base.Add(default(T));
+                            }
+                        }
+                        else
+                        {
+                            base.RemoveRange(value, base.Count - value);
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Return first element or default if list is empty
+            /// </summary>
             public T First
             {
                 get
                 {
                     lock (_Lock)
                     {
-                        return base.Count == 0 ? default(T) : this[0];
+                        return base.Count == 0 ? default(T) : base[0];
                     }
                 }
             }
 
+            /// <summary>
+            /// Return last element or default if list is empty
+            /// </summary>
             public T Last
             {
                 get
                 {
                     lock (_Lock)
                     {
-                        return base.Count == 0 ? default(T) : this[base.Count - 1];
+                        return base.Count == 0 ? default(T) : base[base.Count - 1];
                     }
                 }
             }
 
+            /// <summary>
+            /// Create and add new element to list and return
+            /// </summary>
+            /// <returns></returns>
             public T New()
             {
+                T item = (T)Activator.CreateInstance(typeof(T));
                 lock (_Lock)
                 {
-                    T item = (T)Activator.CreateInstance(typeof(T));
                     base.Add(item);
-                    return item;
                 }
+                return item;
             }
 
             public bool Equals(Array<T> array)
             {
+                if (Count != array.Count)
+                {
+                    return false;
+                }
                 lock (_Lock)
                 {
-                    if (base.Count != array.Count)
-                    {
-                        return false;
-                    }
                     for (int i = 0; i < this.Count; i++)
                     {
                         if (!this[i].Equals(array[i]))
@@ -67,8 +157,8 @@ namespace Energy.Base
                             return false;
                         }
                     }
-                    return true;
                 }
+                return true;
             }
 
             public new T Add(T item)
@@ -102,6 +192,14 @@ namespace Energy.Base
                 lock (_Lock)
                 {
                     base.RemoveAt(index);
+                }
+            }
+
+            public new void RemoveRange(int index, int count)
+            {
+                lock (_Lock)
+                {
+                    base.RemoveRange(index, count);
                 }
             }
 

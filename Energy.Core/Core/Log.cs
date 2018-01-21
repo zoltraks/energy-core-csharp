@@ -10,7 +10,7 @@ namespace Energy.Core
     /// <summary>
     /// Log
     /// </summary>
-    public partial class Log : List<Energy.Base.Log.Entry>
+    public partial class Log
     {
         /// <summary>
         /// Destination
@@ -41,7 +41,19 @@ namespace Energy.Core
 
         #endregion
 
-        #region Singleton
+        #region Lock
+
+        private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
+        #endregion
+
+        #region Buffer
+
+        private List<Energy.Base.Log.Entry> _List = new List<Base.Log.Entry>();
+
+        #endregion
+
+        #region Default
 
         private static Log _Default = null;
 
@@ -64,7 +76,6 @@ namespace Energy.Core
                         }
                     }
                 }
-
                 return _Default;
             }
             set
@@ -75,6 +86,17 @@ namespace Energy.Core
                 }
             }
         }
+
+        #endregion
+
+        #region Property
+
+        private int _Maximum;
+
+        /// <summary>
+        /// Maximum number of entries
+        /// </summary>
+        public int Maximum { get { lock (_Lock) return _Maximum; } set { lock (_Lock) _Maximum = value; } }
 
         #endregion
 
@@ -101,13 +123,17 @@ namespace Energy.Core
         {
             if (Destination.Count == 0)
             {
-                RemoveAll(delegate(Energy.Base.Log.Entry _) { return true; });
+                lock (_Lock)
+                {
+                    _List.Clear();
+                }
                 return;
             }
-            int i = Count;
+
+            int i = _List.Count;
             while (--i >= 0)
             {
-                Energy.Base.Log.Entry entry = this[i];
+                Energy.Base.Log.Entry entry = _List[i];
                 bool remove = true;
                 for (int n = 0; n < Destination.Count; n++)
                 {
@@ -120,29 +146,52 @@ namespace Energy.Core
                 }
                 if (remove)
                 {
-                    this.RemoveAt(i);
+                    _List.RemoveAt(i);
                     continue;
                 }
             }
         }
 
-        public Energy.Base.Log.Entry Add(Exception x)
+        /// <summary>
+        /// Add entry to log
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public Energy.Base.Log.Entry Add(Energy.Base.Log.Entry entry)
         {
-            Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry(x);
-            this.Add(entry);
+            lock (_Lock)
+            {
+                _List.Add(entry);
+            }
             return entry;
         }
 
-        public void Write(Exception x)
+        /// <summary>
+        /// Add exception to log
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <returns></returns>
+        public Energy.Base.Log.Entry Add(Exception exception)
         {
-            Write(Add(x));
+            return Add(new Energy.Base.Log.Entry(exception));
+        }
+
+        /// <summary>
+        /// Write exception
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public Energy.Base.Log.Entry Write(Exception x)
+        {
+            return Write(Add(x));
         }
 
         public virtual void Save()
         {
-            for (int n = 0; n < this.Count; n++)
+            int m = _List.Count;
+            for (int n = 0; n < m; n++)
             {
-                Energy.Base.Log.Entry entry = this[n];
+                Energy.Base.Log.Entry entry = _List[n];
                 for (int i = 0; i < Destination.Count; i++)
                 {
                     Energy.Base.Log.Target target = Destination[i];
@@ -169,7 +218,7 @@ namespace Energy.Core
             return entry;
         }
 
-        public void Write(Energy.Base.Log.Entry entry)
+        public Energy.Base.Log.Entry Write(Energy.Base.Log.Entry entry)
         {
             this.Add(entry);
             for (int i = 0; i < Destination.Count; i++)
@@ -188,24 +237,25 @@ namespace Energy.Core
                     }
                 }
             }
+            return entry;
         }
 
-        public void Write(string message, Energy.Enumeration.LogLevel level)
+        public Energy.Base.Log.Entry Write(string message, Energy.Enumeration.LogLevel level)
         {
-            Write(Add(message, level));
+            return Write(Add(message, level));
         }
 
-        public void Write(string message)
+        public Energy.Base.Log.Entry Write(string message)
         {
-            Write(Add(message, Energy.Enumeration.LogLevel.Default));
+            return Write(Add(message, Energy.Enumeration.LogLevel.Default));
         }
 
-        public void Write(string message, string source, long code)
+        public Energy.Base.Log.Entry Write(string message, string source, long code)
         {
-            Write(message, source, code, Energy.Enumeration.LogLevel.Default);
+            return Write(message, source, code, Energy.Enumeration.LogLevel.Default);
         }
 
-        public void Write(string message, string source, long code, Energy.Enumeration.LogLevel level)
+        public Energy.Base.Log.Entry Write(string message, string source, long code, Energy.Enumeration.LogLevel level)
         {
             Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry()
             {
@@ -214,7 +264,7 @@ namespace Energy.Core
                 Code = code,
                 Level = level,
             };
-            Write(entry);
+            return Write(entry);
         }
     }
 
@@ -243,7 +293,7 @@ namespace Energy.Core
                             continue;
                         if (Accept(log[i]))
                         {
-                            System.Diagnostics.Trace.WriteLine(log[i].ToString(true));
+                            System.Diagnostics.Trace.WriteLine(log[i].ToString());
                         }
                         log[i].Store.Add(this);
                     }
@@ -374,6 +424,14 @@ namespace Energy.Core
                     return true;
                 }
             }
+
+            #endregion
+
+            #region System
+
+            #endregion
+
+            #region Event
 
             #endregion
         }

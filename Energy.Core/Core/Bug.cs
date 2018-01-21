@@ -10,6 +10,11 @@ namespace Energy.Core
     public class Bug
     {
         /// <summary>
+        /// Trace switch
+        /// </summary>
+        public readonly static Energy.Base.Switch Trace = false;
+
+        /// <summary>
         /// Return exception message
         /// </summary>
         /// <param name="exception">Exception object</param>
@@ -51,6 +56,16 @@ namespace Energy.Core
             }
 
             return String.Join(Environment.NewLine, message.ToArray()).Trim();
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>string</returns>
+        public static string ExceptionMessage(Exception exception)
+        {
+            return ExceptionMessage(exception, (bool)Trace);
         }
 
         /// <summary>

@@ -19,37 +19,37 @@ namespace Energy.Base
             /// <summary>
             /// Log entry message text
             /// </summary>
-            public string Message { get; set; }
+            public string Message;
 
             /// <summary>
             /// Log entry time
             /// </summary>
-            public DateTime Stamp { get; set; }
+            public DateTime Stamp;
 
             /// <summary>
             /// Log entry error code
             /// </summary>
-            public long Code { get; set; }
+            public long Code;
 
             /// <summary>
             /// Log entry source name
             /// </summary>
-            public string Source { get; set; }
+            public string Source;
 
             /// <summary>
             /// Log entry severity level
             /// </summary>
-            public Energy.Enumeration.LogLevel Level { get; set; }
+            public Energy.Enumeration.LogLevel Level;
 
             /// <summary>
             /// Log entry additional context
             /// </summary>
-            public object Context { get; set; }
+            public object Context;
 
             /// <summary>
             /// Log entry exception
             /// </summary>
-            public Exception Exception { get; set; }
+            public Exception Exception;
 
             /// <summary>
             /// Log entry store information
@@ -119,25 +119,20 @@ namespace Energy.Base
 
             #region Override
 
-            public string ToString(bool wide)
-            {
-                if (wide)
-                {
-                    DateTime stamp = this.Stamp != DateTime.MinValue ? this.Stamp : DateTime.Now;
-                    return string.Concat(stamp.ToString("HH:mm:ss.fff "), ToString(false));
-                }
-                if (Code != 0)
-                {
-                    if (string.IsNullOrEmpty(Message))
-                        return Code.ToString();
-                    return Code + ": " + Message;
-                }
-                return Message;
-            }
-
             public override string ToString()
             {
-                return ToString(IsToStringWide);
+                List<string> list = new List<string>();
+                DateTime stamp = this.Stamp != DateTime.MinValue ? this.Stamp : DateTime.Now;
+                list.Add(stamp.ToString("HH:mm:ss.fff"));
+                if (Code != 0)
+                {
+                    list.Add(Code.ToString());
+                }
+                if (!string.IsNullOrEmpty(Message))
+                {
+                    list.Add(Message);
+                }
+                return string.Join(" ", list.ToArray());
             }
 
             public string ToString(string format)
@@ -237,6 +232,9 @@ namespace Energy.Base
 
         #region Destination
 
+        /// <summary>
+        /// Log destination targets list
+        /// </summary>
         public class Destination : Energy.Base.Collection.Array<Target>
         {
             #region Constructor
@@ -245,6 +243,11 @@ namespace Energy.Base
 
             #endregion
 
+            /// <summary>
+            /// Add new destination target
+            /// </summary>
+            /// <param name="target"></param>
+            /// <returns></returns>
             public new Target Add(Target target)
             {
                 return base.Add(target);
