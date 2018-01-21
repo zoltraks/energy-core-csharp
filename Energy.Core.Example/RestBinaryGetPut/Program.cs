@@ -9,15 +9,7 @@ namespace RestBinaryGetPut
     {
         static void Main(string[] args)
         {
-            Energy.Core.Log log = Energy.Core.Log.Default;
-            log.Write("1");
-            log.Flush();
-            log.Write("2");
-            log.Destination += new Energy.Core.Log.Target.Console() { Color = false, Immediate = false };
-            log.Write("3");
-            log.Flush();
-            log.Write("4");
-            Console.ReadLine();
+            TestLog();
             try
             {
                 Energy.Core.Web.IgnoreCertificateValidation = true;
@@ -86,6 +78,22 @@ namespace RestBinaryGetPut
             //string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Storage", "Data");
 
            // string baseUrl = "http://localhost/";
+        }
+
+        private static void TestLog()
+        {
+            Energy.Core.Log log = Energy.Core.Log.Default;
+            Energy.Core.Bug.Trace.On();
+            log.Write("1");
+            log.Flush();
+            log.Exception(new Exception("ERROR"));
+            log.Write("2");
+            Console.WriteLine(log.ToString());
+            log.Destination += new Energy.Core.Log.Target.Console() { Color = false, Immediate = false };
+            log.Write("3");
+            log.Flush();
+            log.Write("4");
+            Console.ReadLine();
         }
     }
 }

@@ -110,7 +110,7 @@ namespace Energy.Base
             }
 
             public Entry(Exception exception)
-                : this(exception.Message)
+                : this(Energy.Core.Bug.ExceptionMessage(exception))
             {
                 Exception = exception;
             }

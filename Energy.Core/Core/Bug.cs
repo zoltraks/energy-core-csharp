@@ -12,7 +12,7 @@ namespace Energy.Core
         /// <summary>
         /// Trace switch
         /// </summary>
-        public readonly static Energy.Base.Switch Trace = false;
+        public readonly static Energy.Base.Switch Trace = new Energy.Base.Switch();
 
         /// <summary>
         /// Return exception message

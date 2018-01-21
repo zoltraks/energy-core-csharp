@@ -102,6 +102,19 @@ namespace Energy.Core
 
         public event EventHandler OnFlush;
 
+        public override string ToString()
+        {
+            List<string> list = new List<string>();
+            lock (_Lock)
+            {
+                for (int i = 0; i < _List.Count; i++)
+                {
+                    list.Add(_List[i].ToString());
+                }
+            }
+            return string.Join(Environment.NewLine, list.ToArray());
+        }
+
         private static readonly object FlushLock = new object();
 
         public void Flush()
@@ -179,11 +192,11 @@ namespace Energy.Core
         /// <summary>
         /// Write exception
         /// </summary>
-        /// <param name="x"></param>
+        /// <param name="exception"></param>
         /// <returns></returns>
-        public Energy.Base.Log.Entry Write(Exception x)
+        public Energy.Base.Log.Entry Write(Exception exception)
         {
-            return Write(Add(x));
+            return Write(Add(exception));
         }
 
         public virtual void Save()
@@ -265,6 +278,11 @@ namespace Energy.Core
                 Level = level,
             };
             return Write(entry);
+        }
+
+        public Energy.Base.Log.Entry Exception(Exception exception)
+        {
+            return Write(Add(exception));
         }
     }
 
