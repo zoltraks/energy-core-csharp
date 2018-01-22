@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Random
+    /// </summary>
     public class Random
     {
         #region Private
@@ -135,6 +138,48 @@ namespace Energy.Base
         public static string GetRandomHex()
         {
             return GetRandomHex(8);
+        }
+
+        #endregion
+
+        #region ByteArray
+
+        /// <summary>
+        /// Get byte array filled with random values
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public static byte[] GetRandomByteArray(int size)
+        {
+            byte[] buffer = new byte[size];
+            lock (_RandomObjectLock)
+            {
+                if (_RandomObject == null)
+                    _RandomObject = new System.Random();
+                _RandomObject.NextBytes(buffer);
+            }
+            return buffer;
+        }
+
+        /// <summary>
+        /// Get byte array filled with random values within specified range
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns></returns>
+        public static byte[] GetRandomByteArray(int size, byte minimum, byte maximum)
+        {
+            byte[] buffer = GetRandomByteArray(size);
+            byte width = (byte)(maximum >= minimum ? maximum - minimum : minimum - maximum);
+            if (width > 0)
+            {
+                for (int i = 0; i < size; i++)
+                {
+                    buffer[i] = (byte)(minimum + buffer[i] % (maximum - minimum));
+                }
+            }
+            return buffer;
         }
 
         #endregion
