@@ -713,5 +713,57 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Encoding
+
+        /// <summary>
+        /// Find System.Text.Encoding for specified name.
+        /// Get System.Text.Encoding.UTF8 by default or if specified encoding
+        /// could not be found.
+        /// </summary>
+        /// <param name="encoding">UTF-8, UTF, UTF8, UNICODE, UCS-2 LE, UCS-2 BE, 1250, 1252, ...</param>
+        /// <returns>System.Text.Encoding</returns>
+        public static System.Text.Encoding Encoding(string encoding)
+        {
+            if (string.IsNullOrEmpty(encoding))
+            {
+                return System.Text.Encoding.UTF8;
+            }
+            foreach (string utf8 in new string[] { "utf8", "utf" })
+            {
+                if (0 == string.Compare(utf8, encoding, true))
+                {
+                    return System.Text.Encoding.UTF8;
+                }
+            }
+            if (Regex.Match(encoding, @"^(?:unicode|utf-?16(?:\ ?le?)?|ucs(?:\ |-)?2(?:\ ?le?)?)$"
+                , RegexOptions.IgnoreCase).Success)
+            {
+                return System.Text.Encoding.Unicode;
+            }
+            if (Regex.Match(encoding, @"^(?:utf-?16\ ?be?|ucs(?:\ |-)?2\ ?be?)$"
+                , RegexOptions.IgnoreCase).Success)
+            {
+                return System.Text.Encoding.BigEndianUnicode;
+            }            
+            int number = Energy.Base.Cast.StringToInteger(encoding);
+            try
+            {
+                if (number > 0)
+                    return System.Text.Encoding.GetEncoding(number);
+                else
+                    return System.Text.Encoding.GetEncoding(encoding);
+            }
+            catch (ArgumentException)
+            {
+                return System.Text.Encoding.UTF8;
+            }
+            catch (NotSupportedException)
+            {
+                return System.Text.Encoding.UTF8;
+            }
+        }
+
+        #endregion
     }
 }
