@@ -123,6 +123,31 @@ namespace Energy.Core
             SetLanguage("en-US");
         }
 
+        public static void SetConsoleEncoding(System.Text.Encoding encoding)
+        {
+            try
+            {
+                Console.InputEncoding = encoding;
+                Console.OutputEncoding = encoding;
+            }
+            catch (System.Security.SecurityException)
+            { }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+            }
+        }
+
+        public static void SetConsoleEncoding(string encoding)
+        {
+            SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
+        }
+
+        public static void SetConsoleEncoding()
+        {
+            SetConsoleEncoding(System.Text.Encoding.UTF8);
+        }
+
         #endregion
     }
 }

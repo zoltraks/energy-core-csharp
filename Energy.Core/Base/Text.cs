@@ -689,7 +689,7 @@ namespace Energy.Base
         #region Unique
 
         /// <summary>
-        ///
+        /// Get unique array of strings
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
@@ -712,13 +712,49 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        /// <summary>
+        /// Get unique array of strings case sensitive or not
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string[] Unique(string[] array, bool ignoreCase)
+        {
+            if (!ignoreCase)
+                return Unique(array);
+            if (array == null || array.Length <= 1)
+                return array;
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>
+            {
+                array[0]
+            };
+            System.Collections.Generic.List<string> index = new System.Collections.Generic.List<string>
+            {
+                array[0] == null ? null
+                    : array[0].ToLower(System.Globalization.CultureInfo.InvariantCulture)
+            };
+            for (int i = 1; i < array.Length; i++)
+            {
+                string needle = array[i] == null ? null
+                    : array[i].ToLower(System.Globalization.CultureInfo.InvariantCulture);
+                int n = list.IndexOf(needle);
+                if (n < 0)
+                {
+                    index.Add(needle);
+                    list.Add(array[i]);
+                }
+            }
+            return list.ToArray();
+        }
+
         #endregion
 
         #region Encoding
 
         /// <summary>
         /// Find System.Text.Encoding for specified name.
-        /// Get System.Text.Encoding.UTF8 by default or if specified encoding
+        /// Get System.Text.Encoding.UTF8 by default or if encoding not exists.
+        /// Treats UCS-2 the same as UTF-16 besides differences.
         /// could not be found.
         /// </summary>
         /// <param name="encoding">UTF-8, UTF, UTF8, UNICODE, UCS-2 LE, UCS-2 BE, 1250, 1252, ...</param>
@@ -729,12 +765,9 @@ namespace Energy.Base
             {
                 return System.Text.Encoding.UTF8;
             }
-            foreach (string utf8 in new string[] { "utf8", "utf" })
+            if (0 == string.Compare(encoding, "utf8", true))
             {
-                if (0 == string.Compare(utf8, encoding, true))
-                {
-                    return System.Text.Encoding.UTF8;
-                }
+                return System.Text.Encoding.UTF8;
             }
             if (Regex.Match(encoding, @"^(?:unicode|utf-?16(?:\ ?le?)?|ucs(?:\ |-)?2(?:\ ?le?)?)$"
                 , RegexOptions.IgnoreCase).Success)
