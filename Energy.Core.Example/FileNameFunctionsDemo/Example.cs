@@ -38,6 +38,11 @@ namespace FileNameFunctionsDemo
 
         public static void PathShorten(string path)
         {
+            Energy.Core.Tilde.WriteLine("~c~Long path: ~y~{0}", path);
+            Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 50, "..."));
+            Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 50, "..."));
+            Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 50, "..."));
+            Energy.Core.Tilde.WriteLine("~b~= = = = =");
             Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 30, "..."));
             Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 30, "..."));
             Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 30, "..."));
