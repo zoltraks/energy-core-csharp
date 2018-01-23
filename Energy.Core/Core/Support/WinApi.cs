@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Energy.Support
+namespace Energy.Core.Support
 {
     public class WinApi
     {

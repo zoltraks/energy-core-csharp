@@ -22,7 +22,7 @@ namespace WindowsFormsAppLogBug
 
             //Energy.Core.Log.Default.Destination += new Energy.Log.Target.Event();
             Energy.Core.Log logger = new Energy.Core.Log();
-            logger.Maximum = 10;
+            logger.Maximum = 10;     
         }
     }
 }

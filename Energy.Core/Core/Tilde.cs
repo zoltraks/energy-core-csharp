@@ -319,7 +319,7 @@ namespace Energy.Core
 
         public static object Ask(string question, object value)
         {
-            string text = Energy.Cast.As.String(value);
+            string text = Energy.Base.Cast.As<string>(value);
             string answer = Ask(question, text);
             if (String.IsNullOrEmpty(answer))
                 return value;

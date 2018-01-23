@@ -9,6 +9,9 @@ namespace HexPrint
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Energy.Core.Web.Get("https://www.google.com/search?q=q=Energy"));
+            //Console.WriteLine(Energy.Base.Hex.Print(Energy.Base.Random.GetRandomByteArray(40)));
+            
             Test(new byte[1] { 77 });
             byte[] array21 = new byte[21];
             for (int i = 0; i < array21.Length; i++)

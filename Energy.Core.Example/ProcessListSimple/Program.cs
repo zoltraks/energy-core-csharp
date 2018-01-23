@@ -44,7 +44,7 @@ namespace ProcessListSimple
                     //}
                     try
                     {
-                        record["Process name"] = Energy.Support.WinApi.GetProcessName(process.Id);
+                        record["Process name"] = Energy.Core.Support.WinApi.GetProcessName(process.Id);
                     }
                     catch
                     {
