@@ -36,5 +36,43 @@ namespace Energy.Base
 
             return (ulong)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
         }
+
+        #region Compare
+
+        /// <summary>
+        /// Compare byte arrays
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int Compare(byte[] left, byte[] right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                    return 0;
+                return -1;
+            }
+            if (right == null)
+            {
+                if (left == null)
+                    return 0;
+                return 1;
+            }
+            if (left.Length != right.Length)
+            {
+                return left.Length < right.Length ? -1 : 1;
+            }
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] < right[i])
+                    return -1;
+                if (left[i] > right[i])
+                    return 1;
+            }
+            return 0;
+        }
+
+        #endregion
     }
 }

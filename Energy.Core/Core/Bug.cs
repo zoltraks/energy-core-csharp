@@ -122,7 +122,12 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
-            System.Diagnostics.Debug.WriteLine(ExceptionMessage(exception, true));
+            string message = ExceptionMessage(exception, true);
+            System.Diagnostics.Debug.WriteLine(message);
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
 
         /// <summary>
@@ -132,6 +137,10 @@ namespace Energy.Core
         public static void Write(string message)
         {
             System.Diagnostics.Debug.WriteLine(message);
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
 
         /// <summary>
@@ -141,7 +150,12 @@ namespace Energy.Core
         /// <param name="args"></param>
         public static void Write(string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+            string message = string.Format(format, args);
+            System.Diagnostics.Debug.WriteLine(message);
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
     }
 }

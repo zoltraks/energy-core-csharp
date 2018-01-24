@@ -1285,25 +1285,59 @@ namespace Energy.Base
         #region Base64
 
         /// <summary>
-        /// Convert UTF-8 string to Base64 text.
+        /// Convert UTF-8 string to Base64 text
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string StringToBase64(string input)
         {
-            byte[] data = ASCIIEncoding.UTF8.GetBytes(input);
+            return StringToBase64(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert string to Base64 text
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StringToBase64(string input, System.Text.Encoding encoding)
+        {
+            byte[] data = encoding.GetBytes(input);
             return System.Convert.ToBase64String(data);
         }
 
         /// <summary>
-        /// Convert Base64 input to UTF-8 string.
+        /// Convert Base64 input to UTF-8 string
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string Base64ToString(string input)
         {
-            byte[] data = System.Convert.FromBase64String(input);
-            return ASCIIEncoding.UTF8.GetString(data);
+            return Base64ToString(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert Base64 input to string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Base64ToString(string input, System.Text.Encoding encoding)
+        {
+            if (input == null)
+                return null;
+            if (input.Length == 0)
+                return "";
+            byte[] data;
+            try
+            {
+                data = System.Convert.FromBase64String(input);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            return System.Text.Encoding.UTF8.GetString(data);
         }
 
         #endregion
