@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Counter.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Text.cs" />
