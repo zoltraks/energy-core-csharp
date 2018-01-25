@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using static Energy.Base.Log;
 
@@ -9,7 +10,9 @@ namespace RestBinaryGetPut
     {
         static void Main(string[] args)
         {
-            TestLog();
+            TestPutExe();
+
+            //TestLog();
             try
             {
                 Energy.Core.Web.IgnoreCertificateValidation = true;
@@ -33,7 +36,7 @@ namespace RestBinaryGetPut
             makeDirectory = Energy.Base.Path.ChangeSeparator(makeDirectory);
             Console.WriteLine($"Make directory: {makeDirectory}");
             Energy.Base.File.MakeDirectory(makeDirectory);
-            byte[] array = new byte[258];
+            byte[] array = new byte[25800];
             for (int i = 0; i < array.Length; i++)
             {
                 array[i] = (byte)(i % 256);
@@ -52,6 +55,18 @@ namespace RestBinaryGetPut
             string[] responseHeaders;
 
             Energy.Core.Web.Head(url, out responseHeaders);
+
+            for (int i = 0; i < responseHeaders.Length / 2; i += 2)
+            {
+                if (responseHeaders[i] == "Stamp")
+                {
+                    DateTime dt = Energy.Base.Cast.StringToDateTime(responseHeaders[i + 1]);
+                    dt = dt.ToLocalTime();
+                    Energy.Core.Tilde.WriteLine("~y~Timestamp: ~r~{0}"
+                        , Energy.Base.Cast.DateTimeToString(dt));
+                    break;
+                }
+            }
 
             Console.WriteLine(string.Join("\n", responseHeaders));
             Console.ReadLine();
@@ -78,6 +93,17 @@ namespace RestBinaryGetPut
             //string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Storage", "Data");
 
            // string baseUrl = "http://localhost/";
+        }
+
+        private static void TestPutExe()
+        {
+            byte[] data = File.ReadAllBytes(@"C:\DATA\example.exe");
+            string url = "http://localhost:6000/api/storage/xyz/path/to/file.data";
+            string json;
+            int responseCode = Energy.Core.Web.Post(url, data, out json);
+            Console.WriteLine(responseCode);
+            Console.WriteLine(json);
+            Console.ReadLine();
         }
 
         private static void TestLog()

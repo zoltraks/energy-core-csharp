@@ -348,6 +348,24 @@ namespace Energy.Base
 
         public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
+            #region Contructor
+
+            public StringDictionary()
+            {
+            }
+
+            public StringDictionary(string[] keyValuePairArray)
+            {
+                for (int i = 0; i < keyValuePairArray.Length - 1; i++)
+                {
+                    string key = keyValuePairArray[i++];
+                    string value = keyValuePairArray[i];
+                    this[key] = Energy.Base.Cast.StringToObject<T>(value);
+                }
+            }
+
+            #endregion
+
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
@@ -391,7 +409,9 @@ namespace Energy.Base
             public string XmlParentSeparator { get { lock (_XmlParentSeparatorLock) return _XmlParentSeparator; } set { lock (_XmlParentSeparatorLock) _XmlParentSeparator = value; } }
 
             private string _XmlEscapeString = "_";
-            private readonly object _XmlSpecialCharacterLock = new object();
+
+            private readonly object _XmlSpecialCharacterLock = new object();       
+
             /// <summary>XmlSpecialCharacter</summary>
             public string XmlEscapeString { get { lock (_XmlSpecialCharacterLock) return _XmlEscapeString; } set { lock (_XmlSpecialCharacterLock) _XmlEscapeString = value; } }
 

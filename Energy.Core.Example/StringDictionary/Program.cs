@@ -18,6 +18,10 @@ namespace StringDictionary
             TestB2();
             TestB3();
 
+            string[] dictionary = new string[] { "key1", "value1", "key2", "value2" };
+            var x = new Energy.Base.Collection.StringDictionary<string>(dictionary);
+            Console.WriteLine(x.ToString("="));
+
             Energy.Core.Benchmark.Result result;
 
             result = Energy.Core.Benchmark.Profile(TestA1, 5);
