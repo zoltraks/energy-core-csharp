@@ -176,7 +176,7 @@ namespace Energy.Base
             }
         }
 
-        public void Decrement()
+        public long Decrement()
         {
             lock (_Lock)
             {
@@ -187,13 +187,13 @@ namespace Energy.Base
                         if (_Value == 0)
                         {
                             _Overflow = true;
-                            return;
+                            return _Value;
                         }
                         if (_Value < 0)
                         {
                             _Overflow = true;
                             _Value = 0;
-                            return;
+                            return _Value;
                         }
                     }
                     else
@@ -201,26 +201,28 @@ namespace Energy.Base
                         if (_Value == _Minimum)
                         {
                             _Overflow = true;
-                            return;
+                            return _Value;
                         }
                         if (_Value < _Minimum)
                         {
                             _Overflow = true;
                             _Value = _Minimum;
-                            return;
+                            return _Value;
                         }
                     }
                     _Value--;
+                    return _Value;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
                     _Overflow = true;
                     _Value = _Minimum;
+                    return _Value;
                 }
             }
         }
 
-        public void Increment()
+        public long Increment()
         {
             lock (_Lock)
             {
@@ -232,7 +234,7 @@ namespace Energy.Base
                         {
                             _Overflow = true;
                             _Value = _Minimum;
-                            return;
+                            return _Value;
                         }
                     }
                     else
@@ -241,14 +243,16 @@ namespace Energy.Base
                         {
                             _Overflow = true;
                             _Value = _Minimum;
-                            return;
+                            return _Value;
                         }
                     }
                     _Value++;
+                    return _Value;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
                     _Value = _Minimum;
+                    return _Value;
                 }
             }
         }

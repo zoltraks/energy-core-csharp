@@ -109,6 +109,6 @@ namespace Energy.Base
         /// <summary>
         /// Expression for matching tilde color text
         /// </summary>
-        public static readonly string TildeText = @"~\#(?:\#\#|[^\#])*\#~|~\d+~|~[\w\d]+~|~+|[^~]+";
+        public static readonly string TildeText = @"~`(?:``|[^`])*`~|~\d+~|~[\w\d]+~|~+?|[^~]+";
     }
 }
