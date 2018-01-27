@@ -87,7 +87,7 @@ namespace SQLiteCreateExample
             query = "SELECT * FROM " + script.Format.Object("UserTable");
 
             Console.WriteLine(query);
-            DataTable dx1 = db.Read(query);
+            DataTable dx1 = db.Load(query);
             string text = Energy.Base.Plain.DataTableToPlainText(dx1, new Energy.Base.Plain.TableFormat.FullFrame() { Tilde = true });
             Energy.Core.Tilde.WriteLine(text);
             if (db.Execute(query) < 0)
