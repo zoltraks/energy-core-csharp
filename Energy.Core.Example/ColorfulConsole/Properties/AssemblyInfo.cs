@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SQLiteCreateExample")]
+[assembly: AssemblyTitle("ColorfulConsole")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SQLiteCreateExample")]
+[assembly: AssemblyProduct("ColorfulConsole")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1bd8d261-2ea8-41a4-a17c-2a9acb27374a")]
+[assembly: Guid("274ea230-1c46-4b6a-b28e-a34e2bf2d9ae")]
 
 // Version information for an assembly consists of the following four values:
 //

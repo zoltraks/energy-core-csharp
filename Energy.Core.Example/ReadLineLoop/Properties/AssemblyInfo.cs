@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SQLiteCreateExample")]
+[assembly: AssemblyTitle("ReadLineLoop")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SQLiteCreateExample")]
+[assembly: AssemblyProduct("ReadLineLoop")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1bd8d261-2ea8-41a4-a17c-2a9acb27374a")]
+[assembly: Guid("9ac47280-c617-4f8a-8a2c-c467b7f922f5")]
 
 // Version information for an assembly consists of the following four values:
 //
