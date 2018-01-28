@@ -93,6 +93,12 @@ namespace SQLiteCreateExample
             if (db.Execute(query) < 0)
                 Console.WriteLine(db.ErrorMessage);
 
+            var tbl = db.Fetch(query);
+            foreach (var rec in tbl)
+            {
+                Console.WriteLine(rec.ToString(": "));
+            }
+
             Console.WriteLine(query);
         }
     }

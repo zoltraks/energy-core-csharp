@@ -527,70 +527,98 @@ namespace Energy.Source
 
         #region Fetch
 
+        private Energy.Base.Table Fetch(IDbCommand command)
+        {
+            IDataReader reader = command.ExecuteReader();
+
+            DataTable schema = reader.GetSchemaTable();
+
+            if (schema == null)
+                return null;
+
+            Energy.Base.Table table = new Energy.Base.Table();
+
+            List<string> columnList = new List<string>();
+            foreach (DataRow row in schema.Rows)
+            {
+                string columnName = System.Convert.ToString(row["ColumnName"]);
+                columnList.Add(columnName);
+            }
+
+            // Read rows from DataReader and populate the DataTable
+
+            while (reader.Read())
+            {
+                Energy.Base.Record record = table.New();
+                for (int i = 0; i < columnList.Count; i++)
+                {
+                    record[columnList[i]] = reader[i];
+                }
+            }
+
+            command.Cancel();
+            reader.Close();
+
+            return table;
+        }
+
+        private Energy.Base.Table Fetch(IDbConnection connection, string query)
+        {
+            using (IDbCommand command = Prepare(connection, query))
+            {
+                return Fetch(command);
+            }
+        }
+
+        /// <summary>
+        /// Fetch query results into Energy.Base.Table
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public Energy.Base.Table Fetch(string query)
         {
             ClearError();
-
-            Energy.Base.Table table = null;
-
             int repeat = Repeat;
-
             while (repeat-- >= 0)
             {
-                using (IDbConnection connection = Open())
+                if (Persistent)
                 {
-                    if (connection == null)
+                    if (!Active && Open() == null)
                         return null;
                     try
                     {
-                        IDbCommand command = Prepare(connection, query);
-                        CommandBehavior behaviour = CommandBehavior.CloseConnection;
-                        IDataReader reader = command.ExecuteReader(behaviour);
-
-                        DataTable schema = reader.GetSchemaTable();
-
-                        if (schema == null)
-                            break;
-
-                        table = new Energy.Base.Table();
-
-                        List<string> columnList = new List<string>();
-                        foreach (DataRow row in schema.Rows)
+                        lock (_Lock)
                         {
-                            string columnName = System.Convert.ToString(row["ColumnName"]);
-                            columnList.Add(columnName);
+                            return Fetch(_Connection, query);
                         }
-
-                        // Read rows from DataReader and populate the DataTable
-
-                        while (reader.Read())
-                        {
-                            Energy.Base.Record record = table.New();
-                            for (int i = 0; i < columnList.Count; i++)
-                            {
-                                record[columnList[i]] = reader[i];
-                            }
-                        }
-
-                        command.Cancel();
-                        reader.Close();
-
-                        break;
                     }
                     catch (Exception x)
                     {
                         SetError(x);
-                        if (Catch(x))
-                            continue;
-                        else
-                        {
-                            (Log ?? Energy.Core.Log.Default).Write(x);
+                        if (!Catch(x))
                             return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Fetch(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
                         }
                     }
                 }
             }
-            return table;
+            return null;
         }
 
         #endregion
