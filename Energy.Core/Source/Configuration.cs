@@ -89,7 +89,7 @@ namespace Energy.Source
             string[] special = new string[] { ";" };
             List<string> list = new List<string>();
 
-            if (Dialect == Energy.Enumeration.SqlDialect.SqlServer)
+            if (Dialect == Energy.Enumeration.SqlDialect.SQLSERVER)
             {
                 //Data Source=.\SQLEXPRESS;Initial Catalog=BisSQL;Integrated Security=Yes;Connect Timeout=10;
                 //Data Source=.\SQLEXPRESS;Initial Catalog=BisSQL;Integrated Security=False;User ID=abc;Password=xyz;Connect Timeout=10
@@ -118,7 +118,7 @@ namespace Energy.Source
                 }
             }
 
-            if (this.Dialect == Energy.Enumeration.SqlDialect.MySQL)
+            if (this.Dialect == Energy.Enumeration.SqlDialect.MYSQL)
             {
                 string server = String.IsNullOrEmpty(Server) ? "localhost" : Server;
                 list.Add("Server=" + server);
@@ -148,17 +148,17 @@ namespace Energy.Source
         {
             switch (Dialect)
             {
-                case Energy.Enumeration.SqlDialect.MySQL:
+                case Energy.Enumeration.SqlDialect.MYSQL:
                     return "mysql";
-                case Energy.Enumeration.SqlDialect.SqlServer:
+                case Energy.Enumeration.SqlDialect.SQLSERVER:
                     return "sqlsrv";
-                case Energy.Enumeration.SqlDialect.PostgreSQL:
+                case Energy.Enumeration.SqlDialect.POSTGRESQL:
                     return "pg";
-                case Energy.Enumeration.SqlDialect.Oracle:
+                case Energy.Enumeration.SqlDialect.ORACLE:
                     return "oracle";
-                case Energy.Enumeration.SqlDialect.SQLite:
+                case Energy.Enumeration.SqlDialect.SQLITE:
                     return "sqlite";
-                case Energy.Enumeration.SqlDialect.Firebird:
+                case Energy.Enumeration.SqlDialect.FIREBIRD:
                     return "firebird";
                 default:
                     return "";
@@ -176,7 +176,7 @@ namespace Energy.Source
             List<string> list = new List<string>();
             string[] special = new string[] { ";", "\"" };
 
-            if (Dialect == Energy.Enumeration.SqlDialect.SqlServer)
+            if (Dialect == Energy.Enumeration.SqlDialect.SQLSERVER)
             {
                 string server = String.IsNullOrEmpty(Server) ? "." : Energy.Base.Text.Surround(Server, "'", special);
                 string port = Port > 0 ? ',' + Port.ToString() : "";
@@ -188,7 +188,7 @@ namespace Energy.Source
                 }
             }
 
-            if (Dialect == Enumeration.SqlDialect.MySQL)
+            if (Dialect == Enumeration.SqlDialect.MYSQL)
             {
                 list.Add("host=" + (String.IsNullOrEmpty(Server) ? "localhost" : Energy.Base.Text.Surround(Server, "'", special)));
                 if (Port > 0)

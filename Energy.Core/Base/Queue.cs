@@ -37,6 +37,9 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Return number of elements in queue
+        /// </summary>
         public int Count
         {
             get
@@ -49,7 +52,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Put element at the end of queue.
+        /// Put element at the end of queue
         /// </summary>
         /// <param name="item">Element</param>
         public void Push(T item)
@@ -61,7 +64,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Put array of elements at the end of queue.
+        /// Put array of elements at the end of queue
         /// </summary>
         /// <remarks>Using one element instead of array may be more efficient.</remarks>
         /// <param name="array">Array of elements</param>
@@ -77,7 +80,7 @@ namespace Energy.Base
         /// Take first element from queue, remove it from queue, and finally return.
         /// </summary>
         /// <returns>Element</returns>
-        public T Take()
+        public T Pull()
         {
             lock (_List)
             {
@@ -90,12 +93,12 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Take a number of elements from queue, remove them and return array of elements taken.
-        /// Take(0) will return all elements from queue and empty it.
+        /// Take number of elements from queue, remove them and return array of elements taken.
+        /// Pull(0) will return all elements from queue and empty it.
         /// </summary>
         /// <param name="count">Number of elements</param>
         /// <returns>Array of elements</returns>
-        public T[] Take(int count)
+        public T[] Pull(int count)
         {
             lock (_List)
             {
@@ -175,5 +178,12 @@ namespace Energy.Base
                 return list.ToArray();
             }
         }
+    }
+
+    /// <summary>
+    /// Queue
+    /// </summary>
+    public class Queue: Queue<object>
+    {
     }
 }

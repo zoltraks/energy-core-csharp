@@ -40,15 +40,16 @@ namespace SQLiteCreateExample
             Console.WriteLine(db.Scalar("select current_timestamp;"));
             Console.WriteLine(db.Scalar("select time(time(), 'localtime');"));
             Console.WriteLine(db.Scalar("SELECT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"));
+            Energy.Interface.IDialect dialect = new Energy.Query.Dialect.SQLITE();
             Energy.Query.Script script = new Energy.Query.Script.SQLite();
             string query;
-            query = "select " + script.Format.CurrentTimestamp;
+            query = "select " + dialect.Format.CurrentTimestamp;
             Console.WriteLine(query);
             Console.WriteLine(db.Scalar(query));
 
             Energy.Source.Structure.Table table;
             table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
-            query = script.CreateTable(table);
+            query = dialect.CreateTable(table);
 
             Console.WriteLine(query);
             if (db.Execute(query) < 0)

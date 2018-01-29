@@ -34,19 +34,19 @@ namespace Energy.Query
                     format.ObjectQuote = "\"";
                     break;
 
-                case Enumeration.SqlDialect.MySQL:
+                case Enumeration.SqlDialect.MYSQL:
                     format.LiteralQuote = "'";
                     format.ObjectQuote = "`";
                     format.CurrentTimestamp = "CURRENT_TIMESTAMP()";
                     break;
 
-                case Enumeration.SqlDialect.SqlServer:
+                case Enumeration.SqlDialect.SQLSERVER:
                     format.LiteralQuote = "'";
                     format.ObjectQuote = "[]";
                     format.CurrentTimestamp = "GETDATE()";
                     break;
 
-                case Enumeration.SqlDialect.SQLite:
+                case Enumeration.SqlDialect.SQLITE:
                     format.LiteralQuote = "'";
                     format.ObjectQuote = "\"";
                     format.CurrentTimestamp = "(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))";

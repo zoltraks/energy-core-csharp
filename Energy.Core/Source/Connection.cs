@@ -124,6 +124,13 @@ namespace Energy.Source
         /// </summary>
         public Energy.Core.Log Log { get { lock (_Lock) return _Log; } set { lock (_Lock) _Log = value; } }
 
+        private Energy.Interface.IDialect _Dialect;
+
+        /// <summary>
+        /// Dialects
+        /// </summary>
+        public Energy.Interface.IDialect Dialect { get { lock (_Lock) return _Dialect; } set { lock (_Lock) _Dialect = value; } }
+
         private int _ErrorNumber = 0;
 
         /// <summary>
@@ -981,8 +988,9 @@ namespace Energy.Source
                 copy.Vendor = _Vendor;
                 copy.Timeout = _Timeout;
                 copy.Repeat = _Repeat;
-                copy.Log = _Log;
                 copy.Persistent = _Persistent;
+                copy.Log = _Log;
+                copy.Dialect = _Dialect;
             }
             return copy;
         }
