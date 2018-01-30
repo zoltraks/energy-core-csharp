@@ -226,9 +226,6 @@ Documentation/html/
 /WindowsFormsApplication1
 /WindowsApp/
 
-Test/
-Test.*
-
 # NuGet Packages alternative folder (Package)
 **/Package/*
 # except build/, which is used as an MSBuild target.
