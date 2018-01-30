@@ -55,9 +55,9 @@ namespace SqlServerPlainReport
             }
             Console.WriteLine(query);
 			Energy.Query.Script scriptBuilder = new Energy.Query.Script ();
-			scriptBuilder.Dialect = Energy.Enumeration.SqlDialect.SqlServer;
+			scriptBuilder.Dialect = Energy.Enumeration.SqlDialect.SQLSERVER;
 
-			Energy.Query.Format format = Energy.Enumeration.SqlDialect.MySQL;
+			Energy.Query.Format format = Energy.Enumeration.SqlDialect.MYSQL;
 
 			query = script.CreateTable(table, null);
             if (db.Execute(query) < 0)

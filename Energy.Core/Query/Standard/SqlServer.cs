@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Query.Standard
 {
-    public class SqlServer: Energy.Query.Dialect
+    public class SqlServer: Energy.Query.Dialect1
     {
         public SqlServer()
         {

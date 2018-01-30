@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Energy.Core.Support
+namespace Energy.Support
 {
     public class WinApi
     {
@@ -38,5 +38,8 @@ namespace Energy.Core.Support
 
             return result;
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
     }
 }

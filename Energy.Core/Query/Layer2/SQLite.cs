@@ -12,7 +12,7 @@ namespace Energy.Query
             #region Constructor
 
             public SQLite()
-				: this(Energy.Enumeration.SqlDialect.SQLite)
+				: this(Energy.Enumeration.SqlDialect.SQLITE)
 			{
             }
 

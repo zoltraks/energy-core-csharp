@@ -17,7 +17,7 @@ namespace Energy.Query
 			#region Constructor
 
 			public MySQL ()
-				: this(Energy.Enumeration.SqlDialect.MySQL)
+				: this(Energy.Enumeration.SqlDialect.MYSQL)
 			{
 			}
 				

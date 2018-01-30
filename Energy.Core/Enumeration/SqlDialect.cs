@@ -9,23 +9,19 @@ namespace Energy.Enumeration
     /// </summary>
     public enum SqlDialect
     {
-        /// <summary>Dialect not specified</summary>
-        None,
-        /// <summary>Generic SQL</summary>
-        Generic,
         /// <summary>ANSI SQL-92 standard. Probably will not work with Microsoft SQL Server.</summary>
         ANSI,
         /// <summary>Transact-SQL (T-SQL) for Microsoft SQL Server (2008 and later)</summary>
-        SqlServer,
+        SQLSERVER,
         /// <summary>MySQL</summary>
-        MySQL,
+        MYSQL,
         /// <summary>PostgreSQL (PL/pgSQL)</summary>
-        PostgreSQL,
+        POSTGRESQL,
         /// <summary>Oracle (PL/SQL)</summary>
-        Oracle,
+        ORACLE,
         /// <summary>Firebird</summary>
-        Firebird,
+        FIREBIRD,
         /// <summary>SQLite</summary>
-        SQLite,
+        SQLITE,
     }
 }

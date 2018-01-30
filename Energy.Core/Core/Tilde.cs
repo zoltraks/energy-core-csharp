@@ -9,36 +9,44 @@ namespace Energy.Core
     /// <summary>
     /// Simple elegant text coloring engine for console programs.
     /// Based on Empty Page #0 color engine.
-    /// Color may be changed by value surrounded by tilde ~ character.
-    /// One tilde followed by other than letter or number or
-    /// more than one tilde chars is left as is.
-    ///
-    /// When using tilde character as is, two ore more ~~~ will remain unchanged.
-    /// For escaping tilde text please use ~# ... #~.
-    /// For example ~#~color~#~ will be just ~color~.
-    /// You may optionally use double hash ## to include hash sign inside brackets ~# ## #~.
+    /// 
+    /// Color may be specified by its number or name surrounded by tilde (~) character.
+    /// One tilde followed by a character other than a letter or number or a fragment consisting of two or more tilde characters will not be formatted.
+    /// 
+    /// Colors that can be used are the same as on a standard command console.
+    /// There are 15 different colours plus black.
+    /// 
+    /// Dark colour identifiers are preceded by the letter 'd' (dark).
+    /// In a similar way, bright-colour identifiers can be preceded by the letter 'l' (light).
+    /// 
+    /// Color changes one by one are ignored.Only the last defined color will be used.
     /// </summary>
     /// <remarks>
     /// List of available colors:
     /// <br/>
     /// <table>
-    /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
-    /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-    /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
-    /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
-    /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
-    /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
-    /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
-    /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
-    /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
-    /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
-    /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
-    /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
-    /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
-    /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
-    /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
-    /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
-    /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+    /// <thead>
+    ///     <th>Numeric</th><th>Long</th>           <th>Short</th>   <th></th>
+    /// </thead>
+    /// <tbody>
+    /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>        <td>Default color</td></tr>
+    /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>    <td>Dark blue</td></tr>
+    /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>    <td>Dark green</td></tr>
+    /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>    <td>Dark cyan</td></tr>
+    /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>    <td>Dark red</td></tr>
+    /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>    <td>Dark magenta</td></tr>
+    /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>    <td>Dark yellow</td></tr>
+    /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~</td>     <td>Gray / Silver</td></tr>
+    /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>    <td>Dark gray / Dark silver</td></tr>
+    /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>     <td>Blue</td></tr>
+    /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>     <td>Black</td></tr>
+    /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>     <td>Cyan</td></tr>
+    /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>     <td>Red</td></tr>
+    /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>     <td>Magenta</td></tr>
+    /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>     <td>Yellow</td></tr>
+    /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>     <td>White</td></tr>
+    /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>     <td>Black / Carbon</td></tr>
+    /// </tbody>
     /// </table>
     /// </remarks>
     public static class Tilde
@@ -108,6 +116,48 @@ namespace Energy.Core
                     count += this[i].Text.Length;
                 }
                 return count;
+            }
+
+            /// <summary>
+            /// Explode text to a list separated by color change
+            /// </summary>
+            /// <param name="message">Text</param>
+            /// <returns>List of texts</returns>
+            public static ColorTextList Explode(string message)
+            {
+                if (message == null)
+                    return null;
+                ColorTextList list = new ColorTextList();
+                Match m = Regex.Match(message, Energy.Base.Expression.TildeText);
+                System.ConsoleColor? current = null;
+                while (m.Success)
+                {
+                    string value = m.Value;
+                    if (value.Length >= 4 && value.StartsWith("~`") && value.EndsWith("`~"))
+                    {
+                        list.Add(new ColorTextList.Item()
+                        {
+                            Color = current
+                            ,
+                            Text = value.Substring(2, value.Length - 4).Replace("``", "`")
+                        });
+                    }
+                    else if (value.Length > 2 && value.StartsWith("~") && value.EndsWith("~") && value[1] != '~')
+                    {
+                        current = TildeColorToConsoleColor(value);
+                    }
+                    else
+                    {
+                        list.Add(new ColorTextList.Item()
+                        {
+                            Color = current
+                            ,
+                            Text = value
+                        });
+                    }
+                    m = m.NextMatch();
+                }
+                return list;
             }
         }
 
@@ -190,52 +240,6 @@ namespace Energy.Core
         /// Cheat sheet for all colors defined by default
         /// </summary>
         public static string ExampleColorPalleteTildeString { get { return _ExampleColorPalleteTildeString; } set { _ExampleColorPalleteTildeString = value; } }
-
-        #endregion
-
-        #region Explode
-
-        /// <summary>
-        /// Explode text to a list separated by color change
-        /// </summary>
-        /// <param name="message">Text</param>
-        /// <returns>List of texts</returns>
-        public static ColorTextList Explode(string message)
-        {
-            if (message == null)
-                return null;
-            ColorTextList list = new ColorTextList();
-            Match m = Regex.Match(message, Energy.Base.Expression.TildeText);
-            System.ConsoleColor? current = null;
-            while (m.Success)
-            {
-                string value = m.Value;
-                if (value.Length >= 4 && value.StartsWith("~#") && value.EndsWith("#~"))
-                {
-                    list.Add(new ColorTextList.Item()
-                    {
-                        Color = current
-                        ,
-                        Text = value.Substring(2, value.Length - 4).Replace("##", "#")
-                    });
-                }
-                else if (value.Length > 2 && value.StartsWith("~") && value.EndsWith("~") && value[1] != '~')
-                {
-                    current = TildeColorToConsoleColor(value);
-                }
-                else
-                {
-                    list.Add(new ColorTextList.Item()
-                    {
-                        Color = current
-                        ,
-                        Text = value
-                    });
-                }
-                m = m.NextMatch();
-            }
-            return list;
-        }
 
         #endregion
 
@@ -392,8 +396,8 @@ namespace Energy.Core
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
         /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
-        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
-        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray / Dark silver</para>
+        /// <para>~9~, ~blue~, ~b~, Blue</para>
         /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
@@ -406,23 +410,28 @@ namespace Energy.Core
         /// List of available colors:
         /// <br/>
         /// <table>
-        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
-        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
-        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
-        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
-        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
-        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
-        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
-        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
-        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
-        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
-        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
-        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
-        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
-        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
-        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
-        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// <thead>
+        ///     <th>Numeric</th><th>Long</th>           <th>Short</th>   <th></th>
+        /// </thead>
+        /// <tbody>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>        <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>    <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>    <td>Dark green</td></tr>
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>    <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>    <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>    <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>    <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~</td>     <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>    <td>Dark gray / Dark silver</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>     <td>Blue</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>     <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>     <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>     <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>     <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>     <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>     <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>     <td>Black / Carbon</td></tr>
+        /// </tbody>
         /// </table>
         /// </remarks>
         /// <example>
@@ -435,7 +444,7 @@ namespace Energy.Core
         {
             if (string.IsNullOrEmpty(value))
                 return;
-            ColorTextList list = Explode(value);
+            ColorTextList list = ColorTextList.Explode(value);
             if (list.Count == 0)
                 return;
             lock (_ConsoleLock)
@@ -474,7 +483,8 @@ namespace Energy.Core
 
         /// <summary>
         /// <para>
-        /// Write color text with line ending containing modifiers like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
+        /// Write color text with line ending containing modifiers
+        /// like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
         /// </para>
         /// <para>
         /// <code>
@@ -490,8 +500,8 @@ namespace Energy.Core
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
         /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
-        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
-        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray / Dark silver</para>
+        /// <para>~9~, ~blue~, ~b~, Blue</para>
         /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
@@ -504,23 +514,28 @@ namespace Energy.Core
         /// List of available colors:
         /// <br/>
         /// <table>
-        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
-        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
-        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
-        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
-        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
-        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
-        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
-        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
-        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
-        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
-        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
-        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
-        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
-        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
-        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
-        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// <thead>
+        ///     <th>Numeric</th><th>Long</th>           <th>Short</th>   <th></th>
+        /// </thead>
+        /// <tbody>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>        <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>    <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>    <td>Dark green</td></tr>
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>    <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>    <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>    <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>    <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~</td>     <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>    <td>Dark gray / Dark silver</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>     <td>Blue</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>     <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>     <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>     <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>     <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>     <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>     <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>     <td>Black / Carbon</td></tr>
+        /// </tbody>
         /// </table>
         /// </remarks>
         /// <example>
@@ -537,11 +552,12 @@ namespace Energy.Core
 
         /// <summary>
         /// <para>
-        /// Write color text with line ending containing modifiers like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
+        /// Write color text with line ending containing modifiers using specified format information
+        /// like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
         /// </para>
         /// <para>
         /// <code>
-        ///     Energy.Core.Tilde.WriteLine("~red~Breaking: ~white~Hell, ~yellow~yea.");
+        ///     Energy.Core.Tilde.WriteLine("~red~Breaking: ~white~Hell, ~yellow~yea from {0}.", "Me");
         /// </code>
         /// </para>
         /// <para>List of available console colors:</para>
@@ -553,8 +569,8 @@ namespace Energy.Core
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
         /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
-        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
-        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray / Dark silver</para>
+        /// <para>~9~, ~blue~, ~b~, Blue</para>
         /// <para>~10~, ~green~, ~g~, Green</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
@@ -567,23 +583,28 @@ namespace Energy.Core
         /// List of available colors:
         /// <br/>
         /// <table>
-        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
-        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
-        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
-        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
-        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
-        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
-        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
-        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
-        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
-        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
-        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
-        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
-        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
-        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
-        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
-        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// <thead>
+        ///     <th>Numeric</th><th>Long</th>           <th>Short</th>   <th></th>
+        /// </thead>
+        /// <tbody>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>        <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>    <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>    <td>Dark green</td></tr>
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>    <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>    <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>    <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>    <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~</td>     <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>    <td>Dark gray / Dark silver</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>     <td>Blue</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>     <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>     <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>     <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>     <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>     <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>     <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>     <td>Black / Carbon</td></tr>
+        /// </tbody>
         /// </table>
         /// </remarks>
         /// <example>
@@ -600,7 +621,8 @@ namespace Energy.Core
 
         /// <summary>
         /// <para>
-        /// Write color text with line ending containing modifiers like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
+        /// Write color text with line ending containing modifiers
+        /// like ~7~, ~s~ , ~12~, ~r~,  ~10~, ~g~, ~9~ , ~b~ , ~15~, ~w~, ~14~, ~y~, ~13~, ~m~, ...
         /// </para>
         /// <para>
         /// <code>
@@ -616,8 +638,8 @@ namespace Energy.Core
         /// <para>~5~, ~darkmagenta~, ~dm~, Dark magenta</para>
         /// <para>~6~, ~darkyellow~, ~dy~, Dark yellow</para>
         /// <para>~7~, ~gray~, ~s~<br/>~ls~, Gray / Silver</para>
-        /// <para>~8~, ~darkgray~, ~ds~, Dark gray</para>
-        /// <para>~9~, ~blue~, ~b~, Black</para>
+        /// <para>~8~, ~darkgray~, ~ds~, Dark gray / Dark silver</para>
+        /// <para>~9~, ~blue~, ~b~, Blue</para>
         /// <para>~10~, ~green~, ~g~, Black</para>
         /// <para>~11~, ~cyan~, ~c~, Cyan</para>
         /// <para>~12~, ~red~, ~r~, Red</para>
@@ -630,23 +652,28 @@ namespace Energy.Core
         /// List of available colors:
         /// <br/>
         /// <table>
-        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>               <td>Default color</td></tr>
-        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>           <td>Dark blue</td></tr>
-        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>           <td>Dark green</td></tr>
-        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>           <td>Dark cyan</td></tr>
-        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>           <td>Dark red</td></tr>
-        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>           <td>Dark magenta</td></tr>
-        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>           <td>Dark yellow</td></tr>
-        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~<br/>~ls~</td>   <td>Gray / Silver</td></tr>
-        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>           <td>Dark gray</td></tr>
-        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>            <td>Black</td></tr>
-        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>            <td>Black</td></tr>
-        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>            <td>Cyan</td></tr>
-        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>            <td>Red</td></tr>
-        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>            <td>Magenta</td></tr>
-        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>            <td>Yellow</td></tr>
-        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>            <td>White</td></tr>
-        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>            <td>Black / Carbon</td></tr>
+        /// <thead>
+        ///     <th>Numeric</th><th>Long</th>           <th>Short</th>   <th></th>
+        /// </thead>
+        /// <tbody>
+        /// <tr><td>~0~</td>    <td>~default~</td>      <td></td>        <td>Default color</td></tr>
+        /// <tr><td>~1~</td>    <td>~darkblue~</td>     <td>~db~</td>    <td>Dark blue</td></tr>
+        /// <tr><td>~2~</td>    <td>~darkgreen~</td>    <td>~dg~</td>    <td>Dark green</td></tr>
+        /// <tr><td>~3~</td>    <td>~darkcyan~</td>     <td>~dc~</td>    <td>Dark cyan</td></tr>
+        /// <tr><td>~4~</td>    <td>~darkred~</td>      <td>~dr~</td>    <td>Dark red</td></tr>
+        /// <tr><td>~5~</td>    <td>~darkmagenta~</td>  <td>~dm~</td>    <td>Dark magenta</td></tr>
+        /// <tr><td>~6~</td>    <td>~darkyellow~</td>   <td>~dy~</td>    <td>Dark yellow</td></tr>
+        /// <tr><td>~7~</td>    <td>~gray~</td>         <td>~s~</td>     <td>Gray / Silver</td></tr>
+        /// <tr><td>~8~</td>    <td>~darkgray~</td>     <td>~ds~</td>    <td>Dark gray / Dark silver</td></tr>
+        /// <tr><td>~9~</td>    <td>~blue~</td>         <td>~b~</td>     <td>Blue</td></tr>
+        /// <tr><td>~10~</td>   <td>~green~</td>        <td>~g~</td>     <td>Black</td></tr>
+        /// <tr><td>~11~</td>   <td>~cyan~</td>         <td>~c~</td>     <td>Cyan</td></tr>
+        /// <tr><td>~12~</td>   <td>~red~</td>          <td>~r~</td>     <td>Red</td></tr>
+        /// <tr><td>~13~</td>   <td>~magenta~</td>      <td>~m~</td>     <td>Magenta</td></tr>
+        /// <tr><td>~14~</td>   <td>~yellow~</td>       <td>~y~</td>     <td>Yellow</td></tr>
+        /// <tr><td>~15~</td>   <td>~white~</td>        <td>~w~</td>     <td>White</td></tr>
+        /// <tr><td>~16~</td>   <td>~black~</td>        <td>~k~</td>     <td>Black / Carbon</td></tr>
+        /// </tbody>
         /// </table>
         /// </remarks>
         /// <example>
@@ -661,14 +688,14 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write text in color
+        /// Write text using specifed color and escaping any tilde characters in text
         /// </summary>
         /// <param name="color"></param>
         /// <param name="text"></param>
         public static void WriteLine(ConsoleColor color, string text)
         {
-            text = string.Concat(ConsoleColorToTildeColor(color), Escape(text));
-            WriteLine(text);
+            Write(string.Concat(ConsoleColorToTildeColor(color), Escape(text)
+                , Environment.NewLine));
         }
 
         #endregion
@@ -819,7 +846,7 @@ namespace Energy.Core
                 return text;
             if (text.IndexOf('~') < 0)
                 return text;
-            return string.Concat("~#", text.Replace("#", "##"), "#~");
+            return string.Concat("~`", text.Replace("`", "``"), "`~");
         }
 
         #endregion
@@ -833,7 +860,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static string Strip(string text)
         {
-            ColorTextList list = Explode(text);
+            ColorTextList list = ColorTextList.Explode(text);
             return list.Join("");
         }
 
@@ -966,13 +993,16 @@ namespace Energy.Core
                     {
                         string result = _ReadLineStringBuilder.ToString();
                         _ReadLineStringBuilder.Length = 0;
+                        Console.WriteLine();
                         return result;
                     }
                     if (key.Key == System.ConsoleKey.Backspace)
                     {
                         if (_ReadLineStringBuilder.Length > 0)
+                        {
                             _ReadLineStringBuilder.Length = _ReadLineStringBuilder.Length - 1;
-                        Console.Write(" \b");
+                            Console.Write(" \b");
+                        }
                         continue;
                     }
                     _ReadLineStringBuilder.Append(key.KeyChar);
@@ -1020,7 +1050,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static int Length(string example)
         {
-            return Explode(example).GetTotalLength();
+            return ColorTextList.Explode(example).GetTotalLength();
         }
 
         #endregion

@@ -4,7 +4,7 @@
     <AssemblyName>Energy.Core</AssemblyName>
     <Version>18.01.2</Version>
     <FileVersion>18.01.0</FileVersion>
-    <AssemblyVersion>2018.01.24</AssemblyVersion>
+    <AssemblyVersion>2018.01.28</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
@@ -18,7 +18,8 @@
     <PackageProjectUrl>http://energy.alyx.pl/</PackageProjectUrl>
     <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
     <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
-  </PropertyGroup>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+ </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>bin\</OutputPath>

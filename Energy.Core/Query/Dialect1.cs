@@ -8,7 +8,7 @@ namespace Energy.Query
     /// <summary>
     /// Query language dialect settings
     /// </summary>
-    public partial class Dialect
+    public partial class Dialect1
     {
         public Energy.Query.Format Format { get; set; }
 
@@ -16,24 +16,24 @@ namespace Energy.Query
 
         #region Constructor
 
-        public Dialect(Energy.Enumeration.SqlDialect dialect)
+        public Dialect1(Energy.Enumeration.SqlDialect dialect)
         {
             this.Format = (Energy.Query.Format)dialect;
         }
 
-        public Dialect()
+        public Dialect1()
         {
-            this.Format = (Energy.Query.Format)Energy.Enumeration.SqlDialect.Generic;
+            this.Format = (Energy.Query.Format)Energy.Enumeration.SqlDialect.ANSI;
         }
 
         #endregion
 
         #region Singleton
 
-        private static Energy.Query.Dialect _Default;
+        private static Energy.Query.Dialect1 _Default;
         private static readonly object _DefaultLock = new object();
         /// <summary>Singleton</summary>
-        public static Energy.Query.Dialect Default
+        public static Energy.Query.Dialect1 Default
         {
             get
             {
@@ -43,7 +43,7 @@ namespace Energy.Query
                     {
                         if (_Default == null)
                         {
-                            _Default = new Energy.Query.Dialect();
+                            _Default = new Energy.Query.Dialect1();
                         }
                     }
                 }
@@ -64,14 +64,14 @@ namespace Energy.Query
             if (!string.IsNullOrEmpty(full))
             {
                 if (full == "System.Data.SqlClient.SqlConnection")
-                    return Energy.Enumeration.SqlDialect.SqlServer;
+                    return Energy.Enumeration.SqlDialect.SQLSERVER;
             }
             if (!string.IsNullOrEmpty(name))
             {
                 if (name == "SqlConnection")
-                    return Energy.Enumeration.SqlDialect.SqlServer;
+                    return Energy.Enumeration.SqlDialect.SQLSERVER;
             }
-            return Energy.Enumeration.SqlDialect.None;
+            return Energy.Enumeration.SqlDialect.ANSI;
         }
 
         public static Energy.Enumeration.SqlDialect Guess(string name)
@@ -79,9 +79,9 @@ namespace Energy.Query
             return Guess(name, null);
         }
 
-        public static explicit operator Dialect(SqlDialect dialect)
+        public static explicit operator Dialect1(SqlDialect dialect)
         {
-            return new Energy.Query.Dialect(dialect);
+            return new Energy.Query.Dialect1(dialect);
         }
     }
 }
