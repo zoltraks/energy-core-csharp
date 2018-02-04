@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 namespace Energy.Core
 {
@@ -108,6 +109,46 @@ namespace Energy.Core
         public class SocketClient
         {
 
+        }
+
+        #endregion
+
+        #region Ping
+
+        public static int Ping(string address, int timeout, out System.Net.NetworkInformation.IPStatus status)
+        {
+            status = System.Net.NetworkInformation.IPStatus.Unknown;
+            System.Net.NetworkInformation.Ping request = new System.Net.NetworkInformation.Ping();
+            try
+            {
+                System.Net.NetworkInformation.PingReply response = request.Send(address, timeout);
+                status = response.Status;
+                if (response.Status == IPStatus.Success)
+                {
+                    return (int)response.RoundtripTime;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+                return -1;
+            }
+        }
+
+        public static int Ping(string address, int timeout)
+        {
+            System.Net.NetworkInformation.IPStatus status;
+            return Ping(address, timeout, out status);
+        }
+
+        public static int Ping(string address)
+        {
+            System.Net.NetworkInformation.IPStatus status;
+            return Ping(address, 30000, out status);
         }
 
         #endregion

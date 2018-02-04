@@ -34,9 +34,8 @@ namespace SQLiteCreateExample
         private static void Test1(string[] args)
         {
             string connectionString = @"Data Source=:memory:;Version=3;New=True;";
-            db = new Energy.Source.Connection<System.Data.SQLite.SQLiteConnection>(connectionString);
-            // needed for :memory: !!!
-            db.Persistent = true;
+            db = new Energy.Source.Connection<System.Data.SQLite.SQLiteConnection>(connectionString);        
+            db.Persistent = true; // needed for :memory: !!!
             Console.WriteLine(db.Scalar("select current_timestamp;"));
             Console.WriteLine(db.Scalar("select time(time(), 'localtime');"));
             Console.WriteLine(db.Scalar("SELECT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"));

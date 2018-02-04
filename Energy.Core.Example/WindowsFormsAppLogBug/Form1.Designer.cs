@@ -30,6 +30,7 @@
         {
             this.buttonAddMessage = new System.Windows.Forms.Button();
             this.textBoxMessage = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonAddMessage
@@ -51,11 +52,21 @@
             this.textBoxMessage.TabIndex = 1;
             this.textBoxMessage.Text = "Example message";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 41);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(110, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Add message";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.textBoxMessage);
             this.Controls.Add(this.buttonAddMessage);
             this.Name = "Form1";
@@ -70,6 +81,7 @@
 
         private System.Windows.Forms.Button buttonAddMessage;
         private System.Windows.Forms.TextBox textBoxMessage;
+        private System.Windows.Forms.Button button1;
     }
 }
 
