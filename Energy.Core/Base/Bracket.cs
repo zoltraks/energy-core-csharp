@@ -150,6 +150,7 @@ namespace Energy.Base
         /// instead of treating as end of quoted value.
         /// Set to empty string if you don't want to
         /// escape anything inside text in brackets.
+        /// Set to null if you want to use default double suffix.
         /// </summary>
         public string Include
         {
@@ -227,6 +228,7 @@ namespace Energy.Base
                 list.Add(")");
             }
             list.Add(allowEmpty ? "*" : "+");
+            //list.Add("?");
             list.Add(")");
             if (!string.IsNullOrEmpty(_Suffix))
                 list.Add(Energy.Base.Text.EscapeExpression(_Suffix));
@@ -297,7 +299,12 @@ namespace Energy.Base
                 };
             }
         }
-        
+
+        public override string ToString()
+        {
+            return string.Concat(Enclosure);
+        }
+
         public class SearchResult
         {
             /// <summary>
