@@ -143,6 +143,38 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Represent date and time strictly according to ISO 8601 standard
+        /// with "T" for time, "Z" for UTC and "+/-" for time zone.
+        /// </summary>
+        /// <param name="stamp"></param>
+        /// <returns></returns>
+        public static string GetISO8601(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+            {
+                return "";
+            }
+
+            int ms = ((DateTime)stamp).Millisecond;
+            bool z = ((DateTime)stamp).Kind == DateTimeKind.Utc;
+            string format = "";
+            if (z)
+            {
+                format = ms > 0 
+                    ? "yyyy-MM-ddTHH:mm:ss.fffZ"
+                    : "yyyy-MM-ddTHH:mm:ss.fffZ";
+            }
+            else
+            {
+                format = ms > 0
+                    ? "yyyy-MM-ddTHH:mm:ss.fffzzz"
+                    : "yyyy-MM-ddTHH:mm:sszzz";
+            }
+
+            return ((DateTime)stamp).ToString(format);
+        }
+
+        /// <summary>
         /// Represent date and time as ISO readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00".
         /// If day is not set (equal to "0001-01-01", only time will be returned. Milliseconds are optional.
         /// </summary>
@@ -422,6 +454,28 @@ namespace Energy.Base
             double seconds = 1.0 * ticks / System.TimeSpan.TicksPerSecond;
             double round = Math.Round(seconds, precision);
             return new TimeSpan((long)(round * System.TimeSpan.TicksPerSecond));
+        }
+
+        #endregion
+
+        #region SetDate
+
+        public static DateTime? SetDate(DateTime? value, int year, int month, int day)
+        {
+            if (value == null)
+                return null;
+            return new DateTime(year, month, day
+                , ((DateTime)value).Hour, ((DateTime)value).Minute, ((DateTime)value).Second, ((DateTime)value).Millisecond
+                , ((DateTime)value).Kind
+                );
+        }
+
+        public static DateTime SetDate(DateTime value, int year, int month, int day)
+        {
+            return new DateTime(year, month, day
+                , ((DateTime)value).Hour, ((DateTime)value).Minute, ((DateTime)value).Second, ((DateTime)value).Millisecond
+                , ((DateTime)value).Kind
+                );
         }
 
         #endregion
