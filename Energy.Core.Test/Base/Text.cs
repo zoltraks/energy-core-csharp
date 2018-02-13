@@ -14,7 +14,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void Join()
+        public void TextJoin()
         {
             string glue = "-";
             string format = "{0}{1}";
@@ -25,7 +25,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void Encoding()
+        public void TextEncoding()
         {
             System.Text.Encoding encoding;
             foreach (string utf8 in new string[] { "utf8", "uTf-8", "UTF-8", "Utf8" })

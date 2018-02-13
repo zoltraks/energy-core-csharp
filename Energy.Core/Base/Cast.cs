@@ -74,6 +74,69 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Escape JSON characters and include string in double quotes.
+        /// Null strings will be represented as "null".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string StringToJsonString(string value)
+        {
+            return Energy.Base.Json.Escape(value);
+        }
+
+        public static string ObjectToJsonValue(object value)
+        {
+            // treat DBNull as empty string //
+            if (value == null || value is System.DBNull)
+                return "null";
+            // maybe it is already string? //
+            if (value is string)
+                return (string)StringToJsonString((string)value);
+            // what about bool numbers //
+            if (value is bool)
+                return (bool)value ? "true" : "false";
+            // convert to culture invariant form //
+            if (value is double)
+                return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is decimal)
+                return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is float)
+                return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is DateTime)
+                return string.Concat("\"", DateTimeToISO8601((DateTime)value), "\"");
+            // return default string representation //
+            return StringToJsonString(value.ToString());
+        }
+
+        public static object JsonValueToObject(string text)
+        {
+            if (text == "null")
+                return null;
+            if (text == "true")
+                return true;
+            if (text == "false")
+                return false;
+            int intValue = 0;
+            if (int.TryParse(text, out intValue))
+                return intValue;
+            long longValue = 0;
+            if (long.TryParse(text, out longValue))
+                return longValue;
+            ulong ulongValue = 0;
+            if (ulong.TryParse(text, out ulongValue))
+            {
+                return ulongValue;
+            }
+            double doubleValue = 0;
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
+                return doubleValue;
+            decimal decimalValue = 0;
+            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimalValue))
+                return decimalValue;
+            return Energy.Base.Json.Strip(text);
+        }
+
+        /// <summary>
         /// Convert double value to invariant string
         /// </summary>
         /// <param name="value">Number</param>
@@ -364,6 +427,12 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Check if value is long number with or without negative minus sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
         public static bool IsLong(string value, bool negative)
         {
             if (negative)
@@ -772,13 +841,24 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return DateTime as ISO 8601 time string with milliseconds if not zero (empty if default or null)
+        /// Return DateTime as ISO time string with milliseconds if not zero (empty if default or null)
         /// </summary>
         /// <param name="stamp">DateTime</param>
         /// <returns>Time string representation</returns>
         public static string DateTimeToStringTime(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToStringTime((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Represent date and time strictly according to ISO 8601 standard
+        /// with "T" for time, "Z" for UTC and "+/-" for time zone.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DateTimeToISO8601(DateTime? value)
+        {
+            return Energy.Base.Clock.GetISO8601(value);
         }
 
         /// <summary>

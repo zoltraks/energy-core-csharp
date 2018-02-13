@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -65,6 +66,27 @@ namespace Energy.Core.Test.Base
             byte[] b3 = new byte[] { 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff };
             int c1 = Energy.Base.Byte.Compare(b2, b3);
             Assert.AreEqual(0, c1);
+        }
+
+        [TestMethod]
+        public void DateTimeToJsonString()
+        {
+            DateTime dt1 = DateTime.UtcNow;
+            DateTime dt2 = Energy.Base.Clock.SetDate(dt1, 2018, 01, 01);
+            string jsonString1 = Energy.Base.Cast.DateTimeToISO8601(dt2);
+
+            Assert.AreEqual("2018-01-01T", jsonString1.Substring(0, 11));
+
+            string displayName = "(GMT+06:00) Antarctica/Mawson Time";
+            string standardName = "Mawson Time";
+            TimeSpan offset = new TimeSpan(06, 00, 00);
+            TimeZoneInfo mawson = TimeZoneInfo.CreateCustomTimeZone(standardName, offset, displayName, standardName);
+            Debug.WriteLine("The current time is {0} {1}"
+                , TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, mawson)
+                , mawson.StandardName
+                );
+            DateTime mawsonDateTime = TimeZoneInfo.ConvertTimeFromUtc(dt2, mawson);
+            string jsonStringMawson = Energy.Base.Cast.DateTimeToISO8601(mawsonDateTime);
         }
     }
 }
