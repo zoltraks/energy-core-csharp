@@ -173,6 +173,11 @@ namespace Energy.Base
         {
             if (string.IsNullOrEmpty(value))
                 return value;
+
+            value = value.Trim();
+            if (value.Length == 0)
+                return value;
+
             if (value.IndexOf(' ') >= 0)
                 value = value.Replace(" ", null);
             if (value.IndexOf('_') >= 0)
@@ -181,6 +186,10 @@ namespace Energy.Base
                 value = value.Replace("'", null);
             if (value.IndexOf('’') >= 0)
                 value = value.Replace("’", null);
+
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+
             return value;
         }
 
