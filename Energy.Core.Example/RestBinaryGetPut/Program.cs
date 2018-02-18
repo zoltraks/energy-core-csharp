@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using static Energy.Base.Log;
+using System.Linq;
 
 namespace RestBinaryGetPut
 {
@@ -10,13 +11,11 @@ namespace RestBinaryGetPut
     {
         static void Main(string[] args)
         {
-            TestPutExe();
-
-            //TestLog();
             try
             {
-                Energy.Core.Web.IgnoreCertificateValidation = true;
-                Console.WriteLine(Energy.Core.Web.Get("https://atom.alyx.pl/api/test/echo/XYZ"));
+                Energy.Core.Application.SetConsoleEncoding();
+                Test.S();
+                Test.Make();
             }
             catch (Exception x)
             {

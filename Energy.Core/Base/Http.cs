@@ -1,0 +1,200 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
+using System.Xml.Serialization;
+
+namespace Energy.Base
+{
+    public class Http
+    {
+        /// <summary>
+        /// Represents HTTP message body used in request and response
+        /// </summary>
+        public class Message
+        {
+            #region Public
+
+            public string Body { get { return GetBody(); } set { SetBody(value); } }
+
+            public byte[] Data { get { return GetData(); } set { SetData(value); } }
+
+            [XmlIgnore]
+            public System.Text.Encoding Encoding { get { return GetEncoding(); } set { SetEncoding(value); } }
+
+            public string Charset { get { return GetCharset(); } set { SetCharset(value); } }
+
+            #endregion
+
+            #region Private
+
+            private string _Body;
+
+            private byte[] _Data;
+
+            private System.Text.Encoding _Encoding;
+
+            private string _Charset;
+
+            #endregion
+
+            #region Method
+
+            private string GetBody()
+            {
+                if (_Body != null)
+                    return _Body;
+                if (_Data == null)
+                    return null;
+                System.Text.Encoding encoding = _Encoding;
+                if (encoding == null)
+                    encoding = System.Text.Encoding.UTF8;
+                return encoding.GetString(_Data);
+            }
+
+            private void SetBody(string value)
+            {
+                _Body = value;
+                _Data = null;
+            }
+
+            private byte[] GetData()
+            {
+                if (_Data != null)
+                    return _Data;
+                if (_Body == null)
+                    return null;
+                System.Text.Encoding encoding = GetEncodingOrDefault();
+                return encoding.GetBytes(_Body);
+            }
+
+            private void SetData(byte[] value)
+            {
+                _Data = value;
+                _Body = null;
+            }
+
+            private Encoding GetEncoding()
+            {
+                if (_Encoding != null)
+                    return _Encoding;
+                if (_Charset == null)
+                    return null;
+                return Energy.Base.Text.Encoding(_Charset);
+            }
+
+            private Encoding GetEncodingOrDefault()
+            {
+                System.Text.Encoding encoding = GetEncoding();
+                if (encoding == null)
+                    encoding = System.Text.Encoding.UTF8;
+                return encoding;
+            }
+
+            private void SetEncoding(Encoding value)
+            {
+                _Encoding = value;
+                _Charset = null;
+            }
+
+            private string GetCharset()
+            {
+                if (_Charset != null)
+                    return _Charset;
+                if (_Encoding == null)
+                    return null;
+                return _Encoding.EncodingName;
+            }
+
+            private void SetCharset(string value)
+            {
+                _Charset = value;
+                _Encoding = null;
+            }
+
+            #endregion
+        }
+
+        /// <summary>
+        /// HTTP request
+        /// </summary>
+        public class Request: Message
+        {
+            #region Public
+
+            public string Method { get; set; }
+
+            public string Url { get; set; }
+
+            public string ContentType { get; set; }
+
+            public string AcceptType { get; set; }
+
+            [XmlElement("Header")]
+            public List<string> Headers = new List<string>();
+
+            #endregion
+
+            #region Constructor
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public Request()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="method"></param>
+            public Request(string method)
+            {
+                Method = method;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="method"></param>
+            /// <param name="url"></param>
+            public Request(string method, string url)
+            {
+                Method = method;
+                Url = url;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="method"></param>
+            /// <param name="url"></param>
+            /// <param name="contentType"></param>
+            public Request(string method, string url, string contentType)
+            {
+                Method = method;
+                Url = url;
+                ContentType = contentType;
+            }
+
+            #endregion
+
+            #region Private
+
+            #endregion
+
+            #region Method
+
+            #endregion
+        }
+
+        /// <summary>
+        /// HTTP response
+        /// </summary>
+        public class Response: Message
+        {
+            [DefaultValue((int)0)]
+            public int StatusCode { get; set; }
+        }
+    }
+}

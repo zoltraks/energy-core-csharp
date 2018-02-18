@@ -248,6 +248,77 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Perform HTTP request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request)
+        {
+            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            httpRequest.Method = request.Method;
+            if (!string.IsNullOrEmpty(request.ContentType))
+                httpRequest.ContentType = request.ContentType;
+            if (!string.IsNullOrEmpty(request.AcceptType))
+                httpRequest.Accept = request.AcceptType;
+            if (request.Headers != null && request.Headers.Count > 0)
+            {
+                for (int i = 0; i < request.Headers.Count; i++)
+                {
+                    httpRequest.Headers.Add(request.Headers[i]);
+                }
+            }
+
+            Energy.Base.Http.Response response = new Base.Http.Response();
+
+            int statusCode = 0;
+            //responseHeaders = null;
+            byte[] responseData = null;
+
+            byte[] data = request.Data;
+
+            if (data != null && data.Length > 0)
+            {
+                httpRequest.ContentLength = data.Length;
+
+                using (Stream requestStream = httpRequest.GetRequestStream())
+                {
+                    if (requestStream == null)
+                        return response;
+
+                    requestStream.Write(data, 0, data.Length);
+                    requestStream.Flush();
+                    requestStream.Close();
+                }
+            }
+
+            using (HttpWebResponse httpResponse = (HttpWebResponse)GetResponseWithoutException(httpRequest))
+            {
+                statusCode = (int)httpResponse.StatusCode;
+                if (httpResponse.Headers.Count > 0)
+                {
+                    Energy.Base.Collection.StringDictionary d = new Energy.Base.Collection.StringDictionary();
+                    string[] keys = httpResponse.Headers.AllKeys;
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        d[keys[i]] = httpResponse.Headers[i];
+                    }
+                    //responseHeaders = d.ToArray();
+                }
+                using (Stream responseStream = httpResponse.GetResponseStream())
+                {
+                    if (responseStream != null)
+                    {
+                        using (Energy.Base.ByteArrayBuilder builder = new Energy.Base.ByteArrayBuilder(responseStream))
+                        {
+                            responseData = builder.ToArray();
+                        }
+                    }
+                    return response;
+                }
+            }
+        }
+
         #endregion
 
         #region GET
@@ -294,36 +365,36 @@ namespace Energy.Core
         /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="body"></param>
+        /// <param name="requestBody"></param>
         /// <param name="contentType"></param>
         /// <param name="headerArray"></param>
         /// <returns></returns>
-        public static string Post(string url, string body, string contentType, string[] headerArray)
+        public static string Post(string url, string requestBody, string contentType, string[] headerArray)
         {
-            return Request("POST", url, body, contentType, null, null, headerArray, true);
+            return Request("POST", url, requestBody, contentType, null, null, headerArray, true);
         }
 
         /// <summary>
         /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="body"></param>
+        /// <param name="requestBody"></param>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public static string Post(string url, string body, string contentType)
+        public static string Post(string url, string requestBody, string contentType)
         {
-            return Request("POST", url, body, contentType, null, null, null, true);
+            return Request("POST", url, requestBody, contentType, null, null, null, true);
         }
 
         /// <summary>
         /// Perform POST and return string from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="body"></param>
+        /// <param name="requestBody"></param>
         /// <returns></returns>
-        public static string Post(string url, string body)
+        public static string Post(string url, string requestBody)
         {
-            return Request("POST", url, body, null, null, null, null, true);
+            return Request("POST", url, requestBody, null, null, null, null, true);
         }
 
         /// <summary>
