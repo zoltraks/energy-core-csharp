@@ -5,7 +5,7 @@ Energy Core Library
 About
 -----
 
-**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. Designed for all purposes as a set of libraries compiled into one include file. No external dependencies (*almost*), avaliable for main .NET platform versions. Including **.NET 2** or **Compact Framework** but also available for new **.NET Core** platform.
+**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. Designed for all purposes as a set of libraries compiled into one include file. No external dependencies (*almost*), available for main .NET platform versions. Including **.NET 2** or **Compact Framework** but also available for new **.NET Core** platform.
 
 Filled with radioactive rays and made with love for you...
 
@@ -107,7 +107,7 @@ Library has been divided into several different namespaces. Following table brie
 History
 -------
 
-Working for many years on different development projects, from simple applications, web appplicatons, to a rich and monolithic production environment with plenty of small software programs that act as interfaces and all kinds of small services, as most of you have probably noticed that some part of the functionality is repeated to a greater or lesser extent regardless of the project type.
+Working for many years on different development projects, from simple applications, web applicatons, to a rich and monolithic production environment with plenty of small software programs that act as interfaces and all kinds of small services, as most of you have probably noticed that some part of the functionality is repeated to a greater or lesser extent regardless of the project type.
 
 This library was created completely independently from my professional work as an attempt to build a "base", which can be quickly used in almost any project in order not to repeat again the same codes to achieve functionality like safe (international) type conversion or generic database connection which is easy and most importantly safe to use.
 
