@@ -12,7 +12,12 @@ namespace Energy.Core
         /// <summary>
         /// Trace switch
         /// </summary>
-        public readonly static Energy.Base.Switch Trace = new Energy.Base.Switch();
+        public readonly static Energy.Base.Switch Trace = false;
+
+        /// <summary>
+        /// Use time when writing to System.Diagnostics.Debug
+        /// </summary>
+        public readonly static Energy.Base.Switch DebugOutputTime = true;
 
         /// <summary>
         /// Return exception message
@@ -116,6 +121,15 @@ namespace Energy.Core
             return CallingMethod(1);
         }
 
+        public static string FormatDebugOutput(string message)
+        {
+            if ((bool)DebugOutputTime)
+            {
+                message = string.Format("{0} {1}", DateTime.Now.ToString("HH:mm:ss.fff"), message);
+            }
+            return message;
+        }
+
         /// <summary>
         /// Handle exception
         /// </summary>
@@ -123,7 +137,7 @@ namespace Energy.Core
         public static void Catch(Exception exception)
         {
             string message = ExceptionMessage(exception, true);
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)Trace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
@@ -136,7 +150,7 @@ namespace Energy.Core
         /// <param name="message"></param>
         public static void Write(string message)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)Trace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
@@ -151,7 +165,7 @@ namespace Energy.Core
         public static void Write(string format, params object[] args)
         {
             string message = string.Format(format, args);
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)Trace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);

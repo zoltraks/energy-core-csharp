@@ -432,7 +432,7 @@ namespace Energy.Core
                     {
                         syntax["Date"] = "2017-07-01";
                         syntax["DATE"] = "2017-07-02";
-                        System.Console.WriteLine(string.Join("\n", syntax.ToArray(": ")));
+                        System.Console.WriteLine(string.Join("\n", syntax.Dictionary.ToArray(": ")));
                     }
 
                     for (int i = 0; i < log.Length; i++)

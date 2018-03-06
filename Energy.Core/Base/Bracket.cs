@@ -10,10 +10,33 @@ namespace Energy.Base
     /// </summary>
     public class Bracket
     {
+        #region Class
+
+        public class Array : Energy.Base.Collection.Array<Bracket>
+        {
+            public string GetMatchExpression()
+            {
+                Energy.Base.Bracket[] array = this.ToArray();
+                if (array.Length == 0)
+                    return "";
+                if (array.Length == 1)
+                    return array[0].MatchExpression;
+                List<string> list = new List<string>();
+                foreach (Energy.Base.Bracket bracket in array)
+                {
+                    list.Add(bracket.MatchExpression);
+                }
+                string pattern = string.Join("|", list.ToArray());
+                return pattern;
+            }
+        }
+
+        #endregion
+
         #region Constructor
 
         public Bracket() { }
-        
+
         public Bracket(string enclosure)
         {
             Enclosure = enclosure;

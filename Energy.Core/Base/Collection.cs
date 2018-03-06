@@ -222,6 +222,14 @@ namespace Energy.Base
                 left.Remove(right);
                 return left;
             }
+
+            public new T[] ToArray()
+            {
+                lock (_Lock)
+                {
+                    return base.ToArray();
+                }
+            }
         }
 
         #endregion
@@ -401,7 +409,7 @@ namespace Energy.Base
                 }
             }
 
-            private readonly object _Lock = new object();
+            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
             private string _XmlParentSeparator = ".";
             private readonly object _XmlParentSeparatorLock = new object();
