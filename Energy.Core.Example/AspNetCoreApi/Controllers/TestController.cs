@@ -80,6 +80,30 @@ namespace AspNetCoreApi.Controllers
         }
 
         /// <summary>
+        /// Get body back from request
+        /// </summary>
+        /// <returns></returns>
+        // HEAD: api/test/echo
+        [HttpHead("echo")]
+        public string HeadEchoBody()
+        {
+            string response = Request.GetRawBodyString();
+            return response;
+        }
+
+        /// <summary>
+        /// Get body back from request
+        /// </summary>
+        /// <returns></returns>
+        // DELETE: api/test/echo
+        [HttpDelete("echo")]
+        public string DeleteEchoBody()
+        {
+            string response = Request.GetRawBodyString();
+            return response;
+        }
+
+        /// <summary>
         /// Perform file creation test
         /// </summary>
         /// <returns></returns>
