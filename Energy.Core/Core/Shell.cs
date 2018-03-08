@@ -5,6 +5,9 @@ using System.Xml.Serialization;
 
 namespace Energy.Core
 {
+    /// <summary>
+    /// Shell related classes including command line options
+    /// </summary>
     public class Shell
     {        
         #region OptionStyle
@@ -27,7 +30,7 @@ namespace Energy.Core
             public bool Double = true;
 
             /// <summary>
-            /// Determines if colon may  be used after option name to specify value, like /opt:value.
+            /// Determines if colon may be used after option name to specify value, like /opt:value.
             /// </summary>
             public bool Colon = false;
 

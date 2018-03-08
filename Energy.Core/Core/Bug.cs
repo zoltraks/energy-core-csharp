@@ -10,6 +10,16 @@ namespace Energy.Core
     public class Bug
     {
         /// <summary>
+        /// Trace switch
+        /// </summary>
+        public readonly static Energy.Base.Switch Trace = false;
+
+        /// <summary>
+        /// Use time when writing to System.Diagnostics.Debug
+        /// </summary>
+        public readonly static Energy.Base.Switch DebugOutputTime = true;
+
+        /// <summary>
         /// Return exception message
         /// </summary>
         /// <param name="exception">Exception object</param>
@@ -51,6 +61,16 @@ namespace Energy.Core
             }
 
             return String.Join(Environment.NewLine, message.ToArray()).Trim();
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>string</returns>
+        public static string ExceptionMessage(Exception exception)
+        {
+            return ExceptionMessage(exception, (bool)Trace);
         }
 
         /// <summary>
@@ -101,13 +121,27 @@ namespace Energy.Core
             return CallingMethod(1);
         }
 
+        public static string FormatDebugOutput(string message)
+        {
+            if ((bool)DebugOutputTime)
+            {
+                message = string.Format("{0} {1}", DateTime.Now.ToString("HH:mm:ss.fff"), message);
+            }
+            return message;
+        }
+
         /// <summary>
         /// Handle exception
         /// </summary>
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
-            System.Diagnostics.Debug.WriteLine(ExceptionMessage(exception, true));
+            string message = ExceptionMessage(exception, true);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
 
         /// <summary>
@@ -116,7 +150,11 @@ namespace Energy.Core
         /// <param name="message"></param>
         public static void Write(string message)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
 
         /// <summary>
@@ -126,7 +164,12 @@ namespace Energy.Core
         /// <param name="args"></param>
         public static void Write(string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args));
+            string message = string.Format(format, args);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
         }
     }
 }

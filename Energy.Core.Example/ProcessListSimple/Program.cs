@@ -8,17 +8,12 @@ namespace ProcessListSimple
 {
     class Program
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="args"></param>
         static void Main(string[] args)
         {
             ProcessInformation.ProcessDictionary d = new ProcessInformation.ProcessDictionary();
 
             while (true)
             {
-
                 foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses())
                 {
                     if (d.ContainsKey(process.Id) || d.ContainsProcess(process))
@@ -41,7 +36,7 @@ namespace ProcessListSimple
                     record = table.New();
                     System.Diagnostics.Process process = e.Process;
                     //try
-                    //{                    
+                    //{
                     //    record["Process start"] = process.StartTime;
                     //}
                     //catch (Win32Exception)
@@ -49,7 +44,7 @@ namespace ProcessListSimple
                     //}
                     try
                     {
-                        record["Process name"] = Energy.Support.Win32.GetProcessName(process.Id);
+                        record["Process name"] = Energy.Support.WinApi.GetProcessName(process.Id);
                     }
                     catch
                     {
@@ -61,7 +56,7 @@ namespace ProcessListSimple
                     record["Process Title"] = process.MainWindowTitle;
                 }
                 DataTable dt = table.ToDataTable();
-                Energy.Core.Tilde.WriteLine(Energy.Base.Table.DataTableToPlainText(dt, new Energy.Base.Table.PlainFormat()
+                Energy.Core.Tilde.WriteLine(Energy.Base.Plain.DataTableToPlainText(dt, new Energy.Base.Plain.TableFormat()
                 {
                     Tilde = true,
                     MaximumLength = 25,

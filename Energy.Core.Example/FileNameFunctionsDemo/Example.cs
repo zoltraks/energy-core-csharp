@@ -9,11 +9,11 @@ namespace FileNameFunctionsDemo
         public static void PathSeparator(string filename)
         {
             Console.WriteLine(string.Format("Filename: {0}", filename));
-            string strip = Energy.Base.File.StripQuotation(filename);
+            string strip = Energy.Base.Path.StripQuotation(filename);
             Console.WriteLine(string.Format("Strip: {0}", strip));
-            string dos = Energy.Base.File.ToDosPath(filename);
+            string dos = Energy.Base.Path.ToDos(filename);
             Console.WriteLine(string.Format("DOS path: {0}", dos));
-            string unix = Energy.Base.File.ToUnixPath(strip);
+            string unix = Energy.Base.Path.ToUnix(strip);
             Console.WriteLine(string.Format("UNIX path: {0}", unix));
             string file = Energy.Base.File.GetName(filename);
             Console.WriteLine(string.Format("Filename: {0}", file));
@@ -38,6 +38,11 @@ namespace FileNameFunctionsDemo
 
         public static void PathShorten(string path)
         {
+            Energy.Core.Tilde.WriteLine("~c~Long path: ~y~{0}", path);
+            Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 50, "..."));
+            Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 50, "..."));
+            Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 50, "..."));
+            Energy.Core.Tilde.WriteLine("~b~= = = = =");
             Console.WriteLine("<<< " + Energy.Base.Path.ShortLeft(path, 30, "..."));
             Console.WriteLine(">>> " + Energy.Base.Path.ShortRight(path, 30, "..."));
             Console.WriteLine("--- " + Energy.Base.Path.ShortMiddle(path, 30, "..."));

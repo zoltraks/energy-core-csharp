@@ -10,10 +10,33 @@ namespace Energy.Base
     /// </summary>
     public class Bracket
     {
+        #region Class
+
+        public class Array : Energy.Base.Collection.Array<Bracket>
+        {
+            public string GetMatchExpression()
+            {
+                Energy.Base.Bracket[] array = this.ToArray();
+                if (array.Length == 0)
+                    return "";
+                if (array.Length == 1)
+                    return array[0].MatchExpression;
+                List<string> list = new List<string>();
+                foreach (Energy.Base.Bracket bracket in array)
+                {
+                    list.Add(bracket.MatchExpression);
+                }
+                string pattern = string.Join("|", list.ToArray());
+                return pattern;
+            }
+        }
+
+        #endregion
+
         #region Constructor
 
         public Bracket() { }
-        
+
         public Bracket(string enclosure)
         {
             Enclosure = enclosure;
@@ -150,6 +173,7 @@ namespace Energy.Base
         /// instead of treating as end of quoted value.
         /// Set to empty string if you don't want to
         /// escape anything inside text in brackets.
+        /// Set to null if you want to use default double suffix.
         /// </summary>
         public string Include
         {
@@ -227,6 +251,7 @@ namespace Energy.Base
                 list.Add(")");
             }
             list.Add(allowEmpty ? "*" : "+");
+            //list.Add("?");
             list.Add(")");
             if (!string.IsNullOrEmpty(_Suffix))
                 list.Add(Energy.Base.Text.EscapeExpression(_Suffix));
@@ -297,7 +322,12 @@ namespace Energy.Base
                 };
             }
         }
-        
+
+        public override string ToString()
+        {
+            return string.Concat(Enclosure);
+        }
+
         public class SearchResult
         {
             /// <summary>

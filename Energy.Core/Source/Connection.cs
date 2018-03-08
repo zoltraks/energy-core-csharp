@@ -7,27 +7,36 @@ using System.Threading;
 
 namespace Energy.Source
 {
+    #region Template
+
+    /// <summary>
+    /// Generic method with type of SQL connection driver class
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Connection<T> : Connection
+    {
+        public Connection()
+        {
+            this.Vendor = typeof(T);
+        }
+
+        public Connection(string connectionString)
+            : base(typeof(T), connectionString)
+        {
+        }
+    }
+
+    #endregion
+
     #region Connection
 
     /// <summary>
     /// Database connection interface for application.
     /// To create new connection you have to specify vendor class which implements
-    /// DbConnection compatible with ADO.NET.
+    /// IDbConnection compatible with ADO.NET.
     /// </summary>
-    [Energy.Attribute.Markdown.Text(@"
-
-Connections may be closed automatically when connection timeout is set.
-
-That requires system timer to be set and reset every operation.
-
-Even though ""static"" connections are not recommended, connection timeout might be a *must*
-in a situation when multiple instances of software may be run at the same time to avoid
-SQL server to run out of free connections.
-
-    ")]
-    public partial class Connection : IDisposable, ICloneable
-    //, Energy.Interface.IConnection
-    //, Energy.Interface.ICopy<Connection>
+    public class Connection : IDisposable, ICloneable
+        , Energy.Interface.ICopy<Connection>
     {
         #region Constructor
 
@@ -35,40 +44,39 @@ SQL server to run out of free connections.
 
         public Connection(Type vendor)
         {
-            this.Vendor = vendor;
+            _Vendor = vendor;
         }
 
         public Connection(Type vendor, string connectionString)
             : this(vendor)
         {
-            this.ConnectionString = connectionString;
+            _ConnectionString = connectionString;
         }
 
         public Connection(Type vendor, Configuration configuration)
             : this(vendor)
         {
-            this.ConnectionString = configuration.ConnectionString;
+            _ConnectionString = configuration.ConnectionString;
+            _Timeout = configuration.Timeout;
         }
 
-        public Connection(DbConnection connection)
+        public Connection(IDbConnection connection)
         {
-            this.Vendor = connection.GetType();
-            this.ConnectionString = connection.ConnectionString;
-            this.Timeout = connection.ConnectionTimeout;
+            _Vendor = connection.GetType();
+            _ConnectionString = connection.ConnectionString;
         }
 
-        public Connection(Configuration configuration)
+        public static explicit operator Energy.Source.Connection(DbConnection connection)
         {
-            this.Configuration = configuration;
+            Energy.Source.Connection _ = new Energy.Source.Connection(connection);
+            return _;
         }
 
         #endregion
 
         #region Lock
 
-        private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
-
-        private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
+        private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
         #endregion
 
@@ -77,146 +85,261 @@ SQL server to run out of free connections.
         private string _ConnectionString;
 
         /// <summary>
-        /// Connection string used for opening SQL connection.
-        /// Connection should be closed on change.
+        /// Connection string used for opening database connection
         /// </summary>
-        public string ConnectionString
-        {
-            get
-            {
-                return _ConnectionString;
-            }
-            set
-            {
-                _ConnectionString = value;
-            }
-        }
+        public string ConnectionString { get { return GetConnectionString(); } set { SetConnectionString(value); } }
 
         private System.Type _Vendor;
 
         /// <summary>
-        /// DbConnection vendor class for SQL connection.
+        /// Connection vendor class for database connection
         /// </summary>
-        public System.Type Vendor
+        public System.Type Vendor { get { return GetVendor(); } set { SetVendor(value); } }
+
+        private bool _Persistent;
+
+        /// <summary>
+        /// Persistent connection
+        /// </summary>
+        public bool Persistent { get { return GetPersistent(); } set { SetPersistent(value); } }
+
+        private int _Repeat = 0;
+
+        /// <summary>
+        /// Repeat operation after recoverable error
+        /// </summary>
+        public int Repeat { get { lock (_Lock) return _Repeat; } set { lock (_Lock) _Repeat = value; } }
+
+        private int _Timeout = 30;
+
+        /// <summary>
+        /// Time limit in seconds for SQL operations
+        /// </summary>
+        public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
+
+        private Energy.Core.Log _Log;
+
+        /// <summary>
+        /// Log
+        /// </summary>
+        public Energy.Core.Log Log { get { lock (_Lock) return _Log; } set { lock (_Lock) _Log = value; } }
+
+        private Energy.Interface.IDialect _Dialect;
+
+        /// <summary>
+        /// Dialects
+        /// </summary>
+        public Energy.Interface.IDialect Dialect { get { lock (_Lock) return _Dialect; } set { lock (_Lock) _Dialect = value; } }
+
+        private int _ErrorNumber = 0;
+
+        /// <summary>
+        /// Error error number
+        /// </summary>
+        public int ErrorNumber { get { lock (_Lock) return _ErrorNumber; } }
+
+        private string _ErrorMessage = "";
+
+        /// <summary>
+        /// Last error status
+        /// </summary>
+        public string ErrorMessage { get { lock (_Lock) return _ErrorMessage; } }
+
+        private Exception _ErrorException;
+
+        /// <summary>
+        /// Last error exception
+        /// </summary>
+        public Exception ErrorException { get { lock (_Lock) return _ErrorException; } }
+
+        private IDbConnection _Connection;
+
+        /// <summary>
+        /// True if connection is active
+        /// </summary>
+        public bool Active { get { return GetActive(); } }
+
+        private string GetConnectionString()
         {
-            get
+            lock (_Lock)
+            {
+                return _ConnectionString;
+            }
+        }
+
+        private void SetConnectionString(string connectionString)
+        {
+            lock (_Lock)
+            {
+                if (0 == string.Compare(connectionString, _ConnectionString, false))
+                {
+                    return;
+                }
+                if (0 != string.Compare(connectionString, _ConnectionString, true))
+                {
+                    Close();
+                }
+                _ConnectionString = connectionString;
+            }
+        }
+
+        private Type GetVendor()
+        {
+            lock (_Lock)
             {
                 return _Vendor;
             }
-            set
+        }
+
+        private void SetVendor(Type vendor)
+        {
+            if (vendor == null)
+                throw new ArgumentNullException();
+            if (!typeof(IDbConnection).IsAssignableFrom(vendor))
+                throw new Exception("Vendor must implement IDbConnection interface");
+            lock (_Lock)
             {
-                if (value == Vendor)
+                if (vendor == _Vendor)
                     return;
-                SetVendor(value);
+                Close();
+                _Vendor = vendor;
             }
         }
 
-        private Energy.Source.Configuration _Configuration;
-
-        /// <summary>Configuration</summary>
-        public Energy.Source.Configuration Configuration
+        private bool GetPersistent()
         {
-            get
+            lock (_Lock)
             {
-                return _Configuration;
-            }
-            private set
-            {
-                if (_Configuration == value)
-                    return;
-                _Configuration = value;
+                return _Persistent;
             }
         }
 
-        private int _Repeat = 1;
-        /// <summary>Repeat operation after recoverable error</summary>
-        public int Repeat
+        private void SetPersistent(bool persistent)
         {
-            get
+            lock (_Lock)
             {
-                return _Repeat;
-            }
-            set
-            {
-                if (_Repeat == value)
+                if (persistent == _Persistent)
                     return;
-                _Repeat = value;
+                if (!persistent)
+                    Close();
+                _Persistent = persistent;
             }
         }
 
-        private int _Timeout = 30;
-        /// <summary>Time limit in seconds for SQL operations</summary>
-        public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
-
-        private Exception _ErrorException;
-        /// <summary>Repeat operation after recoverable error</summary>
-        public Exception ErrorException
+        private bool GetActive()
         {
-            get
+            lock (_Lock)
             {
-                lock (_PropertyLock)
-                    return _ErrorException;
-            }
-            private set
-            {
-                lock (_PropertyLock)
-                    _ErrorException = value;
+                if (_Connection == null)
+                    return false;
+                return IsActive(_Connection);
             }
         }
 
         #endregion
 
-        public void SetVendor(Type vendor)
+        #region Event
+
+        public event EventHandler OnCreate;
+
+        public event EventHandler OnOpen;
+
+        public event EventHandler OnClose;
+
+        #endregion
+
+        #region Error
+
+        private void SetError(Exception x)
         {
-            if (vendor == null)
-                throw new ArgumentNullException();
-            if (!vendor.IsSubclassOf(typeof(DbConnection)))
-                throw new Exception("Vendor must derrive from DbConnection class");
-            lock (_PropertyLock)
+            int number = 0;
+            int[] error = Energy.Source.Error.GetErrorNumber(x);
+            if (error.Length > 0)
+                number = error[0];
+            lock (_Lock)
             {
-                _Vendor = vendor;
+                _ErrorNumber = number;
+                _ErrorMessage = x.Message;
+                _ErrorException = x;
             }
         }
 
+        private void ClearError()
+        {
+            lock (_Lock)
+            {
+                _ErrorNumber = 0;
+                _ErrorMessage = "";
+                _ErrorException = null;
+            }
+        }
+
+        private int GetNegativeErrorNumber()
+        {
+            int number = ErrorNumber;
+            if (number == 0)
+                return -1;
+            return number > 0 ? -number : number;
+        }
+
         /// <summary>
-        /// Log
-        /// </summary>
-        public Energy.Core.Log Log { get; set; }
-
-        private int _ErrorNumber = 0;
-        /// <summary>ErrorNumber</summary>
-        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } private set { lock (_PropertyLock) _ErrorNumber = value; } }
-
-        private string _ErrorStatus = "";
-        /// <summary>ErrorStatus</summary>
-        public string ErrorStatus { get { lock (_PropertyLock) return _ErrorStatus; } private set { lock (_PropertyLock) _ErrorStatus = value; } }
-
-        /// <summary>
-        /// Create connection object of vendor class.
-        /// Used by Open() to create DbConnection object.
+        /// Get error text
         /// </summary>
         /// <returns></returns>
-        public DbConnection Create()
+        public string GetErrorText()
         {
-            Type vendor = Vendor;
-            DbConnection _ = null;
+            List<string> list = new List<string>();
+            if (ErrorNumber != 0)
+                list.Add(ErrorNumber.ToString());
+            if (!string.IsNullOrEmpty(ErrorMessage))
+                list.Add(Regex.Replace(ErrorMessage, @"(\r\n|\n|\r)+", " "));
+            return string.Join(" ", list.ToArray());
+        }
+
+        #endregion
+
+        #region Create
+
+        /// <summary>
+        /// Create connection object of vendor class
+        /// </summary>
+        /// <remarks>
+        /// Used by Open() to create DbConnection object.
+        /// </remarks>
+        /// <returns></returns>
+        public IDbConnection Create()
+        {
+            Type vendor;
+            string connectionString;
+            lock (_Lock)
+            {
+                vendor = _Vendor;
+                connectionString = _ConnectionString;
+            }
+            IDbConnection _ = null;
             try
             {
-                _ = (DbConnection)Activator.CreateInstance(vendor);
-                _.ConnectionString = ConnectionString;
+                _ = (IDbConnection)Activator.CreateInstance(vendor);
+                _.ConnectionString = connectionString;
             }
             catch (Exception x)
             {
-                if (!LogWrite(x))
-                    throw;
+                SetError(x);
+                (Log ?? Energy.Core.Log.Default).Write(x);
             }
             finally
             {
+                if (OnCreate != null)
+                    OnCreate(this, null);
             }
             return _;
         }
 
-        public DbConnection Open(DbConnection connection)
+        #endregion
+
+        #region Open
+
+        public IDbConnection Open(IDbConnection connection)
         {
             if (connection == null)
                 return null;
@@ -278,32 +401,92 @@ SQL server to run out of free connections.
                 }
             }
 
-            // If we didn't connect successfully, throw an exception
             if (!success)
-            {
                 connection = null;
-            }
+
+            if (OnOpen != null)
+                OnOpen(this, null);
 
             return connection;
         }
 
         public IDbConnection Open()
         {
+            lock (_Lock)
+            {
+                if (_Persistent)
+                {
+                    Close();
+                    _Connection = Open(Create());
+                    return _Connection;
+                }
+            }
+
             return Open(Create());
         }
 
-        public static explicit operator Energy.Source.Connection(DbConnection connection)
+        #endregion
+
+        #region Close
+
+        /// <summary>
+        /// Close existing connection
+        /// </summary>
+        public void Close()
         {
-            Energy.Source.Connection _ = new Energy.Source.Connection(connection);
-            return _;
+            lock (_Lock)
+            {
+                if (_Connection == null)
+                    return;
+                try
+                {
+                    _Connection.Close();
+                }
+                catch (Exception x)
+                {
+                    SetError(x);
+                    (Log ?? Energy.Core.Log.Default).Write(x);
+                }
+                try
+                {
+                    _Connection.Dispose();
+                }
+                catch
+                {
+                    Energy.Core.Bug.Write("Exception during connection dispose...");
+                }
+                finally
+                {
+                    _Connection = null;
+                    if (OnClose != null)
+                        OnClose(this, null);
+                }
+            }
         }
+
+        #endregion
+
+        #region Test
+
+        /// <summary>
+        /// Test database connection
+        /// </summary>
+        /// <returns></returns>
+        public bool Test()
+        {
+            return Scalar<bool>("SELECT 1");
+        }
+
+        #endregion
+
+        #region Active
 
         /// <summary>
         /// Check if database connection is active.
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static bool IsActive(DbConnection connection)
+        public static bool IsActive(IDbConnection connection)
         {
             if (connection == null)
                 return false;
@@ -320,79 +503,9 @@ SQL server to run out of free connections.
             }
         }
 
-        #region CatchResult
-
-        public class CatchResult
-        {
-            bool access = false;
-            /// <summary>
-            /// Access error
-            /// </summary>
-            public bool Access { get { return access; } set { access = value; } }
-
-            bool timeout = false;
-            /// <summary>
-            /// Timeout
-            /// </summary>
-            public bool Timeout { get { return timeout; } set { timeout = value; } }
-
-            bool damage = false;
-            /// <summary>
-            /// Connection damaged
-            /// </summary>
-            public bool Damage { get { return damage; } set { damage = value; } }
-
-            bool connection = false;
-            /// <summary>
-            /// Connection error
-            /// </summary>
-            public bool Connection { get { return connection; } set { connection = value; } }
-
-            bool deadlock = false;
-            /// <summary>
-            /// Deadlock occured
-            /// </summary>
-            public bool Deadlock { get { return deadlock; } set { deadlock = value; } }
-
-            bool syntax = false;
-            /// <summary>
-            /// Syntax error
-            /// </summary>
-            public bool Syntax { get { return syntax; } set { syntax = value; } }
-
-            bool miss = false;
-            /// <summary>
-            /// Object missing like not existing column
-            /// </summary>
-            public bool Miss { get { return miss; } set { miss = value; } }
-
-            bool operation = false;
-            /// <summary>
-            /// Operation error
-            /// </summary>
-            public bool Operation { get { return operation; } set { operation = value; } }
-
-            public override string ToString()
-            {
-                List<string> list = new List<string>();
-                if (connection)
-                    list.Add("Connection error");
-                if (access)
-                    list.Add("Access error");
-                if (Timeout)
-                    list.Add("Timeout");
-                if (miss)
-                    list.Add("Missing object");
-                if (syntax)
-                    list.Add("Syntax error");
-                if (operation)
-                    list.Add("Operation error");
-                string status = string.Join(" + ", list.ToArray());
-                return status;
-            }
-        }
-
         #endregion
+
+        #region Catch
 
         /// <summary>
         /// Check exception from database connection.
@@ -410,87 +523,13 @@ SQL server to run out of free connections.
         /// <param name="exception"></param>
         /// <param name="command"></param>
         /// <returns>True if operation can be repeated.</returns>
-        private bool Catch(Exception exception, DbCommand command)
+        private bool Catch(Exception exception, IDbCommand command)
         {
-            CatchResult result = new Energy.Source.Connection.CatchResult();
+            Energy.Source.Error.Result result = Energy.Source.Error.Catch(exception, command);
 
             string message = exception.Message;
 
-            if (exception is DbException)
-            {
-                //foreach (SqlError error in ((SqlException)exception).Errors)
-                //{
-                //}
-            }
-
-            int[] error = GetErrorNumber(exception);
-
-            foreach (int number in error)
-            {
-                switch (number)
-                {
-                    case 1042: // Unable to connect to any of the specified MySQL hosts.
-                        result.Connection = true;
-                        result.Damage = true;
-                        break;
-                    case 1045: // Access denied for user 'horizon'@'localhost' (using password: YES)
-                        result.Access = true;
-                        break;
-                    case 53:
-                    case 64:    // Wystąpił błąd poziomu transportu podczas odbierania wyników z serwera. (provider: Dostawca TCP, error: 0 - Określona nazwa sieciowa już jest niedostępna.
-                    case 10054:
-                        result.Damage = true;
-                        break;
-                    case 1205:  // Deadlock
-                        result.Damage = true;
-                        result.Deadlock = true;
-                        break;
-                    case -2:
-                        result.Timeout = true;
-                        break;
-                    case 207:   // Invalid column name
-                    case 208:   // Invalid object name
-                    case 2812:  // Cannot find stored procedure
-                    case 4121:  // Cannot find either column or the user-defined function or aggregate or the name is ambiguous
-                        result.Syntax = true;
-                        result.Miss = true;
-                        break;
-                    case 102:   // Incorrect syntax near '@'
-                    case 156:   // Incorrect syntax near the keyword 'FROM'
-                    case 245:   // Conversion failed when converting the varchar value to data type int
-                    case 1038:  // An object or column name is missing or empty
-                    case 2705:  // Column names in each table must be unique
-                    case 8152:  // String or binary data would be truncated
-                        result.Syntax = true;
-                        break;
-                    case 5074:  // The index is dependent on column
-                    case 8115:  // Arithmetic overflow error converting bigint to data type numeric
-                    case 15233: // Property cannot be added. Property already exists
-                        result.Operation = true;
-                        break;
-                    case 297:   // The user does not have permission to perform this action
-                        result.Access = true;
-                        break;
-                    case -1:    // Connection error, possibly reconnecting is required
-                        result.Damage = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (exception is InvalidOperationException)
-            {
-                result.Damage = true;
-            }
-
-            // Log
-            Core.Log log = Log ?? Core.Log.Default;
-
-            if (Log != null)
-            {
-                Log.Add(result.ToString(), Enumeration.LogLevel.Trace);
-            }
+            (Log ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
 
             // Reaction
 
@@ -508,58 +547,119 @@ SQL server to run out of free connections.
                 //Kill(command);
             }
 
-            if (Log != null)
-                Log.Add(result.ToString(), Enumeration.LogLevel.Error);
-
             // For timeout and damaged connection result is true.
 
             return result.Timeout || result.Damage;
         }
 
-        public int[] GetErrorNumber(Exception exception)
+        private bool Catch(Exception x)
         {
-            List<int> error = new List<int>();
-            Exception e = exception;
-            while (e != null)
-            {
-                foreach (string field in new string[] {
-                    "Number",
-                    "ErrorCode",
-                })
-                {
-                    object value = Energy.Base.Class.GetFieldOrPropertyValue(e, field, true, false);
-                    int number = Energy.Base.Cast.ObjectToInteger(value);
-                    if (number != 0 && !error.Contains(number))
-                        error.Add(number);
-                }
-                e = e.InnerException;
-            }
-            return error.ToArray();
+            return Catch(x, null);
         }
 
-        //public virtual DataTable Fetch(string query)
-        //{
-        //    return FetchDataTable(query);
-        //}
+        #endregion
 
-        //public virtual DataTable FetchDataTable(string query)
-        //{
-        //    return FetchDataTableRead(query);
-        //}
+        #region Fetch
 
-        public virtual DataTable Load(string query)
+        private Energy.Base.Table Fetch(IDbCommand command)
+        {
+            IDataReader reader = command.ExecuteReader();
+
+            DataTable schema = reader.GetSchemaTable();
+
+            if (schema == null)
+                return null;
+
+            Energy.Base.Table table = new Energy.Base.Table();
+
+            List<string> columnList = new List<string>();
+            foreach (DataRow row in schema.Rows)
+            {
+                string columnName = System.Convert.ToString(row["ColumnName"]);
+                columnList.Add(columnName);
+            }
+
+            // Read rows from DataReader and populate the DataTable
+
+            while (reader.Read())
+            {
+                Energy.Base.Record record = table.New();
+                for (int i = 0; i < columnList.Count; i++)
+                {
+                    record[columnList[i]] = reader[i];
+                }
+            }
+
+            command.Cancel();
+            reader.Close();
+
+            return table;
+        }
+
+        private Energy.Base.Table Fetch(IDbConnection connection, string query)
+        {
+            using (IDbCommand command = Prepare(connection, query))
+            {
+                return Fetch(command);
+            }
+        }
+
+        /// <summary>
+        /// Fetch query results into Energy.Base.Table
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public Energy.Base.Table Fetch(string query)
         {
             ClearError();
-
-            using (IDbConnection connection = Open())
+            int repeat = Repeat;
+            while (repeat-- >= 0)
             {
-                if (connection == null)
-                    return null;
-                return Load(connection, query);
+                if (Persistent)
+                {
+                    if (!Active && Open() == null)
+                        return null;
+                    try
+                    {
+                        lock (_Lock)
+                        {
+                            return Fetch(_Connection, query);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (!Catch(x))
+                            return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Fetch(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
+                        }
+                    }
+                }
             }
+            return null;
         }
 
-        public DataTable Load(IDbConnection connection, string query)
+        #endregion
+
+        #region Load
+
+        private DataTable Load(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
             {
@@ -569,7 +669,7 @@ SQL server to run out of free connections.
 
         private DataTable Load(IDbCommand command)
         {
-            using (IDataReader reader = command.ExecuteReader(CommandBehavior.CloseConnection))
+            using (IDataReader reader = command.ExecuteReader())
             {
                 DataTable table = new DataTable();
                 table.Load(reader);
@@ -578,124 +678,165 @@ SQL server to run out of free connections.
             }
         }
 
-        private bool Catch(Exception x)
+        /// <summary>
+        /// Load data from query into DataTable
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable Load(string query)
         {
-            return Catch(x, null);
-        }
-
-        public virtual DataTable Fetch(string query)
-        {
-            //ClearError();
-
-            DataTable table = null;
-
-            int repeat = _Repeat;
+            ClearError();
+            int repeat = Repeat;
             while (repeat-- >= 0)
             {
-                using (IDbConnection connection = Open())
+                if (Persistent)
                 {
-                    if (connection == null)
+                    if (!Active && Open() == null)
                         return null;
                     try
                     {
-                        IDbCommand command = Prepare(connection, query);
-                        CommandBehavior behaviour = CommandBehavior.CloseConnection;
-                        IDataReader reader = command.ExecuteReader(behaviour);
-
-                        DataTable schema = reader.GetSchemaTable();
-
-                        if (schema == null)
-                            break;
-
-                        table = new DataTable();
-
-                        List<DataColumn> list = new List<DataColumn>();
-                        foreach (DataRow row in schema.Rows)
+                        lock (_Lock)
                         {
-                            string columnName = System.Convert.ToString(row["ColumnName"]);
-                            DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
-                            column.Unique = (bool)row["IsUnique"];
-                            column.AllowDBNull = (bool)row["AllowDBNull"];
-                            column.AutoIncrement = (bool)row["IsAutoIncrement"];
-                            list.Add(column);
-                            table.Columns.Add(column);
+                            return Load(_Connection, query);
                         }
-
-                        // Read rows from DataReader and populate the DataTable
-
-                        while (reader.Read())
-                        {
-                            DataRow row = table.NewRow();
-                            for (int i = 0; i < list.Count; i++)
-                            {
-                                row[((DataColumn)list[i])] = reader[i];
-                            }
-                            table.Rows.Add(row);
-                        }
-
-                        command.Cancel();
-                        reader.Close();
-
-                        break;
                     }
                     catch (Exception x)
                     {
                         SetError(x);
-                        if (Catch(x))
-                            continue;
-                        else
-                        {
-                            if (!LogWrite(x))
-                                throw;
+                        if (!Catch(x))
                             return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Load(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
                         }
                     }
                 }
             }
-            return table;
+            return null;
         }
 
-        private bool LogWrite(Exception x)
-        {
-            (Log ?? Energy.Core.Log.Default).Write(x);
-            return true;
-        }
+        #endregion
 
-        private void SetError(Exception x)
-        {
-            ErrorException = x;
-            ErrorStatus = x.Message;
+        #region Read
 
-            int[] error = GetErrorNumber(x);
-            if (error == null || error.Length == 0)
-                ErrorNumber = 0;
-            else
+        private DataTable Read(IDbCommand command)
+        {
+            using (IDataReader reader = command.ExecuteReader())
             {
-                for (int i = 0; i < error.Length; i++)
+                DataTable schema = reader.GetSchemaTable();
+
+                if (schema == null)
+                    return null;
+
+                DataTable table = new DataTable();
+
+                List<DataColumn> list = new List<DataColumn>();
+                foreach (DataRow row in schema.Rows)
                 {
-                    if (error[i] != 0)
+                    string columnName = System.Convert.ToString(row["ColumnName"]);
+                    DataColumn column = new DataColumn(columnName, (Type)(row["DataType"]));
+                    column.Unique = (bool)row["IsUnique"];
+                    column.AllowDBNull = (bool)row["AllowDBNull"];
+                    column.AutoIncrement = (bool)row["IsAutoIncrement"];
+                    list.Add(column);
+                    table.Columns.Add(column);
+                }
+
+                // Read rows from DataReader and populate the DataTable
+
+                while (reader.Read())
+                {
+                    DataRow row = table.NewRow();
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        ErrorNumber = error[i];
-                        break;
+                        row[((DataColumn)list[i])] = reader[i];
+                    }
+                    table.Rows.Add(row);
+                }
+
+                command.Cancel();
+                reader.Close();
+
+                return table;
+            }
+        }
+
+        private DataTable Read(IDbConnection connection, string query)
+        {
+            using (IDbCommand command = Prepare(connection, query))
+            {
+                return Read(command);
+            }
+        }
+
+        /// <summary>
+        /// Read query results into DataTable
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable Read(string query)
+        {
+            ClearError();
+            int repeat = Repeat;
+            while (repeat-- >= 0)
+            {
+                if (Persistent)
+                {
+                    if (!Active && Open() == null)
+                        return null;
+                    try
+                    {
+                        lock (_Lock)
+                        {
+                            return Read(_Connection, query);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (!Catch(x))
+                            return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Read(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
+                        }
                     }
                 }
             }
+            return null;
         }
 
-        private void ClearError()
-        {
-            lock (_PropertyLock)
-            {
-                _ErrorNumber = 0;
-                _ErrorStatus = "";
-                _ErrorException = null;
-            }
-        }
+        #endregion
 
-        public virtual object Single(string query)
-        {
-            return new object();
-        }
+        #region Prepare
 
         public IDbCommand Prepare(IDbConnection connection, string query)
         {
@@ -705,86 +846,100 @@ SQL server to run out of free connections.
             return command;
         }
 
-        public virtual int Execute(string query)
-        {
-            try
-            {
-                using (IDbConnection connection = this.Open())
-                {
-                    if (connection == null)
-                        return GetNegativeErrorNumber();
-                    return Execute(Prepare(connection, query));
-                }
-            }
-            catch (Exception x)
-            {
-                LogWrite(x);
-            }
-            return -1;
-        }
+        #endregion
 
-        public virtual int Execute(IDbCommand command)
+        #region Execute
+
+        private int Execute(IDbCommand command)
         {
             return command.ExecuteNonQuery();
         }
 
-        public virtual bool Bool(string query)
+        private int Execute(IDbConnection connection, string query)
         {
-            return Energy.Base.Cast.StringToBool((string)Scalar(query));
+            using (IDbCommand command = Prepare(connection, query))
+            {
+                return Execute(command);
+            }
         }
 
-        private int GetNegativeErrorNumber()
+        public int Execute(string query)
         {
-            return ErrorNumber != 0 ? -Math.Abs(ErrorNumber) : -1;
+            ClearError();
+            int repeat = Repeat;
+            while (repeat-- >= 0)
+            {
+                if (Persistent)
+                {
+                    if (!Active && Open() == null)
+                        return -1;
+                    try
+                    {
+                        lock (_Lock)
+                        {
+                            return Execute(_Connection, query);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (!Catch(x))
+                            return -1;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return -1;
+                        try
+                        {
+                            return Execute(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return -1;
+                        }
+                    }
+                }
+            }
+            return -1;
         }
 
-        public virtual string Parse(string query)
+        #endregion
+
+        #region Parse
+
+        public string Parse(string query)
         {
             return query;
         }
 
-        public virtual string Parse(string query, Energy.Query.Parameter.List parameters)
+        public string Parse(string query, Energy.Query.Parameter.List parameters)
         {
             return parameters.Parse(query);
         }
 
+        #endregion
+
+        #region Dispose
+
         public void Dispose()
         {
+            Close();
         }
 
-        public virtual object Scalar(IDbCommand command)
+        #endregion
+
+        #region Scalar
+
+        private object Scalar(IDbCommand command)
         {
             object value = command.ExecuteScalar();
             return value;
-        }
-
-        public virtual object Scalar(string query)
-        {
-            int repeat = _Repeat;
-            while (repeat-- >= 0)
-            {
-                using (IDbConnection connection = Open())
-                {
-                    if (connection == null)
-                        return null;
-                    try
-                    {
-                        return Scalar(connection, query);
-                    }
-                    catch (Exception x)
-                    {
-                        if (!Catch(x))
-                            return null;
-                    }
-                }
-            }
-            return null;
-        }
-
-        public virtual T Scalar<T>(string query)
-        {
-            object value = Scalar(query);
-            return Energy.Base.Cast.As<T>(value);
         }
 
         private object Scalar(IDbConnection connection, string query)
@@ -795,276 +950,89 @@ SQL server to run out of free connections.
             }
         }
 
-        public string GetErrorText()
+        public object Scalar(string query)
         {
-            List<string> list = new List<string>();
-            if (ErrorNumber != 0)
-                list.Add(ErrorNumber.ToString());
-            if (!string.IsNullOrEmpty(ErrorStatus))
-                list.Add(Regex.Replace(ErrorStatus, @"(\r\n|\n|\r)+", " "));
-            return string.Join(" ", list.ToArray());
+            ClearError();
+            int repeat = Repeat;
+            while (repeat-- >= 0)
+            {
+                if (Persistent)
+                {
+                    if (!Active && Open() == null)
+                        return null;
+                    try
+                    {
+                        lock (_Lock)
+                        {
+                            return Scalar(_Connection, query);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        SetError(x);
+                        if (!Catch(x))
+                            return null;
+                    }
+                }
+                else
+                {
+                    using (IDbConnection connection = Open())
+                    {
+                        if (connection == null)
+                            return null;
+                        try
+                        {
+                            return Scalar(connection, query);
+                        }
+                        catch (Exception x)
+                        {
+                            SetError(x);
+                            if (!Catch(x))
+                                return null;
+                        }
+                    }
+                }
+            }
+            return null;
         }
+
+        public T Scalar<T>(string query)
+        {
+            object value = Scalar(query);
+            return Energy.Base.Cast.As<T>(value);
+        }
+
+        #endregion
+
+        #region Copy
 
         public Energy.Source.Connection Copy()
         {
             Energy.Source.Connection copy = new Energy.Source.Connection();
-            lock (_PropertyLock)
+            lock (_Lock)
             {
-                if (!string.IsNullOrEmpty(_ConnectionString))
-                    copy.ConnectionString = _ConnectionString;
-                if (_Vendor != null)
-                    copy.Vendor = _Vendor;
-                if (_Configuration != null)
-                    copy.Configuration = _Configuration;
+                copy.ConnectionString = _ConnectionString;
+                copy.Vendor = _Vendor;
+                copy.Timeout = _Timeout;
+                copy.Repeat = _Repeat;
+                copy.Persistent = _Persistent;
+                copy.Log = _Log;
+                copy.Dialect = _Dialect;
             }
             return copy;
-            //    Energy.Source.Connection clone = new Energy.Source.Connection();
-            //    clone.ConnectionString = this.ConnectionString;
-            //    clone.Vendor = this.Vendor;
-            //    clone.Dialect = this.Dialect;
-            //    return clone;
         }
+
+        #endregion
+
+        #region Clone
 
         public object Clone()
         {
             return Copy();
         }
-    }
 
-    #endregion
-
-    #region Generic
-
-    /// <summary>
-    /// Generic method with type of SQL connection driver class
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Connection<T> : Connection
-    {
-        public Connection()
-        {
-            this.Vendor = typeof(T);
-        }
-
-        public Connection(string connectionString)
-            : base(typeof(T), connectionString)
-        {
-        }
-    }
-
-    #endregion
-
-    #region Static
-
-    public partial class Connection
-    {
-        /// <summary>
-        /// Persistent connection to database.
-        /// </summary>
-        public partial class Static : IDisposable
-        {
-            #region Lock
-
-            private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
-
-            private readonly Energy.Base.Lock _DriverLock = new Energy.Base.Lock();
-
-            #endregion
-
-            #region Property
-
-            private DbConnection _Driver;
-
-            #region IDisposable Support
-
-            private bool disposedValue = false; // To detect redundant calls
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!disposedValue)
-                {
-                    if (disposing)
-                    {
-                        // TODO: dispose managed state (managed objects).
-                    }
-
-                    // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                    // TODO: set large fields to null.
-
-                    disposedValue = true;
-                }
-            }
-
-            // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-            // ~Static() {
-            //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            //   Dispose(false);
-            // }
-
-            // This code added to correctly implement the disposable pattern.
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-                Dispose(true);
-                // TODO: uncomment the following line if the finalizer is overridden above.
-                // GC.SuppressFinalize(this);
-            }
-
-            #endregion
-
-            #endregion
-
-            #region Property
-
-            #endregion
-        }
-    }
-
-    #endregion
-
-    #region Base
-
-    public partial class Connection
-    {
-        public /*abstract*/ class DatabaseConnectionBase
-        {
-            private string _ConnectionString;
-
-            /// <summary>
-            /// Connection string used for opening SQL connection.
-            /// Connection should be closed on change.
-            /// </summary>
-            public string ConnectionString
-            {
-                get
-                {
-                    return _ConnectionString;
-                }
-                set
-                {
-                    if (value == _ConnectionString)
-                        return;
-                    _ConnectionString = value;
-                }
-            }
-
-            private System.Type _Vendor;
-
-            /// <summary>
-            /// DbConnection vendor class for SQL connection.
-            /// </summary>
-            public System.Type Vendor
-            {
-                get
-                {
-                    return _Vendor;
-                }
-                set
-                {
-                    if (value == _Vendor)
-                        return;
-                    _Vendor = value;
-                }
-            }
-
-            private int _Timeout = 30;
-            /// <summary>Time limit in seconds for SQL operations</summary>
-            public int Timeout
-            {
-                get
-                {
-                    return _Timeout;
-                }
-                set
-                {
-                    _Timeout = value;
-                }
-            }
-
-            /// <summary>
-            /// Create connection object of vendor class.
-            /// Used internally by Open() to create DbConnection object.
-            /// </summary>
-            /// <returns></returns>
-            public IDbConnection Create()
-            {
-                Type vendor = Vendor;
-                if (vendor == null)
-                    return null;
-                DbConnection _ = null;
-                try
-                {
-                    _ = (DbConnection)Activator.CreateInstance(vendor);
-                    _.ConnectionString = ConnectionString;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                }
-                return (IDbConnection)_;
-            }
-
-            public IDbCommand Prepare(IDbConnection connection, string query)
-            {
-                IDbCommand command = connection.CreateCommand();
-                command.CommandTimeout = Timeout;
-                command.CommandText = query;
-                return command;
-            }
-
-            public object Scalar(IDbCommand command)
-            {
-                object value = null;
-                try
-                {
-                    value = command.ExecuteScalar();
-                }
-                catch (Exception x)
-                {
-                    //Energy.Core.Bug.DebugWrite(x);
-                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.ExceptionMessage(x, true));
-                    throw;
-                }
-                return value;
-            }
-
-            public object Scalar(IDbConnection connection, string query)
-            {
-                return Scalar(Prepare(connection, query));
-            }
-
-            public object Scalar(string query)
-            {
-                using (IDbConnection connection = Create())
-                {
-                    if (connection == null)
-                        return null;
-                    try
-                    {
-                        connection.Open();
-                        try
-                        {
-                            return Scalar(connection, query);
-                        }
-                        finally
-                        {
-                            connection.Close();
-                        }
-                    }
-                    catch
-                    {
-                        throw;
-                    }
-                }
-                //return null;
-
-            }
-        }
+        #endregion
     }
 
     #endregion
 }
-

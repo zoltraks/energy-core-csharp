@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -10,6 +9,7 @@ namespace StringDictionary
     {
         static void Main(string[] args)
         {
+            Energy.Core.Application.SetConsoleEncoding();
             Energy.Core.Tilde.WriteLine("This example demonstrates usage of ~w~Energy~0~.~w~Base~0~.~w~Collection~0~.~y~StringDictionary~0~.");
 
             PrintMemoryUsage();
@@ -17,6 +17,10 @@ namespace StringDictionary
             TestB1();
             TestB2();
             TestB3();
+
+            string[] dictionary = new string[] { "key1", "value1", "key2", "value2" };
+            var x = new Energy.Base.Collection.StringDictionary<string>(dictionary);
+            Console.WriteLine(x.ToString("="));
 
             Energy.Core.Benchmark.Result result;
 

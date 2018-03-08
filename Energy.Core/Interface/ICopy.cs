@@ -8,4 +8,8 @@
         /// <returns></returns>
         T Copy();
     }
+
+    public interface ICopy: ICopy<object>
+    {
+    }
 }

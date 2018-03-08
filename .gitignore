@@ -226,9 +226,6 @@ Documentation/html/
 /WindowsFormsApplication1
 /WindowsApp/
 
-Test/
-Test.*
-
 # NuGet Packages alternative folder (Package)
 **/Package/*
 # except build/, which is used as an MSBuild target.
@@ -236,3 +233,4 @@ Test.*
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/Package/repositories.config
 /Energy.Core.Example/WebApplicationAspNetCoreExample/Properties/PublishProfiles/*.pubxml
+/.vscode

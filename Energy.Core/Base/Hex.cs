@@ -121,6 +121,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region ASCII
+
         /// <summary>
         /// Convert byte to ASCII character
         /// </summary>
@@ -133,6 +135,8 @@ namespace Energy.Base
             if (b > 126) return '.';
             return (char)b;
         }
+
+        #endregion
 
         /// <summary>
         /// Convert hexadecimal string to byte array
@@ -234,21 +238,32 @@ namespace Energy.Base
             return data;
         }
 
-        public static string IntegerToHex(int value)
-        {
-            string hex = value.ToString("X");
-            if (hex.Length < 8)
-                hex = hex.PadLeft(8, '0');
-            return hex;
-        }
+        #region IntegerToHex
 
-        public static string IntegerToHex(int value, int size)
+        public static string IntegerToHex(int value, int size, bool uppperCase)
         {
-            string hex = value.ToString("X");
+            string hex = value.ToString(uppperCase ? "X" : "x");
             if (hex.Length < size)
                 hex = hex.PadLeft(size, '0');
             return hex;
         }
+
+        public static string IntegerToHex(int value)
+        {
+            return IntegerToHex(value, 8, true);
+        }
+
+        public static string IntegerToHex(int value, bool uppperCase)
+        {
+            return IntegerToHex(value, 8, uppperCase);
+        }
+
+        public static string IntegerToHex(int value, int size)
+        {
+            return IntegerToHex(value, size, true);
+        }
+
+        #endregion
 
         #region Parse
 
@@ -287,84 +302,254 @@ namespace Energy.Base
         #region Print
 
         /// <summary>
+        /// Format settings for printing
+        /// </summary>
+        public class PrintFormatSettings
+        {
+            /// <summary>Number of bytes in one line</summary>
+            public int LineSize;
+            /// <summary>Number of bytes in every group</summary>
+            public int GroupSize;
+            /// <summary>Use uppercase letters in hexadecimal representation</summary>
+            public bool UpperCase;
+            /// <summary>Group bytes together, i.e. 2 for 16-bit, 4 for 32-bit, etc.</summary>
+            public int WordSize;
+            /// <summary>Use offset prefix of hexadecimals length</summary>
+            public int OffsetSize;
+            /// <summary>Include optional representation</summary>
+            public string RepresentationMode;
+            /// <summary>Element separator</summary>
+            public string ElementSeparator;
+            /// <summary>Group separator</summary>
+            public string GroupSeparator;
+            /// <summary>Offset separator</summary>
+            public string OffsetSeparator;
+            /// <summary>Representation separator</summary>
+            public string RepresentationSeparator;
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public PrintFormatSettings()
+            {
+                LineSize = 16;
+                ElementSeparator = " ";
+                WordSize = 1;
+                GroupSize = 4;
+                GroupSeparator = "  ";
+                OffsetSize = 0;
+                OffsetSeparator = "  ";
+                UpperCase = false;
+                RepresentationMode = "ASCII";
+                RepresentationSeparator = "   ";
+            }
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form
+        /// </summary>
+        /// <param name="array">Input byte array</param>
+        /// <param name="printFormatSettings">Format settings</param>
+        /// <returns></returns>
+        public static string Print(byte[] array, PrintFormatSettings printFormatSettings)
+        {
+            return Print(array
+                , printFormatSettings.LineSize
+                , printFormatSettings.GroupSize
+                , printFormatSettings.UpperCase
+                , printFormatSettings.WordSize
+                , printFormatSettings.OffsetSize
+                , printFormatSettings.RepresentationMode
+                , printFormatSettings.ElementSeparator
+                , printFormatSettings.GroupSeparator
+                , printFormatSettings.OffsetSeparator
+                , printFormatSettings.RepresentationSeparator
+                );
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form
+        /// </summary>
+        /// <param name="array">Input byte array</param>
+        /// <param name="lineSize">Number of bytes in one line</param>
+        /// <param name="groupSize">Number of bytes in every group</param>
+        /// <param name="upperCase">Use uppercase letters in hexadecimal representation</param>
+        /// <param name="wordSize">Group bytes together, i.e. 2 for 16-bit, 4 for 32-bit, etc.</param>
+        /// <param name="offsetSize">Use offset prefix of hexadecimals length</param>
+        /// <param name="representationMode">Include optional representation</param>
+        /// <param name="elementSeparator">Element separator</param>
+        /// <param name="groupSeparator">Group separator</param>
+        /// <param name="offsetSeparator">Offset separator</param>
+        /// <param name="representationSeparator">Representation separator</param>
+        /// <returns></returns>
+        public static string Print(byte[] array
+            , int lineSize
+            , int groupSize
+            , bool upperCase
+            , int wordSize
+            , int offsetSize
+            , string representationMode
+            , string elementSeparator
+            , string groupSeparator
+            , string offsetSeparator
+            , string representationSeparator
+            )
+        {
+            if (array == null || array.Length == 0)
+                return "";
+            StringBuilder b = new StringBuilder();
+            string s = BitConverter.ToString(array).Replace("-", "");
+            if (!upperCase)
+                s = s.ToLower();
+
+            if (wordSize < 1)
+                wordSize = 1;
+
+            if (lineSize < 1)
+                lineSize = 1;
+
+            if (offsetSeparator == null)
+                offsetSeparator = "";
+
+            if (groupSeparator == null)
+                groupSeparator = "";
+
+            if (elementSeparator == null)
+                elementSeparator = "";
+
+            if (representationSeparator == null)
+                representationSeparator = "";
+
+            int arrayLength = array.Length;
+
+            bool includeRepresentation = !string.IsNullOrEmpty(representationMode);
+
+            int lineCount = (int)Math.Ceiling(1.0 * arrayLength / lineSize);
+
+            for (int o = 0, n = 0; n < lineCount; n++)
+            {
+                if (n > 0)
+                    b.AppendLine();
+                if (offsetSize > 0)
+                {
+                    b.Append(IntegerToHex(o, offsetSize, upperCase));
+                    if (offsetSeparator.Length > 0)
+                        b.Append(offsetSeparator);
+                }
+                bool empty = false;
+                for (int i = 0; i < lineSize; i++)
+                {
+                    if (i > 0)
+                    {
+                        if (groupSize > 0 && 0 == i % groupSize)
+                        {
+                            if (groupSeparator.Length > 0)
+                                b.Append(groupSeparator);
+                        }
+                        else if (wordSize > 1 && 0 != i % wordSize)
+                        {
+                        }
+                        else
+                        {
+                            if (elementSeparator.Length > 0)
+                                b.Append(elementSeparator);
+                        }
+                    }
+                    int a = o + i;
+                    if (!empty && a >= arrayLength)
+                    {
+                        if (!includeRepresentation)
+                            break;
+                        else
+                            empty = true;
+                    }
+                    b.Append(empty ? "  " : s.Substring(a << 1, 2));
+                }
+                if (includeRepresentation)
+                {
+                    if (representationSeparator.Length > 0)
+                        b.Append(representationSeparator);
+                    for (int i = 0; i < lineSize; i++)
+                    {
+                        int a = o + i;
+                        if (a >= arrayLength)
+                            break;
+                        b.Append(ByteToASCII(array[a]));
+                    }
+                }
+                o += lineSize;
+            }
+            return b.ToString();
+        }
+
+        /// <summary>
         /// Pretty print byte array in hexadecimal form
         /// </summary>
         /// <param name="array">Byte array</param>
-        /// <param name="size">Number of bytes in one line</param>
-        /// <param name="divide">Put extra space between each division columns</param>
+        /// <param name="lineSize">Number of bytes in one line</param>
+        /// <param name="groupSize">Put extra space between each division columns</param>
+        /// <param name="offsetSize">Include offset with specified dimension in bytes or -1 for autosize</param>
+        /// <param name="wordSize">Group bytes together 2 for words, 4 for double words, etc.</param>
+        /// <param name="representation">Include character representation</param>
+        /// <returns>Text representation</returns>
+        public static string Print(byte[] array, int lineSize, int groupSize, int offsetSize, int wordSize, bool representation)
+        {
+            return Print(array, new PrintFormatSettings()
+            {
+                LineSize = lineSize,
+                GroupSize = groupSize,
+                OffsetSize = offsetSize,
+                WordSize = wordSize,
+                RepresentationMode = representation ? "ASCII" : "",
+            });
+        }
+
+        /// <summary>
+        /// Pretty print byte array in hexadecimal form
+        /// </summary>
+        /// <param name="array">Byte array</param>
+        /// <param name="lineSize">Number of bytes in one line</param>
+        /// <param name="groupSize">Put extra space between each division columns</param>
         /// <param name="representation">Character representation</param>
         /// <returns>Text representation</returns>
-        public static string Print(byte[] array, int size, int divide, bool representation)
+        public static string Print(byte[] array, int lineSize, int groupSize, bool representation)
         {
-            StringBuilder b = new StringBuilder();
-            string s = BitConverter.ToString(array).Replace("-", "").ToLower();
-            int o = 0;
-            for (int i = 0; i < s.Length; i += 2)
+            return Print(array, new PrintFormatSettings()
             {
-                b.Append(s.Substring(i, 2));
-                b.Append(" ");
-                if (size > 0 && (i / 2 + 1) % size == 0)
-                {
-                    if (representation)
-                    {
-                        b.Append("  ");
-                        for (int j = 0; j < size; j++)
-                        {
-                            b.Append(ByteToASCII(array[o + j]));
-                        }
-                        o += size;
-                    }
-                    b.AppendLine();
-                }
-                else if (divide > 0 && (i / 2 + 1) % divide == 0)
-                {
-                    b.Append(" ");
-                }
-            }
-            if (representation)
-            {
-                if (size == 0)
-                {
-                    b.Append("  ");
-                    for (int j = 0; j < array.Length; j++)
-                    {
-                        b.Append(ByteToASCII(array[j]));
-                    }
-                }
-                else if (array.Length % size != 0)
-                {
-                    b.Append(new String(' ', 2 + 3 * (size - (array.Length % size))));
-                    if (divide > 0) b.Append(new String(' ', (int)(size - (array.Length % size)) / divide));
-                    for (int j = 0; j < array.Length % size; j++)
-                    {
-                        b.Append(ByteToASCII(array[o + j]));
-                    }
-                }
-            }
-            return b.ToString().Trim();
+                LineSize = lineSize,
+                GroupSize = groupSize,
+                RepresentationMode = representation ? "ASCII" : "",
+            });
         }
 
         /// <summary>
         /// Pretty print byte array in hexadecimal form with text represenation
         /// </summary>
         /// <param name="array">Byte array</param>
-        /// <param name="size">Number of bytes in one line</param>
-        /// <param name="divide">Put extra space between each division columns</param>
+        /// <param name="lineSize">Number of bytes in one line</param>
+        /// <param name="groupSize">Put extra space between each division columns</param>
         /// <returns>Text representation</returns>
-        public static string Print(byte[] array, int size, int divide)
+        public static string Print(byte[] array, int lineSize, int groupSize)
         {
-            return Print(array, size, divide, true);
+            return Print(array, new PrintFormatSettings()
+            {
+                LineSize = lineSize,
+                GroupSize = groupSize,
+            });
         }
 
         /// <summary>
         /// Pretty print byte array in hexadecimal form with text represenation
         /// </summary>
         /// <param name="array">Byte array</param>
-        /// <param name="size">Number of bytes in one line</param>
+        /// <param name="lineSize">Number of bytes in one line</param>
         /// <returns>Text representation</returns>
-        public static string Print(byte[] array, int size)
+        public static string Print(byte[] array, int lineSize)
         {
-            return Print(array, size, 4, true);
+            return Print(array, new PrintFormatSettings()
+            {
+                LineSize = lineSize,
+            });
         }
 
         /// <summary>
@@ -374,7 +559,7 @@ namespace Energy.Base
         /// <returns>Text representation</returns>
         public static string Print(byte[] array)
         {
-            return Print(array, 16, 4, true);
+            return Print(array, new PrintFormatSettings());
         }
 
         #endregion
@@ -393,7 +578,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random hexadecimal number.
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public static string Random()
         {

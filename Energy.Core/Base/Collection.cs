@@ -18,46 +18,138 @@ namespace Energy.Base
         [Serializable]
         public class Array<T> : System.Collections.Generic.List<T>
         {
+            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
+            /// <summary>
+            /// Gets or sets the element at the specified index
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
+            public new T this[int index]
+            {
+                get
+                {
+                    lock (_Lock)
+                    {
+                        return base[index];
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        base[index] = value;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Removes all elements from the list
+            /// </summary>
+            public new void Clear()
+            {
+                lock (_Lock)
+                {
+                    base.Clear();
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the number of elements
+            /// </summary>
+            /// <remarks>
+            /// When setting to number which is higher than current capacity, default elements will be added to list
+            /// </remarks>
+            public new int Count
+            {
+                get
+                {
+                    lock (_Lock)
+                    {
+                        return base.Count;
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (value == 0)
+                        {
+                            if (base.Count > 0)
+                            {
+                                base.Clear();
+                            }
+                            return;
+                        }
+                        if (value == base.Count)
+                        {
+                            return;
+                        }
+                        else if (value > base.Count)
+                        {
+                            while (value > base.Count)
+                            {
+                                base.Add(default(T));
+                            }
+                        }
+                        else
+                        {
+                            base.RemoveRange(value, base.Count - value);
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Return first element or default if list is empty
+            /// </summary>
             public T First
             {
                 get
                 {
-                    lock (this)
+                    lock (_Lock)
                     {
-                        return base.Count == 0 ? default(T) : this[0];
+                        return base.Count == 0 ? default(T) : base[0];
                     }
                 }
             }
 
+            /// <summary>
+            /// Return last element or default if list is empty
+            /// </summary>
             public T Last
             {
                 get
                 {
-                    lock (this)
+                    lock (_Lock)
                     {
-                        return base.Count == 0 ? default(T) : this[base.Count - 1];
+                        return base.Count == 0 ? default(T) : base[base.Count - 1];
                     }
                 }
             }
 
+            /// <summary>
+            /// Create and add new element to list and return
+            /// </summary>
+            /// <returns></returns>
             public T New()
             {
-                lock (this)
+                T item = (T)Activator.CreateInstance(typeof(T));
+                lock (_Lock)
                 {
-                    T item = (T)Activator.CreateInstance(typeof(T));
                     base.Add(item);
-                    return item;
                 }
+                return item;
             }
 
             public bool Equals(Array<T> array)
             {
-                lock (this)
+                if (Count != array.Count)
                 {
-                    if (base.Count != array.Count)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
+                lock (_Lock)
+                {
                     for (int i = 0; i < this.Count; i++)
                     {
                         if (!this[i].Equals(array[i]))
@@ -65,13 +157,13 @@ namespace Energy.Base
                             return false;
                         }
                     }
-                    return true;
                 }
+                return true;
             }
 
             public new T Add(T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Add(item);
                     return item;
@@ -80,7 +172,7 @@ namespace Energy.Base
 
             public new T Insert(int index, T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Insert(index, item);
                     return item;
@@ -89,7 +181,7 @@ namespace Energy.Base
 
             public new void Remove(T item)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.Remove(item);
                 }
@@ -97,17 +189,45 @@ namespace Energy.Base
 
             public new void RemoveAt(int index)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.RemoveAt(index);
                 }
             }
 
+            public new void RemoveRange(int index, int count)
+            {
+                lock (_Lock)
+                {
+                    base.RemoveRange(index, count);
+                }
+            }
+
             public new void RemoveAll(Predicate<T> match)
             {
-                lock (this)
+                lock (_Lock)
                 {
                     base.RemoveAll(match);
+                }
+            }
+
+            public static Array<T> operator +(Array<T> left, T right)
+            {
+                left.Add(right);
+                return left;
+            }
+
+            public static Array<T> operator -(Array<T> left, T right)
+            {
+                left.Remove(right);
+                return left;
+            }
+
+            public new T[] ToArray()
+            {
+                lock (_Lock)
+                {
+                    return base.ToArray();
                 }
             }
         }
@@ -236,6 +356,24 @@ namespace Energy.Base
 
         public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
+            #region Contructor
+
+            public StringDictionary()
+            {
+            }
+
+            public StringDictionary(string[] keyValuePairArray)
+            {
+                for (int i = 0; i < keyValuePairArray.Length - 1; i++)
+                {
+                    string key = keyValuePairArray[i++];
+                    string value = keyValuePairArray[i];
+                    this[key] = Energy.Base.Cast.StringToObject<T>(value);
+                }
+            }
+
+            #endregion
+
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
@@ -251,21 +389,27 @@ namespace Energy.Base
             {
                 get
                 {
-                    return _CaseSensitive;
+                    lock (_Lock)
+                    {
+                        return _CaseSensitive;
+                    }
                 }
                 set
                 {
-                    if (_CaseSensitive == value)
-                        return;
-                    _CaseSensitive = value;
-                    if (value)
-                        Index = null;
-                    else
-                        RebuildIndex();
+                    lock (_Lock)
+                    {
+                        if (_CaseSensitive == value)
+                            return;
+                        _CaseSensitive = value;
+                        if (value)
+                            Index = null;
+                        else
+                            RebuildIndex();
+                    }
                 }
             }
 
-            private readonly object _Lock = new object();
+            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
             private string _XmlParentSeparator = ".";
             private readonly object _XmlParentSeparatorLock = new object();
@@ -273,7 +417,9 @@ namespace Energy.Base
             public string XmlParentSeparator { get { lock (_XmlParentSeparatorLock) return _XmlParentSeparator; } set { lock (_XmlParentSeparatorLock) _XmlParentSeparator = value; } }
 
             private string _XmlEscapeString = "_";
-            private readonly object _XmlSpecialCharacterLock = new object();
+
+            private readonly object _XmlSpecialCharacterLock = new object();       
+
             /// <summary>XmlSpecialCharacter</summary>
             public string XmlEscapeString { get { lock (_XmlSpecialCharacterLock) return _XmlEscapeString; } set { lock (_XmlSpecialCharacterLock) _XmlEscapeString = value; } }
 
@@ -375,6 +521,31 @@ namespace Energy.Base
                         foreach (string key in Index.Keys)
                         {
                             list.Add(string.Concat(Index[key], separator, Energy.Base.Cast.ObjectToString(base[Index[key]])));
+                        }
+                    }
+                    return list.ToArray();
+                }
+            }
+
+            public string[] ToArray()
+            {
+                List<string> list = new List<string>();
+                lock (_Lock)
+                {
+                    if (CaseSensitive)
+                    {
+                        foreach (string key in base.Keys)
+                        {
+                            list.Add(key);
+                            list.Add(Energy.Base.Cast.ObjectToString(base[key]));
+                        }
+                    }
+                    else
+                    {
+                        foreach (string key in Index.Keys)
+                        {
+                            list.Add(Index[key]);
+                            list.Add(Energy.Base.Cast.ObjectToString(base[Index[key]]));
                         }
                     }
                     return list.ToArray();

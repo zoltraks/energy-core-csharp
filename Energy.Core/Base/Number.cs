@@ -7,6 +7,31 @@ namespace Energy.Base
     public class Number
     {
         /// <summary>
+        /// Constant array of powers of 10 stored as long array.
+        /// </summary>
+        public static readonly long[] Power10 = {
+            1,
+            10,
+            100,
+            1000,
+            10000,
+            100000,
+            1000000,
+            10000000,
+            100000000,
+            1000000000,
+            10000000000,
+            100000000000,
+            1000000000000,
+            10000000000000,
+            100000000000000,
+            1000000000000000,
+            10000000000000000,
+            100000000000000000,
+            1000000000000000000,
+        };
+
+        /// <summary>
         /// Select highest absolute number with negative sign from pair of numbers.
         /// Negative numbers are stronger than positive,
         /// so it will select -3 over 3 but also 4 over -3.

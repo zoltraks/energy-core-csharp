@@ -9,5 +9,9 @@ namespace Energy.Base
         public delegate TOut Function<TIn, TOut>(TIn input);
 
         public delegate void Function<TIn>(TIn input);
+
+        public delegate void Event();
+
+        public delegate void Event<TEvent>(TEvent argument);
     }
 }

@@ -111,25 +111,27 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Trimmed string</returns>
-        public static string TrimWhite(string value)
+        public static string Trim(string value)
         {
             return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
+
+        #region Join
 
         /// <summary>
         /// Join non empty strings into one list with separator
         /// </summary>
         /// <param name="with">Separator string</param>
-        /// <param name="parts">Parts to join</param>
+        /// <param name="array">Parts to join</param>
         /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string JoinWith(string with, params string[] parts)
+        public static string JoinWith(string with, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                if (String.IsNullOrEmpty(parts[i]))
+                if (String.IsNullOrEmpty(array[i]))
                     continue;
-                string trim = parts[i].Trim();
+                string trim = array[i].Trim();
                 if (trim.Length == 0)
                     continue;
                 list.Add(trim);
@@ -137,7 +139,32 @@ namespace Energy.Base
             return String.Join(with, list.ToArray());
         }
 
-        private static readonly string[] _NewLine = new string[] { "\r\n", "\n\r", "\n" };
+        #endregion
+
+        #region Each
+
+        public static IEnumerable<string> Each(string input)
+        {
+            if (input == null)
+            {
+                yield break;
+            }
+
+            using (System.IO.StringReader reader = new System.IO.StringReader(input))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Split
+
+        private static readonly string[] _NewLine = new string[] { "\r\n", "\n", "\r" };
 
         /// <summary>
         /// Split string to array by new line characters. Elements will not include new line itself.
@@ -148,6 +175,16 @@ namespace Energy.Base
         {
             return content.Split(_NewLine, StringSplitOptions.None);
         }
+
+        public static string[] Split(string input)
+        {
+            System.Collections.Generic.List<string> list = new List<string>();
+            foreach (string line in Each(input))
+                list.Add(line);
+            return list.ToArray();
+        }
+
+        #endregion
 
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
@@ -645,6 +682,119 @@ namespace Energy.Base
                     words[i] = UppercaseFirst(words[i]);
             }
             return string.Join("", words);
+        }
+
+        #endregion
+
+        #region Unique
+
+        /// <summary>
+        /// Get unique array of strings
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string[] Unique(string[] array)
+        {
+            if (array == null || array.Length <= 1)
+                return array;
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>
+            {
+                array[0]
+            };
+            for (int i = 1; i < array.Length; i++)
+            {
+                int index = list.IndexOf(array[i]);
+                if (index >= 0)
+                    list[index] = array[i];
+                else
+                    list.Add(array[i]);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Get unique array of strings case sensitive or not
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string[] Unique(string[] array, bool ignoreCase)
+        {
+            if (!ignoreCase)
+                return Unique(array);
+            if (array == null || array.Length <= 1)
+                return array;
+            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>
+            {
+                array[0]
+            };
+            System.Collections.Generic.List<string> index = new System.Collections.Generic.List<string>
+            {
+                array[0] == null ? null
+                    : array[0].ToLower(System.Globalization.CultureInfo.InvariantCulture)
+            };
+            for (int i = 1; i < array.Length; i++)
+            {
+                string needle = array[i] == null ? null
+                    : array[i].ToLower(System.Globalization.CultureInfo.InvariantCulture);
+                int n = list.IndexOf(needle);
+                if (n < 0)
+                {
+                    index.Add(needle);
+                    list.Add(array[i]);
+                }
+            }
+            return list.ToArray();
+        }
+
+        #endregion
+
+        #region Encoding
+
+        /// <summary>
+        /// Find System.Text.Encoding for specified name.
+        /// Get System.Text.Encoding.UTF8 by default or if encoding not exists.
+        /// Treats UCS-2 the same as UTF-16 besides differences.
+        /// could not be found.
+        /// </summary>
+        /// <param name="encoding">UTF-8, UTF, UTF8, UNICODE, UCS-2 LE, UCS-2 BE, 1250, 1252, ...</param>
+        /// <returns>System.Text.Encoding</returns>
+        public static System.Text.Encoding Encoding(string encoding)
+        {
+            if (string.IsNullOrEmpty(encoding))
+            {
+                return System.Text.Encoding.UTF8;
+            }
+            if (0 == string.Compare(encoding, "utf8", true))
+            {
+                return System.Text.Encoding.UTF8;
+            }
+            if (Regex.Match(encoding, @"^(?:unicode|utf-?16(?:\ ?le?)?|ucs(?:\ |-)?2(?:\ ?le?)?)$"
+                , RegexOptions.IgnoreCase).Success)
+            {
+                return System.Text.Encoding.Unicode;
+            }
+            if (Regex.Match(encoding, @"^(?:utf-?16\ ?be?|ucs(?:\ |-)?2\ ?be?)$"
+                , RegexOptions.IgnoreCase).Success)
+            {
+                return System.Text.Encoding.BigEndianUnicode;
+            }            
+            int number = Energy.Base.Cast.StringToInteger(encoding);
+            try
+            {
+                if (number > 0)
+                    return System.Text.Encoding.GetEncoding(number);
+                else
+                    return System.Text.Encoding.GetEncoding(encoding);
+            }
+            catch (ArgumentException)
+            {
+                return System.Text.Encoding.UTF8;
+            }
+            catch (NotSupportedException)
+            {
+                return System.Text.Encoding.UTF8;
+            }
         }
 
         #endregion

@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Filip Golewski <f.golewski@gmail.com>")]
 [assembly: AssemblyProduct("Energy.Core")]
 [assembly: AssemblyCopyright("Filip Golewski <f.golewski@gmail.com>")]
-[assembly: AssemblyTrademark("Company")]
+[assembly: AssemblyTrademark("Energy Studio")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2017.09.23.*")]
-[assembly: AssemblyFileVersion("17.09.4")]
+[assembly: AssemblyVersion("2018.01.29.*")]
+[assembly: AssemblyFileVersion("18.01.1")]

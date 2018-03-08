@@ -143,49 +143,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip quotation from file path.
-        /// Converts C:\"Program Files"\"Dir" into C:\Program Files\Dir.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string StripQuotation(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("\""))
-                return path;
-            return path.Replace("\"", null);
-        }
-
-        /// <summary>
-        /// Converts DOS backslashes into UNIX slashes in path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string ToDosPath(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("/"))
-                return path;
-            return path.Replace("/", "\\");
-        }
-
-        /// <summary>
-        /// Convert UNIX slashes into DOS backslashes in path.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string ToUnixPath(string path)
-        {
-            if (path == null || path.Length == 0)
-                return path;
-            if (!path.Contains("\\"))
-                return path;
-            return path.Replace("\\", "/");
-        }
-
-        /// <summary>
         /// Include leading root directory to the path if not specified
         /// </summary>
         /// <param name="path">string</param>
@@ -295,7 +252,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return true if file name does not contain expteions
+        /// Return true if file name does not contain extension
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -391,39 +348,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove useless files from list (zero sized or files that not exist)
-        /// </summary>
-        /// <param name="files">string[]</param>
-        /// <returns>string[]</returns>
-        public static string[] FileRemoveUseless(string[] files)
-        {
-            if (files == null)
-            {
-                return null;
-            }
-
-            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                try
-                {
-                    if (System.IO.File.Exists(files[i]))
-                    {
-                        System.IO.FileInfo info = new System.IO.FileInfo(files[i]);
-                        if (info.Length > 0)
-                        {
-                            list.Add(files[i]);
-                        }
-                    }
-                }
-                catch { }
-            }
-
-            return list.ToArray();
-        }
-
-        /// <summary>
         /// Locate file
         /// </summary>
         /// <param name="command">string</param>
@@ -471,9 +395,39 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(file))
                 return "";
 
-            if (search == null || search.Length == 0)
-                search = new string[] { "" };
+            file = Energy.Base.Path.ChangeSeparator(file);
 
+            if (search == null || search.Length == 0)
+            {
+                search = new string[] { "" };
+            }
+            else
+            {
+                bool parse = false;
+                char[] separators = new char[] { ';', ':' };
+                for (int i = 0; i < search.Length; i++)
+                {
+                    if (search[i].IndexOfAny(separators) >= 0)
+                        parse = true;
+                }
+                if (parse)
+                {
+                    List<string> list = new List<string>();
+                    for (int i = 0; i < search.Length; i++)
+                    {
+                        list.AddRange(search[i].Split(separators));
+                    }
+                    search = list.ToArray();
+                }
+            }
+
+            if (search.Length > 0)
+            {
+                for (int i = 0; i < search.Length; i++)
+                {
+                    search[i] = Energy.Base.Path.ChangeSeparator(search[i]);
+                }
+            }
             if (extension == null || extension.Length == 0)
                 extension = new string[] { "" };
 
@@ -556,6 +510,8 @@ namespace Energy.Base
             return "";
         }
 
+        #region Make directory
+
         /// <summary>
         /// Create directory if not exists
         /// </summary>
@@ -576,10 +532,72 @@ namespace Energy.Base
                 System.IO.DirectoryInfo dir = System.IO.Directory.CreateDirectory(path);
                 return dir != null;
             }
-            catch
+            catch (Exception x)
             {
+                Energy.Core.Bug.Catch(x);
                 return false;
             }
         }
+
+        #endregion
+
+        #region Remove directory
+
+        /// <summary>
+        /// Remove directory if exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="recursive"></param>
+        /// <returns>True if directory was removed or not exists</returns>
+        public static bool RemoveDirectory(string path, bool recursive)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            try
+            {
+                if (!System.IO.Directory.Exists(path))
+                {
+                    return true;
+                }
+                System.IO.Directory.Delete(path, recursive);
+                return true;
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Remove directory if exists and is empty
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>True if directory was removed or not exists</returns>
+        public static bool RemoveDirectory(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+            try
+            {
+                if (!System.IO.Directory.Exists(path))
+                {
+                    return true;
+                }
+                System.IO.Directory.Delete(path);
+                return true;
+            }
+            catch (Exception x)
+            {
+                Energy.Core.Bug.Catch(x);
+                return false;
+            }
+        }
+
+        #endregion
     }
 }

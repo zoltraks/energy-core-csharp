@@ -51,7 +51,7 @@ namespace Energy.Base
         /// <summary>
         /// Returns true if object contains no data.
         /// </summary>
-        public bool IsEmpty
+        public bool Empty
         {
             get
             {
@@ -102,6 +102,17 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Indicates that position marker is at end of buffer
+        /// </summary>
+        public bool End
+        {
+            get
+            {
+                return _Stream.Position == _Stream.Length;
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -115,13 +126,28 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Constructor
+        /// Constructor from byte array
         /// </summary>
         /// <param name="data"></param>
         public ByteArrayBuilder(byte[] data)
         {
             _Stream = new System.IO.MemoryStream();
             _Stream.Write(data, 0, data.Length);
+        }
+
+        /// <summary>
+        /// Constructor from System.IO.Stream
+        /// </summary>
+        /// <param name="stream"></param>
+        public ByteArrayBuilder(System.IO.Stream stream)
+        {
+            _Stream = new System.IO.MemoryStream();
+            byte[] buffer = new byte[4096];
+            int count;
+            while ((count = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                _Stream.Write(buffer, 0, count);
+            }
         }
 
         #endregion
@@ -142,7 +168,10 @@ namespace Energy.Base
 
         #region Clear
 
-        private void Clear()
+        /// <summary>
+        /// Clear
+        /// </summary>
+        public void Clear()
         {
             _Stream.Close();
             _Stream.Dispose();
@@ -400,7 +429,7 @@ namespace Energy.Base
         #region Read
 
         /// <summary>
-        /// Read byte value from a stream.
+        /// Read byte value from a stream
         /// </summary>
         /// <returns></returns>
         public byte ReadByte()
@@ -409,7 +438,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read char value from a stream.
+        /// Read char value from a stream
         /// </summary>
         /// <returns></returns>
         public char ReadChar()
@@ -418,7 +447,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read signed byte value from a stream.
+        /// Read signed byte value from a stream
         /// </summary>
         /// <returns></returns>
         public sbyte ReadSByte()
@@ -427,105 +456,107 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read byte array from a stream.
+        /// Read byte array from a stream
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ReadArray()
+        {
+            return ReadArray((int)(_Stream.Length - _Stream.Position));
+        }
+
+        /// <summary>
+        /// Read array of bytes from stream
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
-        public byte[] ReadByteArray(int length)
+        public byte[] ReadArray(int length)
         {
             byte[] data = new byte[length];
             if (length > 0)
             {
                 int read = _Stream.Read(data, 0, length);
                 if (read != length)
+                {
                     throw new ArgumentOutOfRangeException();
+                }
             }
             return data;
         }
 
         /// <summary>
-        /// Read byte array from a stream.
-        /// </summary>
-        /// <returns></returns>
-        public byte[] ReadByteArray()
-        {
-            return ReadByteArray((int)(_Stream.Length - _Stream.Position));
-        }
-
-        /// <summary>
-        /// Read integer value from a stream.
+        /// Read integer value from a stream
         /// </summary>
         /// <returns></returns>
         public int ReadInt()
         {
-            return BitConverter.ToInt32(ReadByteArray(4), 0);
+            return BitConverter.ToInt32(ReadArray(4), 0);
         }
 
         /// <summary>
-        /// Read long integer value from a stream.
+        /// Read long integer value from a stream
         /// </summary>
         /// <returns></returns>
         public long ReadLong()
         {
-            return BitConverter.ToInt64(ReadByteArray(8), 0);
+            return BitConverter.ToInt64(ReadArray(8), 0);
         }
 
         /// <summary>
-        /// Read short integer value from a stream.
+        /// Read short integer value from a stream
         /// </summary>
         /// <returns></returns>
         public short ReadShort()
         {
-            return BitConverter.ToInt16(ReadByteArray(2), 0);
+            return BitConverter.ToInt16(ReadArray(2), 0);
         }
 
         /// <summary>
-        /// Read unsigned integer value from a stream.
+        /// Read unsigned integer value from a stream
         /// </summary>
         /// <returns></returns>
         public uint ReadUInt()
         {
-            return BitConverter.ToUInt32(ReadByteArray(4), 0);
+            return BitConverter.ToUInt32(ReadArray(4), 0);
         }
 
         /// <summary>
-        /// Read unsigned long integer value from a stream.
+        /// Read unsigned long integer value from a stream
         /// </summary>
         /// <returns></returns>
         public ulong ReadULong()
         {
-            return BitConverter.ToUInt64(ReadByteArray(8), 0);
+            return BitConverter.ToUInt64(ReadArray(8), 0);
         }
 
         /// <summary>
-        /// Read unsigned short integer value from a stream.
+        /// Read unsigned short integer value from a stream
         /// </summary>
         /// <returns></returns>
         public ushort ReadUShort()
         {
-            return BitConverter.ToUInt16(ReadByteArray(2), 0);
+            return BitConverter.ToUInt16(ReadArray(2), 0);
         }
 
         /// <summary>
-        /// Read double value from a stream.
+        /// Read double value from a stream
         /// </summary>
         /// <returns></returns>
         public double ReadDouble()
         {
-            return BitConverter.ToDouble(ReadByteArray(8), 0);
+            return BitConverter.ToDouble(ReadArray(8), 0);
         }
 
         /// <summary>
-        /// Read float value from a stream.
+        /// Read float value from a stream
         /// </summary>
         /// <returns></returns>
         public float ReadFloat()
         {
-            return BitConverter.ToSingle(ReadByteArray(4), 0);
+            return BitConverter.ToSingle(ReadArray(4), 0);
         }
 
         /// <summary>
-        /// Read decimal value from a stream.
+        /// Read decimal value from a stream
         /// </summary>
         /// <returns></returns>
         public decimal ReadDecimal()
@@ -535,7 +566,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read boolean value from a stream.
+        /// Read boolean value from a stream
         /// </summary>
         /// <returns></returns>
         public bool ReadBool()
@@ -544,7 +575,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read DateTime value from a stream.
+        /// Read DateTime value from a stream
         /// </summary>
         /// <returns></returns>
         public DateTime ReadDateTime()
@@ -553,7 +584,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read Guid from a stram.
+        /// Read Guid from a stram
         /// </summary>
         /// <returns></returns>
         public Guid ReadGuid()
@@ -562,68 +593,55 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Read string from a stream.
+        /// Read string from a stream
         /// </summary>
         /// <param name="length"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
         public string ReadString(int length, System.Text.Encoding encoding)
         {
-            byte[] data = ReadByteArray(length);
+            byte[] data = ReadArray(length);
             return encoding.GetString(data);
         }
 
         /// <summary>
-        /// Read string from a stream.
+        /// Read string from a stream
         /// </summary>
         /// <param name="length"></param>
         /// <returns></returns>
         public string ReadString(int length)
         {
-            byte[] data = ReadByteArray(length);
+            byte[] data = ReadArray(length);
             return _Encoding.GetString(data);
         }
 
         /// <summary>
-        /// Read string from a stream.
-        /// </summary>
-        /// <returns></returns>
-        public string ReadString(System.Text.Encoding encoding, bool raw)
-        {
-            byte[] data = raw ? ReadByteArray() : ReadByteArray(ReadInt());
-            return encoding.GetString(data);
-        }
-
-        /// <summary>
-        /// Read string from a stream.
-        /// </summary>
-        /// <param name="raw"></param>
-        /// <returns></returns>
-        public string ReadString(bool raw)
-        {
-            byte[] data = raw ? ReadByteArray() : ReadByteArray(ReadInt());
-            return _Encoding.GetString(data);
-        }
-
-        /// <summary>
-        /// Read string from a stream.
+        /// Read string from a stream
         /// </summary>
         /// <param name="encoding"></param>
         /// <returns></returns>
         public string ReadString(System.Text.Encoding encoding)
         {
-            byte[] data = ReadByteArray(ReadInt());
-            return encoding.GetString(data);
+            return encoding.GetString(ReadArray());
         }
 
         /// <summary>
-        /// Read string from a stream.
+        /// Read string from a stream
         /// </summary>
         /// <returns></returns>
         public string ReadString()
         {
-            byte[] data = ReadByteArray(ReadInt());
+            byte[] data = ReadArray();
             return _Encoding.GetString(data);
+        }
+
+        /// <summary>
+        /// Read BASE64 from stream
+        /// </summary>
+        /// <returns></returns>
+        public string ReadBase64()
+        {
+            return System.Convert.ToBase64String(ReadArray());
         }
 
         #endregion
@@ -631,7 +649,7 @@ namespace Energy.Base
         #region Write
 
         /// <summary>
-        /// Write byte value to a stream.
+        /// Write byte value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteByte(byte value)
@@ -640,7 +658,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write unsigned byte value to a stream.
+        /// Write unsigned byte value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteChar(char value)
@@ -649,7 +667,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write signed byte value to a stream.
+        /// Write signed byte value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteSByte(sbyte value)
@@ -658,7 +676,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write byte array to a stream.
+        /// Write byte array to a stream
         /// </summary>
         /// <param name="data"></param>
         public void WriteArray(byte[] data)
@@ -669,7 +687,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write integer value to a stream.
+        /// Write integer value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteInt(int value)
@@ -678,7 +696,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write long integer value to a stream.
+        /// Write long integer value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteLong(long value)
@@ -687,7 +705,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write unsigned integer value to a stream.
+        /// Write unsigned integer value to a stream
         /// </summary>
         /// <param name="value"></param>
         public void WriteUInt(uint value)
@@ -705,7 +723,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write short value to a stream.
+        /// Write short value to a stream
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -715,7 +733,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write unsigned short value to a stream.
+        /// Write unsigned short value to a stream
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -725,7 +743,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write boolean value to a stream.
+        /// Write boolean value to a stream
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -735,7 +753,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Append DateTime to a stream.
+        /// Append DateTime to a stream
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -746,7 +764,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write GUID value to a stream.
+        /// Write GUID value to a stream
         /// </summary>
         /// <param name="guid"></param>
         public void WriteGuid(Guid guid)
@@ -755,75 +773,44 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write string to a stream.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="encoding"></param>
-        /// <param name="raw"></param>
-        /// <returns></returns>
-        public void WriteString(string value, System.Text.Encoding encoding, bool raw)
-        {
-            if (raw && string.IsNullOrEmpty(value))
-                return;
-            byte[] data = encoding.GetBytes(value);
-            if (!raw)
-                WriteInt(data.Length);
-            WriteArray(data);
-        }
-
-        /// <summary>
-        /// Write string to a stream.
+        /// Write string to a stream
         /// </summary>
         /// <param name="value"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
         public void WriteString(string value, System.Text.Encoding encoding)
         {
-            WriteString(value, encoding, false);
+            if (string.IsNullOrEmpty(value))
+                return;
+            WriteArray(encoding.GetBytes(value));
         }
 
         /// <summary>
-        /// Append string to a stream with default encoding.
+        /// Write string to a stream with default encoding
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public void WriteString(string value)
         {
-            WriteString(value, _Encoding, false);
+            if (string.IsNullOrEmpty(value))
+                return;
+            WriteArray(_Encoding.GetBytes(value));
         }
 
         /// <summary>
-        /// Write string to a stream with default encoding.
+        /// Write bytes from BASE64 string
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="raw"></param>
-        /// <returns></returns>
-        public void WriteString(string value, bool raw)
+        /// <param name="base64"></param>
+        public void WriteBase64(string base64)
         {
-            WriteString(value, _Encoding, raw);
-        }
-
-        #endregion
-
-        #region Read
-
-        /// <summary>
-        /// Get array of bytes from stream.
-        /// </summary>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public byte[] ReadArray(int length)
-        {
-            byte[] data = new byte[length];
-            if (length > 0)
+            try
             {
-                int read = _Stream.Read(data, 0, length);
-                if (read != length)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
+                byte[] data = System.Convert.FromBase64String(base64);
+                WriteArray(data);
             }
-            return data;
+            catch (FormatException)
+            {
+            }
         }
 
         #endregion
@@ -890,14 +877,11 @@ namespace Energy.Base
         /// <returns></returns>
         public byte[] ToArray()
         {
-            int length = (int)_Stream.Length;
-            byte[] data = new byte[length];
-            Array.Copy(_Stream.GetBuffer(), data, length);
-            return data;
+            return _Stream.ToArray();
         }
 
         /// <summary>
-        /// Returns the builder as an array of bytes.
+        /// Returns the builder as an array of bytes
         /// </summary>
         /// <param name="length"></param>
         /// <param name="position"></param>
@@ -907,6 +891,29 @@ namespace Energy.Base
             byte[] data = new byte[length];
             Array.Copy(_Stream.GetBuffer(), position, data, 0, length);
             return data;
+        }
+
+        #endregion
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return _Encoding.GetString(ToArray());
+        }
+
+        public string ToString(System.Text.Encoding encoding)
+        {
+            return encoding.GetString(ToArray());
+        }
+
+        #endregion
+
+        #region ToBase64
+
+        public string ToBase64()
+        {
+            return System.Convert.ToBase64String(ToArray());
         }
 
         #endregion

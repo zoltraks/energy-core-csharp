@@ -67,10 +67,10 @@ namespace Energy.Base
         /// <param name="value"></param>
         public Color(uint value)
         {
-            this.A = (byte)(value & 0xff000000 >> 24);
-            this.R = (byte)(value & 0xff00ffff >> 16);
-            this.G = (byte)(value & 0xffff00ff >> 8);
-            this.B = (byte)(value & 0xffffff00 >> 0);
+            this.A = (byte)((value & 0xff000000) >> 24);
+            this.R = (byte)((value & 0x00ff0000) >> 16);
+            this.G = (byte)((value & 0x0000ff00) >> 8);
+            this.B = (byte)((value & 0x000000ff) >> 0);
         }
 
         #endregion

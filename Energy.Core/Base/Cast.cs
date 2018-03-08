@@ -74,6 +74,69 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Escape JSON characters and include string in double quotes.
+        /// Null strings will be represented as "null".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string StringToJsonString(string value)
+        {
+            return Energy.Base.Json.Escape(value);
+        }
+
+        public static string ObjectToJsonValue(object value)
+        {
+            // treat DBNull as empty string //
+            if (value == null || value is System.DBNull)
+                return "null";
+            // maybe it is already string? //
+            if (value is string)
+                return (string)StringToJsonString((string)value);
+            // what about bool numbers //
+            if (value is bool)
+                return (bool)value ? "true" : "false";
+            // convert to culture invariant form //
+            if (value is double)
+                return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is decimal)
+                return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is float)
+                return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (value is DateTime)
+                return string.Concat("\"", DateTimeToISO8601((DateTime)value), "\"");
+            // return default string representation //
+            return StringToJsonString(value.ToString());
+        }
+
+        public static object JsonValueToObject(string text)
+        {
+            if (text == "null")
+                return null;
+            if (text == "true")
+                return true;
+            if (text == "false")
+                return false;
+            int intValue = 0;
+            if (int.TryParse(text, out intValue))
+                return intValue;
+            long longValue = 0;
+            if (long.TryParse(text, out longValue))
+                return longValue;
+            ulong ulongValue = 0;
+            if (ulong.TryParse(text, out ulongValue))
+            {
+                return ulongValue;
+            }
+            double doubleValue = 0;
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
+                return doubleValue;
+            decimal decimalValue = 0;
+            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimalValue))
+                return decimalValue;
+            return Energy.Base.Json.Strip(text);
+        }
+
+        /// <summary>
         /// Convert double value to invariant string
         /// </summary>
         /// <param name="value">Number</param>
@@ -164,18 +227,32 @@ namespace Energy.Base
 
         #region Class
 
+        /// <summary>
+        /// Remove numerical differences from text representation of number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static string RemoveNumericalDifferences(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return value;
-            if (value.Contains(" "))
+
+            value = value.Trim();
+            if (value.Length == 0)
+                return value;
+
+            if (value.IndexOf(' ') >= 0)
                 value = value.Replace(" ", null);
-            if (value.Contains("_"))
+            if (value.IndexOf('_') >= 0)
                 value = value.Replace("_", null);
-            if (value.Contains("'"))
+            if (value.IndexOf('\'') >= 0)
                 value = value.Replace("'", null);
-            if (value.Contains("’"))
-                value = value.Replace("'", null);
+            if (value.IndexOf('’') >= 0)
+                value = value.Replace("’", null);
+
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+
             return value;
         }
 
@@ -241,30 +318,6 @@ namespace Energy.Base
             throw new NotSupportedException();
         }
 
-        private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-
-        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
-        {
-            if (sizeInBytes <= 0)
-                return "0 " + _MemorySizeSuffix[0];
-            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
-            double number = sizeInBytes / Math.Pow(1024, exponent);
-            int p = 1;
-            for (int i = 0; i < decimalPlaces; i++)
-            {
-                p *= 10;
-            }
-            if (numberCeiling)
-                number = Math.Ceiling(number * p);
-            else
-                number = Math.Floor(number * p);
-
-            number /= p;
-
-            return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
-                , _MemorySizeSuffix[exponent]);
-        }
-
         /// <summary>
         /// Convert bool to string
         /// </summary>
@@ -303,7 +356,7 @@ namespace Energy.Base
             int result = 0;
             if (int.TryParse(value, out result))
                 return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
+            string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
             if (int.TryParse(value, out result))
@@ -338,31 +391,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Byte
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByte(string value)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            byte result = 0;
-            if (byte.TryParse(value, out result))
-                return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (byte.TryParse(value, out result))
-                return result;
-            return 0;
-        }
-
-
-        #endregion
-
         #region Long
 
         /// <summary>
@@ -377,7 +405,7 @@ namespace Energy.Base
             long result = 0;
             if (long.TryParse(value, out result))
                 return result;
-            string trim = Energy.Base.Text.TrimWhite(value);
+            string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
             if (long.TryParse(value, out result))
@@ -399,6 +427,12 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Check if value is long number with or without negative minus sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
         public static bool IsLong(string value, bool negative)
         {
             if (negative)
@@ -442,6 +476,8 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
             decimal result = 0;
             if (decimal.TryParse(value, out result))
                 return result;
@@ -466,17 +502,13 @@ namespace Energy.Base
         {
             if (string.IsNullOrEmpty(value))
                 return 0;
+            value = Energy.Base.Text.Trim(value);
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
             double result = 0;
-            value = Energy.Base.Text.TrimWhite(value);
-            if (!double.TryParse(value, System.Globalization.NumberStyles.Float
+            double.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
-                , out result))
-            {
-                double.TryParse(value, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture
-                    , out result);
-            }
-
+                , out result);
             return result;
         }
 
@@ -557,7 +589,7 @@ namespace Energy.Base
             if (string.IsNullOrEmpty(value))
                 return 0;
             float result = 0;
-            value = Energy.Base.Text.TrimWhite(value);
+            value = Energy.Base.Text.Trim(value);
             if (!float.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
                 , out result))
@@ -631,6 +663,74 @@ namespace Energy.Base
         public static string FloatToString(float value, int precision)
         {
             return FloatToString(value, precision, null);
+        }
+
+        #endregion
+
+        #region Byte
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
+        public static byte StringToByte(string value)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            byte result = 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length == value.Length)
+                return 0;
+            if (byte.TryParse(value, out result))
+                return result;
+            return 0;
+        }
+
+        #endregion
+
+        #region Bcd
+
+        /// <summary>
+        /// Convert byte to BCD value
+        /// </summary>
+        /// <param name="value">Byte value</param>
+        /// <returns>BCD value</returns>
+        public static byte ByteToBcd(byte value)
+        {
+            return Energy.Base.Bcd.FromByte(value);
+        }
+
+        /// <summary>
+        /// Convert word to BCD value
+        /// </summary>
+        /// <param name="value">Byte value</param>
+        /// <returns>BCD value</returns>
+        public static ushort WordToBcd(ushort value)
+        {
+            return Energy.Base.Bcd.FromWord(value);
+        }
+
+        /// <summary>
+        /// Convert BCD value to byte
+        /// </summary>
+        /// <param name="value">BCD value</param>
+        /// <returns>Word value</returns>
+        public static ushort BcdToByte(byte value)
+        {
+            return Energy.Base.Bcd.ToByte(value);
+        }
+
+        /// <summary>
+        /// Convert BCD value to word
+        /// </summary>
+        /// <param name="value">BCD value</param>
+        /// <returns>Word value</returns>
+        public static ushort BcdToWord(ushort value)
+        {
+            return Energy.Base.Bcd.ToWord(value);
         }
 
         #endregion
@@ -741,13 +841,24 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return DateTime as ISO 8601 time string with milliseconds if not zero (empty if default or null)
+        /// Return DateTime as ISO time string with milliseconds if not zero (empty if default or null)
         /// </summary>
         /// <param name="stamp">DateTime</param>
         /// <returns>Time string representation</returns>
         public static string DateTimeToStringTime(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToStringTime((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Represent date and time strictly according to ISO 8601 standard
+        /// with "T" for time, "Z" for UTC and "+/-" for time zone.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DateTimeToISO8601(DateTime? value)
+        {
+            return Energy.Base.Clock.GetISO8601(value);
         }
 
         /// <summary>
@@ -819,6 +930,102 @@ namespace Energy.Base
 
         #endregion
 
+        #region TimeSpan
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        {
+            int truncate = (int)seconds;
+            double fractional = seconds - truncate;
+            double milliseconds = fractional * 1000.0;
+            int s = truncate % 60;
+            truncate /= 60;
+            int m = truncate % 60;
+            truncate /= 60;
+            int h = truncate;
+            int ms = (int)milliseconds;
+
+            if (roundUp && ms == 0 && milliseconds - ms > 0)
+            {
+                ms = 1;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!omitZeroHours || h > 0)
+            {
+                sb.Append(h.ToString("00"));
+                sb.Append(":");
+            }
+
+            sb.Append(m.ToString("00"));
+            sb.Append(":");
+            sb.Append(s.ToString("00"));
+
+            if (!omitZeroMilliseconds || ms > 0)
+            {
+                sb.Append(".");
+                sb.Append(ms.ToString("000"));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        {
+            int truncate = (int)seconds;
+            double fractional = seconds - truncate;
+            double microseconds = fractional * 1000000.0;
+            int s = truncate % 60;
+            truncate /= 60;
+            int m = truncate % 60;
+            truncate /= 60;
+            int h = truncate;
+            int μ = (int)microseconds;
+
+            if (roundUp && μ == 0 && microseconds - μ > 0)
+            {
+                μ = 1;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!omitZeroHours || h > 0)
+            {
+                sb.Append(h.ToString("00"));
+                sb.Append(":");
+            }
+
+            sb.Append(m.ToString("00"));
+            sb.Append(":");
+            sb.Append(s.ToString("00"));
+
+            if (!omitZeroMicroseconds || μ > 0)
+            {
+                sb.Append(".");
+                sb.Append(μ.ToString("000000"));
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
+
         #region Dictionary
 
         /// <summary>
@@ -840,17 +1047,43 @@ namespace Energy.Base
         /// <summary>
         /// Convert string dictionary to array containing key and value pairs one by another in one dimensional array.
         /// </summary>
-        /// <param name="dictionary">Dictionary&gt;string, string&lt;</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dictionary">Dictionary&gt;string, T&lt;</param>
         /// <returns></returns>
-        public static string[] LongDictionaryToStringArray(Dictionary<string, long> dictionary)
+        public static string[] StringDictionaryToStringArray<T>(Dictionary<string, T> dictionary)
         {
             List<string> list = new List<string>();
-            foreach (KeyValuePair<string, long> _ in dictionary)
+            foreach (KeyValuePair<string, T> _ in dictionary)
             {
                 list.Add(_.Key);
                 list.Add(_.Value.ToString());
             }
             return list.ToArray();
+        }
+
+        /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<string, string> StringArrayToStringDictionary(params string[] array)
+        {
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                string key = array[i];
+                if (key == null)
+                    continue;
+                string value = array[i + 1];
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                string key = array[array.Length - 1];
+                if (key != null)
+                    dictionary[key] = null;
+            }
+            return dictionary;
         }
 
         #endregion
@@ -1085,7 +1318,7 @@ namespace Energy.Base
                 }
             }
             int length = value.Length;
-            value = Energy.Base.Text.TrimWhite(value);
+            value = Energy.Base.Text.Trim(value);
             if (value.Length == length)
                 return 0;
             for (int i = 0; i < names.Length; i++)
@@ -1141,25 +1374,87 @@ namespace Energy.Base
         #region Base64
 
         /// <summary>
-        /// Convert UTF-8 string to Base64 text.
+        /// Convert UTF-8 string to Base64 text
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string StringToBase64(string input)
         {
-            byte[] data = ASCIIEncoding.UTF8.GetBytes(input);
+            return StringToBase64(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert string to Base64 text
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StringToBase64(string input, System.Text.Encoding encoding)
+        {
+            byte[] data = encoding.GetBytes(input);
             return System.Convert.ToBase64String(data);
         }
 
         /// <summary>
-        /// Convert Base64 input to UTF-8 string.
+        /// Convert Base64 input to UTF-8 string
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string Base64ToString(string input)
         {
-            byte[] data = System.Convert.FromBase64String(input);
-            return ASCIIEncoding.UTF8.GetString(data);
+            return Base64ToString(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert Base64 input to string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Base64ToString(string input, System.Text.Encoding encoding)
+        {
+            if (input == null)
+                return null;
+            if (input.Length == 0)
+                return "";
+            byte[] data;
+            try
+            {
+                data = System.Convert.FromBase64String(input);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            return System.Text.Encoding.UTF8.GetString(data);
+        }
+
+        #endregion
+
+        #region MemorySize
+
+        private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+
+        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
+        {
+            if (sizeInBytes <= 0)
+                return "0 " + _MemorySizeSuffix[0];
+            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
+            double number = sizeInBytes / Math.Pow(1024, exponent);
+            int p = 1;
+            for (int i = 0; i < decimalPlaces; i++)
+            {
+                p *= 10;
+            }
+            if (numberCeiling)
+                number = Math.Ceiling(number * p);
+            else
+                number = Math.Floor(number * p);
+
+            number /= p;
+
+            return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
+                , _MemorySizeSuffix[exponent]);
         }
 
         #endregion

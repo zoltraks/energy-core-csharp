@@ -41,13 +41,19 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Language native name
+        /// Language name definition
         /// </summary>
-        public string NativeName { get; set; }
+        public class Name
+        {
+            /// <summary>
+            /// Language native name
+            /// </summary>
+            public string NativeName { get; set; }
 
-        /// <summary>
-        /// Language english name
-        /// </summary>
-        public string EnglishName { get; set; }
+            /// <summary>
+            /// Language english name
+            /// </summary>
+            public string EnglishName { get; set; }
+        }
     }
 }
