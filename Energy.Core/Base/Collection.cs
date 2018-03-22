@@ -446,6 +446,8 @@ namespace Energy.Base
                 }
             }
 
+            #region Get
+
             public T Get(string key)
             {
                 if (string.IsNullOrEmpty(key))
@@ -466,22 +468,27 @@ namespace Energy.Base
                 }
             }
 
-            public void Get(string key, out T value)
+            public Energy.Base.Collection.StringDictionary<T> Get(string key, out T value)
             {
                 value = Get(key);
+                return this;
             }
 
-            public void Set(string key, T value)
+            #endregion
+
+            #region Set
+
+            public Energy.Base.Collection.StringDictionary<T> Set(string key, T value)
             {
                 if (string.IsNullOrEmpty(key))
-                    return;
+                    return null;
 
                 lock (_Lock)
                 {
                     if (CaseSensitive)
                     {
                         base[key] = value;
-                        return;
+                        return this;
                     }
                     string map = key.ToUpperInvariant();
                     if (Index != null && Index.ContainsKey(map))
@@ -497,7 +504,23 @@ namespace Energy.Base
                         Index.Add(map, key);
                     }
                 }
+
+                return this;
             }
+
+            public Energy.Base.Collection.StringDictionary<T> Set(string[] array)
+            {
+                lock (_Lock)
+                {
+                    for (int i = 0; i - 1 < array.Length; i += 2)
+                    {
+                        Set(array[i], Energy.Base.Cast.StringToObject<T>(array[i + 1]));
+                    }
+                }
+                return this;
+            }
+
+            #endregion
 
             public new void Add(string key, T value)
             {
@@ -542,8 +565,9 @@ namespace Energy.Base
                     }
                     else
                     {
-                        foreach (string key in base.Keys)
+                        foreach (string indexKey in Index.Keys)
                         {
+                            string key = Index[indexKey];
                             list.Add((object)key);
                             list.Add((object)base[key]);
                         };

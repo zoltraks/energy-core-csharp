@@ -1087,23 +1087,37 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert dictionary to array of objects of key value pairs
+        /// Convert dictionary to array of objects of key value pairs.
+        /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
         /// </summary>
         /// <param name="dictionary"></param>
         /// <returns></returns>
         public static object[] DictionaryToObjectArray<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
         {
             List<object> list = new List<object>();
-
             foreach (TKey key in dictionary.Keys)
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
             };
-
             return list.ToArray();
         }
 
+        /// <summary>
+        /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
+        /// </summary>
+        /// <param name="dictionary">Dictionary</param>
+        /// <returns></returns>
+        public static object[] DictionaryToObjectArrayKeyValuePAir<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
+        {
+            List<object> list = new List<object>();
+            foreach (KeyValuePair<TKey, TValue> _ in dictionary)
+            {
+                list.Add(_.Key);
+                list.Add(_.Value);
+            }
+            return list.ToArray();
+        }
 
         /// <summary>
         /// Convert string dictionary to array of objects of key value pairs
@@ -1113,13 +1127,11 @@ namespace Energy.Base
         public static object[] StringDictionaryToObjectArray<TValue>(Dictionary<string, TValue> dictionary)
         {
             List<object> list = new List<object>();
-
             foreach (string key in dictionary.Keys)
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
             };
-
             return list.ToArray();
         }
 
@@ -1131,13 +1143,11 @@ namespace Energy.Base
         public static object[] StringDictionaryToObjectArray(Dictionary<string, string> dictionary)
         {
             List<object> list = new List<object>();
-
             foreach (string key in dictionary.Keys)
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
             };
-
             return list.ToArray();
         }
 
@@ -1348,6 +1358,39 @@ namespace Energy.Base
                 return (TStringToObject)(object)Energy.Base.Cast.StringToDateTime(input);
             else
                 return (TStringToObject)(object)input;
+        }
+
+        /// <summary>
+        /// Convert object array to Dictionary&lt;TKey, TValue&gt;
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> ObjectArrayToDictionary<TKey, TValue>(object[] array)
+        {
+            Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
+            for (int i = 0; i - 1 < array.Length; i += 2)
+            {
+                dictionary[(TKey)array[i]] = (TValue)array[i + 1];
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Object array to 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static Dictionary<string, T> ObjectArrayToStringDictionary<T>(object[] array)
+        {
+            Dictionary<string, T> dictionary = new Dictionary<string, T>();
+            for (int i = 0; i - 1 < array.Length; i += 2)
+            {
+                dictionary[(string)array[i]] = (T)array[i + 1];
+            }
+            return dictionary;
         }
 
         #endregion
