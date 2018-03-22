@@ -527,6 +527,36 @@ namespace Energy.Base
                 }
             }
 
+            public object[] ToObjectArray()
+            {
+                List<object> list = new List<object>();
+                lock (_Lock)
+                {
+                    if (CaseSensitive)
+                    {
+                        foreach (string key in base.Keys)
+                        {
+                            list.Add((object)key);
+                            list.Add((object)base[key]);
+                        }
+                    }
+                    else
+                    {
+                        foreach (string key in base.Keys)
+                        {
+                            list.Add((object)key);
+                            list.Add((object)base[key]);
+                        };
+                    }
+                    return list.ToArray();
+                }
+            }
+
+            public object[] ToArray<TToArray>()
+            {
+                return ToObjectArray();
+            }
+
             public string[] ToArray()
             {
                 List<string> list = new List<string>();

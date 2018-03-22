@@ -1086,6 +1086,61 @@ namespace Energy.Base
             return dictionary;
         }
 
+        /// <summary>
+        /// Convert dictionary to array of objects of key value pairs
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static object[] DictionaryToObjectArray<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
+        {
+            List<object> list = new List<object>();
+
+            foreach (TKey key in dictionary.Keys)
+            {
+                list.Add((object)key);
+                list.Add((object)dictionary[key]);
+            };
+
+            return list.ToArray();
+        }
+
+
+        /// <summary>
+        /// Convert string dictionary to array of objects of key value pairs
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static object[] StringDictionaryToObjectArray<TValue>(Dictionary<string, TValue> dictionary)
+        {
+            List<object> list = new List<object>();
+
+            foreach (string key in dictionary.Keys)
+            {
+                list.Add((object)key);
+                list.Add((object)dictionary[key]);
+            };
+
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Convert string dictionary to array of objects of key value pairs
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static object[] StringDictionaryToObjectArray(Dictionary<string, string> dictionary)
+        {
+            List<object> list = new List<object>();
+
+            foreach (string key in dictionary.Keys)
+            {
+                list.Add((object)key);
+                list.Add((object)dictionary[key]);
+            };
+
+            return list.ToArray();
+        }
+
         #endregion
 
         #region Object
@@ -1455,6 +1510,19 @@ namespace Energy.Base
 
             return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
                 , _MemorySizeSuffix[exponent]);
+        }
+
+        #endregion
+
+        #region MemoryStream
+
+        public static string MemoryStreamToString(System.IO.MemoryStream memoryStream)
+        {
+            byte[] data = memoryStream.ToArray();
+            int index = 0;
+            int count = data.Length;
+            string result = Energy.Base.Text.Encoding(null).GetString(data, index, count);
+            return result;
         }
 
         #endregion
