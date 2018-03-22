@@ -255,7 +255,11 @@ namespace Energy.Core
         /// <returns></returns>
         public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request)
         {
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            HttpWebRequest httpRequest = null;
+            if (request.RequestObject != null)
+                httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            else
+                httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
             httpRequest.Method = request.Method;
             if (!string.IsNullOrEmpty(request.ContentType))
                 httpRequest.ContentType = request.ContentType;
@@ -294,6 +298,7 @@ namespace Energy.Core
 
             using (HttpWebResponse httpResponse = (HttpWebResponse)GetResponseWithoutException(httpRequest))
             {
+                response.ResponseObject = httpResponse;
                 statusCode = (int)httpResponse.StatusCode;
                 if (httpResponse.Headers.Count > 0)
                 {
