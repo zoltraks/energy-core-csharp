@@ -369,7 +369,7 @@ namespace Energy.Source
                     }
                     catch (Exception x)
                     {
-                        ErrorException = x;
+                        SetError(x);
                     }
                 })
                 {
