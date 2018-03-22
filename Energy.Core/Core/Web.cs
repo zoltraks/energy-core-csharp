@@ -248,6 +248,10 @@ namespace Energy.Core
             }
         }
 
+        #endregion
+
+        #region Execute
+
         /// <summary>
         /// Perform HTTP request
         /// </summary>
