@@ -252,12 +252,17 @@ namespace Energy.Core
         /// Perform HTTP request
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="httpWebRequest">Custom HttpWebRequest object to use</param>
         /// <returns></returns>
-        public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request)
+        public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request, HttpWebRequest httpWebRequest)
         {
             HttpWebRequest httpRequest = null;
-            if (request.RequestObject != null)
-                httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            //if (request.RequestObject != null)
+            //    httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            //else
+            //    httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            if (httpWebRequest != null)
+                httpRequest = httpWebRequest;
             else
                 httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
             httpRequest.Method = request.Method;
@@ -298,16 +303,20 @@ namespace Energy.Core
 
             using (HttpWebResponse httpResponse = (HttpWebResponse)GetResponseWithoutException(httpRequest))
             {
-                response.ResponseObject = httpResponse;
+                //response.ResponseObject = httpResponse;
                 statusCode = (int)httpResponse.StatusCode;
+                response.StatusCode = statusCode;
                 if (httpResponse.Headers.Count > 0)
                 {
-                    Energy.Base.Collection.StringDictionary d = new Energy.Base.Collection.StringDictionary();
+                    //Energy.Base.Collection.StringDictionary d = new Energy.Base.Collection.StringDictionary();
+                    List<string> headerList = new List<string>();
                     string[] keys = httpResponse.Headers.AllKeys;
                     for (int i = 0; i < keys.Length; i++)
                     {
-                        d[keys[i]] = httpResponse.Headers[i];
+                        //d[keys[i]] = httpResponse.Headers[i];
+                        headerList.Add(keys[i] + ": " + httpResponse.Headers[i]);
                     }
+                    response.Headers = headerList;
                     //responseHeaders = d.ToArray();
                 }
                 using (Stream responseStream = httpResponse.GetResponseStream())
@@ -319,9 +328,20 @@ namespace Energy.Core
                             responseData = builder.ToArray();
                         }
                     }
+                    response.Data = responseData;
                     return response;
                 }
             }
+        }
+
+        /// <summary>
+        /// Perform HTTP request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request)
+        {
+            return Execute(request, null);
         }
 
         #endregion

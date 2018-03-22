@@ -11,10 +11,17 @@ namespace RestBinaryGetPut
             Energy.Core.Web.IgnoreCertificateValidation = true;
             string baseUrl = "http://localhost:16000/api/test/";
             string methodUrl = baseUrl + "echo/";
+            methodUrl += "XYZ";
 
             //Energy.Core.Web.Post(methodUrl, requestBody, responseData);
 
             var request = new Energy.Base.Http.Request("POST", methodUrl);
+
+            request.Data = new byte[] { (byte)'A', (byte)'B', };
+            Console.WriteLine(request.Body);
+            request.Body = "ABC";
+            Console.WriteLine(request.Data);
+
             request.Encoding = System.Text.Encoding.Unicode;
             request.Body = "{ \"text\": \"Gęś\" }";
             request.ContentType = "application/javascript";
@@ -23,6 +30,9 @@ namespace RestBinaryGetPut
             Console.WriteLine(Energy.Base.Xml.Serialize(request));
 
             Console.ReadLine();
+
+            request.Method = "GET";
+            request.Body = null;
 
             var response = Energy.Core.Web.Execute(request);
 

@@ -119,11 +119,11 @@ namespace Energy.Base
         /// <summary>
         /// HTTP request
         /// </summary>
-        public class Request: Message
+        public class Request : Message
         {
             #region Public
 
-            public WebRequest RequestObject { get; set; }
+            //public WebRequest RequestObject { get; set; }
 
             public string Method { get; set; }
 
@@ -156,20 +156,20 @@ namespace Energy.Base
                 Method = method;
             }
 
+            ///// <summary>
+            ///// Constructor
+            ///// </summary>
+            ///// <param name="requestObject"></param>
+            //public Request(WebRequest requestObject)
+            //{
+            //    RequestObject = requestObject;
+            //}
+
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="requestObject"></param>
-            public Request(WebRequest requestObject)
-            {
-                RequestObject = requestObject;
-            }
-            
-            /// <summary>
-                         /// Constructor
-                         /// </summary>
-                         /// <param name="method"></param>
-                         /// <param name="url"></param>
+            /// <param name="method"></param>
+            /// <param name="url"></param>
             public Request(string method, string url)
             {
                 Method = method;
@@ -203,12 +203,15 @@ namespace Energy.Base
         /// <summary>
         /// HTTP response
         /// </summary>
-        public class Response: Message
+        public class Response : Message
         {
-            public WebResponse ResponseObject { get; set; }
+            //public WebResponse ResponseObject { get; set; }
 
             [DefaultValue((int)0)]
             public int StatusCode { get; set; }
+
+            [XmlElement("Header")]
+            public List<string> Headers = new List<string>();
         }
     }
 }
