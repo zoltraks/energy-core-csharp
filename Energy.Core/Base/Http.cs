@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -122,6 +123,8 @@ namespace Energy.Base
         {
             #region Public
 
+            public WebRequest RequestObject { get; set; }
+
             public string Method { get; set; }
 
             public string Url { get; set; }
@@ -156,8 +159,17 @@ namespace Energy.Base
             /// <summary>
             /// Constructor
             /// </summary>
-            /// <param name="method"></param>
-            /// <param name="url"></param>
+            /// <param name="requestObject"></param>
+            public Request(WebRequest requestObject)
+            {
+                RequestObject = requestObject;
+            }
+            
+            /// <summary>
+                         /// Constructor
+                         /// </summary>
+                         /// <param name="method"></param>
+                         /// <param name="url"></param>
             public Request(string method, string url)
             {
                 Method = method;
@@ -193,6 +205,8 @@ namespace Energy.Base
         /// </summary>
         public class Response: Message
         {
+            public WebResponse ResponseObject { get; set; }
+
             [DefaultValue((int)0)]
             public int StatusCode { get; set; }
         }

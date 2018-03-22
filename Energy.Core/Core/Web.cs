@@ -255,7 +255,11 @@ namespace Energy.Core
         /// <returns></returns>
         public static Energy.Base.Http.Response Execute(Energy.Base.Http.Request request)
         {
-            HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            HttpWebRequest httpRequest = null;
+            if (request.RequestObject != null)
+                httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
+            else
+                httpRequest = (HttpWebRequest)WebRequest.Create(request.Url);
             httpRequest.Method = request.Method;
             if (!string.IsNullOrEmpty(request.ContentType))
                 httpRequest.ContentType = request.ContentType;
@@ -294,6 +298,7 @@ namespace Energy.Core
 
             using (HttpWebResponse httpResponse = (HttpWebResponse)GetResponseWithoutException(httpRequest))
             {
+                response.ResponseObject = httpResponse;
                 statusCode = (int)httpResponse.StatusCode;
                 if (httpResponse.Headers.Count > 0)
                 {
@@ -327,21 +332,34 @@ namespace Energy.Core
         /// Perform GET and return string from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="acceptType"></param>
         /// <returns></returns>
-        public static string Get(string url, string acceptType)
+        public static string Get(string url)
         {
-            return Request("GET", url, null, null, acceptType, null, null, true);
+            Energy.Base.Http.Request request = new Energy.Base.Http.Request()
+            {
+                Method = "GET",
+                Url = url,
+            };
+            Energy.Base.Http.Response response = Execute(request);
+            return response.Body;
         }
 
         /// <summary>
         /// Perform GET and return string from URL
         /// </summary>
         /// <param name="url"></param>
+        /// <param name="acceptType"></param>
         /// <returns></returns>
-        public static string Get(string url)
+        public static string Get(string url, string acceptType)
         {
-            return Request("GET", url, null, null, null, null, null, true);
+            Energy.Base.Http.Request request = new Energy.Base.Http.Request()
+            {
+                Method = "GET",
+                Url = url,
+                AcceptType = acceptType,
+            };
+            Energy.Base.Http.Response response = Execute(request);
+            return response.Body;
         }
 
         /// <summary>
@@ -352,9 +370,32 @@ namespace Energy.Core
         /// <returns></returns>
         public static int Get(string url, out byte[] responseData)
         {
-            string[] responseHeaders;
-            int statusCode = Request("GET", url, null, null, null, null, out responseHeaders, out responseData);
-            return statusCode;
+            Energy.Base.Http.Request request = new Energy.Base.Http.Request()
+            {
+                Method = "GET",
+                Url = url,
+            };
+            Energy.Base.Http.Response response = Execute(request);
+            responseData = response.Data;
+            return response.StatusCode;
+        }
+
+        /// <summary>
+        /// Perform GET and return status code with data from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="responseBody"></param>
+        /// <returns></returns>
+        public static int Get(string url, out string responseBody)
+        {
+            Energy.Base.Http.Request request = new Energy.Base.Http.Request()
+            {
+                Method = "GET",
+                Url = url,
+            };
+            Energy.Base.Http.Response response = Execute(request);
+            responseBody = response.Body;
+            return response.StatusCode;
         }
 
         #endregion

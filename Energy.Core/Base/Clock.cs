@@ -11,6 +11,12 @@ namespace Energy.Base
     /// </summary>
     public class Clock
     {
+        #region Constant
+
+        public static readonly TimeSpan Midday = TimeSpan.FromHours(12);
+
+        #endregion
+
         /// <summary>
         /// Return current time in 24h/ms format, i.e. "12:33:15.176"
         /// </summary>
