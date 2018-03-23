@@ -16,6 +16,7 @@ namespace RestBinaryGetPut
                 Energy.Core.Application.SetConsoleEncoding();
                 Test.S();
                 Test.Make();
+                Test.CheckGet("http://www.google.com");
             }
             catch (Exception x)
             {
@@ -72,18 +73,17 @@ namespace RestBinaryGetPut
 
             //responseData = Energy.Core.Web.Put(url, array);
 
-            Energy.Core.Web.Post(url, array, out responseString);
+            responseString = Energy.Core.Web.Post(url, array).Body;
 
             Console.WriteLine(responseString);
 
             url = "http://localhost:6000/api/storage/xyz/path/to/file.data";
 
-            responseData = Energy.Core.Web.Put(url, array);
+            responseData = Energy.Core.Web.Put(url, array).Data;
 
             Console.WriteLine(Energy.Base.Hex.Print(responseData, 16, 8));
 
             Energy.Core.Tilde.Pause();
-
 
 
             Energy.Base.File.RemoveDirectory(makeDirectory, true);
@@ -99,7 +99,9 @@ namespace RestBinaryGetPut
             byte[] data = File.ReadAllBytes(@"C:\DATA\example.exe");
             string url = "http://localhost:6000/api/storage/xyz/path/to/file.data";
             string json;
-            int responseCode = Energy.Core.Web.Post(url, data, out json);
+            Energy.Base.Http.Response response = Energy.Core.Web.Post(url, data);
+            json = response.Body;
+            int responseCode = response.StatusCode;
             Console.WriteLine(responseCode);
             Console.WriteLine(json);
             Console.ReadLine();

@@ -8,27 +8,37 @@ namespace RestBinaryGetPut
     {
         public static void Make()
         {
+            Energy.Core.Tilde.WriteLine("~g~Trying to make a POST request with body to example AspNetCoreApi");
             Energy.Core.Web.IgnoreCertificateValidation = true;
             string baseUrl = "http://localhost:16000/api/test/";
             string methodUrl = baseUrl + "echo/";
-
+           
             //Energy.Core.Web.Post(methodUrl, requestBody, responseData);
 
             var request = new Energy.Base.Http.Request("POST", methodUrl);
-            request.Encoding = System.Text.Encoding.Unicode;
+
+            request.Encoding = System.Text.Encoding.UTF8;
             request.Body = "{ \"text\": \"Gęś\" }";
             request.ContentType = "application/javascript";
             request.Headers.Add("X-Path: x-path");
 
             Console.WriteLine(Energy.Base.Xml.Serialize(request));
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
             var response = Energy.Core.Web.Execute(request);
 
             Console.WriteLine(Energy.Base.Xml.Serialize(response));
 
-            Console.ReadLine();
+            //Console.ReadLine();
+        }
+
+        internal static void CheckGet(string url)
+        {
+            using (Energy.Core.Bug.Trap(0.0001, (TimeSpan elapsedTime) => { Console.WriteLine(elapsedTime.ToString() + " Sorry"); }))
+            {
+                Energy.Core.Web.Get(url);
+            }
         }
 
         internal static void S()
