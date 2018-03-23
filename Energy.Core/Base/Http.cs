@@ -113,6 +113,27 @@ namespace Energy.Base
                 _Encoding = null;
             }
 
+            public override string ToString()
+            {
+                return GetBody();
+            }
+
+            public void SetValue(object o)
+            {
+                if (o == null)
+                {
+                    _Body = null;
+                    _Data = null;
+                    return;
+                }
+                if (o is string)
+                    Body = (string)o;
+                else if (o is byte[])
+                    Data = (byte[])o;
+                else
+                    Body = o.ToString();
+            }
+
             #endregion
         }
 
@@ -125,12 +146,16 @@ namespace Energy.Base
 
             //public WebRequest RequestObject { get; set; }
 
+            [DefaultValue(null)]
             public string Method { get; set; }
 
+            [DefaultValue(null)]
             public string Url { get; set; }
 
+            [DefaultValue(null)]
             public string ContentType { get; set; }
 
+            [DefaultValue(null)]
             public string AcceptType { get; set; }
 
             [XmlElement("Header")]
@@ -196,7 +221,7 @@ namespace Energy.Base
             #endregion
 
             #region Method
-
+            
             #endregion
         }
 
@@ -205,6 +230,8 @@ namespace Energy.Base
         /// </summary>
         public class Response : Message
         {
+            #region Public
+     
             //public WebResponse ResponseObject { get; set; }
 
             [DefaultValue((int)0)]
@@ -212,6 +239,23 @@ namespace Energy.Base
 
             [XmlElement("Header")]
             public List<string> Headers = new List<string>();
+
+            #endregion
+
+            #region Constructor
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public Response()
+            {
+            }
+
+            #endregion
+
+            #region Method
+
+            #endregion
         }
     }
 }
