@@ -171,5 +171,33 @@ namespace Energy.Core
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        #region Trap
+
+        /// <summary>
+        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// </summary>
+        /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
+        /// <param name="action">Action when time exceeds limit</param>
+        /// <returns></returns>
+        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Function<TimeSpan> action)
+        {
+            Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
+            return trap;
+        }
+
+        /// <summary>
+        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// </summary>
+        /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
+        /// <param name="action">Action when time exceeds limit</param>
+        /// <returns></returns>
+        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Function action)
+        {
+            Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
+            return trap;
+        }
+
+        #endregion
     }
 }
