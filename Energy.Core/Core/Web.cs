@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Energy.Base;
 
 namespace Energy.Core
 {
@@ -425,19 +426,21 @@ namespace Energy.Core
         /// Perform POST and return response from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="requestBody"></param>
+        /// <param name="body"></param>
         /// <param name="contentType"></param>
         /// <param name="headers"></param>
+        /// <param name="acceptType"></param>
         /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, object requestBody, string contentType, string[] headers)
+        public static Energy.Base.Http.Response Post(string url, object body, string contentType, string[] headers, string acceptType)
         {
             Energy.Base.Http.Request request = new Energy.Base.Http.Request()
             {
                 Method = "POST",
                 Url = url,
                 ContentType = contentType,
+                AcceptType = acceptType,
             };
-            request.SetValue(requestBody);
+            request.SetValue(body);
             if (headers != null && headers.Length > 0)
             {
                 request.Headers.AddRange(headers);
@@ -446,78 +449,49 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return string from URL
+        /// Perform POST and return response from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="requestBody"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Post(string url, object body, string contentType, string[] headers)
+        {
+            return Post(url, body, contentType, headers, null);
+        }
+
+        /// <summary>
+        /// Perform POST and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, string requestBody, string contentType)
+        public static Energy.Base.Http.Response Post(string url, object body, string contentType)
         {
-            return Post(url, requestBody, contentType, null);
+            return Post(url, body, contentType, null, null);
         }
 
         /// <summary>
-        /// Perform POST and return string from URL
+        /// Perform POST and return response from URL
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="requestBody"></param>
+        /// <param name="body"></param>
         /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, string requestBody)
+        public static Energy.Base.Http.Response Post(string url, object body)
         {
-            return Post(url, requestBody, null, null);
+            return Post(url, body, null, null, null);
         }
 
         /// <summary>
-        /// Perform POST and return string from URL
+        /// Perform POST and return response from URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
         public static Energy.Base.Http.Response Post(string url)
         {
-            return Post(url, null, null, null);
-        }
-
-        /// <summary>
-        /// Perform POST and return string from URL
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="data"></param>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, byte[] data, string contentType)
-        {
-            return Post(url, data, contentType, null);
-        }
-
-        /// <summary>
-        /// Perform POST and return string from URL
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, byte[] data)
-        {
-            return Post(url, data, null, null);
-        }
-
-        /// <summary>
-        /// Perform POST and return status from URL
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="data"></param>
-        /// <param name="responseData"></param>
-        /// <returns></returns>
-        public static Energy.Base.Http.Response Post(string url, byte[] data, out byte[] responseData)
-        {
-            Energy.Base.Http.Response response = Post(url, data, null, null);
-            if (response == null)
-            {
-                responseData = null;
-                return null;
-            }
-            responseData = response.Data;
-            return response;
+            return Post(url, null, null, null, null);
         }
 
         #endregion
@@ -525,7 +499,7 @@ namespace Energy.Core
         #region PUT
 
         /// <summary>
-        /// Perform PUT and return string from URL
+        /// Perform PUT and return response from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -550,7 +524,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return string from URL
+        /// Perform PUT and return response from URL
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -560,7 +534,19 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return string from URL
+        /// Perform PUT and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Put(string url, object body, string contentType)
+        {
+            return Put(url, body, contentType, null);
+        }
+
+        /// <summary>
+        /// Perform PUT and return response from URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -568,6 +554,93 @@ namespace Energy.Core
         public static Energy.Base.Http.Response Put(string url, object body)
         {
             return Put(url, body, null, null);
+        }
+
+        #endregion
+
+        #region PATCH
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(Energy.Base.Http.Request request)
+        {
+            request.Method = "PATCH";
+            return Execute(request);
+        }
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <param name="headers"></param>
+        /// <param name="acceptType"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(string url, object body, string contentType, string[] headers, string acceptType)
+        {
+            Energy.Base.Http.Request request = new Energy.Base.Http.Request()
+            {
+                Method = "PATCH",
+                Url = url,
+                ContentType = contentType,
+                AcceptType = acceptType,
+            };
+            request.SetValue(body);
+            if (headers != null && headers.Length > 0)
+            {
+                request.Headers.AddRange(headers);
+            }
+            return Execute(request);
+        }
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(string url, object body, string contentType, string[] headers)
+        {
+            return Patch(url, body, contentType, headers, null);
+        }
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(string url, object body, string contentType)
+        {
+            return Patch(url, body, contentType, null, null);
+        }
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(string url, object body)
+        {
+            return Patch(url, body, null, null, null);
+        }
+
+        /// <summary>
+        /// Perform PATCH and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Patch(string url)
+        {
+            return Patch(url, null, null, null, null);
         }
 
         #endregion
@@ -651,6 +724,36 @@ namespace Energy.Core
             Energy.Base.Http.Request request = new Base.Http.Request()
             {
                 Method = "DELETE",
+                Url = url,
+            };
+            return Execute(request);
+        }
+
+        #endregion
+
+        #region OPTIONS
+
+        /// <summary>
+        /// Perform OPTIONS and return response from URL
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Options(Energy.Base.Http.Request request)
+        {
+            request.Method = "OPTIONS";
+            return Execute(request);
+        }
+
+        /// <summary>
+        /// Perform OPTIONS and return response from URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static Energy.Base.Http.Response Options(string url)
+        {
+            Energy.Base.Http.Request request = new Base.Http.Request()
+            {
+                Method = "OPTIONS",
                 Url = url,
             };
             return Execute(request);
