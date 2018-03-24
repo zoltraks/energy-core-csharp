@@ -25,6 +25,9 @@ namespace Energy.Base
 
             public string Charset { get { return GetCharset(); } set { SetCharset(value); } }
 
+            [XmlElement("Header")]
+            public List<string> Headers = new List<string>();
+
             #endregion
 
             #region Private
@@ -134,6 +137,21 @@ namespace Energy.Base
                     Body = o.ToString();
             }
 
+            public static string GetBody(Message message)
+            {
+                return message == null ? null : message.Body;
+            }
+
+            public static string[] GetHeaders(Message message, string[] emptyResult)
+            {
+                return message == null || message.Headers == null ? emptyResult : message.Headers.ToArray();
+            }
+
+            public static string[] GetHeaders(Message message)
+            {
+                return GetHeaders(message, null);
+            }
+
             #endregion
         }
 
@@ -158,9 +176,9 @@ namespace Energy.Base
             [DefaultValue(null)]
             public string AcceptType { get; set; }
 
-            [XmlElement("Header")]
-            public List<string> Headers = new List<string>();
-
+            //[XmlElement("Header")]
+            //public List<string> Headers = new List<string>();
+            
             #endregion
 
             #region Constructor
@@ -237,8 +255,8 @@ namespace Energy.Base
             [DefaultValue((int)0)]
             public int StatusCode { get; set; }
 
-            [XmlElement("Header")]
-            public List<string> Headers = new List<string>();
+            //[XmlElement("Header")]
+            //public List<string> Headers = new List<string>();
 
             #endregion
 
@@ -249,6 +267,11 @@ namespace Energy.Base
             /// </summary>
             public Response()
             {
+            }
+
+            public static int GetStatusCode(Response response)
+            {
+                return response == null ? -1 : response.StatusCode;
             }
 
             #endregion
