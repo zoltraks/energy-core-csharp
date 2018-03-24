@@ -63,10 +63,10 @@ How about:
 
 ```cs
 string url = "https://www.google.com/search?q=Energy";
-Console.WriteLine(Energy.Core.Web.Get(url));
+Console.WriteLine(Energy.Core.Web.Get(url).Body);
 ```
 
-Easy to use, build upon standard **System.Net.WebRequest** class REST functions available for common methods like GET, POST, PUT, DELETE or HEAD.
+Easy to use, build upon standard **System.Net.WebRequest** class REST functions available for common methods like GET, POST, PUT, PATCH, DELETE, HEAD or OPTIONS.
 
 ### Generic SQL database connection ###
 
@@ -102,7 +102,6 @@ Library has been divided into several different namespaces. Following table brie
  - *Energy.Interface* - Interfaces
  - *Energy.Source* - Database connection
 
-> *Energy.Attribute*, *Energy.Enumeration* and *Energy.Interface* may be moved to *Energy.Base* namespace in future.
 
 History
 -------
