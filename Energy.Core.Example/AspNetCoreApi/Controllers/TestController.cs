@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,8 @@ namespace AspNetCoreApi.Controllers
                 platform = platform,
             };
         }
+
+        #region echo
 
         /// <summary>
         /// Get text back from request
@@ -83,9 +86,9 @@ namespace AspNetCoreApi.Controllers
         /// Get body back from request
         /// </summary>
         /// <returns></returns>
-        // HEAD: api/test/echo
-        [HttpHead("echo")]
-        public string HeadEchoBody()
+        // DELETE: api/test/echo
+        [HttpDelete("echo")]
+        public string DeleteEchoBody()
         {
             string response = Request.GetRawBodyString();
             return response;
@@ -95,13 +98,42 @@ namespace AspNetCoreApi.Controllers
         /// Get body back from request
         /// </summary>
         /// <returns></returns>
-        // DELETE: api/test/echo
-        [HttpDelete("echo")]
-        public string DeleteEchoBody()
+        // PATCH: api/test/echo
+        [HttpPatch("echo")]
+        public string PatchEchoBody()
         {
             string response = Request.GetRawBodyString();
             return response;
         }
+
+        /// <summary>
+        /// Get body back from request
+        /// </summary>
+        /// <returns></returns>
+        // HEAD: api/test/echo
+        [HttpHead("echo")]
+        public void HeadEchoBody()
+        {
+            Response.ContentLength = 0;
+            Response.Headers.Add("X-Bug", "XYZ");
+            Response.StatusCode = 200;
+        }
+
+        /// <summary>
+        /// Get body back from request
+        /// </summary>
+        /// <returns></returns>
+        // HEAD: api/test/echo
+        [HttpOptions("echo")]
+        public void OptionsEchoBody()
+        {
+            Response.ContentLength = 0;
+            Response.Headers.Add("X-Bug", "XYZ");
+            //return StatusCode(200, null);
+            Response.StatusCode = 200;
+        }
+
+        #endregion
 
         /// <summary>
         /// Perform file creation test

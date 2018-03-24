@@ -33,6 +33,62 @@ namespace RestBinaryGetPut
             //Console.ReadLine();
         }
 
+        internal static void AspNetCoreApi(string baseUrl)
+        {
+            string url;
+            url = baseUrl + "test/echo";
+            Energy.Base.Http.Response response;
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~GET~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Get(url);
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(Energy.Base.Http.Response.GetBody(response), 50, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~POST~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Post(url, "{ \"request\": \"value\" }", "application/json");
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(Energy.Base.Http.Response.GetBody(response), 70, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~PUT~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Put(url, "{ \"request\": \"value\" }", "application/json");
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(Energy.Base.Http.Response.GetBody(response), 70, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~PATCH~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Patch(url, "{ \"request\": \"value\" }", "application/json");
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(Energy.Base.Http.Response.GetBody(response), 70, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~DELETE~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Delete(url);
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(Energy.Base.Http.Response.GetBody(response), 70, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~HEAD~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Head(url);
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(string.Join(", ", Energy.Base.Http.Response.GetHeaders(response, new string[] { })), 250, "...")
+                ));
+
+            Energy.Core.Tilde.WriteLine($"Testing ~w~OPTIONS~0~ on ~g~{url}~0~...");
+            response = Energy.Core.Web.Options(url);
+            Console.WriteLine(string.Format("{0} {1}"
+                , Energy.Base.Http.Response.GetStatusCode(response)
+                , Energy.Base.Text.Limit(string.Join(", ", Energy.Base.Http.Response.GetHeaders(response, new string[] { })), 250, "...")
+                ));
+        }
+
         internal static void CheckGet(string url)
         {
             using (Energy.Core.Bug.Trap(0.0001, (TimeSpan elapsedTime) => { Console.WriteLine(elapsedTime.ToString() + " Sorry"); }))
@@ -50,6 +106,35 @@ namespace RestBinaryGetPut
             {
                 Console.WriteLine(x.Key + " = " + x.Value);
             }
+        }
+
+        private static void TestPutExe()
+        {
+            byte[] data = System.IO.File.ReadAllBytes(@"C:\DATA\example.exe");
+            string url = "http://localhost:6000/api/storage/xyz/path/to/file.data";
+            string json;
+            Energy.Base.Http.Response response = Energy.Core.Web.Post(url, data);
+            json = response.Body;
+            int responseCode = response.StatusCode;
+            Console.WriteLine(responseCode);
+            Console.WriteLine(json);
+            Console.ReadLine();
+        }
+
+        private static void TestLog()
+        {
+            Energy.Core.Log log = Energy.Core.Log.Default;
+            Energy.Core.Bug.Trace.On();
+            log.Write("1");
+            log.Flush();
+            log.Exception(new Exception("ERROR"));
+            log.Write("2");
+            Console.WriteLine(log.ToString());
+            log.Destination += new Energy.Core.Log.Target.Console() { Color = false, Immediate = false };
+            log.Write("3");
+            log.Flush();
+            log.Write("4");
+            Console.ReadLine();
         }
     }
 }
