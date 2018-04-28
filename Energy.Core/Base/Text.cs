@@ -89,6 +89,12 @@ namespace Energy.Base
             return Surround(value, delimiter, null);
         }
 
+        /// <summary>
+        /// Repeat string pattern to specified amount of characters length.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string Texture(string pattern, int size)
         {
             if (string.IsNullOrEmpty(pattern))
@@ -97,7 +103,9 @@ namespace Energy.Base
                 return pattern;
             if (size < pattern.Length)
                 return pattern.Substring(0, size);
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            if (pattern.Length == 1)
+                return new string(pattern[0], size);
+            System.Text.StringBuilder s = new System.Text.StringBuilder(size);
             while (s.Length < size)
                 s.Append(s.Length == 0 ? pattern : s.ToString());
             if (s.Length == size)
@@ -601,36 +609,85 @@ namespace Energy.Base
 
         #endregion
 
-        #region Naming convention
+        #region Case
 
         /// <summary>
-        /// Capitalize string by uppercasing the first letter,
-        /// remaining the rest unchanged
+        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
         /// </summary>
-        /// <remarks>
-        /// You will want to call String.ToLower() before
-        /// calling this method
-        /// </remarks>
         /// <param name="word">Word</param>
         /// <returns>Word</returns>
         public static string UppercaseFirst(string word)
         {
             if (string.IsNullOrEmpty(word))
                 return word;
-            if (word.Length == 0)
+            if (word.Length == 1)
                 return char.ToUpperInvariant(word[0]).ToString();
             return string.Concat(char.ToUpperInvariant(word[0])
                 , word.Substring(1).ToLowerInvariant());
         }
 
         /// <summary>
-        /// Return words as a string separated with hyphen character
+        /// Upper case conversion for string array.
+        /// </summary>
+        /// <param name="words">Words list</param>
+        /// <returns>Words list</returns>
+        public static string[] Uppercase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return words;
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (null == words[i])
+                    continue;
+                words[i] = words[i].ToUpperInvariant();
+            }
+            return words;
+        }
+
+        /// <summary>
+        /// Lower case conversion for string array.
+        /// </summary>
+        /// <param name="words">Words list</param>
+        /// <returns>Words list</returns>
+        public static string[] Lowercase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return words;
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (null == words[i])
+                    continue;
+                words[i] = words[i].ToLowerInvariant();
+            }
+            return words;
+        }
+
+        #endregion
+
+        #region Naming convention
+
+        /// <summary>
+        /// Return words lower case, separated with hyphen character.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
         public static string HyphenCase(string[] words)
         {
-            return string.Join("-", words);
+            if (words == null || words.Length == 0)
+                return "";
+            return string.Join("-", Lowercase(words));
+        }
+
+        /// <summary>
+        /// Return words lower case, separated with hyphen character.
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string SnakeCase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return "";
+            return string.Join("-", Lowercase(words));
         }
 
         /// <summary>
