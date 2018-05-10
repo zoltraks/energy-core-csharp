@@ -20,7 +20,7 @@ namespace Energy.Enumeration
         All,
 
         /// <summary>
-        /// Only one element need to be resolved
+        /// Only one element needs to be resolved
         /// </summary>
         One,
 

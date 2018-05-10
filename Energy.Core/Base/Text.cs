@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -115,6 +116,164 @@ namespace Energy.Base
         {
             return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
+
+        #region Check
+
+        public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            switch (matchStyle)
+            {
+                default:
+                    return false;
+                case MatchStyle.All:
+                    return CheckAll(input, matchMode, ignoreCase, filters);
+                case MatchStyle.Not:
+                    return CheckNot(input, matchMode, ignoreCase, filters);
+                case MatchStyle.Any:
+                    return CheckAny(input, matchMode, ignoreCase, filters);
+                case MatchStyle.One:
+                    return CheckOne(input, matchMode, ignoreCase, filters);
+            }
+        }
+
+        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (!Check(input, matchMode, ignoreCase, filter))
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            bool found = false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                {
+                    if (found)
+                        return false;
+                    else
+                        found = true;
+                }
+            }
+            return found;
+        }
+
+
+        public static bool Check(string input, MatchMode matchMode, bool ignoreCase, string filter)
+        {
+            if (input == null || filter == null)
+                return false;
+
+            switch (matchMode)
+            {
+                default:
+                case MatchMode.None:
+                    return false;
+                case MatchMode.Same:
+                    return CheckSame(input, filter, ignoreCase);
+                case MatchMode.Simple:
+                    return CheckSimple(input, filter, ignoreCase);
+                case MatchMode.Regex:
+                    return CheckRegex(input, filter, ignoreCase);
+                case MatchMode.Wild:
+                    return CheckWild(input, filter, ignoreCase);
+            }
+        }
+
+        [Energy.Attribute.Code.Wrapper]
+        public static bool CheckRegex(string input, string pattern, RegexOptions options)
+        {
+            try
+            {
+                return Regex.Match(input, pattern, options).Success;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Catch(exception);
+                return false;
+            }
+        }
+
+        public static bool CheckRegex(string input, string pattern, bool ignoreCase)
+        {
+            RegexOptions options = RegexOptions.CultureInvariant;
+            if (ignoreCase)
+                options |= RegexOptions.IgnoreCase;
+            return CheckRegex(input, pattern, options);
+        }
+
+
+        public static bool CheckWild(string input, string pattern, bool ignoreCase)
+        {
+            RegexOptions options = RegexOptions.CultureInvariant;
+            if (ignoreCase)
+                options |= RegexOptions.IgnoreCase;
+            return CheckRegex(input, pattern, options);
+        }
+
+        public static bool CheckSame(string input, string filter, bool ignoreCase)
+        {
+            return 0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        public static bool CheckSimple(string input, string filter, bool ignoreCase)
+        {
+            if (0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture))
+                return true;
+            if (!ignoreCase)
+            {
+                return input.StartsWith(filter) || input.EndsWith(filter);
+            }
+            else
+            {
+                string insensitiveInput = input.ToUpperInvariant();
+                string insensitiveFilter = filter.ToUpperInvariant();
+                if (insensitiveInput.StartsWith(insensitiveFilter))
+                    return true;
+                else if (insensitiveInput.EndsWith(insensitiveFilter))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        #endregion
 
         #region Join
 
@@ -624,7 +783,17 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return words as a string separated with hyphen character
+        /// Return words as a string separated with dash (hyphen minus) character
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string DashCase(string[] words)
+        {
+            return string.Join("-", words);
+        }
+
+        /// <summary>
+        /// Return words as a string separated with hyphen minus (dash) character
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
@@ -682,6 +851,31 @@ namespace Energy.Base
                     words[i] = UppercaseFirst(words[i]);
             }
             return string.Join("", words);
+        }
+
+        /// <summary>
+        /// Convert PascalCase to dash-case
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string PascalCaseToDashCase(string name)
+        {
+            string pattern = @"[A-Z]{2,}|[A-Z][^A-Z\s]*";
+            MatchCollection matches = Regex.Matches(name, pattern);
+            List<string> pieces = new List<string>();
+            foreach (Match match in matches)
+            {
+                string value = match.Value;
+                if (string.IsNullOrEmpty(value))
+                    continue;
+                value = value.Trim();
+                if (value == "")
+                    continue;
+                pieces.Add(value);
+            }
+            string text = string.Join("-", pieces.ToArray());
+            text = text.ToLowerInvariant();
+            return text;
         }
 
         #endregion
