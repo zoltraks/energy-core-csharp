@@ -8,7 +8,7 @@ namespace Energy.Core
 {
     public class Information
     {
-        public static string GetAssemblyDirectory(Assembly assembly)
+        public static string GetAssemblyDirectory(System.Reflection.Assembly assembly)
         {
             string codeBase = assembly.CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);

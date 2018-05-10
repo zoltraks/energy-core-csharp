@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Diagnostics;
 
 namespace Energy.Core
@@ -45,7 +44,7 @@ namespace Energy.Core
 #if (!NETSTANDARD)
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
-        public void Set(Assembly assembly)
+        public void Set(System.Reflection.Assembly assembly)
         {
             Product = GetProduct(assembly);
             Compilation = GetCompilation(assembly);
@@ -61,7 +60,7 @@ namespace Energy.Core
 #if (!NETSTANDARD)
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
-        public static string GetProduct(Assembly assembly)
+        public static string GetProduct(System.Reflection.Assembly assembly)
         {
             try
             {
@@ -78,7 +77,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
         /// <returns>string</returns>
-        public static string GetCompilation(Assembly assembly)
+        public static string GetCompilation(System.Reflection.Assembly assembly)
         {
             try
             {
@@ -140,7 +139,7 @@ namespace Energy.Core
             {
                 if (_LibraryProduct == null)
                 {
-                    _LibraryProduct = GetProduct(Assembly.GetExecutingAssembly());
+                    _LibraryProduct = GetProduct(System.Reflection.Assembly.GetExecutingAssembly());
                 }
                 return _LibraryProduct;
             }
@@ -158,7 +157,7 @@ namespace Energy.Core
             {
                 if (_LibraryCompilation == null)
                 {
-                    _LibraryCompilation = GetCompilation(Assembly.GetExecutingAssembly());
+                    _LibraryCompilation = GetCompilation(System.Reflection.Assembly.GetExecutingAssembly());
                 }
                 return _LibraryCompilation;
             }
