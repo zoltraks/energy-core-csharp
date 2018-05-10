@@ -44,5 +44,55 @@ namespace Energy.Core.Test.Base
                 Assert.AreSame(System.Text.Encoding.BigEndianUnicode, encoding, $"Test for {ucs2be}");
             }
         }
+
+        [TestMethod]
+        public void TextCheck()
+        {
+            string inputText = "555-12345678-123";
+            string filterText1 = "555-";
+            string filterText2 = "-123";
+            string filterText3 = "666";
+            bool ignoreCase = false;
+            bool check;
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2, filterText3);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText3, filterText2);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2, filterText3);
+            Assert.AreEqual(false, check);
+
+            string[] filterArray1 = new string[] { filterText1, filterText2, };
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterArray1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterArray1);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterArray1);
+            Assert.AreEqual(false, check);
+
+            string filterText4 = "[1-9]{9}";
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Regex, ignoreCase, filterText4);
+            Assert.AreEqual(false, check);
+
+            string filterText5 = "[1-9]{8}";
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Regex, ignoreCase, filterText5);
+            Assert.AreEqual(true, check);
+        }
     }
 }
