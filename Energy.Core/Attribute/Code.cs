@@ -54,7 +54,6 @@ namespace Energy.Attribute
             }
         }
 
-
         /// <summary>
         /// Code is probably misplaced and should exist in another location
         /// </summary>
@@ -322,6 +321,94 @@ namespace Energy.Attribute
                 : this(description)
             {
                 this.help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code safety warning
+        /// </summary>
+        public class SafetyAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private bool error;
+
+            /// <summary>
+            /// Treat as error
+            /// </summary>
+            public bool Error { get { return error; } set { error = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public SafetyAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public SafetyAttribute(string description)
+                : this()
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="error"></param>
+            public SafetyAttribute(bool error)
+                : this()
+            {
+                this.error = error;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public SafetyAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="error"></param>
+            public SafetyAttribute(string description, bool error)
+                : this(description)
+            {
+                this.error = error;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            /// <param name="error"></param>
+            public SafetyAttribute(string description, string help, bool error)
+                : this(description, help)
+            {
+                this.error = error;
             }
         }
     }
