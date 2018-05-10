@@ -136,7 +136,7 @@ namespace Energy.Base
             }
         }
 
-        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
                 return false;
@@ -148,7 +148,7 @@ namespace Energy.Base
             return false;
         }
 
-        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
                 return false;
@@ -160,7 +160,7 @@ namespace Energy.Base
             return true;
         }
 
-        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
                 return false;
@@ -172,7 +172,7 @@ namespace Energy.Base
             return true;
         }
 
-        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
                 return false;
@@ -189,7 +189,6 @@ namespace Energy.Base
             }
             return found;
         }
-
 
         public static bool Check(string input, MatchMode matchMode, bool ignoreCase, string filter)
         {
