@@ -473,7 +473,6 @@ namespace Energy.Base
             return l;
         }
 
-
         #region Class information
 
         /// <summary>
@@ -661,6 +660,41 @@ namespace Energy.Base
                 Energy.Base.Class.Information information = Energy.Base.Class.Information.Create(type);
                 _Information[type] = information;
             }
+        }
+
+        #endregion
+
+        #region Assembly management
+
+        /// <summary>
+        /// Get list of assemblies of current application domain
+        /// </summary>
+        /// <returns></returns>
+        public static System.Reflection.Assembly[] GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies();
+        }
+
+        /// <summary>
+        /// Get list of assemblies of current application domain filtered...
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public static System.Reflection.Assembly[] GetAssemblies(params string[] filters)
+        {
+            List<System.Reflection.Assembly> list = new List<System.Reflection.Assembly>();
+            bool ignoreCase = true;
+            foreach (System.Reflection.Assembly assembly in GetAssemblies())
+            {
+                string needle = assembly.FullName;
+                bool check = Energy.Base.Text.Check(needle
+                    , Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, ignoreCase
+                    , filters);
+                if (!check)
+                    continue;
+                list.Add(assembly);
+            }
+            return list.ToArray();
         }
 
         #endregion
