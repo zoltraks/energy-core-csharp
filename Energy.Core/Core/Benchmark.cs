@@ -7,10 +7,16 @@ namespace Energy.Core
 {
     public class Benchmark
     {
+        #region Action
+
         /// <summary>
         /// Test function delegate
         /// </summary>
         public delegate void Action();
+
+        #endregion
+
+        #region Result
 
         public class Result
         {
@@ -93,6 +99,10 @@ namespace Energy.Core
                 return ToString(true, Format);
             }
         }
+
+        #endregion
+
+        #region Profile
 
         /// <summary>
         /// Profile function
@@ -195,16 +205,99 @@ namespace Energy.Core
             return Profile(function, 1, 0);
         }
 
-        [System.AttributeUsage(System.AttributeTargets.Parameter)]
-        public class Description : System.Attribute
-        {
-            private string description;
-            public double version;
+        #endregion
 
-            public Description(string description)
+        #region TimeMeasurement
+
+        public class TimeMeasurement: IDisposable
+        {
+            public static class Default
             {
-                this.description = description;
+                public static string OutputFormat = "{0}";
+
+                public static int TimePrecision = 6;
+            }
+
+            public bool Console;
+
+            public string Format;
+
+            public DateTime Begin;
+
+            public DateTime Finish;
+
+            public int TimePrecision;
+
+            public TimeMeasurement()
+            {
+                TimePrecision = -1;
+            }
+
+            public TimeMeasurement(bool console)
+                : this()
+            {
+                Console = console;
+            }
+
+            public TimeMeasurement(bool console, string format)
+                : this(console)
+            {
+                Format = format;
+            }
+
+            public void Dispose()
+            {
+                Stop();
+
+                string format = Format;
+                if (string.IsNullOrEmpty(format))
+                    format = Default.OutputFormat;
+                TimeSpan span = Finish - Begin;
+                string timeString = Energy.Base.Cast.DoubleToString(span.TotalSeconds, TimePrecision);
+                string message = string.Format(format, timeString);
+                
+                if (Console)
+                {
+                    System.Console.WriteLine(message);
+                }
+
+                Energy.Core.Bug.Write(message);
+            }
+
+            public TimeMeasurement Start()
+            {
+                Begin = DateTime.Now;
+                Finish = DateTime.MinValue;
+                return this;
+            }
+
+            public TimeMeasurement Stop()
+            {
+                if (Finish == DateTime.MinValue)
+                    Finish = DateTime.Now;
+                return this;
             }
         }
+
+        #endregion
+
+        #region Time
+
+        public static TimeMeasurement Time(bool console, string format)
+        {
+            return (new TimeMeasurement(console, format)).Start();
+        }
+
+        public static TimeMeasurement Time(bool console)
+        {
+            return (new TimeMeasurement(console)).Start();
+        }
+
+        public static TimeMeasurement Time()
+        {
+            return (new TimeMeasurement()).Start();
+        }
+
+        #endregion
     }
 }
