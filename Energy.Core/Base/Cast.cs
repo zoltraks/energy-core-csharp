@@ -209,20 +209,6 @@ namespace Energy.Base
             return (T)Energy.Base.Cast.StringToEnum(value, typeof(T));
         }
 
-        /// <summary>
-        /// Convert double value to invariant string.
-        /// </summary>
-        /// <param name="value">Number</param>
-        /// <param name="precision">Precision</param>
-        /// <param name="trim">Trim zeroes from end</param>
-        /// <param name="culture">InvariantCulture by default, that means 1234.56 instead of 1'234,56.</param>
-        /// <returns>String</returns>
-        public static string DoubleToString(double value, int precision, bool trim, CultureInfo culture)
-        {
-            string text = DoubleToString(value, precision, culture);
-            return trim ? text.TrimEnd('0').TrimEnd('.') : text;
-        }
-
         #endregion
 
         #region Class
@@ -338,6 +324,34 @@ namespace Energy.Base
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        #endregion
+
+        #region Char
+
+        /// <summary>
+        /// Get first character from a string without exception
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static char StringToChar(string value)
+        {
+            return string.IsNullOrEmpty(value) ? '\0' : value[0];
+        }
+
+        /// <summary>
+        /// Get character from a string without exception
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        private static char StringToChar(string value, int position)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= position)
+                return '\0';
+            else
+                return value[position];
         }
 
         #endregion
@@ -523,6 +537,35 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert double value to invariant string
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="trim">Trim trailing zeros from fractional part</param>
+        /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
+        /// <returns>String</returns>
+        public static string DoubleToString(double value, int precision, bool trim, System.Globalization.CultureInfo culture)
+        {
+            // HACK: Missing "??=" operator :-)
+            //culture ??= System.Globalization.CultureInfo.InvariantCulture;
+            culture = culture ?? System.Globalization.CultureInfo.InvariantCulture;
+            if (precision < 1)
+            {
+                return value.ToString(culture);
+            }
+            else
+            {
+                string result = value.ToString("0." + new String('0', precision), culture);
+                if (trim)
+                {
+                    char point = Energy.Base.Cast.StringToChar(culture.NumberFormat.NumberDecimalSeparator);
+                    result = result.TrimEnd('0').TrimEnd(point);
+                }
+                return result;
+            }
+        }
+
+        /// <summary>
         /// Convert floating value to invariant string
         /// </summary>
         /// <param name="value">double</param>
@@ -551,17 +594,7 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string DoubleToString(double value, int precision, System.Globalization.CultureInfo culture)
         {
-            // HACK: Missing "??=" operator :-)
-            //culture ??= System.Globalization.CultureInfo.InvariantCulture;
-            culture = culture ?? System.Globalization.CultureInfo.InvariantCulture;
-            if (precision < 1)
-            {
-                return value.ToString(culture);
-            }
-            else
-            {
-                return value.ToString("0." + new String('0', precision), culture);
-            }
+            return DoubleToString(value, precision, false, culture);
         }
 
         /// <summary>
@@ -572,7 +605,19 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string DoubleToString(double value, int precision)
         {
-            return DoubleToString(value, precision, null);
+            return DoubleToString(value, precision, false, null);
+        }
+
+        /// <summary>
+        /// Convert double value to invariant string.
+        /// </summary>
+        /// <param name="value">Number</param>
+        /// <param name="precision">Precision</param>
+        /// <param name="trim">Trim zeroes from end</param>
+        /// <returns>String</returns>
+        public static string DoubleToString(double value, int precision, bool trim)
+        {
+            return DoubleToString(value, precision, trim, CultureInfo.InvariantCulture);
         }
 
         #endregion
@@ -984,7 +1029,7 @@ namespace Energy.Base
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
-        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
         /// <returns>string</returns>
         public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
