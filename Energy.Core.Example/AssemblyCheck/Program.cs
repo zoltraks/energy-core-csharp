@@ -8,7 +8,10 @@ namespace AssemblyCheck
         {
             Console.WriteLine("Hello World!");
 
-            Test.GetAllAssemblies();
+            using (Energy.Core.Benchmark.Time(true))
+            {
+                Test.GetAllAssemblies();
+            }
 
             Console.ReadLine();
         }
