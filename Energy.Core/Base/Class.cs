@@ -663,5 +663,92 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Assembly management
+
+        /// <summary>
+        /// Get list of assemblies of current application domain
+        /// </summary>
+        /// <returns></returns>
+        public static System.Reflection.Assembly[] GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies();
+        }
+
+        /// <summary>
+        /// Get list of assemblies of current application domain filtered...
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public static System.Reflection.Assembly[] GetAssemblies(params string[] filters)
+        {
+            List<System.Reflection.Assembly> list = new List<System.Reflection.Assembly>();
+            bool ignoreCase = true;
+            foreach (System.Reflection.Assembly assembly in GetAssemblies())
+            {
+                string needle = assembly.FullName;
+                bool check = Energy.Base.Text.Check(needle
+                    , Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, ignoreCase
+                    , filters);
+                if (!check)
+                    continue;
+                list.Add(assembly);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Create string dictionary of assemblies by their short names
+        /// </summary>
+        /// <param name="assemblies"></param>
+        /// <returns></returns>
+        public static Energy.Base.Collection.StringDictionary<Assembly> CreateAssemblyDictionaryByShortName(Assembly[] assemblies)
+        {
+            if (assemblies == null) return null;
+            Energy.Base.Collection.StringDictionary<Assembly> dictionary = new Collection.StringDictionary<Assembly>();
+            string pattern = "[^,]+";
+            System.Text.RegularExpressions.RegexOptions options = System.Text.RegularExpressions.RegexOptions.None;
+            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(pattern, options);
+            foreach (Assembly assembly in assemblies)
+            {
+                string name = assembly.FullName;
+                System.Text.RegularExpressions.Match match = regex.Match(name);
+                if (match.Success)
+                {
+                    name = match.Value;
+                }
+                if (dictionary.ContainsKey(name))
+                {
+                    Energy.Core.Bug.Write("Assembly identified by " + name + " found more than one in a list");
+                    continue;
+                }
+                dictionary[name] = assembly;
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Create string dictionary of assemblies by their full names
+        /// </summary>
+        /// <param name="assemblies"></param>
+        /// <returns></returns>
+        public static Energy.Base.Collection.StringDictionary<Assembly> CreateAssemblyDictionaryByFullName(Assembly[] assemblies)
+        {
+            if (assemblies == null) return null;
+            Energy.Base.Collection.StringDictionary<Assembly> dictionary = new Collection.StringDictionary<Assembly>();
+            foreach (Assembly assembly in assemblies)
+            {
+                string name = assembly.FullName;
+                if (dictionary.ContainsKey(name))
+                {
+                    Energy.Core.Bug.Write("Assembly identified by " + name + " found more than one in a list");
+                    continue;
+                }
+                dictionary[name] = assembly;
+            }
+            return dictionary;
+        }
+
+        #endregion
     }
 }
