@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -718,11 +719,78 @@ namespace Energy.Base
                 }
                 return string.Join(Environment.NewLine, list.ToArray());
             }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching style and mode.
+            /// </summary>
+            /// <param name="matchStyle"></param>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public StringDictionary<T> Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                StringDictionary<T> dictionary = new StringDictionary<T>();
+                foreach (KeyValuePair<string, T> pair in this)
+                {
+                    if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
+                        continue;
+                    dictionary.Add(pair.Key, pair.Value);
+                }
+                return dictionary;
+            }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching mode.
+            /// </summary>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public StringDictionary<T> Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+            }
         }
 
         [Serializable]
         public class StringDictionary : StringDictionary<string>
         {
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching style and mode.
+            /// </summary>
+            /// <param name="matchStyle"></param>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public new StringDictionary Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                StringDictionary dictionary = new StringDictionary();
+                foreach (KeyValuePair<string, string> pair in this)
+                {
+                    if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
+                        continue;
+                    dictionary.Add(pair.Key, pair.Value);
+                }
+                return dictionary;
+            }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching mode.
+            /// </summary>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public new StringDictionary Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+            }
         }
 
         #endregion

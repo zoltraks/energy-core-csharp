@@ -473,7 +473,6 @@ namespace Energy.Base
             return l;
         }
 
-
         #region Class information
 
         /// <summary>
