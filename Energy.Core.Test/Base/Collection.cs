@@ -57,5 +57,33 @@ namespace Energy.Core.Test.Base
             Assert.IsNotNull(objectArray2);
             Assert.AreEqual(objectArray1.Length, objectArray2.Length);
         }
+
+        [TestMethod]
+        public void StringDictionaryFilter()
+        {
+            Energy.Base.Collection.StringDictionary x = new Energy.Base.Collection.StringDictionary();
+            x.Add("111-222-333", "111-222-333");
+            x.Add("111-88888888-333", "111-88888888-333");
+            x.Add("111-222", "111-222");
+            x.Add("555-ABC-XYZ", "555-ABC-XYZ");
+            x.Add("Ąę€", "Ąę€");
+
+            string[] filters;
+            Energy.Base.Collection.StringDictionary y;
+
+            filters = new string[] { "111-" };
+
+            y = x.Filter(Enumeration.MatchStyle.Any, Enumeration.MatchMode.Simple, true, filters);
+            Assert.AreEqual(3, y.Count);
+
+            filters = new string[]
+            {
+                "111-222"
+            };
+            y = x.Filter(Enumeration.MatchMode.Same, true, filters);
+            Assert.AreEqual(1, y.Count);
+            y = x.Filter(Enumeration.MatchMode.Simple, true, filters);
+            Assert.AreEqual(2, y.Count);
+        }
     }
 }
