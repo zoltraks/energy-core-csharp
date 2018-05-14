@@ -12,6 +12,12 @@ namespace AssemblyCheck
             Assembly[] assemblies = Energy.Base.Class.GetAssemblies();
             if (assemblies == null)
                 return;
+            WriteAssemblies(assemblies);
+            Energy.Base.Collection.StringDictionary<Assembly> dictionary = Energy.Base.Class.CreateAssemblyDictionaryByShortName(assemblies);
+        }
+
+        private static void WriteAssemblies(Assembly[] assemblies)
+        {
             foreach (Assembly assembly in assemblies)
             {
                 Console.WriteLine(assembly.CodeBase);
