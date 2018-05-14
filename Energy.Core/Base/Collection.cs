@@ -721,6 +721,34 @@ namespace Energy.Base
             }
 
             /// <summary>
+            /// Get array of keys
+            /// </summary>
+            /// <returns></returns>
+            public string[] GetKeyArray()
+            {
+                lock (_Lock)
+                {
+                    string[] array = new string[Count];
+                    this.Keys.CopyTo(array, 0);
+                    return array;
+                }
+            }
+
+            /// <summary>
+            /// Get array of values
+            /// </summary>
+            /// <returns></returns>
+            public T[] GetValueArray()
+            {
+                lock (_Lock)
+                {
+                    T[] array = new T[Count];
+                    this.Values.CopyTo(array, 0);
+                    return array;
+                }
+            }
+
+            /// <summary>
             /// Filter out dictionary by one or more filters
             /// using specified matching style and mode.
             /// </summary>
@@ -731,14 +759,17 @@ namespace Energy.Base
             /// <returns></returns>
             public StringDictionary<T> Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                StringDictionary<T> dictionary = new StringDictionary<T>();
-                foreach (KeyValuePair<string, T> pair in this)
+                lock (_Lock)
                 {
-                    if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
-                        continue;
-                    dictionary.Add(pair.Key, pair.Value);
+                    StringDictionary<T> dictionary = new StringDictionary<T>();
+                    foreach (KeyValuePair<string, T> pair in this)
+                    {
+                        if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
+                            continue;
+                        dictionary.Add(pair.Key, pair.Value);
+                    }
+                    return dictionary;
                 }
-                return dictionary;
             }
 
             /// <summary>
@@ -769,11 +800,10 @@ namespace Energy.Base
             /// <returns></returns>
             public new StringDictionary Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
             {
+                StringDictionary<string> filteredDictionary = base.Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
                 StringDictionary dictionary = new StringDictionary();
-                foreach (KeyValuePair<string, string> pair in this)
+                foreach (KeyValuePair<string, string> pair in filteredDictionary)
                 {
-                    if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
-                        continue;
                     dictionary.Add(pair.Key, pair.Value);
                 }
                 return dictionary;
