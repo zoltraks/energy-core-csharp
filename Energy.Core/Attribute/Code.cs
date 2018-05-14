@@ -79,6 +79,27 @@ namespace Energy.Attribute
             public MisplacedAttribute()
             {
             }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description">Description text</param>
+            public MisplacedAttribute(string description)
+                : this()
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description">Description text</param>
+            /// <param name="help">Help text</param>
+            public MisplacedAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
+            }
         }
 
         /// <summary>
@@ -409,6 +430,53 @@ namespace Energy.Attribute
                 : this(description, help)
             {
                 this.error = error;
+            }
+        }
+
+        /// <summary>
+        /// Code was originally used somewhere else
+        /// </summary>
+        public class OriginAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public OriginAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public OriginAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public OriginAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
             }
         }
     }
