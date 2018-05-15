@@ -54,7 +54,6 @@ namespace Energy.Attribute
             }
         }
 
-
         /// <summary>
         /// Code is probably misplaced and should exist in another location
         /// </summary>
@@ -79,6 +78,27 @@ namespace Energy.Attribute
             /// </summary>
             public MisplacedAttribute()
             {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description">Description text</param>
+            public MisplacedAttribute(string description)
+                : this()
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description">Description text</param>
+            /// <param name="help">Help text</param>
+            public MisplacedAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
             }
         }
 
@@ -182,11 +202,131 @@ namespace Energy.Attribute
             /// Constructor
             /// </summary>
             /// <param name="description"></param>
-            /// <param name="expected"></param>
-            public FutureAttribute(string description, string expected)
+            /// <param name="help"></param>
+            public FutureAttribute(string description, string help)
                 : this(description)
             {
+                this.expected = help;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            /// <param name="expected"></param>
+            public FutureAttribute(string description, string help, string expected)
+                : this(description, help)
+            {
                 this.expected = expected;
+            }
+        }
+
+        /// <summary>
+        /// Code needs some additional verification
+        /// </summary>
+        public class VerifyAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public VerifyAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public VerifyAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public VerifyAttribute(string description, string help)
+                : this(help)
+            {
+                this.help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code needs to be extended
+        /// </summary>
+        public class ExtendAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ExtendAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public ExtendAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public ExtendAttribute(string description, string help)
+                : this(help)
+            {
+                this.help = help;
             }
         }
 
@@ -319,6 +459,141 @@ namespace Energy.Attribute
             /// Constructor
             /// </summary>
             public AttentionAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code safety warning
+        /// </summary>
+        public class SafetyAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private bool error;
+
+            /// <summary>
+            /// Treat as error
+            /// </summary>
+            public bool Error { get { return error; } set { error = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public SafetyAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public SafetyAttribute(string description)
+                : this()
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="error"></param>
+            public SafetyAttribute(bool error)
+                : this()
+            {
+                this.error = error;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public SafetyAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="error"></param>
+            public SafetyAttribute(string description, bool error)
+                : this(description)
+            {
+                this.error = error;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            /// <param name="error"></param>
+            public SafetyAttribute(string description, string help, bool error)
+                : this(description, help)
+            {
+                this.error = error;
+            }
+        }
+
+        /// <summary>
+        /// Code was originally used somewhere else
+        /// </summary>
+        public class OriginAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public OriginAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public OriginAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public OriginAttribute(string description, string help)
                 : this(description)
             {
                 this.help = help;
