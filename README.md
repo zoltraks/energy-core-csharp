@@ -1,13 +1,9 @@
-
-Energy Core Library
-===================
-
-About
------
-
-**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. Designed for all purposes as a set of libraries compiled into one include file. No external dependencies (*almost*), available for main .NET platform versions. Including **.NET 2** or **Compact Framework** but also available for new **.NET Core** platform.
+**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. 
 
 Filled with radioactive rays and made with love for you...
+
+Designed for all purposes as a set of libraries compiled into one include file. No external dependencies (*almost*), available for main .NET platform versions. Including **.NET 2** or **Compact Framework** but also available for new **.NET Core** platform.
+
 
 Installation
 ------------
@@ -101,7 +97,6 @@ Library has been divided into several different namespaces. Following table brie
  - *Energy.Enumeration* - Enumerations
  - *Energy.Interface* - Interfaces
  - *Energy.Source* - Database connection
-
 
 History
 -------
