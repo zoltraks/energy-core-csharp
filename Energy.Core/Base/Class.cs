@@ -686,8 +686,8 @@ namespace Energy.Base
             bool ignoreCase = true;
             foreach (System.Reflection.Assembly assembly in GetAssemblies())
             {
-                string needle = assembly.FullName;
-                bool check = Energy.Base.Text.Check(needle
+                string input = assembly.FullName;
+                bool check = Energy.Base.Text.Check(input
                     , Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, ignoreCase
                     , filters);
                 if (!check)
@@ -702,7 +702,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static Energy.Base.Collection.StringDictionary<Assembly> CreateAssemblyDictionaryByShortName(Assembly[] assemblies)
+        public static Energy.Base.Collection.StringDictionary<Assembly> GetAssembliesDictionaryByShortName(Assembly[] assemblies)
         {
             if (assemblies == null) return null;
             Energy.Base.Collection.StringDictionary<Assembly> dictionary = new Collection.StringDictionary<Assembly>();
@@ -732,7 +732,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static Energy.Base.Collection.StringDictionary<Assembly> CreateAssemblyDictionaryByFullName(Assembly[] assemblies)
+        public static Energy.Base.Collection.StringDictionary<Assembly> GetAssembliesDictionaryByFullName(Assembly[] assemblies)
         {
             if (assemblies == null) return null;
             Energy.Base.Collection.StringDictionary<Assembly> dictionary = new Collection.StringDictionary<Assembly>();

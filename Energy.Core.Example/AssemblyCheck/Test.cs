@@ -14,7 +14,7 @@ namespace AssemblyCheck
                 return;
             WriteAssemblies(assemblies);
             Energy.Core.Tilde.WriteLine("~c~Filtering out only ~w~System.~c~ elements");
-            Energy.Base.Collection.StringDictionary<Assembly> dictionary = Energy.Base.Class.CreateAssemblyDictionaryByShortName(assemblies);
+            Energy.Base.Collection.StringDictionary<Assembly> dictionary = Energy.Base.Class.GetAssembliesDictionaryByShortName(assemblies);
             dictionary = dictionary.Filter(Energy.Enumeration.MatchMode.Simple, true, new string[] { "System." });
             WriteAssemblies(dictionary.GetValueArray());
         }
