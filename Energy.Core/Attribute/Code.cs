@@ -202,9 +202,21 @@ namespace Energy.Attribute
             /// Constructor
             /// </summary>
             /// <param name="description"></param>
-            /// <param name="expected"></param>
-            public FutureAttribute(string description, string expected)
+            /// <param name="help"></param>
+            public FutureAttribute(string description, string help)
                 : this(description)
+            {
+                this.expected = help;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            /// <param name="expected"></param>
+            public FutureAttribute(string description, string help, string expected)
+                : this(description, help)
             {
                 this.expected = expected;
             }
@@ -258,6 +270,60 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             /// <param name="help"></param>
             public VerifyAttribute(string description, string help)
+                : this(help)
+            {
+                this.help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code needs to be extended
+        /// </summary>
+        public class ExtendAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ExtendAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public ExtendAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public ExtendAttribute(string description, string help)
                 : this(help)
             {
                 this.help = help;
