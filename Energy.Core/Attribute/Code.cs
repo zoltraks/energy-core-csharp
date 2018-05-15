@@ -211,6 +211,60 @@ namespace Energy.Attribute
         }
 
         /// <summary>
+        /// Code needs some additional verification
+        /// </summary>
+        public class VerifyAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public VerifyAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public VerifyAttribute(string description)
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public VerifyAttribute(string description, string help)
+                : this(help)
+            {
+                this.help = help;
+            }
+        }
+
+        /// <summary>
         /// Code is a wrapper function whose purpose is to call another funtion
         /// </summary>
         public class WrapperAttribute : System.Attribute
