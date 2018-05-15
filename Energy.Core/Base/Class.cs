@@ -686,8 +686,8 @@ namespace Energy.Base
             bool ignoreCase = true;
             foreach (System.Reflection.Assembly assembly in GetAssemblies())
             {
-                string needle = assembly.FullName;
-                bool check = Energy.Base.Text.Check(needle
+                string input = assembly.FullName;
+                bool check = Energy.Base.Text.Check(input
                     , Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, ignoreCase
                     , filters);
                 if (!check)
