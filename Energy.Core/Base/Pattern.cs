@@ -48,5 +48,47 @@ namespace Energy.Base
                 }
             }
         }
+
+        /// <summary>
+        /// Singleton pattern
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public class Singleton<T>
+        {
+            private static T _Instance;
+
+            private readonly static object _InstanceLock = new object();
+
+            public T Instance
+            {
+                get
+                {
+                    return GetInstance();
+                }
+            }
+
+            public T GetInstance()
+            {
+                if (_Instance == null)
+                {
+                    lock (_InstanceLock)
+                    {
+                        if (_Instance == null)
+                        {
+                            try
+                            {
+                                _Instance = Activator.CreateInstance<T>();
+                                Energy.Core.Bug.Write("Singleton {0} created", typeof(T).FullName);
+                            }
+                            catch (Exception exception)
+                            {
+                                Energy.Core.Bug.Catch(exception);
+                            }
+                        }
+                    }
+                }
+                return _Instance;
+            }
+        }
     }
 }
