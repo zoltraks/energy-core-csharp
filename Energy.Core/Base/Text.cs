@@ -125,6 +125,30 @@ namespace Energy.Base
             return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
 
+        #region Is
+
+        /// <summary>
+        /// Check if string contains one of wild characters ("*" or "?")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsWild(string text)
+        {
+            return text.Contains("*") || text.Contains("?");
+        }
+
+        /// <summary>
+        /// Check if string contains one of characters used in LIKE ("%" or "_")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsLike(string text)
+        {
+            return text.Contains("%") || text.Contains("_");
+        }
+
+        #endregion
+
         #region Check
 
         public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
@@ -246,11 +270,12 @@ namespace Energy.Base
         }
 
 
-        public static bool CheckWild(string input, string pattern, bool ignoreCase)
+        public static bool CheckWild(string input, string wild, bool ignoreCase)
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
                 options |= RegexOptions.IgnoreCase;
+            string pattern = Energy.Base.Text.WildToRegex(wild);
             return CheckRegex(input, pattern, options);
         }
 
@@ -259,6 +284,13 @@ namespace Energy.Base
             return 0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Check if input string is equal or starts or ends with filter string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="filter"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
         public static bool CheckSimple(string input, string filter, bool ignoreCase)
         {
             if (0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture))
@@ -350,8 +382,6 @@ namespace Energy.Base
             return list.ToArray();
         }
 
-        #endregion
-
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
         /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special | New'|Other value".
@@ -423,6 +453,10 @@ namespace Energy.Base
             return null;
         }
 
+        #endregion
+
+        #region Convert
+
         /// <summary>
         /// Test function delegate
         /// </summary>
@@ -448,6 +482,8 @@ namespace Energy.Base
             }
             return a.ToArray();
         }
+
+        #endregion
 
         private static char GetMiddleStringPatternChar(string pattern)
         {
@@ -511,6 +547,8 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #region Limit
 
         /// <summary>
         /// Limit string to have maximum count of characters.
@@ -599,6 +637,10 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region Wild
+
         /// <summary>
         /// Convert text containing wild characters (?, *) to SQL like format (_, %).
         /// </summary>
@@ -621,10 +663,74 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert string containing wild characters (*, ?) into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
+        public static string WildToRegex(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    "\\", "\\\\",
+                    ".", "\\.",
+                    "(", "\\(",
+                    "?", ".",
+                    "*", ".*",
+                });
+
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
+
+        #endregion
+
+        #region Like
+
+        /// <summary>
+        /// Convert LIKE string into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
+        public static string LikeToRegex(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    ".", "\\.",
+                    "*", "\\*",
+                    "(", "\\(",
+                    "_", ".",
+                    "%", ".*",
+                    "?", ".",
+                    "*", ".*",
+                });
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
+
+        #endregion
+
+        /// <summary>
         /// Remove empty lines from string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
         public static string RemoveEmptyLines(string text)
         {
             if (string.IsNullOrEmpty(text))

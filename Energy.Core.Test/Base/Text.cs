@@ -93,6 +93,16 @@ namespace Energy.Core.Test.Base
             string filterText5 = "[1-9]{8}";
             check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Regex, ignoreCase, filterText5);
             Assert.AreEqual(true, check);
+
+            string filterText6 = "5?5-*";
+            Energy.Core.Bug.Write(filterText6);
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Wild, ignoreCase, filterText6);
+            Assert.AreEqual(true, check);
+
+            string filterText7 = "555?-*";
+            Energy.Core.Bug.Write(filterText7);
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Wild, ignoreCase, filterText7);
+            Assert.AreEqual(false, check);
         }
     }
 }
