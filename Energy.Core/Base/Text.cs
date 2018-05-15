@@ -615,6 +615,8 @@ namespace Energy.Base
             }
         }
 
+        #region Wild
+
         /// <summary>
         /// Convert text containing wild characters (?, *) to SQL like format (_, %).
         /// </summary>
@@ -642,7 +644,8 @@ namespace Energy.Base
         /// <param name="value">string</param>
         /// <param name="like">bool</param>
         /// <returns></returns>
-        [Energy.Attribute.Code.Future]
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
         public static string WildToRegex(string value, bool like)
         {
             if (!string.IsNullOrEmpty(value))
@@ -663,11 +666,17 @@ namespace Energy.Base
             return value;
         }
 
+        #endregion
+
+        #region Like
+
         /// <summary>
         /// Convert LIKE string into Regex pattern.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
         public static string LikeToRegex(string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -689,11 +698,15 @@ namespace Energy.Base
             }
             return value;
         }
+
+        #endregion
+
         /// <summary>
         /// Remove empty lines from string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
         public static string RemoveEmptyLines(string text)
         {
             if (string.IsNullOrEmpty(text))
