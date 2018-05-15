@@ -276,6 +276,13 @@ namespace Energy.Base
             return 0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Check if input string is equal or starts or ends with filter string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="filter"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
         public static bool CheckSimple(string input, string filter, bool ignoreCase)
         {
             if (0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture))
