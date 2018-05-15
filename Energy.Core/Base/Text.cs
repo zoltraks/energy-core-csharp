@@ -366,8 +366,6 @@ namespace Energy.Base
             return list.ToArray();
         }
 
-        #endregion
-
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
         /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special | New'|Other value".
@@ -439,6 +437,10 @@ namespace Energy.Base
             return null;
         }
 
+        #endregion
+
+        #region Convert
+
         /// <summary>
         /// Test function delegate
         /// </summary>
@@ -464,6 +466,8 @@ namespace Energy.Base
             }
             return a.ToArray();
         }
+
+        #endregion
 
         private static char GetMiddleStringPatternChar(string pattern)
         {
@@ -527,6 +531,8 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #region Limit
 
         /// <summary>
         /// Limit string to have maximum count of characters.
@@ -614,6 +620,8 @@ namespace Energy.Base
                 return text;
             }
         }
+
+        #endregion
 
         #region Wild
 
