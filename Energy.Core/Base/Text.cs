@@ -117,6 +117,30 @@ namespace Energy.Base
             return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
         }
 
+        #region Is
+
+        /// <summary>
+        /// Check if string contains one of wild characters ("*" or "?")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsWild(string text)
+        {
+            return text.Contains("*") || text.Contains("?");
+        }
+
+        /// <summary>
+        /// Check if string contains one of characters used in LIKE ("%" or "_")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsLike(string text)
+        {
+            return text.Contains("%") || text.Contains("_");
+        }
+
+        #endregion
+
         #region Check
 
         public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
@@ -612,6 +636,59 @@ namespace Energy.Base
             return text;
         }
 
+        /// <summary>
+        /// Convert string containing DOS wild characters into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="like">bool</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Future]
+        public static string WildToRegex(string value, bool like)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    ".", "\\.",
+                    "(", "\\(",
+                    "?", ".",
+                    "*", ".*",
+                });
+
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Convert LIKE string into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns></returns>
+        public static string LikeToRegex(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    ".", "\\.",
+                    "*", "\\*",
+                    "(", "\\(",
+                    "_", ".",
+                    "%", ".*",
+                    "?", ".",
+                    "*", ".*",
+                });
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
         /// <summary>
         /// Remove empty lines from string.
         /// </summary>
