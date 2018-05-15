@@ -262,11 +262,12 @@ namespace Energy.Base
         }
 
 
-        public static bool CheckWild(string input, string pattern, bool ignoreCase)
+        public static bool CheckWild(string input, string wild, bool ignoreCase)
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
                 options |= RegexOptions.IgnoreCase;
+            string pattern = Energy.Base.Text.WildToRegex(wild);
             return CheckRegex(input, pattern, options);
         }
 
@@ -647,19 +648,19 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert string containing DOS wild characters into Regex pattern.
+        /// Convert string containing wild characters (*, ?) into Regex pattern.
         /// </summary>
         /// <param name="value">string</param>
-        /// <param name="like">bool</param>
         /// <returns></returns>
         [Energy.Attribute.Code.Verify]
         [Energy.Attribute.Code.Extend]
-        public static string WildToRegex(string value, bool like)
+        public static string WildToRegex(string value)
         {
             if (!string.IsNullOrEmpty(value))
             {
                 List<string> tab = new List<string>();
                 tab.AddRange(new string[] {
+                    "\\", "\\\\",
                     ".", "\\.",
                     "(", "\\(",
                     "?", ".",
