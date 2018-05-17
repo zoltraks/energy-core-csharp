@@ -10,7 +10,7 @@ namespace Energy.Core
     {
         #region Configure
 
-        public static void ConfigureTcpSocket(Socket socket, int bufferSize = 8192)
+        public static void ConfigureTcpSocket(Socket socket, int bufferSize)
         {
             // Don't allow another socket to bind to this port.
             socket.ExclusiveAddressUse = true;
@@ -104,9 +104,23 @@ namespace Energy.Core
         #region SocketClient
 
         /// <summary>
-        /// Socket client
+        /// Client
         /// </summary>
+        [Energy.Attribute.Code.Future]
         public class SocketClient
+        {
+
+        }
+
+        #endregion
+
+        #region SocketServer
+
+        /// <summary>
+        /// Server
+        /// </summary>
+        [Energy.Attribute.Code.Future]
+        public class SocketServer
         {
 
         }
