@@ -10,6 +10,101 @@ namespace Energy.Core
     {
         #region Configure
 
+        /// <summary>
+        /// Return current socket configuration as array of strings.
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <returns></returns>
+        public static string[] GetSocketConfigurationStringArray(System.Net.Sockets.Socket socket)
+        {
+            List<string> list = new List<string>();
+            list.Add(string.Format("ReceiveBufferSize: {0}", socket.ReceiveBufferSize));
+            list.Add(string.Format("SendBufferSize: {0}", socket.SendBufferSize));
+            list.Add(string.Format("ReceiveTimeout: {0}", socket.ReceiveTimeout));
+            list.Add(string.Format("SendTimeout: {0}", socket.SendTimeout));
+            list.Add(string.Format("ExclusiveAddressUse: {0}", socket.ExclusiveAddressUse));
+            list.Add(string.Format("Ttl: {0}", socket.Ttl));
+            list.Add(string.Format("NoDelay: {0}", socket.NoDelay));
+            list.Add(string.Format("LingerState: {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
+            list.Add(string.Format("IsBound: {0}", socket.IsBound));
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Make configuration of System.Net.Sockets.Socket object.
+        /// </summary>
+        /// <param name="socket">System.Net.Sockets.Socket object</param>
+        /// <param name="buffer">Buffer size in bytes (typically 8192)</param>
+        /// <param name="timeout">Timeout in milliseconds (10000 for 10 seconds)</param>
+        /// <param name="exclusive">Don't allow another socket to bind to this port (should be true on server socket)</param>
+        /// <param name="ttl">TTL value indicates the maximum number of routers the packet can traverse before the router discards the packet</param>
+        /// <param name="linger">
+        /// Specifies behaviour when closing socket, possible values are:
+        /// negative number to disable (attempts to send pending data until the default IP protocol time-out expires),
+        /// zero (discards any pending data, for connection-oriented socket Winsock resets the connection), and
+        /// positive number of seconds (attempts to send pending data until the specified time-out expires, 
+        /// if the attempt fails, then Winsock resets the connection).
+        /// </param>
+        public static void ConfigureSocket(System.Net.Sockets.Socket socket, int buffer, int timeout, bool? exclusive, int? ttl, int? linger)
+        {
+            if (exclusive != null)
+            {
+                // Don't allow another socket to bind to this port
+                socket.ExclusiveAddressUse = (bool)exclusive;
+            }
+
+            if (linger != null)
+            {
+                // The socket will linger for specified amount of seconds after Socket.Close is called. 
+                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections 
+                // sitting in the TIME_WAIT state, tying up all the available resources on a server.
+                if (linger < 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(false, 0);
+                }
+                else if (linger == 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, 0);
+                }
+                else
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, (int)linger);
+                }
+            }
+
+            // Disable the Nagle Algorithm for this socket.
+            // Sets NO_DELAY option for this socket.
+            socket.NoDelay = true;
+
+            // Set the receive buffer size
+            socket.ReceiveBufferSize = buffer;
+
+            // Set the send buffer size
+            socket.SendBufferSize = buffer;
+
+            // Set the timeout for synchronous receive methods
+            socket.ReceiveTimeout = timeout;
+
+            // Set the timeout for synchronous send methods
+            socket.SendTimeout = timeout;
+
+            if (ttl != null)
+            {
+                // Set the Time To Live (TTL) to specified router hops
+                // or 42 by default.
+                if (ttl == 0)
+                {
+                    socket.Ttl = 42;
+                }
+                else
+                {
+                    socket.Ttl = (short)ttl;
+                }
+            }
+
+            Energy.Core.Bug.Write("Socket configured: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+        }
+
         public static void ConfigureTcpSocket(Socket socket, int bufferSize)
         {
             // Don't allow another socket to bind to this port.
@@ -27,7 +122,7 @@ namespace Energy.Core
 
             // Set the timeout for synchronous receive methods to
             // 1 second (1000 milliseconds.)
-            socket.ReceiveTimeout = 10000;
+            socket.ReceiveTimeout = 1000;
 
             // Set the send buffer size to 8k.
             socket.SendBufferSize = bufferSize;
