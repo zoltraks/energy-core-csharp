@@ -19,6 +19,8 @@ namespace Energy.Core
         /// </summary>
         public readonly static Energy.Base.Switch DebugOutputTime = true;
 
+        #region ExceptionMessage
+
         /// <summary>
         /// Return exception message
         /// </summary>
@@ -73,6 +75,10 @@ namespace Energy.Core
             return ExceptionMessage(exception, (bool)Trace);
         }
 
+        #endregion
+
+        #region CallingMethod
+
         /// <summary>
         /// Return calling method name
         /// </summary>
@@ -121,6 +127,11 @@ namespace Energy.Core
             return CallingMethod(1);
         }
 
+        #endregion
+
+        #region FormatDebugOutput
+
+        [Energy.Attribute.Code.Temporary("Should be named differently or moved somewhere else")]
         public static string FormatDebugOutput(string message)
         {
             if ((bool)DebugOutputTime)
@@ -130,6 +141,10 @@ namespace Energy.Core
             return message;
         }
 
+        #endregion
+
+        #region Catch
+
         /// <summary>
         /// Handle exception
         /// </summary>
@@ -137,12 +152,16 @@ namespace Energy.Core
         public static void Catch(Exception exception)
         {
             string message = ExceptionMessage(exception, true);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if (System.Diagnostics.Debugger.IsAttached)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             }
+            Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Error);
         }
+
+        #endregion
+
+        #region Write
 
         /// <summary>
         /// Write debug message
@@ -150,7 +169,10 @@ namespace Energy.Core
         /// <param name="message"></param>
         public static void Write(string message)
         {
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            }
             if ((bool)Trace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
@@ -165,12 +187,33 @@ namespace Energy.Core
         public static void Write(string format, params object[] args)
         {
             string message = string.Format(format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if (System.Diagnostics.Debugger.IsAttached)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+                if ((bool)Trace)
+                {
+                    Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                }
             }
         }
+
+        /// <summary>
+        /// Write debug message using delegated code if necessary
+        /// </summary>
+        /// <param name="function"></param>
+        public static void Write(Energy.Base.Anonymous.String function)
+        {
+            if (function == null)
+                return;
+            if (!System.Diagnostics.Debugger.IsAttached && !(bool)Trace)
+            {
+                return;
+            }
+            string message = function();
+            Write(message);
+        }
+
+        #endregion
 
         #region Trap
 
