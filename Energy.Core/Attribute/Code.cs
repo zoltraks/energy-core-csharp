@@ -223,6 +223,51 @@ namespace Energy.Attribute
         }
 
         /// <summary>
+        /// Code is bad
+        /// </summary>
+        public class BadAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BadAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BadAttribute(string description)
+                : this()
+            {
+                this.description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BadAttribute(string description, string help)
+                : this(description)
+            {
+                this.help = help;
+            }
+        }
+
+        /// <summary>
         /// Code needs some additional verification
         /// </summary>
         public class VerifyAttribute : System.Attribute
