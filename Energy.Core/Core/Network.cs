@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -308,9 +309,38 @@ namespace Energy.Core
         /// Server
         /// </summary>
         [Energy.Attribute.Code.Future]
-        public class SocketServer
+        public class SocketServer : Energy.Base.Abstract.Network.SocketServer
         {
+            public override int Port
+            {
+                get;
+                set;
+            }
 
+            private event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate _Receive;
+
+            public override event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate Receive
+            {
+                add
+                {
+                    _Receive += value;
+                }
+
+                remove
+                {
+                    _Receive -= value;
+                }
+            }
+
+            public override bool Send(byte[] data)
+            {
+                return false;
+            }
+
+            public override bool Listen()
+            {
+                return false;
+            }
         }
 
         #endregion
