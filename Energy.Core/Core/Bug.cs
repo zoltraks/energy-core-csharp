@@ -172,6 +172,21 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Write debug message
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        public static void WriteFormat(string format, params object[] args)
+        {
+            string message = string.Format(format, args);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)Trace)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
+        }
+
         #region Trap
 
         /// <summary>

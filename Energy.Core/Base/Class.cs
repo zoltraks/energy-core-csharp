@@ -698,7 +698,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Create string dictionary of assemblies by their short names
+        /// Create string dictionary of assemblies by their short names.
         /// </summary>
         /// <param name="assemblies"></param>
         /// <returns></returns>
@@ -728,7 +728,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Create string dictionary of assemblies by their full names
+        /// Create string dictionary of assemblies by their full names.
         /// </summary>
         /// <param name="assemblies"></param>
         /// <returns></returns>
@@ -745,6 +745,45 @@ namespace Energy.Base
                     continue;
                 }
                 dictionary[name] = assembly;
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Create string dictionary of short assembly name as key and version as value.
+        /// </summary>
+        /// <param name="assemblies"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> GetAssemblyVersionsDictionaryByShortName(System.Reflection.Assembly[] assemblies)
+        {
+            if (assemblies == null) return null;
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            string patternName = "[^,]+";
+            string patternVersion = "(?:^|[,\\s])(?:Version=)([^,\\s]+)";
+            System.Text.RegularExpressions.RegexOptions options = System.Text.RegularExpressions.RegexOptions.None;
+            System.Text.RegularExpressions.Regex regexName = new System.Text.RegularExpressions.Regex(patternName, options);
+            System.Text.RegularExpressions.Regex regexVersion = new System.Text.RegularExpressions.Regex(patternVersion, options);
+            foreach (System.Reflection.Assembly assembly in assemblies)
+            {
+                string name = assembly.FullName;
+                string version = "";
+                System.Text.RegularExpressions.Match match;
+                match = regexVersion.Match(name);
+                if (match.Success)
+                {
+                    version = match.Groups[1].Value;
+                }
+                match = regexName.Match(name);
+                if (match.Success)
+                {
+                    name = match.Value;
+                }
+                if (dictionary.ContainsKey(name))
+                {
+                    System.Diagnostics.Debug.WriteLine(Core.Clock.CurrentTime + " Assembly identified by " + name + " found more than one in a list");
+                    continue;
+                }
+                dictionary[name] = version;
             }
             return dictionary;
         }
