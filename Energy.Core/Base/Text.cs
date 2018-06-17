@@ -322,7 +322,7 @@ namespace Energy.Base
         /// <param name="with">Separator string</param>
         /// <param name="array">Parts to join</param>
         /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string JoinWith(string with, params string[] array)
+        public static string Join(string with, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             for (int i = 0; i < array.Length; i++)
@@ -334,7 +334,19 @@ namespace Energy.Base
                     continue;
                 list.Add(trim);
             }
-            return String.Join(with, list.ToArray());
+            return string.Join(with, list.ToArray());
+        }
+
+        /// <summary>
+        /// Join non empty strings into one list with separator
+        /// </summary>
+        /// <param name="with">Separator string</param>
+        /// <param name="array">Parts to join</param>
+        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
+        [Energy.Attribute.Code.Obsolete("Use shorter version Join()")]
+        public static string JoinWith(string with, params string[] array)
+        {
+            return Join(with, array);
         }
 
         #endregion
@@ -481,6 +493,26 @@ namespace Energy.Base
                 a.Add(action(array[i]));
             }
             return a.ToArray();
+        }
+
+        #endregion
+
+        #region Contains
+
+        /// <summary>
+        /// Check if object as string contains searched string.
+        /// </summary>
+        /// <param name="o">Object</param>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        public static bool Contains(object o, string search)
+        {
+            if (o == null)
+                return false;
+            string str = o as string;
+            if (str == null)
+                str = o.ToString();
+            return str.Contains(search);
         }
 
         #endregion
