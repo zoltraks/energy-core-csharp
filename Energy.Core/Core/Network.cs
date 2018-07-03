@@ -3,100 +3,289 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using Energy.Interface;
 
 namespace Energy.Core
 {
     public class Network
     {
+        #region Constant
+
+        public const int DEFAULT_SOCKET_TIMEOUT = 10000;
+
+        public const int DEFAULT_SOCKET_BUFFER_SIZE = 8192;
+
+        #endregion
+
+        #region Class
+
+        public class Class
+        {
+            public class Settings
+            {
+                public int SocketTimeout { get; set; }
+
+                public int SocketBufferSize { get; set; }
+
+                public Settings()
+                {
+                    SocketTimeout = DEFAULT_SOCKET_TIMEOUT;
+                    SocketBufferSize = DEFAULT_SOCKET_BUFFER_SIZE;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Settings
+
+        private static Class.Settings _Settings;
+        private static readonly object _SettingsLock = new object();
+        public static Class.Settings Settings
+        {
+            get
+            {
+                if (_Settings == null)
+                {
+                    lock (_SettingsLock)
+                    {
+                        if (_Settings == null)
+                        {
+                            _Settings = new Class.Settings();
+                        }
+                    }
+                }
+                return _Settings;
+            }
+        }
+
+        #endregion
+
         #region Configure
 
-        public static void ConfigureTcpSocket(Socket socket, int bufferSize = 8192)
+        /// <summary>
+        /// Return current socket configuration as array of strings.
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <returns></returns>
+        public static string[] GetSocketConfigurationStringArray(System.Net.Sockets.Socket socket)
         {
-            // Don't allow another socket to bind to this port.
-            socket.ExclusiveAddressUse = true;
+            List<string> list = new List<string>();
+            list.Add(string.Format("ReceiveBufferSize: {0}", socket.ReceiveBufferSize));
+            list.Add(string.Format("ReceiveTimeout: {0}", socket.ReceiveTimeout));
+            list.Add(string.Format("SendBufferSize: {0}", socket.SendBufferSize));
+            list.Add(string.Format("SendTimeout: {0}", socket.SendTimeout));
+            list.Add(string.Format("ExclusiveAddressUse: {0}", socket.ExclusiveAddressUse));
+            list.Add(string.Format("Ttl: {0}", socket.Ttl));
+            list.Add(string.Format("NoDelay: {0}", socket.NoDelay));
+            list.Add(string.Format("LingerState: {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
+            list.Add(string.Format("IsBound: {0}", socket.IsBound));
+            return list.ToArray();
+        }
 
-            // The socket will linger for 10 seconds after
-            // Socket.Close is called.
-            socket.LingerState = new LingerOption(true, 10);
+        /// <summary>
+        /// Return current socket configuration as array of strings.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        private static string[] GetSocketConfigurationStringArray(System.Net.Sockets.TcpClient client)
+        {
+            List<string> list = new List<string>();
+            list.Add(string.Format("ReceiveBufferSize: {0}", client.ReceiveBufferSize));
+            list.Add(string.Format("ReceiveTimeout: {0}", client.ReceiveTimeout));
+            list.Add(string.Format("SendBufferSize: {0}", client.SendBufferSize));
+            list.Add(string.Format("SendTimeout: {0}", client.SendTimeout));
+            list.Add(string.Format("ExclusiveAddressUse: {0}", client.ExclusiveAddressUse));
+            list.Add(string.Format("NoDelay: {0}", client.NoDelay));
+            list.Add(string.Format("LingerState: {0}, {1}", client.LingerState.Enabled, client.LingerState.LingerTime));
+            //list.Add(string.Format("Available: {0}", socket.Available));
+            return list.ToArray();
+        }
 
-            // Disable the Nagle Algorithm for this tcp socket.
+        /// <summary>
+        /// Make configuration of System.Net.Sockets.Socket object.
+        /// </summary>
+        /// <param name="socket">System.Net.Sockets.Socket object</param>
+        /// <param name="buffer">Buffer size in bytes (typically 8192)</param>
+        /// <param name="timeout">Timeout in milliseconds (10000 for 10 seconds)</param>
+        /// <param name="linger">
+        /// Specifies behaviour when closing socket, possible values are:
+        /// negative number to disable (attempts to send pending data until the default IP protocol time-out expires),
+        /// zero (discards any pending data, for connection-oriented socket Winsock resets the connection), and
+        /// positive number of seconds (attempts to send pending data until the specified time-out expires, 
+        /// if the attempt fails, then Winsock resets the connection).
+        /// </param>
+        /// <param name="ttl">TTL value indicates the maximum number of routers the packet can traverse before the router discards the packet</param>
+        /// <param name="exclusive">Don't allow another socket to bind to this port</param>
+        /// <returns>System.Net.Sockets.Socket object itself</returns>
+        public static System.Net.Sockets.Socket ConfigureSocket(System.Net.Sockets.Socket socket, int buffer, int timeout, int? linger, int? ttl, bool? exclusive)
+        {
+            if (exclusive != null)
+            {
+                // Don't allow another socket to bind to this port.
+                // Should be true unless special cases.
+                socket.ExclusiveAddressUse = (bool)exclusive;
+            }
+
+            if (linger != null)
+            {
+                // The socket will linger for specified amount of seconds after Socket.Close is called. 
+                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections 
+                // sitting in the TIME_WAIT state, tying up all the available resources on a server.
+                if (linger < 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(false, 0);
+                }
+                else if (linger == 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, 0);
+                }
+                else
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, (int)linger);
+                }
+            }
+
+            // Disable the Nagle Algorithm for this socket.
+            // Sets NO_DELAY option for this socket.
             socket.NoDelay = true;
 
-            // Set the receive buffer size to 8k
-            socket.ReceiveBufferSize = bufferSize;
+            // Set the receive buffer size
+            socket.ReceiveBufferSize = buffer;
 
-            // Set the timeout for synchronous receive methods to
-            // 1 second (1000 milliseconds.)
-            socket.ReceiveTimeout = 10000;
+            // Set the send buffer size
+            socket.SendBufferSize = buffer;
 
-            // Set the send buffer size to 8k.
-            socket.SendBufferSize = bufferSize;
+            // Set the timeout for synchronous receive methods
+            socket.ReceiveTimeout = timeout;
 
             // Set the timeout for synchronous send methods
-            // to 1 second (1000 milliseconds.)
-            socket.SendTimeout = 1000;
+            socket.SendTimeout = timeout;
 
-            // Set the Time To Live (TTL) to 42 router hops.
-            socket.Ttl = 42;
+            if (ttl != null)
+            {
+                // Set the Time To Live (TTL) to specified router hops
+                // or 42 by default.
+                if (ttl == 0)
+                {
+                    socket.Ttl = 42;
+                }
+                else
+                {
+                    socket.Ttl = (short)ttl;
+                }
+            }
 
-            System.Diagnostics.Debug.WriteLine("Tcp Socket configured:");
-            System.Diagnostics.Debug.WriteLine(string.Format("  ExclusiveAddressUse {0}", socket.ExclusiveAddressUse));
-            System.Diagnostics.Debug.WriteLine(string.Format("  LingerState {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
-            System.Diagnostics.Debug.WriteLine(string.Format("  NoDelay {0}", socket.NoDelay));
-            System.Diagnostics.Debug.WriteLine(string.Format("  ReceiveBufferSize {0}", socket.ReceiveBufferSize));
-            System.Diagnostics.Debug.WriteLine(string.Format("  ReceiveTimeout {0}", socket.ReceiveTimeout));
-            System.Diagnostics.Debug.WriteLine(string.Format("  SendBufferSize {0}", socket.SendBufferSize));
-            System.Diagnostics.Debug.WriteLine(string.Format("  SendTimeout {0}", socket.SendTimeout));
-            System.Diagnostics.Debug.WriteLine(string.Format("  Ttl {0}", socket.Ttl));
-            System.Diagnostics.Debug.WriteLine(string.Format("  IsBound {0}", socket.IsBound));
+            Energy.Core.Bug.Write("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+
+            return socket;
         }
 
-        public static void ConfigureTcpSocket(Socket socket)
+        /// <summary>
+        /// Make configuration of System.Net.Sockets.Socket object.
+        /// </summary>
+        /// <param name="socket">System.Net.Sockets.Socket object</param>
+        /// <param name="buffer">Buffer size in bytes (typically 8192)</param>
+        /// <param name="timeout">Timeout in milliseconds (10000 for 10 seconds)</param>
+        /// <param name="linger">Linger option</param>
+        /// <param name="ttl">Time To Live (TTL)</param>
+        /// <param name="exclusive">Don't allow another socket to bind to this port</param>
+        /// <returns>System.Net.Sockets.Socket object itself</returns>
+        public static System.Net.Sockets.TcpClient ConfigureTcpClient(System.Net.Sockets.TcpClient socket, int buffer, int timeout, int? ttl, int? linger, bool? exclusive)
         {
-            ConfigureTcpSocket(socket, 8192);
-        }
+            if (exclusive != null)
+            {
+                socket.ExclusiveAddressUse = (bool)exclusive;
+            }
 
-        public static void ConfigureTcpClient(TcpClient socket, int bufferSize)
-        {
-            // Don't allow another socket to bind to this port.
-            //socket.ExclusiveAddressUse = true;
+            if (linger != null)
+            {
+                if (linger < 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(false, 0);
+                }
+                else if (linger == 0)
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, 0);
+                }
+                else
+                {
+                    socket.LingerState = new System.Net.Sockets.LingerOption(true, (int)linger);
+                }
+            }
 
-            // The socket will linger for 10 seconds after
-            // Socket.Close is called.
-            socket.LingerState = new LingerOption(true, 10);
-
-            // Disable the Nagle Algorithm for this tcp socket.
             socket.NoDelay = true;
+            socket.ReceiveBufferSize = buffer;
+            socket.SendBufferSize = buffer;
+            socket.ReceiveTimeout = timeout;
+            socket.SendTimeout = timeout;
 
-            // Set the receive buffer size to 8k
-            socket.ReceiveBufferSize = bufferSize;
+            Energy.Core.Bug.Write("TcpClient configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
 
-            // Set the timeout for synchronous receive methods to
-            // 1 second (1000 milliseconds.)
-            socket.ReceiveTimeout = 1000;
-
-            // Set the send buffer size to 8k.
-            socket.SendBufferSize = bufferSize;
-
-            // Set the timeout for synchronous send methods
-            // to 1 second (1000 milliseconds.)
-            socket.SendTimeout = 1000;
-
-            // Set the Time To Live (TTL) to 42 router hops.
-
-            System.Diagnostics.Debug.WriteLine("Tcp Socket configured:");
-            System.Diagnostics.Debug.WriteLine(string.Format("  ExclusiveAddressUse {0}", socket.ExclusiveAddressUse));
-            System.Diagnostics.Debug.WriteLine(string.Format("  LingerState {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
-            System.Diagnostics.Debug.WriteLine(string.Format("  NoDelay {0}", socket.NoDelay));
-            System.Diagnostics.Debug.WriteLine(string.Format("  ReceiveBufferSize {0}", socket.ReceiveBufferSize));
-            System.Diagnostics.Debug.WriteLine(string.Format("  ReceiveTimeout {0}", socket.ReceiveTimeout));
-            System.Diagnostics.Debug.WriteLine(string.Format("  SendBufferSize {0}", socket.SendBufferSize));
-            System.Diagnostics.Debug.WriteLine(string.Format("  SendTimeout {0}", socket.SendTimeout));
+            return socket;
         }
 
-        public static void ConfigureTcpClient(TcpClient socket)
+        /// <summary>
+        /// Make configuration of socket. For more details look for full ConfigureSocket().
+        /// </summary>
+        /// <param name="socket">Socket object</param>
+        /// <param name="bufferSize">Buffer size in bytes (typically 8192)</param>
+        /// <param name="timeout">Timeout in milliseconds (10000 for 10 seconds)</param>
+        /// <param name="linger">Linger option</param>
+        /// <param name="ttl">Time To Live (TTL)</param>
+        /// <param name="exclusive">Don't allow another socket to bind to this port</param>
+        /// <returns>System.Net.Sockets.Socket object itself</returns>
+        public static System.Net.Sockets.TcpListener ConfigureTcpListener(System.Net.Sockets.TcpListener socket, int bufferSize, int timeout, int? ttl, int? linger, bool? exclusive)
         {
-            ConfigureTcpClient(socket, 8192);
+            ConfigureSocket(socket.Server, bufferSize, timeout, linger, ttl, exclusive);
+            return socket;
+        }
+
+        /// <summary>
+        /// Make configuration of System.Net.Sockets.Socket. For more details look for full ConfigureSocket().
+        /// </summary>
+        /// <param name="socket">Socket object</param>
+        /// <returns>System.Net.Sockets.Socket object itself</returns>
+        public static System.Net.Sockets.Socket ConfigureSocket(System.Net.Sockets.Socket socket)
+        {
+            return ConfigureSocket(socket, Settings.SocketBufferSize, Settings.SocketTimeout, null, null, null);
+        }
+
+        /// <summary>
+        /// Make configuration of System.Net.Sockets.TcpClient. For more details look for full ConfigureSocket().
+        /// </summary>
+        /// <param name="socket">Socket object</param>
+        /// <param name="bufferSize">Buffer size in bytes (typically 8192)</param>
+        /// <returns>System.Net.Sockets.Socket object itself</returns>
+        public static System.Net.Sockets.TcpClient ConfigureTcpClient(System.Net.Sockets.TcpClient socket, int bufferSize)
+        {
+            return ConfigureTcpClient(socket, bufferSize, Settings.SocketTimeout, null, null, null);
+        }
+
+        public static System.Net.Sockets.TcpClient ConfigureTcpClient(System.Net.Sockets.TcpClient socket, int bufferSize, int timeout)
+        {
+            return ConfigureTcpClient(socket, bufferSize, timeout, null, null, null);
+        }
+
+        public static System.Net.Sockets.TcpClient ConfigureTcpClient(TcpClient socket)
+        {
+            return ConfigureTcpClient(socket, Settings.SocketBufferSize, Settings.SocketTimeout, null, null, null);
+        }
+
+        [Energy.Attribute.Code.Obsolete]
+        public static System.Net.Sockets.Socket ConfigureTcpSocket(Socket socket, int bufferSize)
+        {
+            return ConfigureSocket(socket, Settings.SocketBufferSize, Settings.SocketTimeout, null, null, null);
+        }
+
+        public static System.Net.Sockets.Socket ConfigureSocket(Socket socket, int bufferSize)
+        {
+            return ConfigureSocket(socket, Settings.SocketBufferSize, Settings.SocketTimeout, null, null, null);
+        }
+
+        public static System.Net.Sockets.Socket ConfigureSocket(Socket socket, int bufferSize, int timeout)
+        {
+            return ConfigureSocket(socket, Settings.SocketBufferSize, timeout, null, null, null);
         }
 
         #endregion
@@ -104,11 +293,54 @@ namespace Energy.Core
         #region SocketClient
 
         /// <summary>
-        /// Socket client
+        /// Client
         /// </summary>
+        [Energy.Attribute.Code.Future]
         public class SocketClient
         {
 
+        }
+
+        #endregion
+
+        #region SocketServer
+
+        /// <summary>
+        /// Server
+        /// </summary>
+        [Energy.Attribute.Code.Future]
+        public class SocketServer : Energy.Base.Abstract.Network.SocketServer
+        {
+            public override int Port
+            {
+                get;
+                set;
+            }
+
+            private event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate _Receive;
+
+            public override event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate Receive
+            {
+                add
+                {
+                    _Receive += value;
+                }
+
+                remove
+                {
+                    _Receive -= value;
+                }
+            }
+
+            public override bool Send(byte[] data)
+            {
+                return false;
+            }
+
+            public override bool Listen()
+            {
+                return false;
+            }
         }
 
         #endregion

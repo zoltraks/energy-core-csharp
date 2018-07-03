@@ -6,6 +6,12 @@ namespace Energy.Base
 {
     public class Anonymous
     {
+        /// <summary>
+        /// Represents function that only output string
+        /// </summary>
+        /// <returns></returns>
+        public delegate string String();
+
         public delegate TOut Function<TIn, TOut>(TIn input);
 
         public delegate void Function<TIn>(TIn input);
