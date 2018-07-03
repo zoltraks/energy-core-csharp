@@ -1186,5 +1186,32 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Newline endings
+
+        /// <summary>
+        /// Convert newline delimiter to specified one
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="newLine"></param>
+        /// <returns></returns>
+        public static string ConvertNewLine(string text, string newLine)
+        {
+            Regex re = new Regex(@"\r\n|\r|\n");
+            text = re.Replace(text, newLine);
+            return text;
+        }
+
+        /// <summary>
+        /// Convert newline delimiter to environment default
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>string[]</returns>
+        public static string ConvertNewLine(string text)
+        {
+            return ConvertNewLine(text, Environment.NewLine);
+        }
+
+        #endregion
     }
 }
