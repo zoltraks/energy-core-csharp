@@ -780,7 +780,7 @@ namespace Energy.Base
                 }
                 if (dictionary.ContainsKey(name))
                 {
-                    System.Diagnostics.Debug.WriteLine(Core.Clock.CurrentTime + " Assembly identified by " + name + " found more than one in a list");
+                    System.Diagnostics.Debug.WriteLine(Energy.Base.Clock.CurrentTime + " Assembly identified by " + name + " found more than one in a list");
                     continue;
                 }
                 dictionary[name] = version;
