@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
-    public class Url
+    public class Url: Energy.Interface.ICopy<Url>
     {
         /// <summary>
         /// Scheme
@@ -223,6 +223,109 @@ namespace Energy.Base
                 url = url.Replace("{0}", value);
             }
             return url;
+        }
+
+        /// <summary>
+        /// Combine two URLs, overwriting all or only empty values with second one.
+        /// </summary>
+        /// <param name="url1"></param>
+        /// <param name="url2"></param>
+        /// <param name="overwrite">When overwrite is true, not null parameters from second object will always be overwritten. If not, only null and empty values will be overwritten.</param>
+        /// <returns></returns>
+        public static Url Combine(Url url1, Url url2, bool overwrite)
+        {
+            Url url0 = url1.Copy();
+            if (overwrite)
+            {
+                if (url2.Scheme != null)
+                    url0.Scheme = url2.Scheme;
+                if (url2.Host != null)
+                    url0.Host = url2.Host;
+                if (url2.Port != null)
+                    url0.Port = url2.Port;
+                if (url2.Path != null)
+                    url0.Path = url2.Path;
+                if (url2.Query != null)
+                    url0.Query = url2.Query;
+                if (url2.Fragment != null)
+                    url0.Fragment = url2.Fragment;
+                if (url2.User != null)
+                    url0.User = url2.User;
+                if (url2.Password != null)
+                    url0.Password = url2.Password;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(url0.Scheme) && url2.Scheme != null)
+                    url0.Scheme = url2.Scheme;
+                if (string.IsNullOrEmpty(url0.Host) && url2.Host != null)
+                    url0.Host = url2.Host;
+                if (string.IsNullOrEmpty(url0.Port) && url2.Port != null)
+                    url0.Port = url2.Port;
+                if (string.IsNullOrEmpty(url0.Path) && url2.Path != null)
+                    url0.Path = url2.Path;
+                if (string.IsNullOrEmpty(url0.Query) && url2.Query != null)
+                    url0.Query = url2.Query;
+                if (string.IsNullOrEmpty(url0.Fragment) && url2.Fragment != null)
+                    url0.Fragment = url2.Fragment;
+                if (string.IsNullOrEmpty(url0.User) && url2.User != null)
+                    url0.User = url2.User;
+                if (string.IsNullOrEmpty(url0.Password) && url2.Password != null)
+                    url0.Password = url2.Password;
+            }
+            return url0;
+        }
+
+        /// <summary>
+        /// Combine two URLs, overwriting empty values with second one.
+        /// </summary>
+        /// <param name="url1"></param>
+        /// <param name="url2"></param>
+        /// <returns></returns>
+        public static Url Combine(Url url1, Url url2)
+        {
+            return Combine(url1, url2, false);
+        }
+
+        /// <summary>
+        /// Combine with another URL, overwriting all or only empty values.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="overwrite">When overwrite is true, not null parameters from second object will always be overwritten. If not, only null and empty values will be overwritten.</param>
+        /// <returns></returns>
+        public Url Combine(Url url, bool overwrite)
+        {
+            return Combine(this, url, overwrite);
+        }
+
+        /// <summary>
+        /// Combine with another URL, overwriting empty values.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public Url Combine(Url url)
+        {
+            return Combine(this, url, false);
+        }
+
+        /// <summary>
+        /// Make a copy of object
+        /// </summary>
+        /// <returns></returns>
+        public Url Copy()
+        {
+            Url o = new Url()
+            {
+                Scheme = this.Scheme,
+                Host = this.Host,
+                Port = this.Port,
+                Path = this.Path,
+                Query = this.Query,
+                Fragment = this.Fragment,
+                User = this.User,
+                Password = this.Password,
+            };
+            return o;
         }
     }
 }
