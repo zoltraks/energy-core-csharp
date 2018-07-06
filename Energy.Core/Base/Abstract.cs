@@ -8,6 +8,10 @@ namespace Energy.Base
     {
         public class Network
         {
+            public delegate bool SendDelegate(byte[] data);
+
+            public delegate bool ReceiveDelegate(byte[] data);
+
             public abstract class SocketServer : Energy.Interface.ISocketServer
             {
                 public virtual int Port
@@ -16,9 +20,20 @@ namespace Energy.Base
                     set;
                 }
 
-                public delegate bool ReceiveDelegate(byte[] data);
+                public virtual event SendDelegate OnSend
+                {
+                    add
+                    {
+                        throw new NotImplementedException();
+                    }
 
-                public virtual event ReceiveDelegate Receive
+                    remove
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+
+                public virtual event ReceiveDelegate OnReceive
                 {
                     add
                     {
