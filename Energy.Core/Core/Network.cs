@@ -309,7 +309,7 @@ namespace Energy.Core
         /// Server
         /// </summary>
         [Energy.Attribute.Code.Future]
-        public class SocketServer : Energy.Base.Abstract.Network.SocketServer
+        public class SocketServer : Energy.Abstract.Network.SocketServer
         {
             public override int Port
             {
@@ -317,18 +317,33 @@ namespace Energy.Core
                 set;
             }
 
-            private event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate _Receive;
+            private event Energy.Abstract.Network.ReceiveDelegate _OnSend;
 
-            public override event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate Receive
+            public override event Energy.Abstract.Network.ReceiveDelegate OnSend
             {
                 add
                 {
-                    _Receive += value;
+                    _OnSend += value;
                 }
 
                 remove
                 {
-                    _Receive -= value;
+                    _OnSend -= value;
+                }
+            }
+
+            private event Energy.Abstract.Network.ReceiveDelegate _OnReceive;
+
+            public override event Energy.Abstract.Network.ReceiveDelegate OnReceive
+            {
+                add
+                {
+                    _OnReceive += value;
+                }
+
+                remove
+                {
+                    _OnReceive -= value;
                 }
             }
 

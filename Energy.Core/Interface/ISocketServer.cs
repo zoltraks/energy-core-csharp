@@ -12,8 +12,8 @@ namespace Energy.Interface
 
         bool Send(byte[] data);
 
-        event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate Receive;
+        event Energy.Abstract.Network.ReceiveDelegate OnSend;
 
-        //public bool SendAsync(byte[] data, )
+        event Energy.Abstract.Network.ReceiveDelegate OnReceive;
     }
 }
