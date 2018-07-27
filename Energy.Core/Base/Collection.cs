@@ -317,7 +317,7 @@ namespace Energy.Base
 
         #region StringArray
 
-        public class StringArray
+        public class StringArray: Energy.Interface.IStringList
         {
             private string[] _Array;
 
@@ -326,6 +326,14 @@ namespace Energy.Base
             public StringArray(string[] array)
             {
                 _Array = array;
+            }
+
+            public StringArray(List<string> list)
+            {
+                if (list != null)
+                {
+                    _Array = list.ToArray();
+                }
             }
 
             public int TotalLength
@@ -348,6 +356,51 @@ namespace Energy.Base
                     length += array[i].Length;
                 }
                 return length;
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <returns></returns>
+            public bool HasDuplicates()
+            {
+                return HasDuplicates(_Array, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public bool HasDuplicates(bool ignoreCase)
+            {
+                return HasDuplicates(_Array, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(string[] array, bool ignoreCase)
+            {
+                if (array == null || array.Length < 2)
+                    return false;
+
+                List<string> check = new List<string>();
+                for (int i = 0; i < array.Length - 1; i++)
+                {
+                    if (i > 0 && check.Count > 0 && check.Contains(array[i]))
+                        continue;
+                    for (int j = i + 1; j < array.Length; j++)
+                    {
+                        if (0 == string.Compare(array[i], array[j], ignoreCase))
+                            return true;
+                    }
+                    check.Add(array[i]);
+                }
+                return false;
             }
         }
 
@@ -827,7 +880,7 @@ namespace Energy.Base
 
         #region StringList
 
-        public class StringList : System.Collections.Generic.List<string>
+        public class StringList : System.Collections.Generic.List<string>, Energy.Interface.IStringList
         {
             public int TotalLength
             {
@@ -849,6 +902,51 @@ namespace Energy.Base
                     length += list[i].Length;
                 }
                 return length;
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <returns></returns>
+            public bool HasDuplicates()
+            {
+                return HasDuplicates(this, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public bool HasDuplicates(bool ignoreCase)
+            {
+                return HasDuplicates(this, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(System.Collections.Generic.List<string> array, bool ignoreCase)
+            {
+                if (array == null || array.Count < 2)
+                    return false;
+
+                List<string> check = new List<string>();
+                for (int i = 0; i < array.Count - 1; i++)
+                {
+                    if (i > 0 && check.Count > 0 && check.Contains(array[i]))
+                        continue;
+                    for (int j = i + 1; j < array.Count; j++)
+                    {
+                        if (0 == string.Compare(array[i], array[j], ignoreCase))
+                            return true;
+                    }
+                    check.Add(array[i]);
+                }
+                return false;
             }
         }
 
