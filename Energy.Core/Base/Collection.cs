@@ -317,7 +317,7 @@ namespace Energy.Base
 
         #region StringArray
 
-        public class StringArray: Energy.Interface.IStringList
+        public class StringArray : Energy.Interface.IStringList
         {
             private string[] _Array;
 
@@ -375,6 +375,16 @@ namespace Energy.Base
             public bool HasDuplicates(bool ignoreCase)
             {
                 return HasDuplicates(_Array, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(string[] array)
+            {
+                return HasDuplicates(array, false);
             }
 
             /// <summary>
@@ -472,7 +482,7 @@ namespace Energy.Base
 
             private string _XmlEscapeString = "_";
 
-            private readonly object _XmlSpecialCharacterLock = new object();       
+            private readonly object _XmlSpecialCharacterLock = new object();
 
             /// <summary>XmlSpecialCharacter</summary>
             public string XmlEscapeString { get { lock (_XmlSpecialCharacterLock) return _XmlEscapeString; } set { lock (_XmlSpecialCharacterLock) _XmlEscapeString = value; } }
@@ -921,6 +931,16 @@ namespace Energy.Base
             public bool HasDuplicates(bool ignoreCase)
             {
                 return HasDuplicates(this, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(System.Collections.Generic.List<string> array)
+            {
+                return HasDuplicates(array, false);
             }
 
             /// <summary>
