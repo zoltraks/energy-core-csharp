@@ -126,5 +126,18 @@ namespace Energy.Core.Test.Base
             compare = Energy.Base.Text.Compare(array, result, false);
             Assert.AreEqual(0, compare, "Uniquify error");
         }
+
+        [TestMethod]
+        public void TextChop()
+        {
+            string[] array;
+            array = new string[] { "A", "B", "C" };
+            string[] result;
+            result = new string[] { "B", "C" };
+            string chop;
+            chop = Energy.Base.Text.Chop(ref array);
+            Assert.AreEqual("A", chop);
+            Assert.AreEqual(0, Energy.Base.Text.Compare(array, result), chop);
+        }
     }
 }

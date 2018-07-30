@@ -122,7 +122,10 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
         {
-            return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            value = string.IsNullOrEmpty(value)
+                ? value
+                : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            return value;
         }
 
         #region Is
@@ -1338,16 +1341,16 @@ namespace Energy.Base
 
         #endregion
 
-            #region Compare
+        #region Compare
 
-            /// <summary>
-            /// Compare arrays of strings.
-            /// </summary>
-            /// <param name="array1"></param>
-            /// <param name="array2"></param>
-            /// <param name="ignoreCase"></param>
-            /// <returns></returns>
-            public static int Compare(string[] array1, string[] array2, bool ignoreCase)
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2, bool ignoreCase)
         {
             if (array1 == null && array2 == null)
                 return 0;
@@ -1366,6 +1369,59 @@ namespace Energy.Base
                     return c;
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2)
+        {
+            return Compare(array1, array2, false);
+        }
+
+        #endregion
+
+        #region Chop
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static T Chop<T>(ref T[] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            T first = array[0];
+            List<T> list = new List<T>(array.Length);
+            list.AddRange(array);
+            list.RemoveAt(0);
+            array = list.ToArray();
+            return first;
+
+        }
+
+        /// <summary>
+        /// Cut first element of string array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string Chop(ref string[] array)
+        {
+            return Chop<string>(ref array);
+        }
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static object Chop(ref object[] array)
+        {
+            return Chop<object>(ref array);
         }
 
         #endregion
