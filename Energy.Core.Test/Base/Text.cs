@@ -104,5 +104,27 @@ namespace Energy.Core.Test.Base
             check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Wild, ignoreCase, filterText7);
             Assert.AreEqual(false, check);
         }
+
+        [TestMethod]
+        public void TextUniquify()
+        {
+            string[] array;
+            array = new string[] { "A", "a", "A" };
+            string[] result;
+            result = Energy.Base.Text.Uniquify(array, true, 1, " - ");
+            int compare;
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreNotEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a - 1", "A - 2" };
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a", "A", "a:1", "a", "a:2", "a" };
+            result = Energy.Base.Text.Uniquify(array, false, 0, ":");
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreNotEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a", "A:0", "a:1", "a:0", "a:2", "a:3" };
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreEqual(0, compare, "Uniquify error");
+        }
     }
 }
