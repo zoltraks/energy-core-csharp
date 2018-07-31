@@ -54,9 +54,9 @@ namespace Energy.Base
 ";
 
         /// <summary>
-        /// Date pattern (year + month + day)
+        /// Date pattern for YYYY-MM-DD, DD-MM-YYYY, DD.MM.YYYY, MM/DD/YYYY or YYYY/MM/DD formats.
         /// </summary>
-        public static readonly string Date = @"(?<year>\d{4})\-(?<month>\d{1,2})\-(?<day>\d{1,2})|(?<day>\d{1,2})\-(?<month>\d{1,2})\-(?<year>\d{4})";
+        public static readonly string Date = @"(?<year>\d{4})\-(?<month>\d{1,2})\-(?<day>\d{1,2})|(?<day>\d{1,2})\-(?<month>\d{1,2})\-(?<year>\d{4})|(?<day>\d{1,2})\.(?<month>\d{1,2})\.(?<year>\d{4})|(?<month>\d{1,2})\/(?<day>\d{1,2})\/(?<year>\d{4})|(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2})";
 
         /// <summary>
         /// Time pattern (hour + minute + second + fraction)
