@@ -9,39 +9,11 @@ namespace Energy.Core
 {
     public class Network
     {
-        #region Constant
-
-        public const int DEFAULT_SOCKET_TIMEOUT = 10000;
-
-        public const int DEFAULT_SOCKET_BUFFER_SIZE = 8192;
-
-        #endregion
-
-        #region Class
-
-        public class Class
-        {
-            public class Settings
-            {
-                public int SocketTimeout { get; set; }
-
-                public int SocketBufferSize { get; set; }
-
-                public Settings()
-                {
-                    SocketTimeout = DEFAULT_SOCKET_TIMEOUT;
-                    SocketBufferSize = DEFAULT_SOCKET_BUFFER_SIZE;
-                }
-            }
-        }
-
-        #endregion
-
         #region Settings
 
-        private static Class.Settings _Settings;
+        private static Energy.Base.Network.Settings _Settings;
         private static readonly object _SettingsLock = new object();
-        public static Class.Settings Settings
+        public static Energy.Base.Network.Settings Settings
         {
             get
             {
@@ -51,7 +23,7 @@ namespace Energy.Core
                     {
                         if (_Settings == null)
                         {
-                            _Settings = new Class.Settings();
+                            _Settings = new Energy.Base.Network.Settings();
                         }
                     }
                 }
