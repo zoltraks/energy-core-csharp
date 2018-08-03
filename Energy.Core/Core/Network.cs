@@ -367,7 +367,7 @@ namespace Energy.Core
         public static int Ping(string address)
         {
             System.Net.NetworkInformation.IPStatus status;
-            return Ping(address, 30000, out status);
+            return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
 
         #endregion

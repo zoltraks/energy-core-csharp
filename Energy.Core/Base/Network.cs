@@ -16,6 +16,8 @@ namespace Energy.Base
 
         public const int DEFAULT_SOCKET_BUFFER_SIZE = 8192;
 
+        public const int DEFAULT_PING_TIMEOUT = 30000;
+
         #endregion
 
         #region Settings
