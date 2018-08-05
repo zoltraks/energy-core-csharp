@@ -20,17 +20,23 @@ namespace AsynchronousNetworkClient
             host = "127.0.0.1";
             int port = 9000;
 
+            string value;
+            int integer;
+
+            value = Energy.Core.Tilde.Ask("Host", host);
+            if (!string.IsNullOrEmpty(value))
+                host = value;
+
+            value = Energy.Core.Tilde.Ask("Port", port.ToString());
+            if (0 < (integer = Energy.Base.Cast.StringToInteger(value)))
+                port = integer;
+
             string address = Energy.Core.Network.GetHostAddress(host);
-            Energy.Core.Tilde.WriteLine($"~w~{address}");
+            Energy.Core.Tilde.WriteLine($"Trying to connect to ~w~{address}~0~:~y~{port}~0~ and start conversation...");
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-            // Create a TCP/IP socket.  
-            Socket client = new Socket((AddressFamily)Energy.Core.Network.GetAddressFamily(address),
-                SocketType.Stream, ProtocolType.Tcp);
-
             StateObject state = new StateObject();
-            state.Socket = client;
             state.ConnectionRepeat = -1;
             state.Host = host;
             state.Port = port;
@@ -55,14 +61,12 @@ namespace AsynchronousNetworkClient
                 // Complete the connection.  
                 socket.EndConnect(ar);
 
-                Energy.Core.Tilde.WriteLine("Socket connected to ~g~{0}",
-                    socket.RemoteEndPoint.ToString());
+                Energy.Core.Tilde.WriteLine("Socket connected to ~g~{0}", socket.RemoteEndPoint.ToString());
 
                 string text = "Hello\r\n";
-                // Convert the string data to byte data using ASCII encoding.  
-                byte[] data = Encoding.ASCII.GetBytes(text);
+                byte[] data = Encoding.UTF8.GetBytes(text);
 
-                // Begin sending the data to the remote device.  
+                // Begin sending the data to the remote
                 socket.BeginSend(data, 0, data.Length, 0,
                     new AsyncCallback(SendCallback), state);
             }
@@ -125,16 +129,16 @@ namespace AsynchronousNetworkClient
             {
                 Socket client = state.Socket;
 
-                // Complete sending the data to the remote device.  
+                // Complete sending the data to the remote
                 int bytesSent = client.EndSend(ar);
                 Energy.Core.Tilde.WriteLine("Sent ~w~{0}~0~ bytes to server", bytesSent);
 
                 int size = state.Capacity;
                 state.Buffer = new byte[size];
                 state.Stream = new MemoryStream(size);
-                // Begin receiving the data from the remote device.  
-                client.BeginReceive(state.Buffer, 0, size, 0,
-                    new AsyncCallback(ReceiveCallback), state);
+                // Begin receiving the data from the remote 
+                client.BeginReceive(state.Buffer, 0, size, SocketFlags.None
+                    , new AsyncCallback(ReceiveCallback), state);
             }
             catch (SocketException socketException)
             {
@@ -156,6 +160,7 @@ namespace AsynchronousNetworkClient
         private static void Connect(StateObject state)
         {
             Socket socket;
+            // Create a TCP/IP socket
             socket = new Socket(Energy.Core.Network.GetAddressFamily(state.Host)
                 , SocketType.Stream, ProtocolType.Tcp);
             state.Socket = socket;
@@ -169,10 +174,8 @@ namespace AsynchronousNetworkClient
             StateObject state = (StateObject)ar.AsyncState;
             try
             {
-                // Retrieve the state object and the client socket 
-                // from the asynchronous state object.
                 Socket client = state.Socket;
-                // Read data from the remote device.
+                // Read data from the remote
                 int bytesRead = client.EndReceive(ar);
                 Energy.Core.Tilde.WriteLine("Read ~w~{0}~0~ bytes from server", bytesRead);
 
@@ -190,37 +193,25 @@ namespace AsynchronousNetworkClient
 
                 byte[] data;
                 data = state.Stream.ToArray();
-                string text = "";
-                try
+                Energy.Core.Memory.Clear(state.Stream);
+
+                data = Parse(state, data);
+
+                if (data != null)
                 {
-                    text = Encoding.UTF8.GetString(data);
-                    text = text.Trim();
-                    if (text.Length > 0)
+                    if (data.Length == 0)
                     {
-                        text = "Repeat \"" + text + "\"";
+                        // Begin receiving the data from the remote 
+                        client.BeginReceive(state.Buffer, 0, state.Capacity, SocketFlags.None
+                            , new AsyncCallback(ReceiveCallback), state);
+                    }
+                    else
+                    {
+                        // Begin sending the data to the remote
+                        client.BeginSend(data, 0, data.Length, SocketFlags.None
+                            , new AsyncCallback(SendCallback), state);
                     }
                 }
-                catch (DecoderFallbackException exceptionDecoderFallback)
-                {
-                    text = exceptionDecoderFallback.Message;
-                }
-
-                if (text.Length == 0)
-                {
-                    Socket socket = state.Socket;
-                    socket.Shutdown(SocketShutdown.Both);
-                    socket.Close();
-                    Connect(state);
-                    return;
-                }
-
-                text += "\r\n";
-
-                data = Encoding.UTF8.GetBytes(text);
-
-                // Begin sending the data to the remote device.  
-                client.BeginSend(data, 0, data.Length, 0,
-                    new AsyncCallback(SendCallback), state);
             }
             catch (SocketException socketException)
             {
@@ -240,6 +231,39 @@ namespace AsynchronousNetworkClient
             {
                 Energy.Core.Tilde.Exception(e, true);
             }
+        }
+
+        private static byte[] Parse(StateObject state, byte[] data)
+        {
+            string text = "";
+            try
+            {
+                text = Encoding.UTF8.GetString(data);
+                text = text.Trim();
+                if (text.Length > 0)
+                {
+                    text = "Repeat \"" + text + "\"";
+                }
+            }
+            catch (DecoderFallbackException exceptionDecoderFallback)
+            {
+                text = exceptionDecoderFallback.Message;
+            }
+
+            if (text.Length == 0)
+            {
+                Socket socket = state.Socket;
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                Connect(state);
+                return null;
+            }
+
+            text += "\r\n";
+
+            data = Encoding.UTF8.GetBytes(text);
+
+            return data;
         }
     }
 }

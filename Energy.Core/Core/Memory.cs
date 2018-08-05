@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Energy.Core
@@ -28,6 +29,14 @@ namespace Energy.Core
             {
                 return 0;
             }
+        }
+
+        public static void Clear(MemoryStream stream)
+        {
+            byte[] buffer = stream.GetBuffer();
+            Array.Clear(buffer, 0, buffer.Length);
+            stream.Position = 0;
+            stream.SetLength(0);
         }
     }
 }
