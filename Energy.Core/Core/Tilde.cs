@@ -253,7 +253,7 @@ namespace Energy.Core
         /// <returns>Value entered or default if skipped</returns>
         public static string Ask(string question, string value)
         {
-            Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
+            Energy.Core.Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
             System.Console.ForegroundColor = System.ConsoleColor.Yellow;

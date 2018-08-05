@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Sockets;
 using System.Text;
 
 namespace Energy.Base
@@ -48,10 +49,12 @@ namespace Energy.Base
         public class Connection
         {
             [DefaultValue(null)]
-            public string Address { get; set; }
+            public string Host { get; set; }
 
             [DefaultValue(null)]
             public string Protocol { get; set; }
+
+            public ProtocolType Type { get; set; }
 
             [DefaultValue(0)]
             public int Port { get; set; }
