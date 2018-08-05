@@ -4,6 +4,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Energy.Interface;
+using System.Net;
 
 namespace Energy.Core
 {
@@ -29,6 +30,39 @@ namespace Energy.Core
                 }
                 return _Settings;
             }
+        }
+
+        #endregion
+
+        #region Utility
+
+        public static string GetHostAddress(string host)
+        {
+            try
+            {
+                IPAddress ipAddress;
+                if (!IPAddress.TryParse(host, out ipAddress))
+                {
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
+                    ipAddress = ipHostInfo.AddressList[0];
+                }
+                return ipAddress.ToString();
+            }
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch(socketException);
+                return null;
+            }
+        }
+
+        public static AddressFamily GetAddressFamily(string address)
+        {
+            IPAddress ipAddress = null;
+            if (IPAddress.TryParse(address, out ipAddress))
+            {
+                return ipAddress.AddressFamily;
+            }
+            return AddressFamily.Unknown;
         }
 
         #endregion
