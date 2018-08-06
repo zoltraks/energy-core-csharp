@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Energy.Abstract
@@ -12,6 +13,21 @@ namespace Energy.Abstract
         public delegate bool SendDelegate(byte[] data);
 
         public delegate bool ReceiveDelegate(byte[] data);
+
+        public abstract class SocketConnection : Energy.Interface.ISocketConnection
+        {
+            public event ReceiveDelegate OnReceive;
+
+            public event SendDelegate OnSend;
+        }
+
+        public abstract class SocketClient : Energy.Abstract.Network.SocketConnection, Energy.Interface.ISocketClient
+        {
+            public virtual bool Connect()
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         public abstract class SocketServer : Energy.Interface.ISocketServer, Energy.Interface.ISocketConnection
         {

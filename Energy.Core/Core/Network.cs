@@ -302,9 +302,12 @@ namespace Energy.Core
         /// Client
         /// </summary>
         [Energy.Attribute.Code.Future]
-        public class SocketClient
+        public class SocketClient : Energy.Abstract.Network.SocketClient
         {
-
+            public override bool Connect()
+            {
+                return base.Connect();
+            }
         }
 
         #endregion
