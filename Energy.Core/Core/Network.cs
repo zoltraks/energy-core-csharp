@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Energy.Interface;
 using System.Net;
+using Energy.Abstract;
+using System.IO;
 
 namespace Energy.Core
 {
@@ -292,6 +294,101 @@ namespace Energy.Core
         public static System.Net.Sockets.Socket ConfigureSocket(Socket socket, int bufferSize, int timeout)
         {
             return ConfigureSocket(socket, Settings.SocketBufferSize, timeout, null, null, null);
+        }
+
+        #endregion
+
+        #region SocketConnection
+
+        public class SocketConnection: Energy.Abstract.Network.SocketConnection
+        {
+            public class StateObject
+            {
+                public Socket Socket;
+
+                public int Capacity = 8192;
+
+                public byte[] Buffer;
+
+                public MemoryStream Stream;
+
+                public int Repeat;
+
+                public StateObject()
+                {
+                    Buffer = new byte[Capacity];
+                    Stream = new MemoryStream(Capacity);
+                }
+
+                public StateObject(int repeat): this()
+                {
+                    Repeat = repeat;
+                }
+            }
+
+            public volatile bool Active;
+
+            public int Repeat;
+
+            public StateObject State;
+
+            private int _Backlog = 100;
+            /// <summary>Backlog</summary>
+            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
+
+            public bool Listen()
+            {
+                string address;
+                address = Energy.Core.Network.GetHostAddress(this.Host);
+                AddressFamily family = this.Family;
+                if (family == default(AddressFamily))
+                {
+                    family = Energy.Core.Network.GetAddressFamily(address);
+                }
+                Socket socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
+                try
+                {
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        address = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
+                    }
+                    IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(address), 11000);
+
+                    socket.Bind(localEndPoint);
+                    socket.Listen(Backlog);
+
+                    this.State = new StateObject();
+                    this.State.Socket = socket;
+
+                    socket.BeginAccept(new AsyncCallback(AcceptCallback), this.State);
+                }
+                catch (Exception e)
+                {
+                    Energy.Core.Bug.Catch(e);
+                    return false;
+                }
+                return true;
+            }
+
+            private void AcceptCallback(IAsyncResult ar)
+            {
+                StateObject state = ar.AsyncState as StateObject;
+                try
+                {
+                    // Get the socket that handles the client request.  
+                    Socket socket = state.Socket;
+                    Socket client = socket.EndAccept(ar);
+                    SocketConnection connection = new SocketConnection();
+                    connection.State = new StateObject();
+                    connection.State.Socket = client;
+                    //client.BeginReceive(connection.)
+                    //// Create the state object.  
+                    ////StateObject state = new StateObject();
+                    //state.workSocket = handler;
+                    //handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    //    new AsyncCallback(ReadCallback), state);
+                }
+            }
         }
 
         #endregion

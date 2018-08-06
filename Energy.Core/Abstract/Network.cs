@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Net.Sockets;
 using System.Text;
 
 namespace Energy.Abstract
@@ -16,6 +17,14 @@ namespace Energy.Abstract
 
         public abstract class SocketConnection : Energy.Interface.ISocketConnection
         {
+            public string Host;
+
+            public int Port;
+
+            public AddressFamily Family;
+
+            public ProtocolType Protocol;
+
             public event ReceiveDelegate OnReceive;
 
             public event SendDelegate OnSend;
