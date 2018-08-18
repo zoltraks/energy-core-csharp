@@ -198,9 +198,17 @@ namespace Energy.Core
             _Colorless = value;
         }
 
-        private static string _PauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
-        /// <summary>DefaultPauseText</summary>
+        public const string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
+        private static string _PauseText = DefaultPauseText;
         public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
+
+        public const string DefaultAskSimpleText = "~15~{0}~0~ : ";
+        private static string _AskSimpleText = DefaultAskSimpleText;
+        public static string AskSimpleText { get { return _AskSimpleText; } set { _AskSimpleText = value; } }
+
+        public const string DefaultAskChangeText = "~15~{0}~0~ ~13~[~0~ ~9~{1}~0~ ~13~]~0~ : ";
+        private static string _AskChangeText = DefaultAskChangeText;
+        public static string AskChangeText { get { return _AskChangeText; } set { _AskChangeText = value; } }
 
         private static string _ExampleColorPalleteTildeString = ""
             + "~darkblue~~#~1~#~\t~#~darkblue~#~"
@@ -253,7 +261,14 @@ namespace Energy.Core
         /// <returns>Value entered or default if skipped</returns>
         public static string Ask(string question, string value)
         {
-            Energy.Core.Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
+            if (!string.IsNullOrEmpty(question))
+            {
+                if (value == null)
+                    value = "";
+                string message = value == "" ? AskSimpleText : AskChangeText;
+                message = string.Format(message, question, value);
+                Tilde.Write(message);
+            }
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
             System.Console.ForegroundColor = System.ConsoleColor.Yellow;
