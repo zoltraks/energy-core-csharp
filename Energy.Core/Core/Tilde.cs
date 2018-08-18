@@ -206,7 +206,7 @@ namespace Energy.Core
         private static string _AskSimpleText = DefaultAskSimpleText;
         public static string AskSimpleText { get { return _AskSimpleText; } set { _AskSimpleText = value; } }
 
-        public const string DefaultAskChangeText = "~15~{0}~0~ ~13~[~0~ ~9~{1}~0~ ~13~]~0~ : ";
+        public const string DefaultAskChangeText = "~15~{0}~0~ ~13~[~0~ ~11~{1}~0~ ~13~]~0~ : ";
         private static string _AskChangeText = DefaultAskChangeText;
         public static string AskChangeText { get { return _AskChangeText; } set { _AskChangeText = value; } }
 
