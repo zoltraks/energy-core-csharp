@@ -170,7 +170,9 @@ namespace AsynchronousNetworkClient
             socket = new Socket(Energy.Core.Network.GetAddressFamily(state.Host)
                 , SocketType.Stream, ProtocolType.Tcp);
             state.Socket = socket;
-            socket.BeginConnect(state.Host, state.Port, new AsyncCallback(ConnectCallback), state);
+            IAsyncResult ar = socket.BeginConnect(state.Host, state.Port, new AsyncCallback(ConnectCallback), state);
+            //ar.AsyncWaitHandle.WaitOne(1000);
+            //(ar.AsyncState as StateObject).Active = false;
         }
 
         private static void ReceiveCallback(IAsyncResult ar)
