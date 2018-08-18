@@ -36,15 +36,21 @@ namespace AsynchronousNetworkClient
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
+            StateObject state = CreateStateObject(host, port);
+
+            Connect(state);
+
+            Energy.Core.Tilde.Pause();
+        }
+
+        private static StateObject CreateStateObject(string host, int port)
+        {
             StateObject state = new StateObject();
             state.ConnectionRepeat = -1;
             state.Host = host;
             state.Port = port;
             state.Capacity = 10;
-
-            Connect(state);
-
-            Energy.Core.Tilde.Pause();
+            return state;
         }
 
         private static void ConnectCallback(IAsyncResult ar)
