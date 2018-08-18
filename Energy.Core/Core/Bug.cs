@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -61,6 +62,16 @@ namespace Energy.Core
             }
 
             return String.Join(Environment.NewLine, message.ToArray()).Trim();
+        }
+
+        /// <summary>
+        /// Get current thread id as hex string.
+        /// </summary>
+        /// <returns></returns>
+        public static string ThreadIdHex()
+        {
+            int id = Thread.CurrentThread.ManagedThreadId;
+            return Energy.Base.Hex.IntegerToHex(id);
         }
 
         /// <summary>

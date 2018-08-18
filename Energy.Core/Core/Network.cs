@@ -4,44 +4,19 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Energy.Interface;
+using System.Net;
+using Energy.Abstract;
+using System.IO;
 
 namespace Energy.Core
 {
     public class Network
     {
-        #region Constant
-
-        public const int DEFAULT_SOCKET_TIMEOUT = 10000;
-
-        public const int DEFAULT_SOCKET_BUFFER_SIZE = 8192;
-
-        #endregion
-
-        #region Class
-
-        public class Class
-        {
-            public class Settings
-            {
-                public int SocketTimeout { get; set; }
-
-                public int SocketBufferSize { get; set; }
-
-                public Settings()
-                {
-                    SocketTimeout = DEFAULT_SOCKET_TIMEOUT;
-                    SocketBufferSize = DEFAULT_SOCKET_BUFFER_SIZE;
-                }
-            }
-        }
-
-        #endregion
-
         #region Settings
 
-        private static Class.Settings _Settings;
+        private static Energy.Base.Network.Settings _Settings;
         private static readonly object _SettingsLock = new object();
-        public static Class.Settings Settings
+        public static Energy.Base.Network.Settings Settings
         {
             get
             {
@@ -51,12 +26,45 @@ namespace Energy.Core
                     {
                         if (_Settings == null)
                         {
-                            _Settings = new Class.Settings();
+                            _Settings = new Energy.Base.Network.Settings();
                         }
                     }
                 }
                 return _Settings;
             }
+        }
+
+        #endregion
+
+        #region Utility
+
+        public static string GetHostAddress(string host)
+        {
+            try
+            {
+                IPAddress ipAddress;
+                if (!IPAddress.TryParse(host, out ipAddress))
+                {
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
+                    ipAddress = ipHostInfo.AddressList[0];
+                }
+                return ipAddress.ToString();
+            }
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch(socketException);
+                return null;
+            }
+        }
+
+        public static AddressFamily GetAddressFamily(string address)
+        {
+            IPAddress ipAddress = null;
+            if (IPAddress.TryParse(address, out ipAddress))
+            {
+                return ipAddress.AddressFamily;
+            }
+            return AddressFamily.Unknown;
         }
 
         #endregion
@@ -290,15 +298,115 @@ namespace Energy.Core
 
         #endregion
 
+        #region SocketConnection
+
+        public class SocketConnection: Energy.Abstract.Network.SocketConnection
+        {
+            public class StateObject
+            {
+                public Socket Socket;
+
+                public int Capacity = 8192;
+
+                public byte[] Buffer;
+
+                public MemoryStream Stream;
+
+                public int Repeat;
+
+                public StateObject()
+                {
+                    Buffer = new byte[Capacity];
+                    Stream = new MemoryStream(Capacity);
+                }
+
+                public StateObject(int repeat): this()
+                {
+                    Repeat = repeat;
+                }
+            }
+
+            public volatile bool Active;
+
+            public int Repeat;
+
+            public StateObject State;
+
+            private int _Backlog = 100;
+            /// <summary>Backlog</summary>
+            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
+
+            public bool Listen()
+            {
+                string address;
+                address = Energy.Core.Network.GetHostAddress(this.Host);
+                AddressFamily family = this.Family;
+                if (family == default(AddressFamily))
+                {
+                    family = Energy.Core.Network.GetAddressFamily(address);
+                }
+                Socket socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
+                try
+                {
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        address = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
+                    }
+                    IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(address), 11000);
+
+                    socket.Bind(localEndPoint);
+                    socket.Listen(Backlog);
+
+                    this.State = new StateObject();
+                    this.State.Socket = socket;
+
+                    socket.BeginAccept(new AsyncCallback(AcceptCallback), this.State);
+                }
+                catch (Exception e)
+                {
+                    Energy.Core.Bug.Catch(e);
+                    return false;
+                }
+                return true;
+            }
+
+            private void AcceptCallback(IAsyncResult ar)
+            {
+                StateObject state = ar.AsyncState as StateObject;
+                try
+                {
+                    // Get the socket that handles the client request.  
+                    Socket socket = state.Socket;
+                    Socket client = socket.EndAccept(ar);
+                    SocketConnection connection = new SocketConnection();
+                    connection.State = new StateObject();
+                    connection.State.Socket = client;
+                    //client.BeginReceive(connection.)
+                    //// Create the state object.  
+                    ////StateObject state = new StateObject();
+                    //state.workSocket = handler;
+                    //handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    //    new AsyncCallback(ReadCallback), state);
+                }
+                catch
+                { }
+            }
+        }
+
+        #endregion
+
         #region SocketClient
 
         /// <summary>
         /// Client
         /// </summary>
         [Energy.Attribute.Code.Future]
-        public class SocketClient
+        public class SocketClient : Energy.Abstract.Network.SocketClient
         {
-
+            public override bool Connect()
+            {
+                return base.Connect();
+            }
         }
 
         #endregion
@@ -309,7 +417,7 @@ namespace Energy.Core
         /// Server
         /// </summary>
         [Energy.Attribute.Code.Future]
-        public class SocketServer : Energy.Base.Abstract.Network.SocketServer
+        public class SocketServer : Energy.Abstract.Network.SocketServer
         {
             public override int Port
             {
@@ -317,18 +425,33 @@ namespace Energy.Core
                 set;
             }
 
-            private event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate _Receive;
+            private event Energy.Abstract.Network.SendDelegate _OnSend;
 
-            public override event Energy.Base.Abstract.Network.SocketServer.ReceiveDelegate Receive
+            public override event Energy.Abstract.Network.SendDelegate OnSend
             {
                 add
                 {
-                    _Receive += value;
+                    _OnSend += value;
                 }
 
                 remove
                 {
-                    _Receive -= value;
+                    _OnSend -= value;
+                }
+            }
+
+            private event Energy.Abstract.Network.ReceiveDelegate _OnReceive;
+
+            public override event Energy.Abstract.Network.ReceiveDelegate OnReceive
+            {
+                add
+                {
+                    _OnReceive += value;
+                }
+
+                remove
+                {
+                    _OnReceive -= value;
                 }
             }
 
@@ -380,7 +503,7 @@ namespace Energy.Core
         public static int Ping(string address)
         {
             System.Net.NetworkInformation.IPStatus status;
-            return Ping(address, 30000, out status);
+            return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
 
         #endregion

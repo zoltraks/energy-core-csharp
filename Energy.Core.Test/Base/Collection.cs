@@ -85,5 +85,15 @@ namespace Energy.Core.Test.Base
             y = x.Filter(Enumeration.MatchMode.Simple, true, filters);
             Assert.AreEqual(2, y.Count);
         }
+
+        [TestMethod]
+        public void StringList()
+        {
+            string[] array;
+            array = new string[] { "A", "B", "a" };
+            Energy.Base.Collection.StringArray stringArray = new Energy.Base.Collection.StringArray(array);
+            Assert.IsFalse(stringArray.HasDuplicates(), "String array should not have duplicates");
+            Assert.IsTrue(stringArray.HasDuplicates(true), "String array should have duplicates when ignoreCase is true");
+        }
     }
 }

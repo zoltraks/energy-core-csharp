@@ -122,7 +122,10 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
         {
-            return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            value = string.IsNullOrEmpty(value)
+                ? value
+                : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            return value;
         }
 
         #region Is
@@ -912,7 +915,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="word">Word</param>
         /// <returns>Word</returns>
-        public static string UppercaseFirst(string word)
+        public static string UpperFirst(string word)
         {
             if (string.IsNullOrEmpty(word))
                 return word;
@@ -927,7 +930,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Words list</param>
         /// <returns>Words list</returns>
-        public static string[] Uppercase(string[] words)
+        public static string[] Upper(string[] words)
         {
             if (words == null || words.Length == 0)
                 return words;
@@ -941,11 +944,21 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Upper case conversion for string.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Words list</returns>
+        public static string Upper(string word)
+        {
+            return word == null ? null : word.ToUpperInvariant();
+        }
+
+        /// <summary>
         /// Lower case conversion for string array.
         /// </summary>
         /// <param name="words">Words list</param>
         /// <returns>Words list</returns>
-        public static string[] Lowercase(string[] words)
+        public static string[] Lower(string[] words)
         {
             if (words == null || words.Length == 0)
                 return words;
@@ -956,6 +969,16 @@ namespace Energy.Base
                 words[i] = words[i].ToLowerInvariant();
             }
             return words;
+        }
+
+        /// <summary>
+        /// Lower case conversion for string.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Words list</returns>
+        public static string Lower(string word)
+        {
+            return word == null ? null : word.ToLowerInvariant();
         }
 
         #endregion
@@ -981,7 +1004,7 @@ namespace Energy.Base
         {
             if (words == null || words.Length == 0)
                 return "";
-            return string.Join("-", Lowercase(words));
+            return string.Join("-", Lower(words));
         }
 
         /// <summary>
@@ -993,7 +1016,7 @@ namespace Energy.Base
         {
             if (words == null || words.Length == 0)
                 return "";
-            return string.Join("-", Lowercase(words));
+            return string.Join("-", Lower(words));
         }
 
         /// <summary>
@@ -1017,7 +1040,7 @@ namespace Energy.Base
                 return "";
             for (int i = 0; i < words.Length; i++)
             {
-                words[i] = UppercaseFirst(words[i]);
+                words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
         }
@@ -1042,7 +1065,7 @@ namespace Energy.Base
             words[0] = words[0].ToLowerInvariant();
             for (int i = 1; i < words.Length; i++)
             {
-                    words[i] = UppercaseFirst(words[i]);
+                    words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
         }
@@ -1210,6 +1233,195 @@ namespace Energy.Base
         public static string ConvertNewLine(string text)
         {
             return ConvertNewLine(text, Environment.NewLine);
+        }
+
+        #endregion
+
+        #region Uniquify
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// and optional text between element and number.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="ignoreCase">Case insensitive</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <param name="subText">Optional text between element and number</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, bool ignoreCase, int initialNumber, string subText)
+        {
+            if (array == null || array.Length < 2)
+                return array;
+            Dictionary<string, int> next = new Dictionary<string, int>();
+            List<string> index = new List<string>();
+            List<string> output = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                string needle = ignoreCase ? Upper(array[i]) : array[i];
+                if (index.Count == 0)
+                {
+                    index.Add(needle);
+                    output.Add(array[i]);
+                    continue;
+                }
+                if (index.Contains(needle))
+                {
+                    if (needle == null)
+                        continue;
+                    int number = initialNumber;
+                    if (next.ContainsKey(needle))
+                        number = next[needle];
+                    while (true)
+                    {
+                        string candidate = string.Concat(array[i], subText, number++);
+                        bool found = false;
+                        for (int j = 0; j < array.Length; j++)
+                        {
+                            if (0 == string.Compare(array[j], candidate, ignoreCase))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            output.Add(candidate);
+                            index.Add(ignoreCase ? Upper(candidate) : candidate);
+                            next[needle] = number;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    output.Add(array[i]);
+                    index.Add(needle);
+                }
+            }
+            return output.ToArray();
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// after text.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="ignoreCase">Case insensitive</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, bool ignoreCase, int initialNumber)
+        {
+            return Uniquify(array, ignoreCase, initialNumber, "");
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// after text.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, int initialNumber)
+        {
+            return Uniquify(array, false, initialNumber, "");
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// and optional text between element and number.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <param name="subText">Optional text between element and number</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, int initialNumber, string subText)
+        {
+            return Uniquify(array, false, initialNumber, subText);
+        }
+
+        #endregion
+
+        #region Compare
+
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2, bool ignoreCase)
+        {
+            if (array1 == null && array2 == null)
+                return 0;
+            if (array1 == null && array2 != null)
+                return -1;
+            if (array1 != null && array2 == null)
+                return 1;
+            if (array1.Length < array2.Length)
+                return -1;
+            if (array1.Length > array2.Length)
+                return 1;
+            for (int i = 0; i < array1.Length; i++)
+            {
+                int c = string.Compare(array1[i], array2[i], ignoreCase);
+                if (c != 0)
+                    return c;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2)
+        {
+            return Compare(array1, array2, false);
+        }
+
+        #endregion
+
+        #region Chop
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static T Chop<T>(ref T[] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            T first = array[0];
+            List<T> list = new List<T>(array.Length);
+            list.AddRange(array);
+            list.RemoveAt(0);
+            array = list.ToArray();
+            return first;
+
+        }
+
+        /// <summary>
+        /// Cut first element of string array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string Chop(ref string[] array)
+        {
+            return Chop<string>(ref array);
+        }
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static object Chop(ref object[] array)
+        {
+            return Chop<object>(ref array);
         }
 
         #endregion

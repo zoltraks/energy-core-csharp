@@ -1026,6 +1026,45 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Read line from console using mask character. Could be useful for passwords.
+        /// Returns null if user press ESC key.
+        /// </summary>
+        /// <returns></returns>
+        public static string ReadLine(char? mask)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            System.ConsoleKeyInfo key;
+            do
+            {
+                key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return stringBuilder.ToString();
+                }
+                if (key.Key == System.ConsoleKey.Backspace)
+                {
+                    if (stringBuilder.Length > 0)
+                    {
+                        stringBuilder.Length = stringBuilder.Length - 1;
+                        Console.Write("\b \b");
+                    }
+                    continue;
+                }
+                if (!char.IsControl(key.KeyChar))
+                {
+                    stringBuilder.Append(key.KeyChar);
+                    if (mask != null)
+                        Console.Write(mask);
+                    else
+                        Console.Write(key.KeyChar);
+                }
+            }
+            while (key.Key != ConsoleKey.Escape);
+            return null;
+        }
+
         #endregion
 
         #region Input

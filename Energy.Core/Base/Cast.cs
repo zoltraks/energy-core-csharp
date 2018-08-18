@@ -508,7 +508,7 @@ namespace Energy.Base
         #region Double
 
         /// <summary>
-        /// Convert string to double value without exception
+        /// Convert string to double value without exception.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>double</returns>
@@ -526,11 +526,6 @@ namespace Energy.Base
             return result;
         }
 
-        /// <summary>
-        /// Smart convert string to double value without exception.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <returns>double</returns>
         public static double StringToDoubleSmart(string value)
         {
             return StringToDouble(RemoveNumericalDifferences(value));
@@ -805,18 +800,6 @@ namespace Energy.Base
         public static DateTime StringToDateTime(string text)
         {
             return Clock.Parse(text);
-        }
-
-        /// <summary>
-        /// Convert stamp text to DateTime.
-        /// If stamp was not recognized null will be returned.
-        /// </summary>
-        /// <param name="text">string</param>
-        /// <returns>DateTime or null</returns>
-        public static DateTime? StringToDateTimeSmart(string text)
-        {
-            DateTime d = Clock.Parse(text);
-            return d != DateTime.MinValue ? d : (DateTime?)null;
         }
 
         /// <summary>

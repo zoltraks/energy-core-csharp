@@ -60,6 +60,7 @@
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Syntax.cs" />
+    <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Base\Color.cs" />
