@@ -120,7 +120,7 @@ namespace Energy.Core
         /// Specifies behaviour when closing socket, possible values are:
         /// negative number to disable (attempts to send pending data until the default IP protocol time-out expires),
         /// zero (discards any pending data, for connection-oriented socket Winsock resets the connection), and
-        /// positive number of seconds (attempts to send pending data until the specified time-out expires, 
+        /// positive number of seconds (attempts to send pending data until the specified time-out expires,
         /// if the attempt fails, then Winsock resets the connection).
         /// </param>
         /// <param name="ttl">TTL value indicates the maximum number of routers the packet can traverse before the router discards the packet</param>
@@ -137,8 +137,8 @@ namespace Energy.Core
 
             if (linger != null)
             {
-                // The socket will linger for specified amount of seconds after Socket.Close is called. 
-                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections 
+                // The socket will linger for specified amount of seconds after Socket.Close is called.
+                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections
                 // sitting in the TIME_WAIT state, tying up all the available resources on a server.
                 if (linger < 0)
                 {
@@ -302,17 +302,53 @@ namespace Energy.Core
 
         public class SocketConnection: Energy.Abstract.Network.SocketConnection
         {
+            #region StateObject
+
             public class StateObject
             {
-                public Socket Socket;
+                private volatile Socket _Socket;
+                /// <summary>
+                /// Working socket
+                /// </summary>
+                public Socket Socket { get { return _Socket; } set { _Socket = value; } }
 
-                public int Capacity = 8192;
+                private volatile int _Capacity = 8192;
 
-                public byte[] Buffer;
+                /// <summary>
+                /// Buffer capacity
+                /// </summary>
+                public int Capacity { get { return _Capacity; } set { _Capacity = value; } }
 
-                public MemoryStream Stream;
+                private volatile byte[] _Buffer;
 
-                public int Repeat;
+                public byte[] Buffer { get { return _Buffer; } set { _Buffer = value; } }
+
+                private volatile MemoryStream _Stream;
+
+                MemoryStream Stream { get { return _Stream; } set { _Stream = value; } }
+
+                private volatile bool _Active;
+
+                /// <summary>
+                /// Is connection active? Set to 0 if should be closed immediately
+                /// </summary>
+                public bool Active { get { return _Active; } set { _Active = value; } }
+
+                private volatile int _Repeat = 0;
+
+                /// <summary>
+                /// Repeat operation if possible, 0 means no repeat
+                /// </summary>
+                public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
+
+                private volatile int _Limit = 0;
+
+                /// <summary>
+                /// Limit connections to specified amount, 0 means unlimited
+                /// </summary>
+                public int Limit { get { return _Limit; } set { _Limit = value; } }
+
+                #region Constructor
 
                 public StateObject()
                 {
@@ -324,11 +360,21 @@ namespace Energy.Core
                 {
                     Repeat = repeat;
                 }
+
+                #endregion
             }
 
-            public volatile bool Active;
+            #endregion
 
-            public int Repeat;
+            #region Event
+
+            public delegate void OnAcceptHandler(SocketConnection connection);
+
+            public event OnAcceptHandler OnAccept;
+
+            #endregion
+
+            #region Property
 
             public StateObject State;
 
@@ -336,23 +382,25 @@ namespace Energy.Core
             /// <summary>Backlog</summary>
             public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
 
+            #endregion
+
             public bool Listen()
             {
-                string address;
-                address = Energy.Core.Network.GetHostAddress(this.Host);
+                string host;
+                host = Energy.Core.Network.GetHostAddress(this.Host);
+                if (string.IsNullOrEmpty(host))
+                {
+                    host = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
+                }
                 AddressFamily family = this.Family;
                 if (family == default(AddressFamily))
                 {
-                    family = Energy.Core.Network.GetAddressFamily(address);
+                    family = Energy.Core.Network.GetAddressFamily(host);
                 }
                 Socket socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
                 try
                 {
-                    if (string.IsNullOrEmpty(address))
-                    {
-                        address = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
-                    }
-                    IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(address), 11000);
+                    IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(host), 11000);
 
                     socket.Bind(localEndPoint);
                     socket.Listen(Backlog);
@@ -373,23 +421,30 @@ namespace Energy.Core
             private void AcceptCallback(IAsyncResult ar)
             {
                 StateObject state = ar.AsyncState as StateObject;
+                if (state.Active)
+                if (state.Socket == null)
+                    return;
                 try
                 {
-                    // Get the socket that handles the client request.  
-                    Socket socket = state.Socket;
-                    Socket client = socket.EndAccept(ar);
+                    // Get the socket that handles the client request.
+                    Socket socket = state.Socket.EndAccept(ar);
                     SocketConnection connection = new SocketConnection();
                     connection.State = new StateObject();
-                    connection.State.Socket = client;
+                    connection.State.Socket = socket;
                     //client.BeginReceive(connection.)
-                    //// Create the state object.  
+                    //// Create the state object.
                     ////StateObject state = new StateObject();
                     //state.workSocket = handler;
                     //handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     //    new AsyncCallback(ReadCallback), state);
+                    if (OnAccept != null)
+                    {
+                        OnAccept(connection);
+                    }
                 }
                 catch
-                { }
+                {
+                }
             }
         }
 
