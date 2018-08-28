@@ -3,15 +3,129 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
-using Energy.Interface;
 using System.Net;
-using Energy.Abstract;
 using System.IO;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Energy.Core
 {
     public class Network
     {
+        #region Utility
+
+        public static string GetHostAddress(string host)
+        {
+            if (host == "localhost")
+            {
+                return IPAddress.Parse("127.0.0.1").ToString();
+            }
+            IPAddress ipAddress;
+            if (!IPAddress.TryParse(host, out ipAddress))
+            {
+                try
+                {
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
+                    ipAddress = ipHostInfo.AddressList[0];
+                }
+                catch (SocketException socketException)
+                {
+                    Energy.Core.Bug.Catch(socketException);
+                    return null;
+                }
+            }
+            return ipAddress.ToString();
+        }
+
+        public static AddressFamily GetAddressFamily(string address)
+        {
+            if (address == "localhost" || address == "127.0.0.1")
+                return AddressFamily.InterNetwork;
+            if (address == "::1" || address == "[::1]" || address == "::" || address == "[::]")
+                return AddressFamily.InterNetworkV6;
+            IPAddress ipAddress = null;
+            if (IPAddress.TryParse(address, out ipAddress))
+            {
+                return ipAddress.AddressFamily;
+            }
+            else
+            {
+                try
+                {
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(address);
+                    ipAddress = ipHostInfo.AddressList[0];
+                    return ipAddress.AddressFamily;
+                }
+                catch (SocketException socketException)
+                {
+                    Energy.Core.Bug.Catch(socketException);
+                    return AddressFamily.Unknown;
+                }
+            }
+        }
+
+        public static SocketType GetSocketType(ProtocolType protocol, AddressFamily family)
+        {
+            switch (protocol)
+            {
+                default:
+                    return SocketType.Unknown;
+
+                case ProtocolType.Tcp:
+                    switch (family)
+                    {
+                        default:
+                            return SocketType.Unknown;
+                        case AddressFamily.InterNetwork:
+                        case AddressFamily.InterNetworkV6:
+                            return SocketType.Stream;
+                    }
+
+                case ProtocolType.Udp:
+                    switch (family)
+                    {
+                        default:
+                            return SocketType.Unknown;
+                        case AddressFamily.InterNetwork:
+                        case AddressFamily.InterNetworkV6:
+                            return SocketType.Dgram;
+                    }
+
+                case ProtocolType.Igmp:
+                    return SocketType.Raw;
+
+            }
+        }
+
+        public static void Shutdown(Socket socket)
+        {
+            if (socket == null)
+                return;
+            try
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Disconnect(true);
+            }
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch(socketException);
+            }
+            catch (ObjectDisposedException exceptionObjectDisposed)
+            {
+                Energy.Core.Bug.Catch(exceptionObjectDisposed);
+            }
+            try
+            {
+                socket.Close();
+            }
+            catch (Exception exceptionAny)
+            {
+                Energy.Core.Bug.Catch(exceptionAny);
+            }
+        }
+
+        #endregion
+
         #region Settings
 
         private static Energy.Base.Network.Settings _Settings;
@@ -32,39 +146,6 @@ namespace Energy.Core
                 }
                 return _Settings;
             }
-        }
-
-        #endregion
-
-        #region Utility
-
-        public static string GetHostAddress(string host)
-        {
-            try
-            {
-                IPAddress ipAddress;
-                if (!IPAddress.TryParse(host, out ipAddress))
-                {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
-                    ipAddress = ipHostInfo.AddressList[0];
-                }
-                return ipAddress.ToString();
-            }
-            catch (SocketException socketException)
-            {
-                Energy.Core.Bug.Catch(socketException);
-                return null;
-            }
-        }
-
-        public static AddressFamily GetAddressFamily(string address)
-        {
-            IPAddress ipAddress = null;
-            if (IPAddress.TryParse(address, out ipAddress))
-            {
-                return ipAddress.AddressFamily;
-            }
-            return AddressFamily.Unknown;
         }
 
         #endregion
@@ -300,7 +381,7 @@ namespace Energy.Core
 
         #region SocketConnection
 
-        public class SocketConnection: Energy.Abstract.Network.SocketConnection
+        public class SocketConnection : Energy.Interface.ISocketConnection
         {
             #region StateObject
 
@@ -366,23 +447,75 @@ namespace Energy.Core
 
             #endregion
 
-            #region Event
+            #region Lock
 
-            public delegate void OnAcceptHandler(SocketConnection connection);
-
-            public event OnAcceptHandler OnAccept;
+            private readonly object _PropertyLock = new object();
 
             #endregion
 
             #region Property
 
-            public StateObject State;
+            private bool _Active = false;
+            [DefaultValue(false)]
+            public bool Active { get { lock (_PropertyLock) return _Active; } set { lock (_PropertyLock) _Active = value; } }
+
+            private string _Host = "";
+            [DefaultValue(null)]
+            public string Host { get { lock (_PropertyLock) return _Host; } set { lock (_PropertyLock) _Host = value; } }
+
+            private int _Port = 0;
+            [DefaultValue(0)]
+            public int Port { get { lock (_PropertyLock) return _Port; } set { lock (_PropertyLock) _Port = value; } }
+
+            private AddressFamily _Family = AddressFamily.InterNetwork;
+            [DefaultValue(default(AddressFamily))]
+            public AddressFamily Family { get { lock (_PropertyLock) return _Family; } set { lock (_PropertyLock) _Family = value; } }
+
+            private ProtocolType _Protocol = ProtocolType.Tcp;
+            [DefaultValue(default(ProtocolType))]
+            public ProtocolType Protocol { get { lock (_PropertyLock) return _Protocol; } set { lock (_PropertyLock) _Protocol = value; } }
 
             private int _Backlog = 100;
-            /// <summary>Backlog</summary>
-            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
+            [DefaultValue(100)]
+            public int Backlog { get { lock (_PropertyLock) return _Backlog; } set { lock (_PropertyLock) _Backlog = value; } }
+
+            private int _Timeout = 0;
+            [DefaultValue(0)]
+            public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
 
             #endregion
+
+            #region Event
+
+            public event Energy.Base.Network.ConnectDelegate OnConnect;
+
+            public event Energy.Base.Network.CloseDelegate OnClose;
+
+            public event Energy.Base.Network.ListenDelegate OnListen;
+
+            public event Energy.Base.Network.AcceptDelegate OnAccept;
+
+            public event Energy.Base.Network.ReceiveDelegate OnReceive;
+
+            public event Energy.Base.Network.SendDelegate OnSend;
+
+            public event Energy.Base.Network.TimeoutDelegate OnTimeout;
+
+            #endregion
+
+            #region Synchronisation
+
+            public ManualResetEvent ConnectResetEvent = new ManualResetEvent(false);
+
+            #endregion
+
+            #region Other
+
+            public StateObject State;
+
+            #endregion
+
+            #region Listen
 
             public bool Listen()
             {
@@ -397,7 +530,9 @@ namespace Energy.Core
                 {
                     family = Energy.Core.Network.GetAddressFamily(host);
                 }
-                Socket socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
+                ProtocolType protocol = this.Protocol;
+                SocketType socketType = Energy.Core.Network.GetSocketType(protocol, family);
+                Socket socket = new Socket(family, socketType, protocol);
                 try
                 {
                     IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(host), 11000);
@@ -409,6 +544,11 @@ namespace Energy.Core
                     this.State.Socket = socket;
 
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), this.State);
+
+                    if (OnListen != null)
+                    {
+                        OnListen(this);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -418,10 +558,16 @@ namespace Energy.Core
                 return true;
             }
 
+            #endregion
+
+            #region Accept
+
             private void AcceptCallback(IAsyncResult ar)
             {
                 StateObject state = ar.AsyncState as StateObject;
-                if (state.Active)
+                //Energy.Core.Network.SocketConnection state = ar.AsyncState as Energy.Core.Network.SocketConnection;
+                if (!state.Active)
+                    return;
                 if (state.Socket == null)
                     return;
                 try
@@ -439,86 +585,15 @@ namespace Energy.Core
                     //    new AsyncCallback(ReadCallback), state);
                     if (OnAccept != null)
                     {
-                        OnAccept(connection);
+                        OnAccept(this);
                     }
                 }
                 catch
                 {
                 }
             }
-        }
 
-        #endregion
-
-        #region SocketClient
-
-        /// <summary>
-        /// Client
-        /// </summary>
-        [Energy.Attribute.Code.Future]
-        public class SocketClient : Energy.Abstract.Network.SocketClient
-        {
-            public override bool Connect()
-            {
-                return base.Connect();
-            }
-        }
-
-        #endregion
-
-        #region SocketServer
-
-        /// <summary>
-        /// Server
-        /// </summary>
-        [Energy.Attribute.Code.Future]
-        public class SocketServer : Energy.Abstract.Network.SocketServer
-        {
-            public override int Port
-            {
-                get;
-                set;
-            }
-
-            private event Energy.Abstract.Network.SendDelegate _OnSend;
-
-            public override event Energy.Abstract.Network.SendDelegate OnSend
-            {
-                add
-                {
-                    _OnSend += value;
-                }
-
-                remove
-                {
-                    _OnSend -= value;
-                }
-            }
-
-            private event Energy.Abstract.Network.ReceiveDelegate _OnReceive;
-
-            public override event Energy.Abstract.Network.ReceiveDelegate OnReceive
-            {
-                add
-                {
-                    _OnReceive += value;
-                }
-
-                remove
-                {
-                    _OnReceive -= value;
-                }
-            }
-
-            public override bool Send(byte[] data)
-            {
-                return false;
-            }
-
-            public override bool Listen()
-            {
-                return false;
-            }
+            #endregion
         }
 
         #endregion

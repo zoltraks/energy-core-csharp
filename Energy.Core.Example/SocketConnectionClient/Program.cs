@@ -19,22 +19,22 @@ namespace SocketConnectionClient
             Energy.Core.Tilde.Pause();
         }
 
-        private static bool Connection_OnConnect(object self)
+        private static void Connection_OnConnect(object self)
         {
             Energy.Core.Network.SocketConnection connection = self as Energy.Core.Network.SocketConnection;
             if (connection == null)
             {
                 Energy.Core.Tilde.WriteLine("~r~ERROR~0~ ~lm~Object is null in ~y~Connection_OnConnect");
-                return false;
+                return;
             }
         }
 
-        private static bool Connection_OnSend(byte[] data)
+        private static void Connection_OnSend(object self, byte[] data)
         {
             throw new NotImplementedException();
         }
 
-        private static bool Connection_OnReceive(byte[] data)
+        private static void Connection_OnReceive(object self, byte[] data)
         {
             throw new NotImplementedException();
         }

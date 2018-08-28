@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace AsynchronousNetworkClient
 {
@@ -40,7 +41,7 @@ namespace AsynchronousNetworkClient
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-            StateObject state = CreateStateObject(host, port);
+            StateObject state = CreateStateObject(address, port);
 
             Connect(state);
 
@@ -53,7 +54,7 @@ namespace AsynchronousNetworkClient
             state.ConnectionRepeat = -1;
             state.Host = host;
             state.Port = port;
-            state.Capacity = 10;
+            state.Capacity = 250;
             return state;
         }
 
@@ -171,8 +172,8 @@ namespace AsynchronousNetworkClient
         {
             Socket socket;
             // Create a TCP/IP socket
-            socket = new Socket(Energy.Core.Network.GetAddressFamily(state.Host)
-                , SocketType.Stream, ProtocolType.Tcp);
+            AddressFamily addressFamily = Energy.Core.Network.GetAddressFamily(state.Host);
+            socket = new Socket(addressFamily, SocketType.Stream, ProtocolType.Tcp);
             state.Socket = socket;
             IAsyncResult ar = socket.BeginConnect(state.Host, state.Port, new AsyncCallback(ConnectCallback), state);
             //ar.AsyncWaitHandle.WaitOne(1000);
@@ -207,6 +208,8 @@ namespace AsynchronousNetworkClient
                 data = state.Stream.ToArray();
                 Energy.Core.Memory.Clear(state.Stream);
 
+                Console.WriteLine(Energy.Base.Hex.Print(data));
+
                 data = Parse(state, data);
 
                 if (data != null)
@@ -216,12 +219,16 @@ namespace AsynchronousNetworkClient
                         // Begin receiving the data from the remote
                         client.BeginReceive(state.Buffer, 0, state.Capacity, SocketFlags.None
                             , new AsyncCallback(ReceiveCallback), state);
+                        //client.BeginReceive(state.Buffer, 0, state.Capacity, SocketFlags.None
+                        //    , new AsyncCallback(ReceiveCallback), state);
                     }
                     else
                     {
                         // Begin sending the data to the remote
                         client.BeginSend(data, 0, data.Length, SocketFlags.None
                             , new AsyncCallback(SendCallback), state);
+                        //client.BeginReceive(state.Buffer, 0, state.Capacity, SocketFlags.None
+                        //    , new AsyncCallback(ReceiveCallback), state);
                     }
                 }
             }
@@ -233,8 +240,7 @@ namespace AsynchronousNetworkClient
                         break;
                     case SocketError.ConnectionReset:
                         Socket socket = state.Socket;
-                        socket.Shutdown(SocketShutdown.Both);
-                        socket.Close();
+                        Energy.Core.Network.Shutdown(socket);
                         Connect(state);
                         break;
                 }
@@ -265,8 +271,7 @@ namespace AsynchronousNetworkClient
             if (text.Length == 0)
             {
                 Socket socket = state.Socket;
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
+                Energy.Core.Network.Shutdown(socket);
                 Connect(state);
                 return null;
             }

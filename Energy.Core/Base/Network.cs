@@ -21,6 +21,28 @@ namespace Energy.Base
 
         #endregion
 
+        #region Delegate
+
+        public delegate void ConnectDelegate(object self);
+
+        public delegate void CloseDelegate(object self);
+
+        public delegate void ListenDelegate(object self);
+
+        public delegate void AcceptDelegate(object self);
+
+        public delegate void SendDelegate<T>(object self, T data);
+
+        public delegate void SendDelegate(object self, byte[] data);
+
+        public delegate void ReceiveDelegate<T>(object self, T data);
+
+        public delegate void ReceiveDelegate(object self, byte[] data);
+
+        public delegate void TimeoutDelegate(object self);
+
+        #endregion
+
         #region Settings
 
         /// <summary>
