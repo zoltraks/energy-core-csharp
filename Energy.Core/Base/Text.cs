@@ -1189,7 +1189,7 @@ namespace Energy.Base
                 , RegexOptions.IgnoreCase).Success)
             {
                 return System.Text.Encoding.BigEndianUnicode;
-            }            
+            }
             int number = Energy.Base.Cast.StringToInteger(encoding);
             try
             {
@@ -1422,6 +1422,47 @@ namespace Energy.Base
         public static object Chop(ref object[] array)
         {
             return Chop<object>(ref array);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index)
+        {
+            return GetElementOrEmpty<string>(array, index, "");
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index, string emptyValue)
+        {
+            return GetElementOrEmpty<string>(array, index, emptyValue);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static T GetElementOrEmpty<T>(T[] array, int index, T emptyValue)
+        {
+            if (array == null || array.Length == 0)
+                return emptyValue;
+            else if (array.Length <= index)
+                return emptyValue;
+            else
+                return array[index];
         }
 
         #endregion
