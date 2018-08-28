@@ -12,13 +12,17 @@ namespace AsynchronousNetworkClient
         static void Main(string[] args)
         {
             //(new SimpleClient()).Start();
-
-            string host;
             //host = "localhost";
             //host = "211.1.1.1";
             //host = "::1";
-            host = "127.0.0.1";
-            int port = 9000;
+
+            string host = Energy.Base.Text.GetElementOrEmpty(args, 0);
+            int port = Energy.Base.Cast.StringToInteger(Energy.Base.Text.GetElementOrEmpty(args, 1));
+
+            if (string.IsNullOrEmpty(host))
+                host = "127.0.0.1";
+            if (port == 0)
+                port = 9000;
 
             string value;
             int integer;
@@ -64,7 +68,7 @@ namespace AsynchronousNetworkClient
 
                 Socket socket = state.Socket;
 
-                // Complete the connection.  
+                // Complete the connection.
                 socket.EndConnect(ar);
 
                 Energy.Core.Tilde.WriteLine("Socket connected to ~g~{0}", socket.RemoteEndPoint.ToString());
@@ -96,7 +100,7 @@ namespace AsynchronousNetworkClient
                         time = true;
                         break;
                     case 10061:
-                        // Message: "No connection could be made because the target machine actively refused it"                    
+                        // Message: "No connection could be made because the target machine actively refused it"
                         // NativeErrorCode: 10061
                         // SocketErrorCode: ConnectionRefused
                         block = true;
@@ -142,7 +146,7 @@ namespace AsynchronousNetworkClient
                 int size = state.Capacity;
                 state.Buffer = new byte[size];
                 state.Stream = new MemoryStream(size);
-                // Begin receiving the data from the remote 
+                // Begin receiving the data from the remote
                 client.BeginReceive(state.Buffer, 0, size, SocketFlags.None
                     , new AsyncCallback(ReceiveCallback), state);
             }
@@ -209,7 +213,7 @@ namespace AsynchronousNetworkClient
                 {
                     if (data.Length == 0)
                     {
-                        // Begin receiving the data from the remote 
+                        // Begin receiving the data from the remote
                         client.BeginReceive(state.Buffer, 0, state.Capacity, SocketFlags.None
                             , new AsyncCallback(ReceiveCallback), state);
                     }
