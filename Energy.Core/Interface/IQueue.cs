@@ -9,13 +9,15 @@
         /// Put element at the end of queue.
         /// </summary>
         /// <param name="item">Element</param>
-        void Push(T item);
+        /// <returns>Success</returns>
+        bool Push(T item);
 
         /// <summary>
         /// Put array of elements at the end of queue.
         /// </summary>
         /// <param name="array"></param>
-        void Push(T[] array);
+        /// <returns>Success</returns>
+        bool Push(T[] array);
 
         /// <summary>
         /// Take element from queue, remove it from queue, and finally return.
