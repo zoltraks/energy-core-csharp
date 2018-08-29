@@ -326,6 +326,39 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Convert bool to string.
+        /// </summary>
+        /// <param name="value">bool</param>
+        /// <returns>string</returns>
+        public static string BoolToString(bool? value)
+        {
+            return value == null ? BoolToString(false) : BoolToString((bool)value);
+        }
+
+        /// <summary>
+        /// Convert bool to string using style.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        public static string BoolToString(bool? value, string style)
+        {
+            return value == null ? BoolToString(false, style) : BoolToString((bool)value, style);
+        }
+
+        /// <summary>
+        /// Convert bool to string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        public static string BoolToString(bool? value, Energy.Enumeration.BooleanStyle style)
+        {
+            return value == null ? BoolToString(false, style) : BoolToString((bool)value, style);
+
+        }
+
         #endregion
 
         #region Char
@@ -1406,7 +1439,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Object array to 
+        /// Object array to
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
