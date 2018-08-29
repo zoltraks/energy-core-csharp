@@ -917,5 +917,45 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Compare
+
+        /// <summary>
+        /// Compare two arrays of bytes
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static int Compare(byte[] array1, byte[] array2)
+        {
+            if (array1 == null || array2 == null)
+            {
+                if (array1 == null && array2 == null)
+                    return 0;
+                if (array1 == null)
+                    return -1;
+                else
+                    return 1;
+            }
+            if (array1.Length != array2.Length)
+            {
+                if (array1.Length < array2.Length)
+                    return -1;
+                else
+                    return 1;
+            }
+            for (int i = 0; i < array1.Length; i++)
+            {
+                if (array1[i] == array2[i])
+                    continue;
+                if (array1[i] < array2[i])
+                    return -1;
+                else
+                    return 1;
+            }
+            return 0;
+        }
+
+        #endregion
     }
 }
