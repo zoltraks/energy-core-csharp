@@ -126,6 +126,25 @@ namespace Energy.Core
 
         #endregion
 
+        #region IsConnected
+
+        /// <summary>
+        /// Check if socket is connected
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <returns></returns>
+        public static bool IsConnected(Socket socket)
+        {
+            if (socket == null)
+                return false;
+            if (!socket.Connected)
+                return false;
+            bool result = !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
+            return result;
+        }
+
+        #endregion
+
         #region Settings
 
         private static Energy.Base.Network.Settings _Settings;
