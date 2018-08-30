@@ -436,6 +436,26 @@ namespace Energy.Base
             return (byte)value;
         }
 
+        public static string IntegerToHex(int value)
+        {
+            return Energy.Base.Hex.IntegerToHex(value);
+        }
+
+        public static string IntegerToHex(int value, int size)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, size);
+        }
+
+        public static string IntegerToHex(int value, int size, bool upperCase)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, size, upperCase);
+        }
+
+        public static string IntegerToHex(int value, bool upperCase)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, upperCase);
+        }
+
         #endregion
 
         #region Long
