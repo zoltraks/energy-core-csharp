@@ -1060,6 +1060,88 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
         /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
@@ -1103,6 +1185,89 @@ namespace Energy.Base
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
         }
 
         #endregion
