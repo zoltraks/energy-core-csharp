@@ -1555,6 +1555,44 @@ namespace Energy.Base
             return System.Text.Encoding.UTF8.GetString(data);
         }
 
+        /// <summary>
+        /// Convert Base64 input to byte array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] Base64ToByteArray(string input)
+        {
+            if (input == null)
+                return null;
+            if (input.Length == 0)
+                return new byte[] { };
+            byte[] data;
+            try
+            {
+                data = System.Convert.FromBase64String(input);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// Convert byte array to Base64 string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToBase64(byte[] data)
+        {
+            if (data == null)
+                return null;
+            if (data.Length == 0)
+                return "";
+            string base64 = System.Convert.ToBase64String(data);
+            return base64;
+        }
+
         #endregion
 
         #region MemorySize

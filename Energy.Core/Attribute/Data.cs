@@ -215,5 +215,27 @@ namespace Energy.Attribute
         public class AbstractAttribute : System.Attribute
         {
         }
+
+        /// <summary>
+        /// Model attribute
+        /// </summary>
+        public class ModelAttribute : System.Attribute
+        {
+            private string name;
+
+            /// <summary>
+            /// Name
+            /// </summary>
+            public string Name { get { return name; } set { name = value; } }
+
+            /// <summary>
+            /// Model attribute with custom name
+            /// </summary>
+            /// <param name="value"></param>
+            public ModelAttribute(string value)
+            {
+                name = value;
+            }
+        }
     }
 }
