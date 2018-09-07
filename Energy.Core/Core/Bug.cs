@@ -61,7 +61,7 @@ namespace Energy.Core
                 message.Add(fault.Message);
             }
 
-            return String.Join(Environment.NewLine, message.ToArray()).Trim();
+            return String.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
         }
 
         /// <summary>

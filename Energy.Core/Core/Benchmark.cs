@@ -77,7 +77,7 @@ namespace Energy.Core
                 {
                     list.Add(string.Concat("Average time of execution ", Average.ToString(format, CultureInfo.InvariantCulture), " s"));
                 }
-                return String.Join(Environment.NewLine, list.ToArray());
+                return String.Join(Energy.Base.Text.NL, list.ToArray());
             }
 
             /// <summary>
