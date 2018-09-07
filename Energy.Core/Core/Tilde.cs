@@ -212,35 +212,35 @@ namespace Energy.Core
 
         private static string _ExampleColorPalleteTildeString = ""
             + "~darkblue~~#~1~#~\t~#~darkblue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkred~~#~4~#~\t~#~darkred~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~gray~~#~7~#~\t~#~gray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgray~~#~8~#~\t~#~darkgray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~blue~~#~9~#~\t~#~blue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~green~~#~10~#~\t~#~green~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~cyan~~#~11~#~\t~#~cyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~red~~#~12~#~\t~#~red~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~magenta~~#~13~#~\t~#~magenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~yellow~~#~14~#~\t~#~yellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~white~~#~15~#~\t~#~white~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~black~~#~16~#~\t~#~black~#~"
             ;
 
@@ -385,7 +385,7 @@ namespace Energy.Core
             for (int i = 0; i < padding; i++)
                 s.AppendLine();
             string x = s.ToString();
-            string t = string.Concat(x, line, x, Environment.NewLine);
+            string t = string.Concat(x, line, x, Energy.Base.Text.NL);
             Write(t);
         }
 
@@ -631,7 +631,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string format, params object[] value)
         {
-            Write(string.Concat(string.Format(format, value), Environment.NewLine));
+            Write(string.Concat(string.Format(format, value), Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -699,7 +699,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string value)
         {
-            Write(string.Concat(value, Environment.NewLine));
+            Write(string.Concat(value, Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace Energy.Core
         public static void WriteLine(ConsoleColor color, string text)
         {
             Write(string.Concat(ConsoleColorToTildeColor(color), Escape(text)
-                , Environment.NewLine));
+                , Energy.Base.Text.NL));
         }
 
         #endregion
@@ -929,7 +929,7 @@ namespace Energy.Core
                 //}
                 //if (stack.Count > 0)
                 //{
-                //    message += "~ds~" + String.Join(Environment.NewLine, stack.ToArray()) + "~0~" + Environment.NewLine;
+                //    message += "~ds~" + String.Join(Energy.Base.Text.NL, stack.ToArray()) + "~0~" + Energy.Base.Text.NL;
                 //}
             }
 

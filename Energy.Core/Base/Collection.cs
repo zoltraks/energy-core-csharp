@@ -780,7 +780,7 @@ namespace Energy.Base
                 {
                     list.Add(string.Concat(e.Key, glue, Energy.Base.Cast.ObjectToString(e.Value)));
                 }
-                return string.Join(Environment.NewLine, list.ToArray());
+                return string.Join(Energy.Base.Text.NL, list.ToArray());
             }
 
             /// <summary>

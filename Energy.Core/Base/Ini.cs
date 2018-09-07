@@ -214,7 +214,7 @@ namespace Energy.Base
                             lines.Add(string.Concat(key, separator, value));
                     }
                 }
-                return string.Join(Environment.NewLine, lines.ToArray());
+                return string.Join(Energy.Base.Text.NL, lines.ToArray());
             }
         }
     }

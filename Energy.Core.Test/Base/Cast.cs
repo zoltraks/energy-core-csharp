@@ -88,5 +88,18 @@ namespace Energy.Core.Test.Base
             DateTime mawsonDateTime = TimeZoneInfo.ConvertTimeFromUtc(dt2, mawson);
             string jsonStringMawson = Energy.Base.Cast.DateTimeToISO8601(mawsonDateTime);
         }
+
+        [TestMethod]
+        public void Base64ToByteArray()
+        {
+            string s1 = "Ąę";
+            Assert.AreEqual("xITEmQ==", Energy.Base.Cast.StringToBase64(s1));
+            byte[] b1 = new byte[] { 0xff, 0xff };
+            string s2 = Energy.Base.Cast.ByteArrayToBase64(b1);
+            Assert.AreEqual("//8=", s2);
+            byte[] b2 = Energy.Base.Cast.Base64ToByteArray("//8=");
+            int c1 = Energy.Base.ByteArrayBuilder.Compare(b1, b2);
+            Assert.AreEqual(0, c1);
+        }
     }
 }
