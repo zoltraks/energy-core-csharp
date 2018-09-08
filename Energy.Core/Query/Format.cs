@@ -234,9 +234,19 @@ namespace Energy.Query
         /// Format as NUMBER.
         /// </summary>
         /// <param name="value"></param>
+        /// <returns></returns>
+        public string Number(object value)
+        {
+            return Number(value, false);
+        }
+
+        /// <summary>
+        /// Format as NUMBER.
+        /// </summary>
+        /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns></returns>
-        public string Number(object value, bool nullify = false)
+        public string Number(object value, bool nullify)
         {
             if (value == null)
                 return nullify ? "NULL" : "0";
