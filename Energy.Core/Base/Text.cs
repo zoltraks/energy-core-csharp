@@ -11,6 +11,35 @@ namespace Energy.Base
     // TODO This class probably should be renamed to avoid conflicts and allow to add using Energy.Base
     public class Text
     {
+        #region Constants
+
+        private static string _BR = "<br>";
+        /// <summary>HTML break</summary>
+        public static string BR { get { return _BR; } private set { _BR = value; } }
+
+        private static string _NL;
+        /// <summary>New line "character"</summary>
+        public static string NL
+        {
+            get
+            {
+                if (_NL == null)
+                {
+                    if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+                        _NL = "\r\n";
+                    else
+                        _NL = "\n";
+                }
+                return _NL;
+            }
+            private set
+            {
+                _NL = value;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Exchange texts between each other
         /// </summary>
@@ -774,7 +803,7 @@ namespace Energy.Base
             string pattern = @"^[\s\t\v\ ]*(?:\r\n|\n|\r)+";
             string result = Regex.Replace(text, pattern, "", RegexOptions.Multiline);
             if (eol)
-                result += Environment.NewLine;
+                result += Energy.Base.Text.NL;
             return result;
         }
 
@@ -1189,7 +1218,7 @@ namespace Energy.Base
                 , RegexOptions.IgnoreCase).Success)
             {
                 return System.Text.Encoding.BigEndianUnicode;
-            }            
+            }
             int number = Energy.Base.Cast.StringToInteger(encoding);
             try
             {
@@ -1232,7 +1261,7 @@ namespace Energy.Base
         /// <returns>string[]</returns>
         public static string ConvertNewLine(string text)
         {
-            return ConvertNewLine(text, Environment.NewLine);
+            return ConvertNewLine(text, Energy.Base.Text.NL);
         }
 
         #endregion
@@ -1422,6 +1451,47 @@ namespace Energy.Base
         public static object Chop(ref object[] array)
         {
             return Chop<object>(ref array);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index)
+        {
+            return GetElementOrEmpty<string>(array, index, "");
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index, string emptyValue)
+        {
+            return GetElementOrEmpty<string>(array, index, emptyValue);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static T GetElementOrEmpty<T>(T[] array, int index, T emptyValue)
+        {
+            if (array == null || array.Length == 0)
+                return emptyValue;
+            else if (array.Length <= index)
+                return emptyValue;
+            else
+                return array[index];
         }
 
         #endregion

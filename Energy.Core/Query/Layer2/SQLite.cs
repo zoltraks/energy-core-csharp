@@ -55,7 +55,7 @@ namespace Energy.Query
                     }
                     list.Add(line);
                 }
-                string join = string.Concat(" ,", Environment.NewLine, "\t");
+                string join = string.Concat(" ,", Energy.Base.Text.NL, "\t");
                 s.Append(string.Concat("\t", string.Join(join, list.ToArray())));
                 s.AppendLine();
                 s.AppendLine(")");

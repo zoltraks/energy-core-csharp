@@ -198,41 +198,49 @@ namespace Energy.Core
             _Colorless = value;
         }
 
-        private static string _PauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
-        /// <summary>DefaultPauseText</summary>
+        public const string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
+        private static string _PauseText = DefaultPauseText;
         public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
+
+        public const string DefaultAskSimpleText = "~15~{0}~0~ : ";
+        private static string _AskSimpleText = DefaultAskSimpleText;
+        public static string AskSimpleText { get { return _AskSimpleText; } set { _AskSimpleText = value; } }
+
+        public const string DefaultAskChangeText = "~15~{0}~0~ ~13~[~0~ ~11~{1}~0~ ~13~]~0~ : ";
+        private static string _AskChangeText = DefaultAskChangeText;
+        public static string AskChangeText { get { return _AskChangeText; } set { _AskChangeText = value; } }
 
         private static string _ExampleColorPalleteTildeString = ""
             + "~darkblue~~#~1~#~\t~#~darkblue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkred~~#~4~#~\t~#~darkred~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~gray~~#~7~#~\t~#~gray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgray~~#~8~#~\t~#~darkgray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~blue~~#~9~#~\t~#~blue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~green~~#~10~#~\t~#~green~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~cyan~~#~11~#~\t~#~cyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~red~~#~12~#~\t~#~red~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~magenta~~#~13~#~\t~#~magenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~yellow~~#~14~#~\t~#~yellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~white~~#~15~#~\t~#~white~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~black~~#~16~#~\t~#~black~#~"
             ;
 
@@ -253,7 +261,14 @@ namespace Energy.Core
         /// <returns>Value entered or default if skipped</returns>
         public static string Ask(string question, string value)
         {
-            Tilde.Write("~15~" + question + (String.IsNullOrEmpty(value) ? "" : "~13~" + " [ " + "~9~" + value + "~13~" + " ]") + "~0~" + " : ");
+            if (!string.IsNullOrEmpty(question))
+            {
+                if (value == null)
+                    value = "";
+                string message = value == "" ? AskSimpleText : AskChangeText;
+                message = string.Format(message, question, value);
+                Tilde.Write(message);
+            }
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
             System.Console.ForegroundColor = System.ConsoleColor.Yellow;
@@ -370,7 +385,7 @@ namespace Energy.Core
             for (int i = 0; i < padding; i++)
                 s.AppendLine();
             string x = s.ToString();
-            string t = string.Concat(x, line, x, Environment.NewLine);
+            string t = string.Concat(x, line, x, Energy.Base.Text.NL);
             Write(t);
         }
 
@@ -616,7 +631,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string format, params object[] value)
         {
-            Write(string.Concat(string.Format(format, value), Environment.NewLine));
+            Write(string.Concat(string.Format(format, value), Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -684,7 +699,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string value)
         {
-            Write(string.Concat(value, Environment.NewLine));
+            Write(string.Concat(value, Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -695,7 +710,7 @@ namespace Energy.Core
         public static void WriteLine(ConsoleColor color, string text)
         {
             Write(string.Concat(ConsoleColorToTildeColor(color), Escape(text)
-                , Environment.NewLine));
+                , Energy.Base.Text.NL));
         }
 
         #endregion
@@ -914,7 +929,7 @@ namespace Energy.Core
                 //}
                 //if (stack.Count > 0)
                 //{
-                //    message += "~ds~" + String.Join(Environment.NewLine, stack.ToArray()) + "~0~" + Environment.NewLine;
+                //    message += "~ds~" + String.Join(Energy.Base.Text.NL, stack.ToArray()) + "~0~" + Energy.Base.Text.NL;
                 //}
             }
 
@@ -1009,6 +1024,45 @@ namespace Energy.Core
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Read line from console using mask character. Could be useful for passwords.
+        /// Returns null if user press ESC key.
+        /// </summary>
+        /// <returns></returns>
+        public static string ReadLine(char? mask)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            System.ConsoleKeyInfo key;
+            do
+            {
+                key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return stringBuilder.ToString();
+                }
+                if (key.Key == System.ConsoleKey.Backspace)
+                {
+                    if (stringBuilder.Length > 0)
+                    {
+                        stringBuilder.Length = stringBuilder.Length - 1;
+                        Console.Write("\b \b");
+                    }
+                    continue;
+                }
+                if (!char.IsControl(key.KeyChar))
+                {
+                    stringBuilder.Append(key.KeyChar);
+                    if (mask != null)
+                        Console.Write(mask);
+                    else
+                        Console.Write(key.KeyChar);
+                }
+            }
+            while (key.Key != ConsoleKey.Escape);
+            return null;
         }
 
         #endregion
