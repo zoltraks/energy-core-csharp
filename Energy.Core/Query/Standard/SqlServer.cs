@@ -9,7 +9,7 @@ namespace Energy.Query.Standard
         public SqlServer()
         {
             this.Format.UseT = true;
-            this.Format.ObjectQuote.Bracket = "[]";
+            this.Format.Bracket.Object.Enclosure = "[]";
             this.Special.AddRange(new string[]
             {
                 "CREATE",

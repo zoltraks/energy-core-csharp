@@ -42,7 +42,7 @@ namespace SQLiteCreateExample
             Energy.Interface.IDialect dialect = new Energy.Query.Dialect.SQLITE();
             Energy.Query.Script script = new Energy.Query.Script.SQLite();
             string query;
-            query = "select " + dialect.Format.CurrentTimestamp;
+            query = "select " + dialect.Format.CurrentStamp;
             Console.WriteLine(query);
             Console.WriteLine(db.Scalar(query));
 
