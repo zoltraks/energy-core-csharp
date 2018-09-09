@@ -27,11 +27,6 @@ namespace Energy.Query
                 /// Object bracket for database objects.
                 /// </summary>
                 public Energy.Base.Bracket Object; // "column"
-
-                /// <summary>
-                /// Numeric bracket for numbers.
-                /// </summary>
-                public Energy.Base.Bracket Numeric; // 123
             }
         }
 
@@ -60,7 +55,6 @@ namespace Energy.Query
         {
             Bracket.Literal = "'";
             Bracket.Object = "\"";
-            Bracket.Numeric = "";
 
             CurrentStamp = "CURRENT_TIMESTAMP";
         }
@@ -81,7 +75,6 @@ namespace Energy.Query
                 dialect = "";
             string literal = "'";
             string special = "\"";
-            string numeric = "";
             string current = "";
             bool useT = false;
             switch (dialect.Trim().ToUpper())
@@ -90,21 +83,18 @@ namespace Energy.Query
                 default:
                     literal = "'";
                     special = "\"";
-                    numeric = "";
                     current = "CURRENT_TIMESTAMP";
                     break;
 
                 case "MYSQL":
                     literal = "'";
                     special = "`";
-                    numeric = "";
                     current = "CURRENT_TIMESTAMP()";
                     break;
 
                 case "SQLSERVER":
                     literal = "'";
                     special = "[]";
-                    numeric = "";
                     current = "GETDATE()";
                     useT = true;
                     break;
@@ -112,14 +102,12 @@ namespace Energy.Query
                 case "SQLITE":
                     literal = "'";
                     special = "\"";
-                    numeric = "";
                     current = "(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))";
                     break;
             }
 
             this.Bracket.Literal = literal;
             this.Bracket.Object = special;
-            this.Bracket.Numeric = numeric;
             this.CurrentStamp = current;
             this.UseT = useT;
         }
