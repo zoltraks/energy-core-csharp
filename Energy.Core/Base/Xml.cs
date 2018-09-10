@@ -56,11 +56,7 @@ namespace Energy.Base
             }
             catch (Exception x)
             {
-                Debug.WriteLine(x.Message);
-                if (x.InnerException != null && x.InnerException.Message != x.Message)
-                {
-                    Debug.WriteLine(x.InnerException.Message);
-                }
+                Energy.Core.Bug.Catch(x);
             }
             return xml;
         }
