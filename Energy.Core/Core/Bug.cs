@@ -50,9 +50,9 @@ namespace Energy.Core
         /// <summary>
         /// Constructor
         /// </summary>
-        public Bug()
+        static Bug()
         {
-            System.Diagnostics.Debug.WriteLine("BUG");
+            //System.Diagnostics.Debug.WriteLine("BUG");
             TraceLogging = false;
             DebugOutputTime = true;
         }
