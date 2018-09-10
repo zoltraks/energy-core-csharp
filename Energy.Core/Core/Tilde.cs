@@ -893,10 +893,12 @@ namespace Energy.Core
             List<string> list = new List<string>();
             string message = (exception.Message ?? "").Trim();
             const string eol = "~0~\r\n";
+
             if (!String.IsNullOrEmpty(message))
             {
                 list.Add(string.Concat("~r~", message));
             }
+
             if (exception.InnerException != null)
             {
                 string next = (exception.InnerException.Message ?? "").Trim();
@@ -905,32 +907,26 @@ namespace Energy.Core
                     list.Add(string.Concat("~m~", next));
                 }
             }
+
             if (trace)
             {
-                string pattern = @"^\s+[a-z]+\s+(?<method>[a-z][a-z0-9_\.]*\([^\)\r\n]*\))(?:(?:[\ \t]+[a-z]+[\ \t]+)(?<file>[^\r\n]+))?";
-                Regex r = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
-                Match m = r.Match(exception.StackTrace);
-                while (m.Success)
+                //string stackTrace = Energy.Base.Class.GetFieldOrPropertyValue(exception, "StackTrace") as string;
+                string stackTrace = exception.StackTrace;
+                if (!string.IsNullOrEmpty(stackTrace))
                 {
-                    string method = m.Groups["method"].Value;
-                    string file = m.Groups["file"].Value;
-                    m = m.NextMatch();
-                    list.Add(string.Concat(Energy.Core.Tilde.Color.DarkGray
-                        , method, " ", Energy.Core.Tilde.Color.Yellow
-                        , file).Trim());
+                    string pattern = @"^\s+[a-z]+\s+(?<method>[a-z][a-z0-9_\.]*\([^\)\r\n]*\))(?:(?:[\ \t]+[a-z]+[\ \t]+)(?<file>[^\r\n]+))?";
+                    Regex r = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
+                    Match m = r.Match(stackTrace);
+                    while (m.Success)
+                    {
+                        string method = m.Groups["method"].Value;
+                        string file = m.Groups["file"].Value;
+                        m = m.NextMatch();
+                        list.Add(string.Concat(Energy.Core.Tilde.Color.DarkGray
+                            , method, " ", Energy.Core.Tilde.Color.Yellow
+                            , file).Trim());
+                    }
                 }
-
-                //string comment = (new Regex(@"^\s*\w+\s*", RegexOptions.Multiline).Replace(exception.StackTrace, ""));
-                //string[] split = Energy.Base.Text.SplitNewLine(comment);
-                //List<string> stack = new List<string>();
-                //for (int i = split.Length - 1; i >= 0; i--)
-                //{
-                //    stack.Add(split[i]);
-                //}
-                //if (stack.Count > 0)
-                //{
-                //    message += "~ds~" + String.Join(Energy.Base.Text.NL, stack.ToArray()) + "~0~" + Energy.Base.Text.NL;
-                //}
             }
 
             message = string.Join(eol, list.ToArray());

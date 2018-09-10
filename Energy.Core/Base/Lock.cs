@@ -19,7 +19,8 @@ namespace Energy.Base
         /// </summary>
         public Lock()
         {
-            Energy.Core.Bug.Write("Lock {0} created at {1}", this.GetHashCode(), Energy.Core.Bug.CallingMethod(1));
+            Energy.Core.Bug.Write("CREATE LOCK {0} {1}", this.GetHashCode()
+                , Energy.Core.Bug.CallingMethod(1));
         }
     }
 }
