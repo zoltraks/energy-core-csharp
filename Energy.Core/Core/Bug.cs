@@ -10,15 +10,56 @@ namespace Energy.Core
 {
     public class Bug
     {
+        #region Property
+
         /// <summary>
         /// Trace switch
         /// </summary>
-        public readonly static Energy.Base.Switch Trace = false;
+        public static Energy.Base.Switch TraceLogging;
 
         /// <summary>
         /// Use time when writing to System.Diagnostics.Debug
         /// </summary>
-        public readonly static Energy.Base.Switch DebugOutputTime = true;
+        public static Energy.Base.Switch DebugOutputTime;
+
+        private static Energy.Core.Log _Log;
+        /// <summary>Log</summary>
+        public static Energy.Core.Log Log
+        {
+            get
+            {
+                if (_Log == null)
+                {
+                    return Core.Log.Default;
+                }
+                else
+                {
+                    return _Log;
+                }
+            }
+            set
+            {
+                _Log = value;
+            }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Bug()
+        {
+            System.Diagnostics.Debug.WriteLine("BUG");
+            TraceLogging = false;
+            DebugOutputTime = true;
+        }
+
+        #endregion
+
+        #region ExceptionMessage
 
         /// <summary>
         /// Return exception message
@@ -61,17 +102,7 @@ namespace Energy.Core
                 message.Add(fault.Message);
             }
 
-            return String.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
-        }
-
-        /// <summary>
-        /// Get current thread id as hex string.
-        /// </summary>
-        /// <returns></returns>
-        public static string ThreadIdHex()
-        {
-            int id = Thread.CurrentThread.ManagedThreadId;
-            return Energy.Base.Hex.IntegerToHex(id);
+            return string.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
         }
 
         /// <summary>
@@ -81,8 +112,36 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string ExceptionMessage(Exception exception)
         {
-            return ExceptionMessage(exception, (bool)Trace);
+            return ExceptionMessage(exception, (bool)TraceLogging);
         }
+      
+        #endregion
+
+        #region ThreadIdHex
+
+        /// <summary>
+        /// Get thread id as hex string.
+        /// </summary>
+        /// <param name="thread"></param>
+        /// <returns></returns>
+        public static string ThreadIdHex(System.Threading.Thread thread)
+        {
+            int id = thread.ManagedThreadId;
+            return Energy.Base.Hex.IntegerToHex(id);
+        }
+
+        /// <summary>
+        /// Get current thread id as hex string.
+        /// </summary>
+        /// <returns></returns>
+        public static string ThreadIdHex()
+        {
+            return ThreadIdHex(System.Threading.Thread.CurrentThread);
+        }
+
+        #endregion
+
+        #region CallingMethod
 
         /// <summary>
         /// Return calling method name
@@ -132,6 +191,10 @@ namespace Energy.Core
             return CallingMethod(1);
         }
 
+        #endregion
+
+        #region FormatDebugOutput
+
         public static string FormatDebugOutput(string message)
         {
             if ((bool)DebugOutputTime)
@@ -141,6 +204,10 @@ namespace Energy.Core
             return message;
         }
 
+        #endregion
+
+        #region Catch
+
         /// <summary>
         /// Handle exception
         /// </summary>
@@ -149,11 +216,15 @@ namespace Energy.Core
         {
             string message = ExceptionMessage(exception, true);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                Log.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        #endregion
+
+        #region Write
 
         /// <summary>
         /// Write debug message
@@ -162,7 +233,7 @@ namespace Energy.Core
         public static void Write(string message)
         {
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
@@ -177,11 +248,15 @@ namespace Energy.Core
         {
             string message = string.Format(format, args);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        #endregion
+
+        #region WriteFormat
 
         /// <summary>
         /// Write debug message
@@ -192,7 +267,7 @@ namespace Energy.Core
         {
             string message = string.Format(format, args);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
@@ -208,11 +283,13 @@ namespace Energy.Core
         {
             string message = string.Format(provider, format, args);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        #endregion
 
         #region Trap
 
