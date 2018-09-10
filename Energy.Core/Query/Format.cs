@@ -303,6 +303,16 @@ namespace Energy.Query
         /// Format as NUMBER.
         /// </summary>
         /// <param name="value"></param>
+        /// <returns></returns>
+        public string Number(object value)
+        {
+            return Number(value, false);
+        }
+
+        /// <summary>
+        /// Format as NUMBER.
+        /// </summary>
+        /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns></returns>
         public string Number(object value, bool nullify = false)
@@ -331,22 +341,20 @@ namespace Energy.Query
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (value is decimal)
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            if (value is string)
-            {
-                string v = ((string)value).Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
-                long l;
-                if (long.TryParse(v, out l))
-                    return Number(l);
-                double d;
-                if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.InvariantCulture, out d))
-                    return Number(d);
-                if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture, out d))
-                    return Number(d);
-                return nullify ? "NULL" : "0";
-            }
-            throw new NotImplementedException();
+
+            string s = value is string ? (string)value : value.ToString();
+            string v = s.Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
+            long l;
+            if (long.TryParse(v, out l))
+                return Number(l);
+            double d;
+            if (double.TryParse(v, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.InvariantCulture, out d))
+                return Number(d);
+            if (double.TryParse(v, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.CurrentCulture, out d))
+                return Number(d);
+            return nullify ? "NULL" : "0";
         }
 
         #endregion
@@ -360,27 +368,42 @@ namespace Energy.Query
         /// <returns>string</returns>
         public string Integer(decimal number)
         {
-            return ((long)Math.Floor(number)).ToString();
+            return Number(Math.Floor(number));
         }
 
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
-        /// <param name="number">decimal</param>
+        /// <param name="number"></param>
         /// <returns>string</returns>
         public string Integer(double number)
         {
-            return ((long)Math.Floor(number)).ToString();
+            return Number(Math.Floor(number));
         }
 
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
-        /// <param name="number">decimal</param>
+        /// <param name="number"></param>
         /// <returns>string</returns>
         public string Integer(int number)
         {
             return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="nullify"></param>
+        /// <returns>string</returns>
+        public string Integer(object number, bool nullify)
+        {
+            if (number == null)
+                return Number(number, nullify);
+            if (number is decimal)
+                return Number((decimal)number, nullify);
+            return Number(Energy.Base.Cast.ObjectToLong(number), nullify);
         }
 
         #endregion

@@ -151,10 +151,15 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
         {
-            value = string.IsNullOrEmpty(value)
-                ? value
-                : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            return value;
+            if (value == null || value.Length == 0)
+            {
+                return value;
+            }
+            else
+            {
+                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+                return value;
+            }
         }
 
         #region Is
