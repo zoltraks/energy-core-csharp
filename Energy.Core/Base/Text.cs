@@ -1503,7 +1503,7 @@ namespace Energy.Base
 
         #region Parse
 
-        public bool Parse(string text, out bool boolean)
+        public static bool TryParse(string text, out bool boolean)
         {
             boolean = Energy.Base.Cast.StringToBool(text);
             return true;
@@ -1511,7 +1511,7 @@ namespace Energy.Base
 
         private static bool? _TypeInt32HasTryParse = null;
 
-        public static bool Parse(string text, out int integer)
+        public static bool TryParse(string text, out int integer)
         {
             if (text == null || text.Length == 0)
             {
@@ -1528,7 +1528,6 @@ namespace Energy.Base
                     , null
                     );
                 _TypeInt32HasTryParse = method != null;
-
             }
             if ((bool)_TypeInt32HasTryParse)
             {
