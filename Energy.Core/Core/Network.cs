@@ -1,8 +1,20 @@
-﻿using System;
+﻿#if CFNET
+    //
+#elif WindowsCE || PocketPC || WINDOWS_PHONE
+    //
+#define CFNET
+#elif COMPACT_FRAMEWORK
+//
+#define CFNET
+#else
+    //
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
+//using System.Net.NetworkInformation;
 using Energy.Interface;
 using System.Net;
 using Energy.Abstract;
@@ -470,6 +482,7 @@ namespace Energy.Core
 
         #region Ping
 
+#if !CFNET
         public static int Ping(string address, int timeout, out System.Net.NetworkInformation.IPStatus status)
         {
             status = System.Net.NetworkInformation.IPStatus.Unknown;
@@ -478,7 +491,7 @@ namespace Energy.Core
             {
                 System.Net.NetworkInformation.PingReply response = request.Send(address, timeout);
                 status = response.Status;
-                if (response.Status == IPStatus.Success)
+                if (response.Status == System.Net.NetworkInformation.IPStatus.Success)
                 {
                     return (int)response.RoundtripTime;
                 }
@@ -493,18 +506,23 @@ namespace Energy.Core
                 return -1;
             }
         }
+#endif
 
+#if !CFNET
         public static int Ping(string address, int timeout)
         {
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, timeout, out status);
         }
+#endif
 
+#if !CFNET
         public static int Ping(string address)
         {
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
+#endif
 
         #endregion
     }
