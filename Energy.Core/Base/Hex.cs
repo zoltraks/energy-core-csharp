@@ -245,6 +245,8 @@ namespace Energy.Base
             string hex = value.ToString(uppperCase ? "X" : "x");
             if (hex.Length < size)
                 hex = hex.PadLeft(size, '0');
+            else if (hex.Length > size)
+                hex = hex.Substring(hex.Length - size);
             return hex;
         }
 

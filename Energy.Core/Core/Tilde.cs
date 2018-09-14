@@ -1,24 +1,23 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Energy.Enumeration;
-using System.Text;
 
 namespace Energy.Core
 {
     /// <summary>
     /// Simple elegant text coloring engine for console programs.
     /// Based on Empty Page #0 color engine.
-    /// 
+    ///
     /// Color may be specified by its number or name surrounded by tilde (~) character.
     /// One tilde followed by a character other than a letter or number or a fragment consisting of two or more tilde characters will not be formatted.
-    /// 
+    ///
     /// Colors that can be used are the same as on a standard command console.
     /// There are 15 different colours plus black.
-    /// 
+    ///
     /// Dark colour identifiers are preceded by the letter 'd' (dark).
     /// In a similar way, bright-colour identifiers can be preceded by the letter 'l' (light).
-    /// 
+    ///
     /// Color changes one by one are ignored.Only the last defined color will be used.
     /// </summary>
     /// <remarks>
@@ -308,7 +307,7 @@ namespace Energy.Core
         /// <param name="casing">Character casing</param>
         /// <param name="value">Default value</param>
         /// <returns>Value entered or default if skipped</returns>
-        public static string Ask(string question, CharacterCasing casing, string value)
+        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing, string value)
         {
             string answer = Ask(question);
             if (String.IsNullOrEmpty(answer))
@@ -317,9 +316,9 @@ namespace Energy.Core
             {
                 default:
                     return answer;
-                case CharacterCasing.Lower:
+                case Energy.Enumeration.CharacterCasing.Lower:
                     return answer.ToLower();
-                case CharacterCasing.Upper:
+                case Energy.Enumeration.CharacterCasing.Upper:
                     return answer.ToUpper();
             }
         }
@@ -331,7 +330,7 @@ namespace Energy.Core
         /// <param name="question">Question string</param>
         /// <param name="casing">Character casing</param>
         /// <returns>Value entered or default if skipped, empty string by default</returns>
-        public static string Ask(string question, CharacterCasing casing)
+        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing)
         {
             return Ask(question, casing, "");
         }

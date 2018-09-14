@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
+//using System.IO.Compression;
 using System.Text;
 
 namespace Energy.Base
@@ -27,7 +27,8 @@ namespace Energy.Base
                 try
                 {
                     using (MemoryStream memoryStream = new MemoryStream())
-                    using (DeflateStream compressionStream = new DeflateStream(memoryStream, CompressionMode.Compress))
+                    using (System.IO.Compression.DeflateStream compressionStream = new System.IO.Compression.DeflateStream(memoryStream
+                        , System.IO.Compression.CompressionMode.Compress))
                     {
                         compressionStream.Write(data, 0, data.Length);
                         compressionStream.Close();
@@ -53,7 +54,8 @@ namespace Energy.Base
                 {
                     using (MemoryStream inputStream = new MemoryStream(data))
                     using (MemoryStream outputStream = new MemoryStream())
-                    using (DeflateStream decompressionStream = new DeflateStream(inputStream, CompressionMode.Decompress))
+                    using (System.IO.Compression.DeflateStream decompressionStream = new System.IO.Compression.DeflateStream(inputStream
+                        , System.IO.Compression.CompressionMode.Decompress))
                     {
                         int count = 2048;
                         byte[] buffer = new byte[count];
@@ -91,7 +93,8 @@ namespace Energy.Base
                 try
                 {
                     using (MemoryStream memoryStream = new MemoryStream())
-                    using (GZipStream compressionStream = new GZipStream(memoryStream, CompressionMode.Compress))
+                    using (System.IO.Compression.GZipStream compressionStream = new System.IO.Compression.GZipStream(memoryStream
+                        , System.IO.Compression.CompressionMode.Compress))
                     {
                         compressionStream.Write(data, 0, data.Length);
                         compressionStream.Close();
@@ -117,7 +120,8 @@ namespace Energy.Base
                 {
                     using (MemoryStream inputStream = new MemoryStream(data))
                     using (MemoryStream outputStream = new MemoryStream())
-                    using (GZipStream decompressionStream = new GZipStream(inputStream, CompressionMode.Decompress))
+                    using (System.IO.Compression.GZipStream decompressionStream = new System.IO.Compression.GZipStream(inputStream
+                        , System.IO.Compression.CompressionMode.Decompress))
                     {
                         int count = 2048;
                         byte[] buffer = new byte[count];

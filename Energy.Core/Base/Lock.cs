@@ -10,9 +10,9 @@ namespace Energy.Base
     /// </summary>
     public class Lock
     {
-        private DateTimeOffset _Create = DateTimeOffset.Now;
+        private DateTime _Create = DateTime.Now;
         /// <summary>Create stamp</summary>
-        public DateTimeOffset CreateStamp { get { return _Create; } }
+        public DateTime CreateStamp { get { return _Create; } }
 
         /// <summary>
         /// Constructor

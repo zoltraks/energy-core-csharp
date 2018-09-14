@@ -58,6 +58,7 @@
     <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Counter.cs" />
     <Compile Include="Base\File.cs" />
+    <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Syntax.cs" />
     <Compile Include="Base\Queue.cs" />
