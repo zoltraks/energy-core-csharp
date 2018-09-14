@@ -1075,6 +1075,7 @@ namespace Energy.Base
         /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if 0</param>
         /// <returns>string</returns>
         public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds)
         {
@@ -1442,6 +1443,65 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert object to integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int ObjectToInteger(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (int)(long)value;
+            if (value is int)
+                return (int)(int)value;
+            if (value is double)
+                return (int)(double)value;
+            if (value is uint)
+                return (int)(uint)value;
+            if (value is ulong)
+                return (int)(ulong)value;
+            if (value is decimal)
+                return (int)(decimal)value;
+
+            if (value is Int16)
+                return (int)(Int16)value;
+            if (value is UInt16)
+                return (int)(UInt16)value;
+
+            if (value is short)
+                return (int)(short)value;
+            if (value is ushort)
+                return (int)(ushort)value;
+            if (value is byte)
+                return (int)(byte)value;
+            if (value is char)
+                return (int)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            int i = 0;
+            long l = 0;
+            double d = 0;
+
+            if (false)
+            { }
+            else if (int.TryParse(s, out i))
+                return i;
+            else if (long.TryParse(s, out l))
+                return (int)l;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (int)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (int)d;
+
+            return 0;
+        }
+        /// <summary>
         /// Convert object to long integer number.
         /// </summary>
         /// <param name="value"></param>
@@ -1478,29 +1538,16 @@ namespace Energy.Base
             if (value is char)
                 return (long)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
-
-            if (s == null)
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
                 return 0;
 
-            long r = 0;
+            long l = 0;
             double d = 0;
 
-            if (long.TryParse(s, out r))
-                return r;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (long)d;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (long)d;
-
-            s = s.Trim();
-
-            if (long.TryParse(s, out r))
-                return r;
+            if (long.TryParse(s, out l))
+                return l;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
                 return (long)d;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
@@ -1553,11 +1600,121 @@ namespace Energy.Base
             return StringToBool(ObjectToString(value));
         }
 
-        public static int ObjectToInteger(object value)
+        /// <summary>
+        /// Convert object to double number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static double ObjectToDouble(object value)
         {
-            return (int)ObjectToLong(value);
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (double)(long)value;
+            if (value is int)
+                return (double)(int)value;
+            if (value is double)
+                return (double)(double)value;
+            if (value is uint)
+                return (double)(uint)value;
+            if (value is ulong)
+                return (double)(ulong)value;
+            if (value is decimal)
+                return (double)(decimal)value;
+
+            if (value is Int16)
+                return (double)(Int16)value;
+            if (value is UInt16)
+                return (double)(UInt16)value;
+
+            if (value is short)
+                return (double)(short)value;
+            if (value is ushort)
+                return (double)(ushort)value;
+            if (value is byte)
+                return (double)(byte)value;
+            if (value is char)
+                return (long)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            long l = 0;
+            double d = 0;
+
+            if (long.TryParse(s, out l))
+                return (double)l;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (long)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (long)d;
+
+            return 0;
         }
 
+        /// <summary>
+        /// Convert object to double number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static decimal ObjectToDecimal(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (decimal)(long)value;
+            if (value is int)
+                return (decimal)(int)value;
+            if (value is double)
+                return (decimal)(double)value;
+            if (value is uint)
+                return (decimal)(uint)value;
+            if (value is ulong)
+                return (decimal)(ulong)value;
+            if (value is decimal)
+                return (decimal)(decimal)value;
+
+            if (value is Int16)
+                return (decimal)(Int16)value;
+            if (value is UInt16)
+                return (decimal)(UInt16)value;
+
+            if (value is short)
+                return (decimal)(short)value;
+            if (value is ushort)
+                return (decimal)(ushort)value;
+            if (value is byte)
+                return (decimal)(byte)value;
+            if (value is char)
+                return (decimal)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            long l = 0;
+            decimal d = 0;
+
+            if (long.TryParse(s, out l))
+                return (decimal)l;
+            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (decimal)d;
+            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (decimal)d;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert object to unsigned byte.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static byte ObjectToByte(object value)
         {
             if (value == null)

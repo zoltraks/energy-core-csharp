@@ -190,7 +190,7 @@ namespace Energy.Base
         {
             string result = indent;
             if (Value != null) result += Value.ToString();
-            if (!String.IsNullOrEmpty(indent)) result += Environment.NewLine;
+            if (!String.IsNullOrEmpty(indent)) result += Energy.Base.Text.NL;
             for (int i = 0; i < children.Count; i++)
             {
                 result += children[i].ToString(indent + indent);
