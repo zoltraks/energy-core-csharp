@@ -94,8 +94,8 @@ namespace Energy.Core
 
         public Energy.Base.Collection.StringDictionary<object> Dictionary;
 
-        public Energy.Base.Bracket.Array Brackets; 
-        
+        public Energy.Base.Bracket.Array Brackets;
+
         #region Constructor
 
         public Syntax()
