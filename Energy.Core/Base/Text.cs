@@ -1532,5 +1532,67 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Parse
+
+        public static bool TryParse(string text, out bool boolean)
+        {
+            boolean = Energy.Base.Cast.StringToBool(text);
+            return true;
+        }
+
+        private static bool? _TypeInt32HasTryParse = null;
+
+        public static bool TryParse(string text, out int integer)
+        {
+            if (text == null || text.Length == 0)
+            {
+                integer = 0;
+                return false;
+            }
+            if (_TypeInt32HasTryParse == null)
+            {
+                Type type = typeof(int);
+                System.Reflection.MemberInfo method = typeof(int).GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), typeof(int).MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt32HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt32HasTryParse)
+            {
+                return int.TryParse(text, out integer);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        integer = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    integer = System.Convert.ToInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    integer = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    integer = 0;
+                    return false;
+                }
+            }
+        }
+
+        #endregion
     }
 }
