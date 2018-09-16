@@ -25,6 +25,7 @@ Installation package contains versions for **.NET 4**, **.NET Standard** / **.NE
 Documentation
 -------------
 
+http://energy-core.readthedocs.io/
 
 Examples
 --------
