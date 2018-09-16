@@ -237,5 +237,29 @@ namespace Energy.Attribute
                 name = value;
             }
         }
+
+        /// <summary>
+        /// What to do with null values?
+        /// </summary>
+        public class NullAttribute : System.Attribute
+        {
+            private bool ignore;
+
+            /// <summary>
+            /// Ignore column if value is null when scripting.
+            /// </summary>
+            public bool Ignore { get { return ignore; } set { ignore = value; } }
+
+            private bool zero;
+
+            /// <summary>
+            /// Zero value to default when value was NULL.
+            /// </summary>
+            public bool Zero { get { return zero; } set { zero = value; } }
+
+            public NullAttribute()
+            {
+            }
+        }
     }
 }

@@ -1,10 +1,21 @@
-﻿using System;
+﻿#if CFNET
+    //
+#elif WindowsCE || PocketPC || WINDOWS_PHONE
+    //
+#define CFNET
+#elif COMPACT_FRAMEWORK
+//
+#define CFNET
+#else
+    //
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
+//using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Energy.Base;
 
@@ -41,7 +52,20 @@ namespace Energy.Core
 
         #region Certificate validation
 
-        private static bool ServerIgnoreCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+#if !CFNET
+        private static bool ServerIgnoreCertificateValidationCallback(object sender
+            , System.Security.Cryptography.X509Certificates.X509Certificate certificate
+            , System.Security.Cryptography.X509Certificates.X509Chain chain
+            , System.Net.Security.SslPolicyErrors sslPolicyErrors
+            )
+        {
+            return (true);
+        }
+#endif
+
+        private static bool ServerIgnoreCertificateValidationCallback(object sender
+            , System.Security.Cryptography.X509Certificates.X509Certificate certificate
+            )
         {
             return (true);
         }

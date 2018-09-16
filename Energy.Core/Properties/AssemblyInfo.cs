@@ -1,4 +1,16 @@
-﻿using System.Reflection;
+﻿#if CFNET
+    //
+#elif WindowsCE || PocketPC || WINDOWS_PHONE
+    //
+#define CFNET
+#elif COMPACT_FRAMEWORK
+//
+#define CFNET
+#else
+    //
+#endif
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -33,4 +45,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("2018.01.29.*")]
+#if !CFNET
 [assembly: AssemblyFileVersion("18.01.1")]
+#endif

@@ -66,8 +66,10 @@ namespace Energy.Base
             return null;
         }
 
+        #region Surround
+
         /// <summary>
-        /// Surround text with delimiters if contains delimiter itself or any of special characters
+        /// Surround text with delimiters if contains delimiter itself or any of special characters.
         /// </summary>
         /// <param name="value">Text value</param>
         /// <param name="delimiter">Delimiter like ' or "</param>
@@ -118,6 +120,36 @@ namespace Energy.Base
         {
             return Surround(value, delimiter, null);
         }
+
+        /// <summary>
+        /// Surround text with prefix and suffix, optionally adding prefix only when needed.
+        /// </summary>
+        /// <param name="text">Text to surround</param>
+        /// <param name="prefix">Prefix to add at begining</param>
+        /// <param name="suffix">Suffix to add at ending</param>
+        /// <param name="optional">Add prefix and suffix only when needed</param>
+        /// <returns></returns>
+        public static string Surround(string text, string prefix, string suffix, bool optional)
+        {
+            if (String.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (!optional)
+            {
+                return String.Concat(prefix, text, suffix);
+            }
+            else
+            {
+                if (!text.StartsWith(prefix))
+                    text = prefix + text;
+                if (!text.EndsWith(suffix))
+                    text = text + suffix;
+                return text;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Repeat string pattern to specified amount of characters length.
