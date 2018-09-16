@@ -1,9 +1,15 @@
-**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. 
+Energy Core Library
+===================
+
+**Energy.Core** is a **.NET** library which boosts your program with static functionality covering various type conversions,
+database abstraction layer, object mapping and simple application framework.
+Useful to build simple console applications as well as services, websites or even bigger applications. 
 
 Filled with radioactive rays and made with love for you...
 
-Designed for all purposes as a set of libraries compiled into one include file. No external dependencies (*almost*), available for main .NET platform versions. Including **.NET 2** or **Compact Framework** but also available for new **.NET Core** platform.
-
+Designed for all purposes as a set of different classes compiled into one library file.
+It has minimal set of external dependencies and is available for several .NET platform versions.
+Supports old **.NET 2.0** as well as new **.NET Core** platform.
 
 Installation
 ------------
@@ -15,6 +21,10 @@ Install-Package Energy.Core
 ```
 
 Installation package contains versions for **.NET 4**, **.NET Standard** / **.NET Core** and legacy **.NET 2**. Nuget should choose apropriate version automatically.
+
+Documentation
+-------------
+
 
 Examples
 --------
