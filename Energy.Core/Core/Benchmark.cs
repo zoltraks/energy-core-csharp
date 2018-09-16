@@ -7,15 +7,6 @@ namespace Energy.Core
 {
     public class Benchmark
     {
-        #region Action
-
-        /// <summary>
-        /// Test function delegate
-        /// </summary>
-        public delegate void Action();
-
-        #endregion
-
         #region Result
 
         public class Result
@@ -105,12 +96,13 @@ namespace Energy.Core
         #region Profile
 
         /// <summary>
-        /// Profile function
+        /// Perform a profiling operation by launching the action the specified number of times
+        /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="warm"></param>
-        public static Result Profile(Action function, int iterations, int warm)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, int warm)
         {
             Result result = new Result() { Name = function.Method.Name, Iterations = iterations };
 
@@ -158,12 +150,13 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Profile function
+        /// Perform a profiling operation by launching the action the specified number of times
+        /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="name"></param>
-        public static Result Profile(Action function, int iterations, string name)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, string name)
         {
             Result result = Profile(function, iterations, 0);
             if (!string.IsNullOrEmpty(name))
@@ -172,13 +165,14 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Profile function
+        /// Perform a profiling operation by launching the action the specified number of times
+        /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="warm"></param>
         /// <param name="name"></param>
-        public static Result Profile(Action function, int iterations, int warm, string name)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, int warm, string name)
         {
             Result result = Profile(function, iterations, warm);
             if (!string.IsNullOrEmpty(name))
@@ -187,20 +181,22 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Profile function
+        /// Perform a profiling operation by launching the action the specified number of times
+        /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
-        public static Result Profile(Action function, int iterations)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations)
         {
             return Profile(function, iterations, 0);
         }
 
         /// <summary>
-        /// Profile function
+        /// Perform a profiling operation by launching the action the specified number of times
+        /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
-        public static Result Profile(Action function)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function)
         {
             return Profile(function, 1, 0);
         }
@@ -209,7 +205,7 @@ namespace Energy.Core
 
         #region TimeMeasurement
 
-        public class TimeMeasurement: IDisposable
+        public class TimeMeasurement : IDisposable
         {
             public static class Default
             {
@@ -255,7 +251,7 @@ namespace Energy.Core
                 TimeSpan span = Finish - Begin;
                 string timeString = Energy.Base.Cast.DoubleToString(span.TotalSeconds, TimePrecision);
                 string message = string.Format(format, timeString);
-                
+
                 if (Console)
                 {
                     System.Console.WriteLine(message);
@@ -296,6 +292,57 @@ namespace Energy.Core
         public static TimeMeasurement Time()
         {
             return (new TimeMeasurement()).Start();
+        }
+
+        #endregion
+
+        #region Loop
+
+        /// <summary>
+        /// Repeat action for a specified time and return number of iterations done during the specified time.
+        /// If time was not specified function will result -1.
+        /// If no operation has been performed before the specified time has elapsed, the function will return a zero value.
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="timeSpan"></param>
+        /// <returns></returns>
+        public static int Loop(Energy.Base.Anonymous.Function function, TimeSpan timeSpan)
+        {
+            if (timeSpan == null || timeSpan.TotalSeconds == 0)
+            {
+                return -1;
+            }
+            int count = 0;
+            System.Threading.ManualResetEvent reset = new System.Threading.ManualResetEvent(false);
+            System.Threading.Thread thread = new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        function();
+                        count++;
+                    }
+                }
+                catch (System.Threading.ThreadAbortException)
+                { }
+            });
+            thread.Start();
+            reset.WaitOne(timeSpan);
+            thread.Abort();
+            return count;
+        }
+
+        /// <summary>
+        /// Repeat action for a specified time and return number of iterations done during the specified time.
+        /// If no operation has been performed before the specified time has elapsed, the function will return a zero value.
+        /// </summary>
+        /// <param name="function"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static int Loop(Energy.Base.Anonymous.Function function, double time)
+        {
+            return Loop(function, TimeSpan.FromSeconds(time));
         }
 
         #endregion
