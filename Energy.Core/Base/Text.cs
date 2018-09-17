@@ -1501,7 +1501,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Parse
+        #region TryParse
 
         public static bool TryParse(string text, out bool boolean)
         {
@@ -1510,28 +1510,90 @@ namespace Energy.Base
         }
 
         private static bool? _TypeInt32HasTryParse = null;
+        private static bool? _TypeUInt32HasTryParse = null;
+        private static bool? _TypeInt64HasTryParse = null;
+        private static bool? _TypeUInt64HasTryParse = null;
 
-        public static bool TryParse(string text, out int integer)
+        public static bool TryParse(string text, out int signedInteger)
         {
             if (text == null || text.Length == 0)
             {
-                integer = 0;
+                signedInteger = 0;
                 return false;
             }
             if (_TypeInt32HasTryParse == null)
             {
                 Type type = typeof(int);
-                System.Reflection.MemberInfo method = typeof(int).GetMethod("TryParse"
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
                     , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
                     , null
-                    , new Type[] { typeof(string), typeof(int).MakeByRefType() } // Method TryParse() with 2 parameters
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
                     , null
                     );
                 _TypeInt32HasTryParse = method != null;
             }
             if ((bool)_TypeInt32HasTryParse)
             {
-                return int.TryParse(text, out integer);
+                return int.TryParse(text, out signedInteger);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i == 0 && text[0] == '-')
+                    {
+                        if (text.Length == 1)
+                        {
+                            signedInteger = 0;
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        signedInteger = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    signedInteger = System.Convert.ToInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    signedInteger = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    signedInteger = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out uint unsignedInteger)
+        {
+            if (text == null || text.Length == 0)
+            {
+                unsignedInteger = 0;
+                return false;
+            }
+            if (_TypeUInt32HasTryParse == null)
+            {
+                Type type = typeof(uint);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt32HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt32HasTryParse)
+            {
+                return uint.TryParse(text, out unsignedInteger);
             }
             else
             {
@@ -1539,23 +1601,132 @@ namespace Energy.Base
                 {
                     if (text[i] < '0' || text[i] > '9')
                     {
-                        integer = 0;
+                        unsignedInteger = 0;
                         return false;
                     }
                 }
                 try
                 {
-                    integer = System.Convert.ToInt32(text);
+                    unsignedInteger = System.Convert.ToUInt32(text);
                     return true;
                 }
                 catch (FormatException)
                 {
-                    integer = 0;
+                    unsignedInteger = 0;
                     return false;
                 }
                 catch (OverflowException)
                 {
-                    integer = 0;
+                    unsignedInteger = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out long signedLong)
+        {
+            if (text == null || text.Length == 0)
+            {
+                signedLong = 0;
+                return false;
+            }
+            if (_TypeInt64HasTryParse == null)
+            {
+                Type type = typeof(long);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt64HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt64HasTryParse)
+            {
+                return long.TryParse(text, out signedLong);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i == 0 && text[0] == '-')
+                    {
+                        if (text.Length == 1)
+                        {
+                            signedLong = 0;
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        signedLong = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    signedLong = System.Convert.ToInt64(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    signedLong = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    signedLong = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out ulong unsignedLong)
+        {
+            if (text == null || text.Length == 0)
+            {
+                unsignedLong = 0;
+                return false;
+            }
+            if (_TypeUInt64HasTryParse == null)
+            {
+                Type type = typeof(ulong);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeUInt64HasTryParse = method != null;
+            }
+            if ((bool)_TypeUInt64HasTryParse)
+            {
+                return ulong.TryParse(text, out unsignedLong);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        unsignedLong = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    unsignedLong = System.Convert.ToUInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    unsignedLong = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    unsignedLong = 0;
                     return false;
                 }
             }

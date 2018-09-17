@@ -166,7 +166,7 @@ namespace Energy.Base
             string format = "";
             if (z)
             {
-                format = ms > 0 
+                format = ms > 0
                     ? "yyyy-MM-ddTHH:mm:ss.fffZ"
                     : "yyyy-MM-ddTHH:mm:ss.fffZ";
             }

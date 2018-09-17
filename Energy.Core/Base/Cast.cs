@@ -116,14 +116,14 @@ namespace Energy.Base
                 return true;
             if (text == "false")
                 return false;
-            int intValue = 0;
-            if (int.TryParse(text, out intValue))
+            int intValue;
+            if (Energy.Base.Text.TryParse(text, out intValue))
                 return intValue;
             long longValue = 0;
-            if (long.TryParse(text, out longValue))
+            if (Energy.Base.Text.TryParse(text, out longValue))
                 return longValue;
             ulong ulongValue = 0;
-            if (ulong.TryParse(text, out ulongValue))
+            if (Energy.Base.Text.TryParse(text, out ulongValue))
             {
                 return ulongValue;
             }
@@ -400,13 +400,13 @@ namespace Energy.Base
         {
             if (value == null || value.Length == 0)
                 return 0;
-            int result = 0;
-            if (int.TryParse(value, out result))
+            int result;
+            if (Energy.Base.Text.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
-            if (int.TryParse(value, out result))
+            if (Energy.Base.Text.TryParse(value, out result))
                 return result;
             return 0;
         }
@@ -484,13 +484,13 @@ namespace Energy.Base
         {
             if (negative)
             {
-                int useless;
-                return int.TryParse(value, out useless);
+                long useless;
+                return Energy.Base.Text.TryParse(value, out useless);
             }
             else
             {
-                uint useless;
-                return uint.TryParse(value, out useless);
+                ulong useless;
+                return Energy.Base.Text.TryParse(value, out useless);
             }
         }
 
@@ -1490,9 +1490,9 @@ namespace Energy.Base
 
             if (false)
             { }
-            else if (int.TryParse(s, out i))
+            else if (Energy.Base.Text.TryParse(s, out i))
                 return i;
-            else if (long.TryParse(s, out l))
+            else if (Energy.Base.Text.TryParse(s, out l))
                 return (int)l;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
                 return (int)d;
