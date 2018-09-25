@@ -8,6 +8,21 @@ namespace Energy.Base
 {
     public class Class
     {
+        #region GetDefault
+
+        public static object GetDefault(Type type)
+        {
+            object o = Activator.CreateInstance(type);
+            return o;
+        }
+
+        public static T GetDefault<T>()
+        {
+            return default(T);
+        }
+
+        #endregion
+
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
         /// </summary>
