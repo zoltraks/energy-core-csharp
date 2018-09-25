@@ -36,6 +36,29 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Generic conversion from one type to another.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static object As(System.Type type, object value)
+        {
+            if (value == null)
+                return null;
+
+            Type r = type;
+            Type t = value.GetType();
+
+            if (t == r)
+                return value;
+
+            if (r == typeof(string))
+                return (object)(ObjectToString(value));
+
+            return Energy.Base.Class.GetDefault(type);
+        }
+
+        /// <summary>
         /// Convert string to integer value without exception
         /// </summary>
         /// <param name="value">Object</param>

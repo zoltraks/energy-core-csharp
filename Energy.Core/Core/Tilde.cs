@@ -290,10 +290,10 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with prompt. Empty string will be returned if no data were provided.
         /// </summary>
         /// <param name="question">Question string</param>
-        /// <returns>Value entered or default if skipped, empty string by default</returns>
+        /// <returns>Value entered or empty string if skipped</returns>
         public static string Ask(string question)
         {
             return Ask(question, "");
@@ -304,12 +304,12 @@ namespace Energy.Core
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
-        /// <param name="casing">Character casing</param>
         /// <param name="value">Default value</param>
+        /// <param name="casing">Character casing</param>
         /// <returns>Value entered or default if skipped</returns>
-        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing, string value)
+        public static string Ask(string question, string value, Energy.Enumeration.CharacterCasing casing)
         {
-            string answer = Ask(question);
+            string answer = Ask(question, value);
             if (String.IsNullOrEmpty(answer))
                 return value;
             switch (casing)
@@ -329,19 +329,64 @@ namespace Energy.Core
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="casing">Character casing</param>
+        /// <param name="value">Default value</param>
+        /// <returns>Value entered or default if skipped</returns>
+        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing, string value)
+        {
+            return Ask(question, value, casing);
+        }
+
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Return input value lower or upper case.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <param name="casing">Character casing</param>
         /// <returns>Value entered or default if skipped, empty string by default</returns>
         public static string Ask(string question, Energy.Enumeration.CharacterCasing casing)
         {
-            return Ask(question, casing, "");
+            return Ask(question, "", casing);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object Ask(string question, object value, Type type)
+        {
+            string text = Energy.Base.Cast.As<string>(value);
+            string answer = Ask(question, text);
+            if (!string.IsNullOrEmpty(answer))
+            {
+                return Energy.Base.Cast.As(type, answer);
+            }
+            else
+            {
+                if (value != null && type != value.GetType())
+                {
+                    return Energy.Base.Cast.As(type, value);
+                }
+                else
+                {
+                    return value;
+                }
+            }
         }
 
         public static object Ask(string question, object value)
         {
-            string text = Energy.Base.Cast.As<string>(value);
-            string answer = Ask(question, text);
-            if (String.IsNullOrEmpty(answer))
-                return value;
-            return answer;
+            Type type = value != null ? value.GetType() : typeof(string);
+            return Ask(question, value, type);
+        }
+
+        public static T Ask<T>(string question, T value)
+        {
+            T result;
+            result = (T)Ask(question, value, typeof(T));
+            return result;
         }
 
         #endregion
@@ -1064,6 +1109,12 @@ namespace Energy.Core
 
         #region Input
 
+        /// <summary>
+        /// Write out prompt message and wait for input string. If user did not provide
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static string Input(string message, string defaultValue)
         {
             if (string.IsNullOrEmpty(message))
