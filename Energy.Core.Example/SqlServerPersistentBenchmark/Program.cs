@@ -28,12 +28,12 @@ namespace SqlServerPersistentBenchmark
 
         private static bool Setup(string[] args)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         private static void Go(string[] args)
         {
-            throw new NotImplementedException();
+            Test.GetDate();
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Energy.Query
 
         public Script()
         {
+            Energy.Core.Bug.Write("");
             Debug.WriteLine("Energy.Query.Script created");
         }
 
@@ -67,11 +68,6 @@ namespace Energy.Query
         public virtual string CreateTable(Energy.Source.Structure.Table table)
         {
             return CreateTable(table, null);
-        }
-
-        public virtual string CreateTable(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
-        {
-            throw new NotImplementedException();
         }
 
         public virtual string CreateDescription(Energy.Source.Structure.Table table)

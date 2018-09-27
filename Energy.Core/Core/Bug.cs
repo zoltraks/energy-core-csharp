@@ -114,7 +114,7 @@ namespace Energy.Core
         {
             return ExceptionMessage(exception, (bool)TraceLogging);
         }
-      
+
         #endregion
 
         #region ThreadIdHex
@@ -253,6 +253,130 @@ namespace Energy.Core
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        public struct Code
+        {
+            public long Number;
+            public string Text;
+
+            public Code(long number)
+            {
+                Number = number;
+                Text = "";
+            }
+
+            public Code(string text)
+            {
+                Number = 0;
+                Text = text;
+            }
+
+            public Code(long number, string text)
+            {
+                Number = number;
+                Text = text;
+            }
+
+            public static implicit operator Code(long number)
+            {
+                return new Code(number);
+            }
+
+            public static implicit operator Code(string text)
+            {
+                return new Code(text);
+            }
+        }
+
+        public class Suppress: List<Item>
+        {
+            private static Suppress _Default;
+            private static readonly object _DefaultLock = new object();
+            /// <summary>Singleton</summary>
+            public static Suppress Default
+            {
+                get
+                {
+                    if (_Default == null)
+                    {
+                        lock (typeof(Suppress))
+                        {
+                            if (_Default == null)
+                            {
+                                _Default = new Suppress();
+                            }
+                        }
+                    }
+                    return _Default;
+                }
+            }
+
+            public class Item
+            {
+                public Code Code;
+
+                public bool Suppress;
+            }
+
+            public Item Find(Code code, bool ignoreCase, bool matchAny)
+            {
+                for (int i = 0; i < this.Count; i++)
+                {
+                    bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
+                    bool thisTextEmpty = string.IsNullOrEmpty(this[i].Text);
+                    bool textMatch = 0 == string.Compare(code.Text, this[i].Text, ignoreCase);
+                    if (!matchAny && !codeTextEmpty && !thisTextEmpty)
+                    {
+                        continue;
+                    }
+                    else if (textMatch)
+                    {
+                        return this[i];
+                    }
+                    else
+                    {
+                        bool numberMatch = code.Number != 0 && this[i].Number == code.Number;
+                        if (numberMatch)
+                        {
+                            return this[i];
+                        }
+                    }
+                }
+                return null;
+            }
+
+            public bool IsSuppressed(Code code)
+            {
+                Item item = Find(code, true, true);
+                if (item == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return item.Suppress;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Write debug message with numeric code which may be suppressed or limited.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        public static void Write(Code code, string message)
+        {
+            if (Suppress.Default.IsSuppressed(code))
+            {
+                return;
+            }
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)TraceLogging)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
+        }
+
 
         #endregion
 
