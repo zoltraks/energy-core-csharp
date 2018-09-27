@@ -65,9 +65,14 @@ namespace Energy.Query
 
         #region CREATE
 
+        public virtual string CreateTable(Energy.Source.Structure.Table table, Energy.Query.Configuration configuration)
+        {
+            throw new NotImplementedException();
+        }
+
         public virtual string CreateTable(Energy.Source.Structure.Table table)
         {
-            return CreateTable(table, null);
+            throw new NotImplementedException();
         }
 
         public virtual string CreateDescription(Energy.Source.Structure.Table table)

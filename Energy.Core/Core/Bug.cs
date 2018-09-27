@@ -59,6 +59,130 @@ namespace Energy.Core
 
         #endregion
 
+        #region Class
+
+        public class Class
+        {
+            #region SuppressCodeList
+
+            public class SuppressCodeList : List<SuppressCodeList.Item>
+            {
+                private static SuppressCodeList _Default;
+                private static readonly object _DefaultLock = new object();
+                /// <summary>Singleton</summary>
+                public static SuppressCodeList Default
+                {
+                    get
+                    {
+                        if (_Default == null)
+                        {
+                            lock (typeof(SuppressCodeList))
+                            {
+                                if (_Default == null)
+                                {
+                                    _Default = new SuppressCodeList();
+                                }
+                            }
+                        }
+                        return _Default;
+                    }
+                }
+
+                public class Item
+                {
+                    public Code Code;
+
+                    public bool Suppress;
+                }
+
+                public Item Find(Code code, bool ignoreCase, bool matchAny)
+                {
+                    for (int i = 0; i < this.Count; i++)
+                    {
+                        if (code.Match(this[i].Code, ignoreCase, matchAny))
+                            return this[i];
+                    }
+                    return null;
+                }
+
+                public Item Find(Code code)
+                {
+                    return Find(code, true, true);
+                }
+
+                public bool IsSuppressed(Code code)
+                {
+                    Item item = Find(code, true, true);
+                    if (item == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return item.Suppress;
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Code
+
+        /// <summary>
+        /// Bug message code. May be numbered, litereal or both.
+        /// </summary>
+        public struct Code
+        {
+            public long Number;
+            public string Text;
+
+            public Code(long number)
+            {
+                Number = number;
+                Text = "";
+            }
+
+            public Code(string text)
+            {
+                Number = 0;
+                Text = text;
+            }
+
+            public Code(long number, string text)
+            {
+                Number = number;
+                Text = text;
+            }
+
+            public static implicit operator Code(long number)
+            {
+                return new Code(number);
+            }
+
+            public static implicit operator Code(string text)
+            {
+                return new Code(text);
+            }
+
+            public bool Match(Code code, bool ignoreCase, bool matchAny)
+            {
+                bool numberMatch = code.Number != 0 && code.Number == this.Number;
+                if (numberMatch && matchAny)
+                    return true;
+                bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
+                bool thisTextEmpty = string.IsNullOrEmpty(this.Text);
+                if (codeTextEmpty && thisTextEmpty)
+                    return true;
+                bool textMatch = 0 == string.Compare(code.Text, this.Text, ignoreCase);
+                return textMatch;
+            }
+        }
+
+        #endregion
+
         #region ExceptionMessage
 
         /// <summary>
@@ -206,6 +330,18 @@ namespace Energy.Core
 
         #endregion
 
+        #region Static
+
+        private static Class.SuppressCodeList SuppressCodeList
+        {
+            get
+            {
+                return Class.SuppressCodeList.Default;
+            }
+        }
+
+        #endregion
+
         #region Catch
 
         /// <summary>
@@ -254,111 +390,6 @@ namespace Energy.Core
             }
         }
 
-        public struct Code
-        {
-            public long Number;
-            public string Text;
-
-            public Code(long number)
-            {
-                Number = number;
-                Text = "";
-            }
-
-            public Code(string text)
-            {
-                Number = 0;
-                Text = text;
-            }
-
-            public Code(long number, string text)
-            {
-                Number = number;
-                Text = text;
-            }
-
-            public static implicit operator Code(long number)
-            {
-                return new Code(number);
-            }
-
-            public static implicit operator Code(string text)
-            {
-                return new Code(text);
-            }
-        }
-
-        public class Suppress: List<Item>
-        {
-            private static Suppress _Default;
-            private static readonly object _DefaultLock = new object();
-            /// <summary>Singleton</summary>
-            public static Suppress Default
-            {
-                get
-                {
-                    if (_Default == null)
-                    {
-                        lock (typeof(Suppress))
-                        {
-                            if (_Default == null)
-                            {
-                                _Default = new Suppress();
-                            }
-                        }
-                    }
-                    return _Default;
-                }
-            }
-
-            public class Item
-            {
-                public Code Code;
-
-                public bool Suppress;
-            }
-
-            public Item Find(Code code, bool ignoreCase, bool matchAny)
-            {
-                for (int i = 0; i < this.Count; i++)
-                {
-                    bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
-                    bool thisTextEmpty = string.IsNullOrEmpty(this[i].Text);
-                    bool textMatch = 0 == string.Compare(code.Text, this[i].Text, ignoreCase);
-                    if (!matchAny && !codeTextEmpty && !thisTextEmpty)
-                    {
-                        continue;
-                    }
-                    else if (textMatch)
-                    {
-                        return this[i];
-                    }
-                    else
-                    {
-                        bool numberMatch = code.Number != 0 && this[i].Number == code.Number;
-                        if (numberMatch)
-                        {
-                            return this[i];
-                        }
-                    }
-                }
-                return null;
-            }
-
-            public bool IsSuppressed(Code code)
-            {
-                Item item = Find(code, true, true);
-                if (item == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return item.Suppress;
-                }
-            }
-        }
-
         /// <summary>
         /// Write debug message with numeric code which may be suppressed or limited.
         /// </summary>
@@ -366,7 +397,7 @@ namespace Energy.Core
         /// <param name="message"></param>
         public static void Write(Code code, string message)
         {
-            if (Suppress.Default.IsSuppressed(code))
+            if (IsSuppressed(code))
             {
                 return;
             }
@@ -376,7 +407,6 @@ namespace Energy.Core
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
         }
-
 
         #endregion
 
@@ -439,6 +469,57 @@ namespace Energy.Core
         {
             Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
             return trap;
+        }
+
+        #endregion
+
+        #region Suppress
+
+        /// <summary>
+        /// Suppress message identified by code.
+        /// </summary>
+        /// <param name="code"></param>
+        public static void Suppress(Code code)
+        {
+            Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
+            if (item == null)
+            {
+                item = new Class.SuppressCodeList.Item()
+                {
+                    Code = code,
+                    Suppress = true,
+                };
+                SuppressCodeList.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Suppress message identified by code.
+        /// Optionaly "unsuppress" by calling with suppress:false parameter.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="suppress"></param>
+        public static void Suppress(Code code, bool suppress)
+        {
+            Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
+            if (item == null)
+            {
+                item = new Class.SuppressCodeList.Item()
+                {
+                    Code = code,
+                    Suppress = suppress,
+                };
+                SuppressCodeList.Add(item);
+            }
+            else
+            {
+                item.Suppress = suppress;
+            }
+        }
+
+        public static bool IsSuppressed(Code code)
+        {
+            return SuppressCodeList.IsSuppressed(code);
         }
 
         #endregion
