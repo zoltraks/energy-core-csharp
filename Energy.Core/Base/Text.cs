@@ -1594,5 +1594,108 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Quote(string text)
+        {
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with)
+        {
+            return Quote(text, with, with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape)
+        {
+            return string.Concat(with, text.Replace(with, escape + with), with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape, bool optional)
+        {
+            if (optional && !text.Contains(with))
+                return text;
+            return Quote(text, with, escape);
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Strip(string text)
+        {
+            return Strip(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with)
+        {
+            return Strip(text, with, with);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with, string escape)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            int a = 0;
+            int b = text.Length;
+            if (text.StartsWith(with))
+            {
+                a = with.Length;
+                b -= with.Length;
+            }
+            if (text.EndsWith(with))
+            {
+                b -= with.Length;
+            }
+            string cut = text.Substring(a, b);
+            return cut.Replace(escape + with, with);
+        }
+
+        #endregion
     }
 }

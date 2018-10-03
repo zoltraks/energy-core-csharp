@@ -141,6 +141,54 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void TextQuote()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "''";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "\"";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "'\"'";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "\"";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextStrip()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Strip(value);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "'X\\'Y'";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+            value = "X\\'Y";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
         public void TextSurround()
         {
             string text1, text2, text3;
