@@ -124,7 +124,7 @@ namespace RestBinaryGetPut
         private static void TestLog()
         {
             Energy.Core.Log log = Energy.Core.Log.Default;
-            Energy.Core.Bug.Trace.On();
+            Energy.Core.Bug.TraceLogging.On();
             log.Write("1");
             log.Flush();
             log.Exception(new Exception("ERROR"));

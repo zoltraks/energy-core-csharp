@@ -36,6 +36,29 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Generic conversion from one type to another.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static object As(System.Type type, object value)
+        {
+            if (value == null)
+                return null;
+
+            Type r = type;
+            Type t = value.GetType();
+
+            if (t == r)
+                return value;
+
+            if (r == typeof(string))
+                return (object)(ObjectToString(value));
+
+            return Energy.Base.Class.GetDefault(type);
+        }
+
+        /// <summary>
         /// Convert string to integer value without exception
         /// </summary>
         /// <param name="value">Object</param>
@@ -326,6 +349,39 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// Convert bool to string.
+        /// </summary>
+        /// <param name="value">bool</param>
+        /// <returns>string</returns>
+        public static string BoolToString(bool? value)
+        {
+            return value == null ? BoolToString(false) : BoolToString((bool)value);
+        }
+
+        /// <summary>
+        /// Convert bool to string using style.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        public static string BoolToString(bool? value, string style)
+        {
+            return value == null ? BoolToString(false, style) : BoolToString((bool)value, style);
+        }
+
+        /// <summary>
+        /// Convert bool to string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        public static string BoolToString(bool? value, Energy.Enumeration.BooleanStyle style)
+        {
+            return value == null ? BoolToString(false, style) : BoolToString((bool)value, style);
+
+        }
+
         #endregion
 
         #region Char
@@ -401,6 +457,26 @@ namespace Energy.Base
         public static byte IntegerToByte(int value)
         {
             return (byte)value;
+        }
+
+        public static string IntegerToHex(int value)
+        {
+            return Energy.Base.Hex.IntegerToHex(value);
+        }
+
+        public static string IntegerToHex(int value, int size)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, size);
+        }
+
+        public static string IntegerToHex(int value, int size, bool upperCase)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, size, upperCase);
+        }
+
+        public static string IntegerToHex(int value, bool upperCase)
+        {
+            return Energy.Base.Hex.IntegerToHex(value, upperCase);
         }
 
         #endregion
@@ -1007,6 +1083,89 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if 0</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(double seconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMilliseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
         /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
@@ -1050,6 +1209,89 @@ namespace Energy.Base
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="seconds">Time in seconds</param>
+        /// <returns>string</returns>
+        public static string TimeSpanToStringTimeMicroseconds(double seconds)
+        {
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <param name="omitZeroHours">Omit hours part if zero</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+        }
+
+        /// <summary>
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324567" or "00:03:10.123456" or "00:00.000000"
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan object</param>
+        /// <returns></returns>
+        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan)
+        {
+            double seconds = timeSpan.TotalSeconds;
+            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
         }
 
         #endregion
@@ -1224,6 +1466,65 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert object to integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int ObjectToInteger(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (int)(long)value;
+            if (value is int)
+                return (int)(int)value;
+            if (value is double)
+                return (int)(double)value;
+            if (value is uint)
+                return (int)(uint)value;
+            if (value is ulong)
+                return (int)(ulong)value;
+            if (value is decimal)
+                return (int)(decimal)value;
+
+            if (value is Int16)
+                return (int)(Int16)value;
+            if (value is UInt16)
+                return (int)(UInt16)value;
+
+            if (value is short)
+                return (int)(short)value;
+            if (value is ushort)
+                return (int)(ushort)value;
+            if (value is byte)
+                return (int)(byte)value;
+            if (value is char)
+                return (int)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            int i = 0;
+            long l = 0;
+            double d = 0;
+
+            if (false)
+            { }
+            else if (int.TryParse(s, out i))
+                return i;
+            else if (long.TryParse(s, out l))
+                return (int)l;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (int)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (int)d;
+
+            return 0;
+        }
+        /// <summary>
         /// Convert object to long integer number.
         /// </summary>
         /// <param name="value"></param>
@@ -1260,29 +1561,16 @@ namespace Energy.Base
             if (value is char)
                 return (long)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
-
-            if (s == null)
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
                 return 0;
 
-            long r = 0;
+            long l = 0;
             double d = 0;
 
-            if (long.TryParse(s, out r))
-                return r;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (long)d;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (long)d;
-
-            s = s.Trim();
-
-            if (long.TryParse(s, out r))
-                return r;
+            if (long.TryParse(s, out l))
+                return l;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
                 return (long)d;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
@@ -1335,11 +1623,121 @@ namespace Energy.Base
             return StringToBool(ObjectToString(value));
         }
 
-        public static int ObjectToInteger(object value)
+        /// <summary>
+        /// Convert object to double number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static double ObjectToDouble(object value)
         {
-            return (int)ObjectToLong(value);
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (double)(long)value;
+            if (value is int)
+                return (double)(int)value;
+            if (value is double)
+                return (double)(double)value;
+            if (value is uint)
+                return (double)(uint)value;
+            if (value is ulong)
+                return (double)(ulong)value;
+            if (value is decimal)
+                return (double)(decimal)value;
+
+            if (value is Int16)
+                return (double)(Int16)value;
+            if (value is UInt16)
+                return (double)(UInt16)value;
+
+            if (value is short)
+                return (double)(short)value;
+            if (value is ushort)
+                return (double)(ushort)value;
+            if (value is byte)
+                return (double)(byte)value;
+            if (value is char)
+                return (long)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            long l = 0;
+            double d = 0;
+
+            if (long.TryParse(s, out l))
+                return (double)l;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (long)d;
+            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (long)d;
+
+            return 0;
         }
 
+        /// <summary>
+        /// Convert object to double number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static decimal ObjectToDecimal(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is long)
+                return (decimal)(long)value;
+            if (value is int)
+                return (decimal)(int)value;
+            if (value is double)
+                return (decimal)(double)value;
+            if (value is uint)
+                return (decimal)(uint)value;
+            if (value is ulong)
+                return (decimal)(ulong)value;
+            if (value is decimal)
+                return (decimal)(decimal)value;
+
+            if (value is Int16)
+                return (decimal)(Int16)value;
+            if (value is UInt16)
+                return (decimal)(UInt16)value;
+
+            if (value is short)
+                return (decimal)(short)value;
+            if (value is ushort)
+                return (decimal)(ushort)value;
+            if (value is byte)
+                return (decimal)(byte)value;
+            if (value is char)
+                return (decimal)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+            s = Energy.Base.Text.Trim(s);
+            if (s == null || s.Length == 0)
+                return 0;
+
+            long l = 0;
+            decimal d = 0;
+
+            if (long.TryParse(s, out l))
+                return (decimal)l;
+            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+                return (decimal)d;
+            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
+                return (decimal)d;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert object to unsigned byte.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static byte ObjectToByte(object value)
         {
             if (value == null)
@@ -1406,7 +1804,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Object array to 
+        /// Object array to
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
@@ -1553,6 +1951,44 @@ namespace Energy.Base
                 return null;
             }
             return System.Text.Encoding.UTF8.GetString(data);
+        }
+
+        /// <summary>
+        /// Convert Base64 input to byte array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] Base64ToByteArray(string input)
+        {
+            if (input == null)
+                return null;
+            if (input.Length == 0)
+                return new byte[] { };
+            byte[] data;
+            try
+            {
+                data = System.Convert.FromBase64String(input);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// Convert byte array to Base64 string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToBase64(byte[] data)
+        {
+            if (data == null)
+                return null;
+            if (data.Length == 0)
+                return "";
+            string base64 = System.Convert.ToBase64String(data);
+            return base64;
         }
 
         #endregion

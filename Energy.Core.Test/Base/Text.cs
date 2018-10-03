@@ -139,5 +139,68 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("A", chop);
             Assert.AreEqual(0, Energy.Base.Text.Compare(array, result), chop);
         }
+
+        [TestMethod]
+        public void TextQuote()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "''";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "\"";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "'\"'";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "\"";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextStrip()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Strip(value);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "'X\\'Y'";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+            value = "X\\'Y";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextSurround()
+        {
+            string text1, text2, text3;
+            string q;
+            q = '"'.ToString();
+            text1 = "Just..." + q;
+            text2 = Energy.Base.Text.Surround(text1, q, q, false);
+            text3 = q + text1 + q;
+            Assert.AreEqual(text3, text2);
+            text2 = Energy.Base.Text.Surround(text1, q, q, true);
+            text3 = q + text1;
+            Assert.AreEqual(text3, text2);
+        }
     }
 }

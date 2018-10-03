@@ -11,6 +11,35 @@ namespace Energy.Base
     // TODO This class probably should be renamed to avoid conflicts and allow to add using Energy.Base
     public class Text
     {
+        #region Constants
+
+        private static string _BR = "<br>";
+        /// <summary>HTML break</summary>
+        public static string BR { get { return _BR; } private set { _BR = value; } }
+
+        private static string _NL;
+        /// <summary>New line "character"</summary>
+        public static string NL
+        {
+            get
+            {
+                if (_NL == null)
+                {
+                    if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+                        _NL = "\r\n";
+                    else
+                        _NL = "\n";
+                }
+                return _NL;
+            }
+            private set
+            {
+                _NL = value;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Exchange texts between each other
         /// </summary>
@@ -37,8 +66,10 @@ namespace Energy.Base
             return null;
         }
 
+        #region Surround
+
         /// <summary>
-        /// Surround text with delimiters if contains delimiter itself or any of special characters
+        /// Surround text with delimiters if contains delimiter itself or any of special characters.
         /// </summary>
         /// <param name="value">Text value</param>
         /// <param name="delimiter">Delimiter like ' or "</param>
@@ -91,6 +122,36 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Surround text with prefix and suffix, optionally adding prefix only when needed.
+        /// </summary>
+        /// <param name="text">Text to surround</param>
+        /// <param name="prefix">Prefix to add at begining</param>
+        /// <param name="suffix">Suffix to add at ending</param>
+        /// <param name="optional">Add prefix and suffix only when needed</param>
+        /// <returns></returns>
+        public static string Surround(string text, string prefix, string suffix, bool optional)
+        {
+            if (String.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (!optional)
+            {
+                return String.Concat(prefix, text, suffix);
+            }
+            else
+            {
+                if (!text.StartsWith(prefix))
+                    text = prefix + text;
+                if (!text.EndsWith(suffix))
+                    text = text + suffix;
+                return text;
+            }
+        }
+
+        #endregion
+
+        /// <summary>
         /// Repeat string pattern to specified amount of characters length.
         /// </summary>
         /// <param name="pattern"></param>
@@ -122,10 +183,15 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
         {
-            value = string.IsNullOrEmpty(value)
-                ? value
-                : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            return value;
+            if (value == null || value.Length == 0)
+            {
+                return value;
+            }
+            else
+            {
+                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+                return value;
+            }
         }
 
         #region Is
@@ -774,7 +840,7 @@ namespace Energy.Base
             string pattern = @"^[\s\t\v\ ]*(?:\r\n|\n|\r)+";
             string result = Regex.Replace(text, pattern, "", RegexOptions.Multiline);
             if (eol)
-                result += Environment.NewLine;
+                result += Energy.Base.Text.NL;
             return result;
         }
 
@@ -1189,7 +1255,7 @@ namespace Energy.Base
                 , RegexOptions.IgnoreCase).Success)
             {
                 return System.Text.Encoding.BigEndianUnicode;
-            }            
+            }
             int number = Energy.Base.Cast.StringToInteger(encoding);
             try
             {
@@ -1232,7 +1298,7 @@ namespace Energy.Base
         /// <returns>string[]</returns>
         public static string ConvertNewLine(string text)
         {
-            return ConvertNewLine(text, Environment.NewLine);
+            return ConvertNewLine(text, Energy.Base.Text.NL);
         }
 
         #endregion
@@ -1422,6 +1488,212 @@ namespace Energy.Base
         public static object Chop(ref object[] array)
         {
             return Chop<object>(ref array);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index)
+        {
+            return GetElementOrEmpty<string>(array, index, "");
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index, string emptyValue)
+        {
+            return GetElementOrEmpty<string>(array, index, emptyValue);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static T GetElementOrEmpty<T>(T[] array, int index, T emptyValue)
+        {
+            if (array == null || array.Length == 0)
+                return emptyValue;
+            else if (array.Length <= index)
+                return emptyValue;
+            else
+                return array[index];
+        }
+
+        #endregion
+
+        #region Parse
+
+        public static bool TryParse(string text, out bool boolean)
+        {
+            boolean = Energy.Base.Cast.StringToBool(text);
+            return true;
+        }
+
+        private static bool? _TypeInt32HasTryParse = null;
+
+        public static bool TryParse(string text, out int integer)
+        {
+            if (text == null || text.Length == 0)
+            {
+                integer = 0;
+                return false;
+            }
+            if (_TypeInt32HasTryParse == null)
+            {
+                Type type = typeof(int);
+                System.Reflection.MemberInfo method = typeof(int).GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), typeof(int).MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt32HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt32HasTryParse)
+            {
+                return int.TryParse(text, out integer);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        integer = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    integer = System.Convert.ToInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    integer = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    integer = 0;
+                    return false;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Quote(string text)
+        {
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with)
+        {
+            return Quote(text, with, with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape)
+        {
+            return string.Concat(with, text.Replace(with, escape + with), with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape, bool optional)
+        {
+            if (optional && !text.Contains(with))
+                return text;
+            return Quote(text, with, escape);
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Strip(string text)
+        {
+            return Strip(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with)
+        {
+            return Strip(text, with, with);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with, string escape)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            int a = 0;
+            int b = text.Length;
+            if (text.StartsWith(with))
+            {
+                a = with.Length;
+                b -= with.Length;
+            }
+            if (text.EndsWith(with))
+            {
+                b -= with.Length;
+            }
+            string cut = text.Substring(a, b);
+            return cut.Replace(escape + with, with);
         }
 
         #endregion

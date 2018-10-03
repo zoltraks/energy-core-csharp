@@ -112,7 +112,7 @@ namespace Energy.Core
                     list.Add(_List[i].ToString());
                 }
             }
-            return string.Join(Environment.NewLine, list.ToArray());
+            return string.Join(Energy.Base.Text.NL, list.ToArray());
         }
 
         private static readonly object FlushLock = new object();

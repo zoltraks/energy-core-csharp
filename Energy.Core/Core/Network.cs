@@ -1,8 +1,20 @@
-﻿using System;
+﻿#if CFNET
+    //
+#elif WindowsCE || PocketPC || WINDOWS_PHONE
+    //
+#define CFNET
+#elif COMPACT_FRAMEWORK
+//
+#define CFNET
+#else
+    //
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
+//using System.Net.NetworkInformation;
 using Energy.Interface;
 using System.Net;
 using Energy.Abstract;
@@ -120,7 +132,7 @@ namespace Energy.Core
         /// Specifies behaviour when closing socket, possible values are:
         /// negative number to disable (attempts to send pending data until the default IP protocol time-out expires),
         /// zero (discards any pending data, for connection-oriented socket Winsock resets the connection), and
-        /// positive number of seconds (attempts to send pending data until the specified time-out expires, 
+        /// positive number of seconds (attempts to send pending data until the specified time-out expires,
         /// if the attempt fails, then Winsock resets the connection).
         /// </param>
         /// <param name="ttl">TTL value indicates the maximum number of routers the packet can traverse before the router discards the packet</param>
@@ -137,8 +149,8 @@ namespace Energy.Core
 
             if (linger != null)
             {
-                // The socket will linger for specified amount of seconds after Socket.Close is called. 
-                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections 
+                // The socket will linger for specified amount of seconds after Socket.Close is called.
+                // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections
                 // sitting in the TIME_WAIT state, tying up all the available resources on a server.
                 if (linger < 0)
                 {
@@ -184,7 +196,7 @@ namespace Energy.Core
                 }
             }
 
-            Energy.Core.Bug.Write("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+            Energy.Core.Bug.Write(string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }
@@ -228,7 +240,7 @@ namespace Energy.Core
             socket.ReceiveTimeout = timeout;
             socket.SendTimeout = timeout;
 
-            Energy.Core.Bug.Write("TcpClient configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+            Energy.Core.Bug.Write(string.Format("TcpClient configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }
@@ -375,14 +387,14 @@ namespace Energy.Core
                 StateObject state = ar.AsyncState as StateObject;
                 try
                 {
-                    // Get the socket that handles the client request.  
+                    // Get the socket that handles the client request.
                     Socket socket = state.Socket;
                     Socket client = socket.EndAccept(ar);
                     SocketConnection connection = new SocketConnection();
                     connection.State = new StateObject();
                     connection.State.Socket = client;
                     //client.BeginReceive(connection.)
-                    //// Create the state object.  
+                    //// Create the state object.
                     ////StateObject state = new StateObject();
                     //state.workSocket = handler;
                     //handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -470,6 +482,7 @@ namespace Energy.Core
 
         #region Ping
 
+#if !CFNET
         public static int Ping(string address, int timeout, out System.Net.NetworkInformation.IPStatus status)
         {
             status = System.Net.NetworkInformation.IPStatus.Unknown;
@@ -478,7 +491,7 @@ namespace Energy.Core
             {
                 System.Net.NetworkInformation.PingReply response = request.Send(address, timeout);
                 status = response.Status;
-                if (response.Status == IPStatus.Success)
+                if (response.Status == System.Net.NetworkInformation.IPStatus.Success)
                 {
                     return (int)response.RoundtripTime;
                 }
@@ -493,18 +506,23 @@ namespace Energy.Core
                 return -1;
             }
         }
+#endif
 
+#if !CFNET
         public static int Ping(string address, int timeout)
         {
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, timeout, out status);
         }
+#endif
 
+#if !CFNET
         public static int Ping(string address)
         {
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
+#endif
 
         #endregion
     }

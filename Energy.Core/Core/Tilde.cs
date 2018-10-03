@@ -1,24 +1,23 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Energy.Enumeration;
-using System.Text;
 
 namespace Energy.Core
 {
     /// <summary>
     /// Simple elegant text coloring engine for console programs.
     /// Based on Empty Page #0 color engine.
-    /// 
+    ///
     /// Color may be specified by its number or name surrounded by tilde (~) character.
     /// One tilde followed by a character other than a letter or number or a fragment consisting of two or more tilde characters will not be formatted.
-    /// 
+    ///
     /// Colors that can be used are the same as on a standard command console.
     /// There are 15 different colours plus black.
-    /// 
+    ///
     /// Dark colour identifiers are preceded by the letter 'd' (dark).
     /// In a similar way, bright-colour identifiers can be preceded by the letter 'l' (light).
-    /// 
+    ///
     /// Color changes one by one are ignored.Only the last defined color will be used.
     /// </summary>
     /// <remarks>
@@ -212,35 +211,35 @@ namespace Energy.Core
 
         private static string _ExampleColorPalleteTildeString = ""
             + "~darkblue~~#~1~#~\t~#~darkblue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkred~~#~4~#~\t~#~darkred~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~gray~~#~7~#~\t~#~gray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~darkgray~~#~8~#~\t~#~darkgray~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~blue~~#~9~#~\t~#~blue~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~green~~#~10~#~\t~#~green~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~cyan~~#~11~#~\t~#~cyan~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~red~~#~12~#~\t~#~red~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~magenta~~#~13~#~\t~#~magenta~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~yellow~~#~14~#~\t~#~yellow~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~white~~#~15~#~\t~#~white~#~"
-            + Environment.NewLine
+            + Energy.Base.Text.NL
             + "~black~~#~16~#~\t~#~black~#~"
             ;
 
@@ -291,10 +290,10 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with prompt. Empty string will be returned if no data were provided.
         /// </summary>
         /// <param name="question">Question string</param>
-        /// <returns>Value entered or default if skipped, empty string by default</returns>
+        /// <returns>Value entered or empty string if skipped</returns>
         public static string Ask(string question)
         {
             return Ask(question, "");
@@ -305,21 +304,21 @@ namespace Energy.Core
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
-        /// <param name="casing">Character casing</param>
         /// <param name="value">Default value</param>
+        /// <param name="casing">Character casing</param>
         /// <returns>Value entered or default if skipped</returns>
-        public static string Ask(string question, CharacterCasing casing, string value)
+        public static string Ask(string question, string value, Energy.Enumeration.CharacterCasing casing)
         {
-            string answer = Ask(question);
+            string answer = Ask(question, value);
             if (String.IsNullOrEmpty(answer))
                 return value;
             switch (casing)
             {
                 default:
                     return answer;
-                case CharacterCasing.Lower:
+                case Energy.Enumeration.CharacterCasing.Lower:
                     return answer.ToLower();
-                case CharacterCasing.Upper:
+                case Energy.Enumeration.CharacterCasing.Upper:
                     return answer.ToUpper();
             }
         }
@@ -330,19 +329,64 @@ namespace Energy.Core
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="casing">Character casing</param>
-        /// <returns>Value entered or default if skipped, empty string by default</returns>
-        public static string Ask(string question, CharacterCasing casing)
+        /// <param name="value">Default value</param>
+        /// <returns>Value entered or default if skipped</returns>
+        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing, string value)
         {
-            return Ask(question, casing, "");
+            return Ask(question, value, casing);
+        }
+
+        /// <summary>
+        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Return input value lower or upper case.
+        /// </summary>
+        /// <param name="question">Question string</param>
+        /// <param name="casing">Character casing</param>
+        /// <returns>Value entered or default if skipped, empty string by default</returns>
+        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing)
+        {
+            return Ask(question, "", casing);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object Ask(string question, object value, Type type)
+        {
+            string text = Energy.Base.Cast.As<string>(value);
+            string answer = Ask(question, text);
+            if (!string.IsNullOrEmpty(answer))
+            {
+                return Energy.Base.Cast.As(type, answer);
+            }
+            else
+            {
+                if (value != null && type != value.GetType())
+                {
+                    return Energy.Base.Cast.As(type, value);
+                }
+                else
+                {
+                    return value;
+                }
+            }
         }
 
         public static object Ask(string question, object value)
         {
-            string text = Energy.Base.Cast.As<string>(value);
-            string answer = Ask(question, text);
-            if (String.IsNullOrEmpty(answer))
-                return value;
-            return answer;
+            Type type = value != null ? value.GetType() : typeof(string);
+            return Ask(question, value, type);
+        }
+
+        public static T Ask<T>(string question, T value)
+        {
+            T result;
+            result = (T)Ask(question, value, typeof(T));
+            return result;
         }
 
         #endregion
@@ -385,7 +429,7 @@ namespace Energy.Core
             for (int i = 0; i < padding; i++)
                 s.AppendLine();
             string x = s.ToString();
-            string t = string.Concat(x, line, x, Environment.NewLine);
+            string t = string.Concat(x, line, x, Energy.Base.Text.NL);
             Write(t);
         }
 
@@ -631,7 +675,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string format, params object[] value)
         {
-            Write(string.Concat(string.Format(format, value), Environment.NewLine));
+            Write(string.Concat(string.Format(format, value), Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -699,7 +743,7 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void WriteLine(string value)
         {
-            Write(string.Concat(value, Environment.NewLine));
+            Write(string.Concat(value, Energy.Base.Text.NL));
         }
 
         /// <summary>
@@ -710,7 +754,7 @@ namespace Energy.Core
         public static void WriteLine(ConsoleColor color, string text)
         {
             Write(string.Concat(ConsoleColorToTildeColor(color), Escape(text)
-                , Environment.NewLine));
+                , Energy.Base.Text.NL));
         }
 
         #endregion
@@ -893,10 +937,12 @@ namespace Energy.Core
             List<string> list = new List<string>();
             string message = (exception.Message ?? "").Trim();
             const string eol = "~0~\r\n";
+
             if (!String.IsNullOrEmpty(message))
             {
                 list.Add(string.Concat("~r~", message));
             }
+
             if (exception.InnerException != null)
             {
                 string next = (exception.InnerException.Message ?? "").Trim();
@@ -905,32 +951,26 @@ namespace Energy.Core
                     list.Add(string.Concat("~m~", next));
                 }
             }
+
             if (trace)
             {
-                string pattern = @"^\s+[a-z]+\s+(?<method>[a-z][a-z0-9_\.]*\([^\)\r\n]*\))(?:(?:[\ \t]+[a-z]+[\ \t]+)(?<file>[^\r\n]+))?";
-                Regex r = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
-                Match m = r.Match(exception.StackTrace);
-                while (m.Success)
+                //string stackTrace = Energy.Base.Class.GetFieldOrPropertyValue(exception, "StackTrace") as string;
+                string stackTrace = exception.StackTrace;
+                if (!string.IsNullOrEmpty(stackTrace))
                 {
-                    string method = m.Groups["method"].Value;
-                    string file = m.Groups["file"].Value;
-                    m = m.NextMatch();
-                    list.Add(string.Concat(Energy.Core.Tilde.Color.DarkGray
-                        , method, " ", Energy.Core.Tilde.Color.Yellow
-                        , file).Trim());
+                    string pattern = @"^\s+[a-z]+\s+(?<method>[a-z][a-z0-9_\.]*\([^\)\r\n]*\))(?:(?:[\ \t]+[a-z]+[\ \t]+)(?<file>[^\r\n]+))?";
+                    Regex r = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.CultureInvariant);
+                    Match m = r.Match(stackTrace);
+                    while (m.Success)
+                    {
+                        string method = m.Groups["method"].Value;
+                        string file = m.Groups["file"].Value;
+                        m = m.NextMatch();
+                        list.Add(string.Concat(Energy.Core.Tilde.Color.DarkGray
+                            , method, " ", Energy.Core.Tilde.Color.Yellow
+                            , file).Trim());
+                    }
                 }
-
-                //string comment = (new Regex(@"^\s*\w+\s*", RegexOptions.Multiline).Replace(exception.StackTrace, ""));
-                //string[] split = Energy.Base.Text.SplitNewLine(comment);
-                //List<string> stack = new List<string>();
-                //for (int i = split.Length - 1; i >= 0; i--)
-                //{
-                //    stack.Add(split[i]);
-                //}
-                //if (stack.Count > 0)
-                //{
-                //    message += "~ds~" + String.Join(Environment.NewLine, stack.ToArray()) + "~0~" + Environment.NewLine;
-                //}
             }
 
             message = string.Join(eol, list.ToArray());
@@ -1069,6 +1109,12 @@ namespace Energy.Core
 
         #region Input
 
+        /// <summary>
+        /// Write out prompt message and wait for input string. If user did not provide
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static string Input(string message, string defaultValue)
         {
             if (string.IsNullOrEmpty(message))

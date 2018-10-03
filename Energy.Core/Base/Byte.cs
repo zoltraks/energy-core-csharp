@@ -73,6 +73,142 @@ namespace Energy.Base
             return 0;
         }
 
+        /// <summary>
+        /// Compare int arrays
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int Compare(int[] left, int[] right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                    return 0;
+                return -1;
+            }
+            if (right == null)
+            {
+                if (left == null)
+                    return 0;
+                return 1;
+            }
+            if (left.Length != right.Length)
+            {
+                return left.Length < right.Length ? -1 : 1;
+            }
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] < right[i])
+                    return -1;
+                if (left[i] > right[i])
+                    return 1;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Compare long arrays
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int Compare(long[] left, long[] right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                    return 0;
+                return -1;
+            }
+            if (right == null)
+            {
+                if (left == null)
+                    return 0;
+                return 1;
+            }
+            if (left.Length != right.Length)
+            {
+                return left.Length < right.Length ? -1 : 1;
+            }
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] < right[i])
+                    return -1;
+                if (left[i] > right[i])
+                    return 1;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Compare double arrays
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int Compare(double[] left, double[] right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                    return 0;
+                return -1;
+            }
+            if (right == null)
+            {
+                if (left == null)
+                    return 0;
+                return 1;
+            }
+            if (left.Length != right.Length)
+            {
+                return left.Length < right.Length ? -1 : 1;
+            }
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] < right[i])
+                    return -1;
+                if (left[i] > right[i])
+                    return 1;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Compare decimal arrays
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static int Compare(decimal[] left, decimal[] right)
+        {
+            if (left == null)
+            {
+                if (right == null)
+                    return 0;
+                return -1;
+            }
+            if (right == null)
+            {
+                if (left == null)
+                    return 0;
+                return 1;
+            }
+            if (left.Length != right.Length)
+            {
+                return left.Length < right.Length ? -1 : 1;
+            }
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (left[i] < right[i])
+                    return -1;
+                if (left[i] > right[i])
+                    return 1;
+            }
+            return 0;
+        }
+
         #endregion
     }
 }

@@ -10,15 +10,210 @@ namespace Energy.Core
 {
     public class Bug
     {
+        #region Property
+
         /// <summary>
         /// Trace switch
         /// </summary>
-        public readonly static Energy.Base.Switch Trace = false;
+        public static Energy.Base.Switch TraceLogging;
 
         /// <summary>
         /// Use time when writing to System.Diagnostics.Debug
         /// </summary>
-        public readonly static Energy.Base.Switch DebugOutputTime = true;
+        public static Energy.Base.Switch DebugOutputTime;
+
+        private static Energy.Core.Log _Log;
+        /// <summary>Log</summary>
+        public static Energy.Core.Log Log
+        {
+            get
+            {
+                if (_Log == null)
+                {
+                    return Core.Log.Default;
+                }
+                else
+                {
+                    return _Log;
+                }
+            }
+            set
+            {
+                _Log = value;
+            }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        static Bug()
+        {
+            //System.Diagnostics.Debug.WriteLine("BUG");
+            TraceLogging = false;
+            DebugOutputTime = true;
+        }
+
+        #endregion
+
+        #region Class
+
+        public class Class
+        {
+            #region SuppressCodeList
+
+            public class SuppressCodeList : List<SuppressCodeList.Item>
+            {
+                private static SuppressCodeList _Default;
+                private static readonly object _DefaultLock = new object();
+                /// <summary>Singleton</summary>
+                public static SuppressCodeList Default
+                {
+                    get
+                    {
+                        if (_Default == null)
+                        {
+                            lock (typeof(SuppressCodeList))
+                            {
+                                if (_Default == null)
+                                {
+                                    _Default = new SuppressCodeList();
+                                }
+                            }
+                        }
+                        return _Default;
+                    }
+                }
+
+                public class Item
+                {
+                    public Code Code;
+
+                    public bool Suppress;
+                }
+
+                public Item Find(Code code, bool ignoreCase, bool matchAny)
+                {
+                    for (int i = 0; i < this.Count; i++)
+                    {
+                        if (code.Match(this[i].Code, ignoreCase, matchAny))
+                            return this[i];
+                    }
+                    return null;
+                }
+
+                public Item Find(Code code)
+                {
+                    return Find(code, true, true);
+                }
+
+                public bool IsSuppressed(Code code)
+                {
+                    Item item = Find(code, true, true);
+                    if (item == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return item.Suppress;
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region Code
+
+        /// <summary>
+        /// Bug message code. May be numbered, litereal or both.
+        /// </summary>
+        public struct Code
+        {
+            public long Number;
+            public string Text;
+
+            public Code(long number)
+            {
+                Number = number;
+                Text = "";
+            }
+
+            public Code(string text)
+            {
+                Number = 0;
+                Text = text;
+            }
+
+            public Code(long number, string text)
+            {
+                Number = number;
+                Text = text;
+            }
+
+            public static implicit operator Code(long number)
+            {
+                return new Code(number);
+            }
+
+            public static implicit operator Code(string text)
+            {
+                return new Code(text);
+            }
+
+            public bool Match(Code code, bool ignoreCase, bool matchAny)
+            {
+                bool numberMatch = code.Number != 0 && code.Number == this.Number;
+                if (numberMatch && matchAny)
+                    return true;
+                bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
+                bool thisTextEmpty = string.IsNullOrEmpty(this.Text);
+                if (codeTextEmpty && thisTextEmpty)
+                {
+                    if (code.Number != 0 || this.Number != 0)
+                        return false;
+                    else
+                        return true;
+                }
+                bool textMatch = 0 == string.Compare(code.Text, this.Text, ignoreCase);
+                return textMatch;
+            }
+        }
+
+        #endregion
+
+        #region Entry
+
+        /// <summary>
+        /// Bug message entry.
+        /// </summary>
+        public struct Entry
+        {
+            public Code Code;
+            public string Message;
+
+            public Entry(string message)
+            {
+                this.Code = default(Code);
+                this.Message = message;
+            }
+
+            public Entry(Code code, string message)
+            {
+                this.Code = code;
+                this.Message = message;
+            }
+        }
+
+        #endregion
+
+        #region ExceptionMessage
 
         /// <summary>
         /// Return exception message
@@ -61,17 +256,7 @@ namespace Energy.Core
                 message.Add(fault.Message);
             }
 
-            return String.Join(Environment.NewLine, message.ToArray()).Trim();
-        }
-
-        /// <summary>
-        /// Get current thread id as hex string.
-        /// </summary>
-        /// <returns></returns>
-        public static string ThreadIdHex()
-        {
-            int id = Thread.CurrentThread.ManagedThreadId;
-            return Energy.Base.Hex.IntegerToHex(id);
+            return string.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
         }
 
         /// <summary>
@@ -81,8 +266,36 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string ExceptionMessage(Exception exception)
         {
-            return ExceptionMessage(exception, (bool)Trace);
+            return ExceptionMessage(exception, (bool)TraceLogging);
         }
+
+        #endregion
+
+        #region ThreadIdHex
+
+        /// <summary>
+        /// Get thread id as hex string.
+        /// </summary>
+        /// <param name="thread"></param>
+        /// <returns></returns>
+        public static string ThreadIdHex(System.Threading.Thread thread)
+        {
+            int id = thread.ManagedThreadId;
+            return Energy.Base.Hex.IntegerToHex(id);
+        }
+
+        /// <summary>
+        /// Get current thread id as hex string.
+        /// </summary>
+        /// <returns></returns>
+        public static string ThreadIdHex()
+        {
+            return ThreadIdHex(System.Threading.Thread.CurrentThread);
+        }
+
+        #endregion
+
+        #region CallingMethod
 
         /// <summary>
         /// Return calling method name
@@ -132,6 +345,10 @@ namespace Energy.Core
             return CallingMethod(1);
         }
 
+        #endregion
+
+        #region FormatDebugOutput
+
         public static string FormatDebugOutput(string message)
         {
             if ((bool)DebugOutputTime)
@@ -141,6 +358,22 @@ namespace Energy.Core
             return message;
         }
 
+        #endregion
+
+        #region Static
+
+        private static Class.SuppressCodeList SuppressCodeList
+        {
+            get
+            {
+                return Class.SuppressCodeList.Default;
+            }
+        }
+
+        #endregion
+
+        #region Catch
+
         /// <summary>
         /// Handle exception
         /// </summary>
@@ -149,11 +382,45 @@ namespace Energy.Core
         {
             string message = ExceptionMessage(exception, true);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                Log.Write(message, Enumeration.LogLevel.Bug);
             }
         }
+
+        #endregion
+
+        #region Last
+
+        private static Entry _Last;
+
+        private readonly static object _LastLock = new object();
+
+        /// <summary>
+        /// Last entry
+        /// </summary>
+        public static Entry Last
+        {
+            get
+            {
+                lock (_LastLock)
+                {
+                    return _Last;
+                }
+            }
+            set
+            {
+                lock (_LastLock)
+                {
+                    _Last = value;
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region Write
 
         /// <summary>
         /// Write debug message
@@ -162,26 +429,65 @@ namespace Energy.Core
         public static void Write(string message)
         {
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
+            Last = new Entry(message);
         }
 
         /// <summary>
-        /// Write debug message
+        /// Write debug message with numeric code which may be suppressed or limited.
         /// </summary>
-        /// <param name="format"></param>
-        /// <param name="args"></param>
-        public static void Write(string format, params object[] args)
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        public static void Write(Code code, string message)
         {
-            string message = string.Format(format, args);
+            if (IsSuppressed(code))
+            {
+                return;
+            }
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
+            if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
+            Last = new Entry(code, message);
         }
+
+        /// <summary>
+        /// Write debug message with numeric code which may be suppressed or limited.
+        /// Provide a function that returns message and will be invoked only if not suppressed.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="action"></param>
+        public static void Write(Code code, Energy.Base.Anonymous.String action)
+        {
+            if (IsSuppressed(code))
+            {
+                return;
+            }
+            string message = null;
+            try
+            {
+                message = action();
+            }
+            catch { }
+            if (string.IsNullOrEmpty(message))
+            {
+                return;
+            }
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)TraceLogging)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
+            Last = new Entry(code, message);
+        }
+
+        #endregion
+
+        #region WriteFormat
 
         /// <summary>
         /// Write debug message
@@ -190,12 +496,7 @@ namespace Energy.Core
         /// <param name="args"></param>
         public static void WriteFormat(string format, params object[] args)
         {
-            string message = string.Format(format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
-            {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
-            }
+            Write(string.Format(format, args));
         }
 
         /// <summary>
@@ -207,17 +508,15 @@ namespace Energy.Core
         public static void WriteFormat(IFormatProvider provider, string format, params object[] args)
         {
             string message = string.Format(provider, format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)Trace)
-            {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
-            }
+            Write(message);
         }
+
+        #endregion
 
         #region Trap
 
         /// <summary>
-        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// Create time trap for execution. While disposed, it will invoke optional action.
         /// </summary>
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>
@@ -229,7 +528,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// Create time trap for execution. While disposed, it will invoke optional action.
         /// </summary>
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>
@@ -238,6 +537,57 @@ namespace Energy.Core
         {
             Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
             return trap;
+        }
+
+        #endregion
+
+        #region Suppress
+
+        /// <summary>
+        /// Suppress message identified by code.
+        /// </summary>
+        /// <param name="code"></param>
+        public static void Suppress(Code code)
+        {
+            Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
+            if (item == null)
+            {
+                item = new Class.SuppressCodeList.Item()
+                {
+                    Code = code,
+                    Suppress = true,
+                };
+                SuppressCodeList.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Suppress message identified by code.
+        /// Optionaly "unsuppress" by calling with suppress:false parameter.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="suppress"></param>
+        public static void Suppress(Code code, bool suppress)
+        {
+            Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
+            if (item == null)
+            {
+                item = new Class.SuppressCodeList.Item()
+                {
+                    Code = code,
+                    Suppress = suppress,
+                };
+                SuppressCodeList.Add(item);
+            }
+            else
+            {
+                item.Suppress = suppress;
+            }
+        }
+
+        public static bool IsSuppressed(Code code)
+        {
+            return SuppressCodeList.IsSuppressed(code);
         }
 
         #endregion

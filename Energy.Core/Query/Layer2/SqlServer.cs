@@ -59,7 +59,7 @@ namespace Energy.Query
                 script.Add("");
                 script.Add("GO");
 
-                return String.Join(Environment.NewLine, script.ToArray());
+                return String.Join(Energy.Base.Text.NL, script.ToArray());
             }
 
             public override string CreateDescription(Energy.Source.Structure.Table table)
@@ -93,7 +93,7 @@ namespace Energy.Query
                 script.Add("");
                 script.Add("GO");
 
-                return String.Join(Environment.NewLine, script.ToArray());
+                return String.Join(Energy.Base.Text.NL, script.ToArray());
             }
         }
     }
