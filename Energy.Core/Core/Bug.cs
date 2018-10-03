@@ -175,9 +175,39 @@ namespace Energy.Core
                 bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
                 bool thisTextEmpty = string.IsNullOrEmpty(this.Text);
                 if (codeTextEmpty && thisTextEmpty)
-                    return true;
+                {
+                    if (code.Number != 0 || this.Number != 0)
+                        return false;
+                    else
+                        return true;
+                }
                 bool textMatch = 0 == string.Compare(code.Text, this.Text, ignoreCase);
                 return textMatch;
+            }
+        }
+
+        #endregion
+
+        #region Entry
+
+        /// <summary>
+        /// Bug message entry.
+        /// </summary>
+        public struct Entry
+        {
+            public Code Code;
+            public string Message;
+
+            public Entry(string message)
+            {
+                this.Code = default(Code);
+                this.Message = message;
+            }
+
+            public Entry(Code code, string message)
+            {
+                this.Code = code;
+                this.Message = message;
             }
         }
 
@@ -360,6 +390,36 @@ namespace Energy.Core
 
         #endregion
 
+        #region Last
+
+        private static Entry _Last;
+
+        private readonly static object _LastLock = new object();
+
+        /// <summary>
+        /// Last entry
+        /// </summary>
+        public static Entry Last
+        {
+            get
+            {
+                lock (_LastLock)
+                {
+                    return _Last;
+                }
+            }
+            set
+            {
+                lock (_LastLock)
+                {
+                    _Last = value;
+                }
+            }
+        }
+
+        #endregion
+
+
         #region Write
 
         /// <summary>
@@ -373,21 +433,7 @@ namespace Energy.Core
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
-        }
-
-        /// <summary>
-        /// Write debug message
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="args"></param>
-        public static void Write(string format, params object[] args)
-        {
-            string message = string.Format(format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
-            {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
-            }
+            Last = new Entry(message);
         }
 
         /// <summary>
@@ -406,6 +452,37 @@ namespace Energy.Core
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
+            Last = new Entry(code, message);
+        }
+
+        /// <summary>
+        /// Write debug message with numeric code which may be suppressed or limited.
+        /// Provide a function that returns message and will be invoked only if not suppressed.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="action"></param>
+        public static void Write(Code code, Energy.Base.Anonymous.String action)
+        {
+            if (IsSuppressed(code))
+            {
+                return;
+            }
+            string message = null;
+            try
+            {
+                message = action();
+            }
+            catch { }
+            if (string.IsNullOrEmpty(message))
+            {
+                return;
+            }
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            if ((bool)TraceLogging)
+            {
+                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+            }
+            Last = new Entry(code, message);
         }
 
         #endregion
@@ -419,12 +496,7 @@ namespace Energy.Core
         /// <param name="args"></param>
         public static void WriteFormat(string format, params object[] args)
         {
-            string message = string.Format(format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
-            {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
-            }
+            Write(string.Format(format, args));
         }
 
         /// <summary>
@@ -436,11 +508,7 @@ namespace Energy.Core
         public static void WriteFormat(IFormatProvider provider, string format, params object[] args)
         {
             string message = string.Format(provider, format, args);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
-            {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
-            }
+            Write(message);
         }
 
         #endregion
@@ -448,7 +516,7 @@ namespace Energy.Core
         #region Trap
 
         /// <summary>
-        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// Create time trap for execution. While disposed, it will invoke optional action.
         /// </summary>
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>
@@ -460,7 +528,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Create time trap for execution. While disposed, it Will invoke optional action.
+        /// Create time trap for execution. While disposed, it will invoke optional action.
         /// </summary>
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>

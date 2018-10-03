@@ -196,7 +196,7 @@ namespace Energy.Core
                 }
             }
 
-            Energy.Core.Bug.Write("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+            Energy.Core.Bug.Write(string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }
@@ -240,7 +240,7 @@ namespace Energy.Core
             socket.ReceiveTimeout = timeout;
             socket.SendTimeout = timeout;
 
-            Energy.Core.Bug.Write("TcpClient configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket)));
+            Energy.Core.Bug.Write(string.Format("TcpClient configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }

@@ -69,6 +69,7 @@
     <Compile Include="Base\Color.cs" />
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Http.cs" />
+    <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
