@@ -60,6 +60,8 @@ namespace Energy.Base
             return Energy.Base.Class.GetDefault(type);
         }
 
+        #endregion
+
         #region AsInteger
 
         /// <summary>
