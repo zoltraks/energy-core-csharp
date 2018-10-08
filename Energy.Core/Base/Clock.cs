@@ -17,6 +17,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region CurrentTime
+
         /// <summary>
         /// Return current time in 24h/ms format, i.e. "12:33:15.176"
         /// </summary>
@@ -29,6 +31,82 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15"
+        /// </summary>
+        public static string CurrentTimeShort
+        {
+            get
+            {
+                return DateTime.Now.ToString("HH:mm:ss");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15.123"
+        /// </summary>
+        public static string CurrentTimeMilliseconds
+        {
+            get
+            {
+                return DateTime.Now.ToString("HH:mm:ss.fff");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15.123456"
+        /// </summary>
+        public static string CurrentTimeMicroseconds
+        {
+            get
+            {
+                return DateTime.Now.ToString("HH:mm:ss.ffffff");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15.176"
+        /// </summary>
+        public static string CurrentTimeUtc
+        {
+            get
+            {
+                return DateTime.UtcNow.ToString("HH:mm:ss.fff");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15"
+        /// </summary>
+        public static string CurrentUtcTimeShort
+        {
+            get
+            {
+                return DateTime.UtcNow.ToString("HH:mm:ss");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15.123"
+        /// </summary>
+        public static string CurrentTimeUtcMilliseconds
+        {
+            get
+            {
+                return DateTime.UtcNow.ToString("HH:mm:ss.fff");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "12:33:15.123456"
+        /// </summary>
+        public static string CurrentTimeUtcMicroseconds
+        {
+            get
+            {
+                return DateTime.UtcNow.ToString("HH:mm:ss.ffffff");
+            }
+        }
+        /// <summary>
         /// Return current time in unix time format, i.e. 1461477755.353
         /// </summary>
         /// <returns></returns>
@@ -39,6 +117,10 @@ namespace Energy.Base
                 return GetUnixTime(DateTime.Now);
             }
         }
+
+        #endregion
+
+        #region Unix
 
         /// <summary>
         /// Return time as unix time
@@ -61,6 +143,33 @@ namespace Energy.Base
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(unix).ToLocalTime();
         }
+
+
+        /// <summary>
+        /// Return time as unix time
+        /// </summary>
+        /// <param name="stamp"></param>
+        /// <param name="yearZero">Year of zero value, 1970 for unix</param>
+        /// <returns></returns>
+        public static double GetUnixTime(DateTime stamp, int yearZero)
+        {
+            TimeSpan span = (stamp.ToUniversalTime() - new DateTime(yearZero, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
+            return span.TotalSeconds;
+        }
+
+        /// <summary>
+        /// Return unix time as DateTime
+        /// </summary>
+        /// <param name="unix">Unix time</param>
+        /// <param name="yearZero">Year of zero value, 1970 for unix</param>
+        /// <returns>DateTime</returns>
+        public static DateTime GetDateTime(double unix, int yearZero)
+        {
+            DateTime epoch = new DateTime(yearZero, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(unix).ToLocalTime();
+        }
+
+        #endregion
 
         #region ISO 8601
 
