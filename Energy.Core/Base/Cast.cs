@@ -457,16 +457,17 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static int StringToInteger(string value)
         {
-            if (value == null || value.Length == 0)
+            if (null == value || 0 == value.Length)
                 return 0;
             int result;
             if (int.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (int.TryParse(value, out result))
-                return result;
+            if (trim.Length != value.Length)
+            {
+                if (int.TryParse(value, out result))
+                    return result;
+            }
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;

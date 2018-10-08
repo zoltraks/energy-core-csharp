@@ -127,7 +127,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextParse", "Energy.Core.Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerPersistentBenchmark", "Energy.Core.Example\SqlServerPersistentBenchmark\SqlServerPersistentBenchmark.csproj", "{739065A7-0B7D-4B12-B34F-A9040C177D1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLitePCLCore", "Example\SQLitePCLCore\SQLitePCLCore.csproj", "{3571E14B-FFDE-463F-98A4-CE95C2501A5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLitePCLCore", "Example\SQLitePCLCore\SQLitePCLCore.csproj", "{3571E14B-FFDE-463F-98A4-CE95C2501A5C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
