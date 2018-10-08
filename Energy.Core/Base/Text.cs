@@ -38,6 +38,24 @@ namespace Energy.Base
             }
         }
 
+        private static string _WS;
+        /// <summary>Whitespace characters string</summary>
+        public static string WS
+        {
+            get
+            {
+                if (_WS == null)
+                {
+                    _WS = " \t\r\n\v";
+                }
+                return _WS;
+            }
+            private set
+            {
+                _WS = value;
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -648,6 +666,60 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #region RemoveWhiteSpace
+
+        /// <summary>
+        /// Remove whitespace characters from entire string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string RemoveWhitespace(string value)
+        {
+            if (value == null || value.Length == 0)
+                return value;
+            string white = Energy.Base.Text.WS;
+            char[] charArray = value.ToCharArray();
+            if (!Energy.Base.Text.ContainsWhitespace(charArray))
+            {
+                return value;
+            }
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                if (white.IndexOf(charArray[i]) >= 0)
+                    continue;
+                else
+                    sb.Append(charArray[i]);
+            }
+            return sb.ToString();
+        }
+
+        #endregion
+
+        #region ContainsWhitespace
+
+        /// <summary>
+        /// Check if array contains any of whitespace character.
+        /// </summary>
+        /// <param name="charArray"></param>
+        /// <returns></returns>
+        public static bool ContainsWhitespace(char[] charArray)
+        {
+            if (null == charArray)
+                return false;
+            if (0 == charArray.Length)
+                return false;
+            string white = Energy.Base.Text.WS;
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                if (0 <= white.IndexOf(charArray[i]))
+                    return true;
+            }
+            return false;
+        }
+
+        #endregion
 
         #region Limit
 
@@ -1762,6 +1834,109 @@ namespace Energy.Base
                     return false;
                 }
             }
+        }
+
+        #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Quote(string text)
+        {
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with)
+        {
+            return Quote(text, with, with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape)
+        {
+            return string.Concat(with, text.Replace(with, escape + with), with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape, bool optional)
+        {
+            if (optional && !text.Contains(with))
+                return text;
+            return Quote(text, with, escape);
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Strip(string text)
+        {
+            return Strip(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with)
+        {
+            return Strip(text, with, with);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with, string escape)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            int a = 0;
+            int b = text.Length;
+            if (text.StartsWith(with))
+            {
+                a = with.Length;
+                b -= with.Length;
+            }
+            if (text.EndsWith(with))
+            {
+                b -= with.Length;
+            }
+            string cut = text.Substring(a, b);
+            return cut.Replace(escape + with, with);
         }
 
         #endregion

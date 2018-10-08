@@ -35,7 +35,8 @@ namespace Energy.Base
                                 try
                                 {
                                     _Default = Activator.CreateInstance<T>();
-                                    Energy.Core.Bug.Write("Default instance of {0} created", typeof(T).FullName);
+                                    Energy.Core.Bug.Write(new Core.Bug.Code(0xc001, "BC001")
+                                        , () => { return string.Format("Default instance of {0} created", typeof(T).FullName); });
                                 }
                                 catch (Exception exception)
                                 {
@@ -78,7 +79,7 @@ namespace Energy.Base
                             try
                             {
                                 _Instance = Activator.CreateInstance<T>();
-                                Energy.Core.Bug.Write("Singleton {0} created", typeof(T).FullName);
+                                Energy.Core.Bug.Write(string.Format("Singleton {0} created", typeof(T).FullName));
                             }
                             catch (Exception exception)
                             {
