@@ -921,7 +921,8 @@ namespace Energy.Base
         #region Compare
 
         /// <summary>
-        /// Compare two arrays of bytes
+        /// Compare two arrays of bytes.
+        /// Returns 0 if contains the same values.
         /// </summary>
         /// <param name="array1"></param>
         /// <param name="array2"></param>
@@ -954,6 +955,22 @@ namespace Energy.Base
                     return 1;
             }
             return 0;
+        }
+
+        #endregion
+
+        #region AreEqual
+
+        public static bool AreEqual(params byte[][] array)
+        {
+            if (array.Length < 2)
+                return false;
+            for (int i = 0; i < array.Length - 1; i++)
+            {
+                if (0 != Compare(array[i], array[i + 1]))
+                    return false;
+            }
+            return true;
         }
 
         #endregion

@@ -11,6 +11,16 @@ namespace Energy.Base
     /// </summary>
     public class Hex
     {
+        #region Constant
+
+        internal const string HEX_STRING = "0123456789ABCDEF";
+        internal const string HEX_STRING_UPPER = "0123456789ABCDEF";
+        internal const string HEX_STRING_LOWER = "0123456789abcdef";
+        internal const string HEX_STRING_32 = "0123456789ABCDEF0123456789abcdef";
+        internal const string HEX_STRING_24_REVERSE = "FEDCBA9876543210fedcba";
+
+        #endregion
+
         #region ByteArray
 
         /// <summary>
@@ -223,18 +233,68 @@ namespace Energy.Base
         /// <returns></returns>
         public static byte[] HexToByteArray(string hex)
         {
-            if (hex == null) return null;
-            hex = Regex.Replace(hex, @"\s", "");
-            if (hex.Length < 2) return new byte[] { };
+            return HexToByteArray(hex, null);
+        }
+
+        /// <summary>
+        /// Convert hex to byte array
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <param name="prefix">Optional prefix list of hexadecimal number</param>
+        /// <returns></returns>
+        public static byte[] HexToByteArray(string hex, string[] prefix)
+        {
+            if (null == hex)
+                return null;
+
+            // TODO Compare performance with hex = Regex.Replace(hex, @"\s", "");
+            hex = Energy.Base.Text.RemoveWhitespace(hex);
+
+            if (0 == hex.Length)
+            {
+                return new byte[] { };
+            }
+
+            if (prefix != null && prefix.Length > 0)
+            {
+                bool found = false;
+                for (int i = 0; i < prefix.Length; i++)
+                {
+                    if (hex.StartsWith(prefix[i]))
+                    {
+                        hex = hex.Substring(prefix[i].Length);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    return null;
+                }
+            }
+
+            if (hex.Length % 2 != 0)
+            {
+                hex = "0" + hex;
+            }
+
             int count = hex.Length / 2;
             byte[] data = new byte[count];
-            for (int i = 0; i < count; i++)
+            char[] charArray = hex.ToCharArray();
+
+            for (int i = 0, n = 0; i < hex.Length; i += 2)
             {
-                data[i] = (byte)(
-                   "0123456789ABCDEF".IndexOf(hex.Substring(i * 2, 1), StringComparison.InvariantCultureIgnoreCase) * 16 +
-                   "0123456789ABCDEF".IndexOf(hex.Substring(1 + i * 2, 1), StringComparison.InvariantCultureIgnoreCase)
-                );
+                int hi = HEX_STRING_24_REVERSE.IndexOf(charArray[i]);
+                int lo = HEX_STRING_24_REVERSE.IndexOf(charArray[i + 1]);
+                if (hi < 0)
+                    hi = 0;
+                if (lo < 0)
+                    lo = 0;
+                hi = (15 - (hi % 16)) * 16;
+                lo = 15 - (lo % 16);
+                data[n++] = (byte)(hi + lo);
             }
+
             return data;
         }
 
@@ -585,6 +645,78 @@ namespace Energy.Base
         public static string Random()
         {
             return Energy.Base.Random.GetRandomHex();
+        }
+
+        /// <summary>
+        /// Check if text is a hexadecimal number string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="prefixArray"></param>
+        /// <param name="removeWhite"></param>
+        /// <returns></returns>
+        public static bool IsHex(string value, string[] prefixArray, bool removeWhite)
+        {
+            if (removeWhite)
+            {
+                value = Energy.Base.Text.RemoveWhitespace(value);
+            }
+            if (null == prefixArray || 0 == prefixArray.Length)
+            {
+                return IsHex(value);
+            }
+            for (int i = 0; i < prefixArray.Length; i++)
+            {
+                string prefix = prefixArray[i];
+                if (!value.StartsWith(prefix))
+                {
+                    continue;
+                }
+                value = value.Substring(prefix.Length);
+                return IsHex(value);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check if text is a hexadecimal number string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="prefixArray"></param>
+        /// <returns></returns>
+        public static bool IsHex(string value, string[] prefixArray)
+        {
+            return IsHex(value, prefixArray, false);
+        }
+
+        /// <summary>
+        /// Check if text is a hexadecimal number string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsHex(string value)
+        {
+            if (null == value)
+                return false;
+            return IsHex(value.ToCharArray());
+        }
+
+        /// <summary>
+        /// Check if text is a hexadecimal number string.
+        /// </summary>
+        /// <param name="charArray"></param>
+        /// <returns></returns>
+        private static bool IsHex(char[] charArray)
+        {
+            if (charArray == null)
+                return false;
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                if (0 < HEX_STRING_24_REVERSE.IndexOf(charArray[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
