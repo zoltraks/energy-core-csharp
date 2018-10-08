@@ -1684,28 +1684,15 @@ namespace Energy.Base
             if (value is char)
                 return (int)(char)value;
 
-            string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (s == null || s.Length == 0)
-                return 0;
+            string s = null;
+            if (value is string)
+                s = (string)value;
+            else
+                s = value.ToString();
 
-            int i = 0;
-            long l = 0;
-            double d = 0;
-
-            if (false)
-            { }
-            else if (int.TryParse(s, out i))
-                return i;
-            else if (long.TryParse(s, out l))
-                return (int)l;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (int)d;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (int)d;
-
-            return 0;
+            return StringToInteger(s);
         }
+
         /// <summary>
         /// Convert object to long integer number.
         /// </summary>
