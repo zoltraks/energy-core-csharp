@@ -44,5 +44,37 @@ namespace Energy.Core.Test.Base
             string s5 = "R8SZxZs=";
             Assert.AreEqual(s5, s4);
         }
+
+        [TestMethod]
+        public void ByteArrayBuilderToByteArrayFromInt()
+        {
+            int[] value;
+            byte[] expect;
+            byte[] result;
+
+            value = new int[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value);
+            expect = new byte[] { 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+            value = new int[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value, true);
+            expect = new byte[] { 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+            value = new int[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value, 2);
+            expect = new byte[] { 0, 1, 0, 2, 0, 3, 0, 4 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+            value = new int[] { -1, -2, -3, -4 };
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value, 2, true);
+            expect = new byte[] { 255, 255, 254, 255, 253, 255, 252, 255 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value, 3, false);
+            expect = new byte[] { 255, 255, 255, 255, 255, 254, 255, 255, 253, 255, 255, 252 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+            value = new int[] { -2 };
+            result = Energy.Base.ByteArrayBuilder.ToByteArray(value, true);
+            expect = new byte[] { 254, 255, 255, 255 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+        }
     }
 }

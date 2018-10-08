@@ -974,5 +974,121 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Conversion
+
+        #region ToByteArray
+
+        /// <summary>
+        /// Convert array of integers to a byte array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static byte[] ToByteArray(int[] array)
+        {
+            return ToByteArray(array, 4, false);
+        }
+
+        /// <summary>
+        /// Convert array of integers to a byte array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
+        public static byte[] ToByteArray(int[] array, int width)
+        {
+            return ToByteArray(array, width, false);
+        }
+
+        /// <summary>
+        /// Convert array of integers to a byte array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="reverse"></param>
+        /// <returns></returns>
+        public static byte[] ToByteArray(int[] array, bool reverse)
+        {
+            return ToByteArray(array, 4, reverse);
+        }
+
+        /// <summary>
+        /// Convert array of integers to a byte array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="width"></param>
+        /// <param name="reverse"></param>
+        /// <returns></returns>
+        public static byte[] ToByteArray(int[] array, int width, bool reverse)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return new byte[] { };
+            if (width < 1 || width > 4)
+                throw new ArgumentOutOfRangeException("Parameter width for int must be from 1 to 4");
+            int length = array.Length * width;
+            byte[] data = new byte[length];
+            for (int i = 0, n = 0; i < array.Length; i++)
+            {
+                uint x = (uint)array[i];
+                switch (width)
+                {
+                    default:
+                        break;
+                    case 1:
+                        data[n++] = (byte)(x % 256);
+                        continue;
+                    case 2:
+                        x = x % 65536;
+                        if (reverse)
+                        {
+                            data[n++] = (byte)(x % 256);
+                            data[n++] = (byte)(x / 256);
+                        }
+                        else
+                        {
+                            data[n++] = (byte)(x / 256);
+                            data[n++] = (byte)(x % 256);
+                        }
+                        continue;
+                    case 3:
+                        x = x % 16777216;
+                        if (reverse)
+                        {
+                            data[n++] = (byte)(x % 256);
+                            data[n++] = (byte)((x / 256) % 256);
+                            data[n++] = (byte)((x / 65536) % 256);
+                        }
+                        else
+                        {
+                            data[n++] = (byte)((x / 65536) % 256);
+                            data[n++] = (byte)((x / 256) % 256);
+                            data[n++] = (byte)(x % 256);
+                        }
+                        continue;
+                    case 4:
+                        if (reverse)
+                        {
+                            data[n++] = (byte)(x % 256);
+                            data[n++] = (byte)((x / 256) % 256);
+                            data[n++] = (byte)((x / 65536) % 256);
+                            data[n++] = (byte)((x / 16777216) % 256);
+                        }
+                        else
+                        {
+                            data[n++] = (byte)((x / 16777216) % 256);
+                            data[n++] = (byte)((x / 65536) % 256);
+                            data[n++] = (byte)((x / 256) % 256);
+                            data[n++] = (byte)(x % 256);
+                        }
+                        continue;
+                }
+            }
+            return data;
+        }
+
+        #endregion
+
+        #endregion
     }
 }
