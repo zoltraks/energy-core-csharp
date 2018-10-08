@@ -37,10 +37,6 @@ namespace Energy.Base
             return default(T);
         }
 
-        #endregion
-
-        #region AsInteger
-
         /// <summary>
         /// Generic conversion from one type to another.
         /// </summary>
@@ -64,8 +60,22 @@ namespace Energy.Base
             return Energy.Base.Class.GetDefault(type);
         }
 
+        #endregion
+
+        #region AsInteger
+
         /// <summary>
-        /// Convert string to integer value without exception
+        /// Convert string to integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static int AsInteger(string value)
+        {
+            return Energy.Base.Cast.StringToInteger(value);
+        }
+
+        /// <summary>
+        /// Convert string to integer value without exception.
         /// </summary>
         /// <param name="value">Object</param>
         /// <returns>Integer number</returns>
