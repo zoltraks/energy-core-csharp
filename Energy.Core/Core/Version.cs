@@ -1,4 +1,16 @@
-﻿using System;
+﻿#if CFNET
+    //
+#elif WindowsCE || PocketPC || WINDOWS_PHONE
+    //
+#define CFNET
+#elif COMPACT_FRAMEWORK
+//
+#define CFNET
+#else
+    //
+#endif
+
+using System;
 using System.Diagnostics;
 
 namespace Energy.Core
@@ -41,7 +53,7 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-#if (!NETSTANDARD)
+#if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public void Set(System.Reflection.Assembly assembly)
@@ -56,8 +68,8 @@ namespace Energy.Core
 /// Get product version for assembly
 /// </summary>
 /// <param name="assembly">System.Reflection.Assembly</param>
-/// <returns>string</returns>
-#if (!NETSTANDARD)
+        /// <returns>string</returns>
+#if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public static string GetProduct(System.Reflection.Assembly assembly)
@@ -132,7 +144,7 @@ namespace Energy.Core
         /// <summary>Library version</summary>
         public static string LibraryVersion
         {
-#if (!NETSTANDARD)
+#if !NETSTANDARD && !CFNET
             [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
             get

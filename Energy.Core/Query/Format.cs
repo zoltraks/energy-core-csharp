@@ -315,7 +315,7 @@ namespace Energy.Query
         /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns></returns>
-        public string Number(object value, bool nullify = false)
+        public string Number(object value, bool nullify)
         {
             if (value == null)
                 return nullify ? "NULL" : "0";
