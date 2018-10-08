@@ -460,13 +460,27 @@ namespace Energy.Base
             if (value == null || value.Length == 0)
                 return 0;
             int result;
-            if (Energy.Base.Text.TryParse(value, out result))
+            if (int.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length == value.Length)
                 return 0;
-            if (Energy.Base.Text.TryParse(value, out result))
+            if (int.TryParse(value, out result))
                 return result;
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            decimal number = 0;
+            if (decimal.TryParse(value, out number))
+            {
+                try
+                {
+                    return (int)number;
+                }
+                catch (System.OverflowException)
+                {
+                    return 0;
+                }
+            }
             return 0;
         }
 
@@ -1681,9 +1695,9 @@ namespace Energy.Base
 
             if (false)
             { }
-            else if (Energy.Base.Text.TryParse(s, out i))
+            else if (int.TryParse(s, out i))
                 return i;
-            else if (Energy.Base.Text.TryParse(s, out l))
+            else if (long.TryParse(s, out l))
                 return (int)l;
             else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
                 return (int)d;
