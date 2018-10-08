@@ -76,5 +76,28 @@ namespace Energy.Core.Test.Base
             expect = new byte[] { 254, 255, 255, 255 };
             Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
         }
+
+        [TestMethod]
+        public void ByteArrayBuilderSubArray()
+        {
+            byte[] value;
+            byte[] expect;
+            byte[] result;
+
+            value = new byte[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.SubArray(value, 1, 2);
+            expect = new byte[] { 2, 3 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+
+            value = new byte[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.SubArray(value, 3, 2);
+            expect = new byte[] { 4 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+
+            value = new byte[] { 1, 2, 3, 4 };
+            result = Energy.Base.ByteArrayBuilder.SubArray(value, 3, 2, true);
+            expect = new byte[] { 4, 0 };
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
+        }
     }
 }

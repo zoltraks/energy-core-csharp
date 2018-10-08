@@ -1090,5 +1090,34 @@ namespace Energy.Base
         #endregion
 
         #endregion
+
+        #region SubArray
+
+        /// <summary>
+        /// Get sub array of bytes from an existing one.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="start"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static byte[] SubArray(byte[] array, int start, int count)
+        {
+            return Energy.Base.Collection.Array<byte>.SubArray(array, start, count, false);
+        }
+
+        /// <summary>
+        /// Get sub array of bytes from an existing one.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="start"></param>
+        /// <param name="count"></param>
+        /// <param name="pad"></param>
+        /// <returns></returns>
+        public static byte[] SubArray(byte[] array, int start, int count, bool pad)
+        {
+            return Energy.Base.Collection.Array<byte>.SubArray(array, start, count, pad);
+        }
+
+        #endregion
     }
 }

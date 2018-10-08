@@ -231,6 +231,42 @@ namespace Energy.Base
                     return base.ToArray();
                 }
             }
+
+            /// <summary>
+            /// Get sub array from an existing one.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="start"></param>
+            /// <param name="count"></param>
+            /// <returns></returns>
+            public static T[] SubArray(T[] array, int start, int count)
+            {
+                return SubArray(array, start, count, false);
+            }
+
+            /// <summary>
+            /// Get sub array from an existing one.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="start"></param>
+            /// <param name="count"></param>
+            /// <param name="pad"></param>
+            /// <returns></returns>
+            public static T[] SubArray(T[] array, int start, int count, bool pad)
+            {
+                if (array == null)
+                    return null;
+                if (start == 0 && array.Length == count)
+                    return array;
+                bool enough = array.Length >= start + count;
+                if (!enough && !pad)
+                    count = array.Length - start;
+                T[] data = new T[count];
+                if (!enough && pad)
+                    count = array.Length - start;
+                Array.Copy(array, start, data, 0, count);
+                return data;
+            }
         }
 
         #endregion
