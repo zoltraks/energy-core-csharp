@@ -17,7 +17,7 @@ namespace Energy.Base
         internal const string HEX_STRING_UPPER = "0123456789ABCDEF";
         internal const string HEX_STRING_LOWER = "0123456789abcdef";
         internal const string HEX_STRING_32 = "0123456789ABCDEF0123456789abcdef";
-        internal const string HEX_STRING_24_REVERSE = "FEDCBA987654321fedcba";
+        internal const string HEX_STRING_24_REVERSE = "FEDCBA9876543210fedcba";
 
         #endregion
 
@@ -233,19 +233,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static byte[] HexToByteArray(string hex)
         {
-            if (hex == null) return null;
-            hex = Regex.Replace(hex, @"\s", "");
-            if (hex.Length < 2) return new byte[] { };
-            int count = hex.Length / 2;
-            byte[] data = new byte[count];
-            for (int i = 0; i < count; i++)
-            {
-                data[i] = (byte)(
-                   "0123456789ABCDEF".IndexOf(hex.Substring(i * 2, 1), StringComparison.InvariantCultureIgnoreCase) * 16 +
-                   "0123456789ABCDEF".IndexOf(hex.Substring(1 + i * 2, 1), StringComparison.InvariantCultureIgnoreCase)
-                );
-            }
-            return data;
+            return HexToByteArray(hex, null);
         }
 
         /// <summary>
@@ -293,7 +281,8 @@ namespace Energy.Base
             int count = hex.Length / 2;
             byte[] data = new byte[count];
             char[] charArray = hex.ToCharArray();
-            for (int i = 0, n = 0; i < count; i += 2)
+
+            for (int i = 0, n = 0; i < hex.Length; i += 2)
             {
                 int hi = HEX_STRING_24_REVERSE.IndexOf(charArray[i]);
                 int lo = HEX_STRING_24_REVERSE.IndexOf(charArray[i + 1]);
@@ -301,10 +290,11 @@ namespace Energy.Base
                     hi = 0;
                 if (lo < 0)
                     lo = 0;
-                hi = (16 - (hi % 16)) * 16;
-                lo = 16 - (lo % 16);
+                hi = (15 - (hi % 16)) * 16;
+                lo = 15 - (lo % 16);
                 data[n++] = (byte)(hi + lo);
             }
+
             return data;
         }
 
