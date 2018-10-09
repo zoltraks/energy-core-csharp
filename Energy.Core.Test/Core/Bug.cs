@@ -10,12 +10,12 @@ namespace Energy.Core.Test.Core
         public void CoreBugSuppress()
         {
             Energy.Base.Lock lock1 = new Energy.Base.Lock();
-            Assert.IsTrue(Energy.Core.Bug.Last.Code.Match(0xc002, false, true));
+            Assert.IsTrue(Energy.Core.Bug.Last.Code.Match("C002", false));
             Energy.Core.Bug.Entry defaultEntry = default(Energy.Core.Bug.Entry);
             Energy.Core.Bug.Last = defaultEntry;
             Energy.Core.Bug.Suppress(0xc002);
             Energy.Base.Lock lock2 = new Energy.Base.Lock();
-            Assert.IsFalse(Energy.Core.Bug.Last.Code.Match(0xc002, false, true));
+            Assert.IsFalse(Energy.Core.Bug.Last.Code.Match("C002", false));
         }
     }
 }
