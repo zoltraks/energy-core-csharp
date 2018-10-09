@@ -22,6 +22,11 @@ namespace Energy.Core
         /// </summary>
         public static Energy.Base.Switch DebugOutputTime;
 
+        /// <summary>
+        /// Prefix with code number when writing to System.Diagnostics.Debug
+        /// </summary>
+        public static Energy.Base.Switch DebugOutputCode;
+
         private static Energy.Core.Log _Log;
         /// <summary>Log</summary>
         public static Energy.Core.Log Log
@@ -55,6 +60,7 @@ namespace Energy.Core
             //System.Diagnostics.Debug.WriteLine("BUG");
             TraceLogging = false;
             DebugOutputTime = true;
+            DebugOutputCode = false;
         }
 
         #endregion
@@ -436,7 +442,13 @@ namespace Energy.Core
             {
                 return;
             }
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            string debugMessage = message;
+            if ((bool)DebugOutputCode)
+            {
+                debugMessage = (code.Number + " " + debugMessage).Trim();
+            }
+            debugMessage = FormatDebugOutput(debugMessage);
+            System.Diagnostics.Debug.WriteLine(debugMessage);
             if ((bool)TraceLogging)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
