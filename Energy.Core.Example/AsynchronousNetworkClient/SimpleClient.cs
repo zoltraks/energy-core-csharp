@@ -26,7 +26,7 @@ namespace AsynchronousNetworkClient
             Thread.Start();
         }
 
-        // ManualResetEvent instances signal completion.  
+        // ManualResetEvent instances signal completion.
         private static ManualResetEvent connectDone =
             new ManualResetEvent(false);
         private static ManualResetEvent sendDone =
