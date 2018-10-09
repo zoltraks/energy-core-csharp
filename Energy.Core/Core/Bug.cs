@@ -95,11 +95,11 @@ namespace Energy.Core
                     public bool Suppress;
                 }
 
-                public Item Find(Code code, bool ignoreCase, bool matchAny)
+                public Item Find(Code code, bool ignoreCase)
                 {
                     for (int i = 0; i < this.Count; i++)
                     {
-                        if (code.Match(this[i].Code, ignoreCase, matchAny))
+                        if (code.Match(this[i].Code, ignoreCase))
                             return this[i];
                     }
                     return null;
@@ -107,12 +107,12 @@ namespace Energy.Core
 
                 public Item Find(Code code)
                 {
-                    return Find(code, true, true);
+                    return Find(code, true);
                 }
 
                 public bool IsSuppressed(Code code)
                 {
-                    Item item = Find(code, true, true);
+                    Item item = Find(code, true);
                     if (item == null)
                     {
                         return false;
@@ -136,25 +136,16 @@ namespace Energy.Core
         /// </summary>
         public struct Code
         {
-            public long Number;
-            public string Text;
-
-            public Code(long number)
-            {
-                Number = number;
-                Text = "";
-            }
+            public string Number;
 
             public Code(string text)
             {
-                Number = 0;
-                Text = text;
+                Number = text;
             }
 
-            public Code(long number, string text)
+            public Code(long number)
             {
-                Number = number;
-                Text = text;
+                Number = number.ToString();
             }
 
             public static implicit operator Code(long number)
@@ -162,27 +153,26 @@ namespace Energy.Core
                 return new Code(number);
             }
 
-            public static implicit operator Code(string text)
+            public static implicit operator Code(string number)
             {
-                return new Code(text);
+                return new Code(number);
             }
 
-            public bool Match(Code code, bool ignoreCase, bool matchAny)
+            public bool Match(Code code)
             {
-                bool numberMatch = code.Number != 0 && code.Number == this.Number;
-                if (numberMatch && matchAny)
-                    return true;
-                bool codeTextEmpty = string.IsNullOrEmpty(code.Text);
-                bool thisTextEmpty = string.IsNullOrEmpty(this.Text);
-                if (codeTextEmpty && thisTextEmpty)
+                return Match(code, true);
+            }
+
+            public bool Match(Code code, bool ignoreCase)
+            {
+                if (0 == string.Compare(this.Number, code.Number))
                 {
-                    if (code.Number != 0 || this.Number != 0)
-                        return false;
-                    else
-                        return true;
+                    return true;
                 }
-                bool textMatch = 0 == string.Compare(code.Text, this.Text, ignoreCase);
-                return textMatch;
+                else
+                {
+                    return false;
+                }
             }
         }
 
@@ -418,7 +408,6 @@ namespace Energy.Core
         }
 
         #endregion
-
 
         #region Write
 
