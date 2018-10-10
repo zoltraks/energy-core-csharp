@@ -76,7 +76,21 @@ namespace Energy.Source
 
         #region Lock
 
-        private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+        private readonly Energy.Base.Lock _PropertyLock = new Energy.Base.Lock();
+
+        #endregion
+
+        #region Empty
+
+        /// <summary>
+        /// Represents empty object
+        /// </summary>
+        public static Connection Empty { get { return GetEmpty(); } }
+
+        private static Connection GetEmpty()
+        {
+            return new Connection();
+        }
 
         #endregion
 
@@ -108,49 +122,60 @@ namespace Energy.Source
         /// <summary>
         /// Repeat operation after recoverable error
         /// </summary>
-        public int Repeat { get { lock (_Lock) return _Repeat; } set { lock (_Lock) _Repeat = value; } }
+        public int Repeat { get { lock (_PropertyLock) return _Repeat; } set { lock (_PropertyLock) _Repeat = value; } }
 
         private int _Timeout = 30;
 
         /// <summary>
         /// Time limit in seconds for SQL operations
         /// </summary>
-        public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
+        public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
 
         private Energy.Core.Log _Log;
 
         /// <summary>
         /// Log
         /// </summary>
-        public Energy.Core.Log Log { get { lock (_Lock) return _Log; } set { lock (_Lock) _Log = value; } }
+        public Energy.Core.Log Log { get { lock (_PropertyLock) return _Log; } set { lock (_PropertyLock) _Log = value; } }
 
         private Energy.Interface.IDialect _Dialect;
 
         /// <summary>
         /// Dialects
         /// </summary>
-        public Energy.Interface.IDialect Dialect { get { lock (_Lock) return _Dialect; } set { lock (_Lock) _Dialect = value; } }
+        public Energy.Interface.IDialect Dialect { get { lock (_PropertyLock) return _Dialect; } set { lock (_PropertyLock) _Dialect = value; } }
+
+        #region Option
+
+        private bool? _OptionThreadOpen;
+
+        /// <summary>
+        /// Persistent connection
+        /// </summary>
+        public bool OptionThreadOpen { get { return GetOptionThreadOpen(); } set { SetOptionThreadOpen(value); } }
+
+        #endregion
 
         private int _ErrorNumber = 0;
 
         /// <summary>
         /// Error error number
         /// </summary>
-        public int ErrorNumber { get { lock (_Lock) return _ErrorNumber; } }
+        public int ErrorNumber { get { lock (_PropertyLock) return _ErrorNumber; } }
 
         private string _ErrorMessage = "";
 
         /// <summary>
         /// Last error status
         /// </summary>
-        public string ErrorMessage { get { lock (_Lock) return _ErrorMessage; } }
+        public string ErrorMessage { get { lock (_PropertyLock) return _ErrorMessage; } }
 
         private Exception _ErrorException;
 
         /// <summary>
         /// Last error exception
         /// </summary>
-        public Exception ErrorException { get { lock (_Lock) return _ErrorException; } }
+        public Exception ErrorException { get { lock (_PropertyLock) return _ErrorException; } }
 
         private IDbConnection _Connection;
 
@@ -161,7 +186,7 @@ namespace Energy.Source
 
         private string GetConnectionString()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 return _ConnectionString;
             }
@@ -169,7 +194,7 @@ namespace Energy.Source
 
         private void SetConnectionString(string connectionString)
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (0 == string.Compare(connectionString, _ConnectionString, false))
                 {
@@ -185,7 +210,7 @@ namespace Energy.Source
 
         private Type GetVendor()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 return _Vendor;
             }
@@ -197,7 +222,7 @@ namespace Energy.Source
                 throw new ArgumentNullException();
             if (!typeof(IDbConnection).IsAssignableFrom(vendor))
                 throw new Exception("Vendor must implement IDbConnection interface");
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (vendor == _Vendor)
                     return;
@@ -208,7 +233,7 @@ namespace Energy.Source
 
         private bool GetPersistent()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 return _Persistent;
             }
@@ -216,7 +241,7 @@ namespace Energy.Source
 
         private void SetPersistent(bool persistent)
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (persistent == _Persistent)
                     return;
@@ -226,9 +251,35 @@ namespace Energy.Source
             }
         }
 
+        private bool GetOptionThreadOpen()
+        {
+            lock (_PropertyLock)
+            {
+                if (_OptionThreadOpen == null)
+                {
+                    bool result = true;
+
+                    // MS Sqlite can't open on background thread.
+                    if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
+                        result = false;
+
+                    return result;
+                }
+                else
+                {
+                    return (bool)_OptionThreadOpen;
+                }
+            }
+        }
+
+        private void SetOptionThreadOpen(bool value)
+        {
+            _OptionThreadOpen = value;
+        }
+
         private bool GetActive()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (_Connection == null)
                     return false;
@@ -240,6 +291,9 @@ namespace Energy.Source
 
         #region Event
 
+        /// <summary>
+        /// Event fired when vendor connection object is created by Activator.
+        /// </summary>
         public event EventHandler OnCreate;
 
         public event EventHandler OnOpen;
@@ -256,7 +310,7 @@ namespace Energy.Source
             int[] error = Energy.Source.Error.GetErrorNumber(x);
             if (error.Length > 0)
                 number = error[0];
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 _ErrorNumber = number;
                 _ErrorMessage = x.Message;
@@ -266,7 +320,7 @@ namespace Energy.Source
 
         private void ClearError()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 _ErrorNumber = 0;
                 _ErrorMessage = "";
@@ -311,7 +365,7 @@ namespace Energy.Source
         {
             Type vendor;
             string connectionString;
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 vendor = _Vendor;
                 connectionString = _ConnectionString;
@@ -330,7 +384,9 @@ namespace Energy.Source
             finally
             {
                 if (OnCreate != null)
+                {
                     OnCreate(this, null);
+                }
             }
             return _;
         }
@@ -352,10 +408,7 @@ namespace Energy.Source
 
             bool success = false;
 
-            bool openOnBackgroundThread = true;
-            // MS Sqlite can't open on background thread.
-            if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
-                openOnBackgroundThread = false;
+            bool openOnBackgroundThread = this.OptionThreadOpen;
 
             // Open connection in separate thread
             if (openOnBackgroundThread)
@@ -367,6 +420,10 @@ namespace Energy.Source
                         connection.Open();
                         success = true;
                     }
+                    catch (ThreadAbortException)
+                    {
+                        Energy.Core.Bug.Write("C081", "ThreadAbortException");
+                    }
                     catch (Exception x)
                     {
                         SetError(x);
@@ -375,11 +432,14 @@ namespace Energy.Source
                 {
                     // Make sure it's marked as a background thread
                     // so it'll get cleaned up automatically
-                    IsBackground = true,
+                    IsBackground = true, // don't block app
                     CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
                 };
                 thread.Start();
-                thread.Join(timeout * 1000);
+                if (!thread.Join(timeout * 1000))
+                {
+                    thread.Abort();
+                }
             }
             else
             // Open connection in main thread
@@ -405,14 +465,16 @@ namespace Energy.Source
                 connection = null;
 
             if (OnOpen != null)
+            {
                 OnOpen(this, null);
+            }
 
             return connection;
         }
 
         public IDbConnection Open()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (_Persistent)
                 {
@@ -434,7 +496,7 @@ namespace Energy.Source
         /// </summary>
         public void Close()
         {
-            lock (_Lock)
+            lock (_PropertyLock)
             {
                 if (_Connection == null)
                     return;
@@ -621,7 +683,7 @@ namespace Energy.Source
                         return null;
                     try
                     {
-                        lock (_Lock)
+                        lock (_PropertyLock)
                         {
                             return Fetch(_Connection, query);
                         }
@@ -695,7 +757,7 @@ namespace Energy.Source
                         return null;
                     try
                     {
-                        lock (_Lock)
+                        lock (_PropertyLock)
                         {
                             return Load(_Connection, query);
                         }
@@ -737,7 +799,16 @@ namespace Energy.Source
         {
             using (IDataReader reader = command.ExecuteReader())
             {
-                DataTable schema = reader.GetSchemaTable();
+                DataTable schema = null;
+
+                try
+                {
+                    reader.GetSchemaTable();
+                }
+                catch (Exception x)
+                {
+                    //Energy.Core.Bug.Write(x);
+                }
 
                 if (schema == null)
                     return null;
@@ -775,7 +846,13 @@ namespace Energy.Source
             }
         }
 
-        private DataTable Read(IDbConnection connection, string query)
+        /// <summary>
+        /// Read query results into DataTable.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public DataTable Read(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
             {
@@ -784,15 +861,15 @@ namespace Energy.Source
         }
 
         /// <summary>
-        /// Read query results into DataTable
+        /// Read query results into DataTable.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public DataTable Read(string query)
         {
             ClearError();
-            int repeat = Repeat;
-            while (repeat-- >= 0)
+            int attempt = Repeat;
+            while (attempt-- >= 0)
             {
                 if (Persistent)
                 {
@@ -800,7 +877,7 @@ namespace Energy.Source
                         return null;
                     try
                     {
-                        lock (_Lock)
+                        lock (_PropertyLock)
                         {
                             return Read(_Connection, query);
                         }
@@ -875,7 +952,7 @@ namespace Energy.Source
                         return -1;
                     try
                     {
-                        lock (_Lock)
+                        lock (_PropertyLock)
                         {
                             return Execute(_Connection, query);
                         }
@@ -953,16 +1030,19 @@ namespace Energy.Source
         public object Scalar(string query)
         {
             ClearError();
-            int repeat = Repeat;
-            while (repeat-- >= 0)
+            int attempt = Repeat;
+            if (attempt < 0)
+                attempt = 0;
+            while (attempt-- >= 0)
             {
                 if (Persistent)
                 {
-                    if (!Active && Open() == null)
-                        return null;
+                    if (!Active)
+                        if (null == Open())
+                            return null;
                     try
                     {
-                        lock (_Lock)
+                        lock (_PropertyLock)
                         {
                             return Scalar(_Connection, query);
                         }
@@ -970,6 +1050,7 @@ namespace Energy.Source
                     catch (Exception x)
                     {
                         SetError(x);
+
                         if (!Catch(x))
                             return null;
                     }
@@ -1009,15 +1090,17 @@ namespace Energy.Source
         public Energy.Source.Connection Copy()
         {
             Energy.Source.Connection copy = new Energy.Source.Connection();
-            lock (_Lock)
+            lock (_PropertyLock)
             {
-                copy.ConnectionString = _ConnectionString;
-                copy.Vendor = _Vendor;
-                copy.Timeout = _Timeout;
-                copy.Repeat = _Repeat;
-                copy.Persistent = _Persistent;
-                copy.Log = _Log;
-                copy.Dialect = _Dialect;
+                copy.ConnectionString = this._ConnectionString;
+                copy.Vendor = this._Vendor;
+                copy.Timeout = this._Timeout;
+                copy.Repeat = this._Repeat;
+                copy.Persistent = this._Persistent;
+                copy.Log = this._Log;
+                copy.Dialect = this._Dialect;
+                if (this._OptionThreadOpen != null)
+                    copy.OptionThreadOpen = (bool)this._OptionThreadOpen;
             }
             return copy;
         }
@@ -1029,6 +1112,16 @@ namespace Energy.Source
         public object Clone()
         {
             return Copy();
+        }
+
+        #endregion
+
+        #region ToString
+
+        public override string ToString()
+        {
+
+            return base.ToString();
         }
 
         #endregion

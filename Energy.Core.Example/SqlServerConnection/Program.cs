@@ -26,11 +26,11 @@ namespace SqlServerConnection
 
         private static void Go(string[] args)
         {
-            Console.WriteLine(Energy.Base.Cast.DateTimeToStringDate(DateTime.Now));
+            Energy.Core.Tilde.WriteLine("Current time is ~y~{0}~0~", Energy.Base.Cast.DateTimeToStringDate(DateTime.Now));
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=Test;Integrated Security=Yes;Connect Timeout=10;";
             connectionString = Energy.Core.Tilde.Ask("Connection string", connectionString);
             Energy.Source.Connection connection = new Energy.Source.Connection<SqlConnection>(connectionString);
-            MakeTest1(connection);
+            Energy.Core.Tilde.WriteLine("Connection vendor is ~g~{0}~0~", connection.Vendor.Name);
             string result = connection.Scalar<string>("SELECT GETDATE()");
             if (string.IsNullOrEmpty(result))
             {
@@ -43,11 +43,8 @@ namespace SqlServerConnection
             Console.WriteLine("Time from server: {0}", result);
             DateTime stamp = connection.Scalar<DateTime>("SELECT GETDATE()");
             Console.WriteLine("Time from server: {0}", Energy.Base.Cast.DateTimeToString(stamp));
-        }
 
-        private static void MakeTest1(Energy.Source.Connection connection)
-        {
-            Console.WriteLine(connection.Vendor.GetType().Name);
+            Test.UseEvents(connection);
         }
     }
 }

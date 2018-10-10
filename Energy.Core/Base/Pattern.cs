@@ -35,7 +35,7 @@ namespace Energy.Base
                                 try
                                 {
                                     _Default = Activator.CreateInstance<T>();
-                                    Energy.Core.Bug.Write("C001", () =>
+                                    Energy.Core.Bug.Write("C011", () =>
                                     {
                                         return string.Format("Default instance of {0} created", typeof(T).FullName);
                                     });
