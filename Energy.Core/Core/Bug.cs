@@ -486,6 +486,25 @@ namespace Energy.Core
             Last = new Entry(code, message);
         }
 
+        /// <summary>
+        /// Write debug message from an exception
+        /// </summary>
+        /// <param name="exception"></param>
+        public static void Write(Exception exception)
+        {
+            Write(ExceptionMessage(exception));
+        }
+
+        /// <summary>
+        /// Write debug message from an exception with numeric code which may be suppressed or limited.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="exception"></param>
+        public static void Write(Code code, Exception exception)
+        {
+            Write(code, ExceptionMessage(exception));
+        }
+
         #endregion
 
         #region WriteFormat
