@@ -12,9 +12,10 @@ namespace RestBinaryGetPut
             Energy.Core.Web.IgnoreCertificateValidation = true;
             string baseUrl = "http://localhost:16000/api/test/";
             string methodUrl = baseUrl + "echo/";
-           
+
             //Energy.Core.Web.Post(methodUrl, requestBody, responseData);
 
+            //Energy.Core.Web.Request
             var request = new Energy.Base.Http.Request("POST", methodUrl);
 
             request.Encoding = System.Text.Encoding.UTF8;
@@ -124,7 +125,7 @@ namespace RestBinaryGetPut
         private static void TestLog()
         {
             Energy.Core.Log log = Energy.Core.Log.Default;
-            Energy.Core.Bug.Trace.On();
+            Energy.Core.Bug.TraceLogging.On();
             log.Write("1");
             log.Flush();
             log.Exception(new Exception("ERROR"));

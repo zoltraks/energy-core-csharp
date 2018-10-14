@@ -215,5 +215,51 @@ namespace Energy.Attribute
         public class AbstractAttribute : System.Attribute
         {
         }
+
+        /// <summary>
+        /// Model attribute
+        /// </summary>
+        public class ModelAttribute : System.Attribute
+        {
+            private string name;
+
+            /// <summary>
+            /// Name
+            /// </summary>
+            public string Name { get { return name; } set { name = value; } }
+
+            /// <summary>
+            /// Model attribute with custom name
+            /// </summary>
+            /// <param name="value"></param>
+            public ModelAttribute(string value)
+            {
+                name = value;
+            }
+        }
+
+        /// <summary>
+        /// What to do with null values?
+        /// </summary>
+        public class NullAttribute : System.Attribute
+        {
+            private bool ignore;
+
+            /// <summary>
+            /// Ignore column if value is null when scripting.
+            /// </summary>
+            public bool Ignore { get { return ignore; } set { ignore = value; } }
+
+            private bool zero;
+
+            /// <summary>
+            /// Zero value to default when value was NULL.
+            /// </summary>
+            public bool Zero { get { return zero; } set { zero = value; } }
+
+            public NullAttribute()
+            {
+            }
+        }
     }
 }

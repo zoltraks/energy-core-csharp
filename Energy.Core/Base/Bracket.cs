@@ -10,7 +10,7 @@ namespace Energy.Base
     /// </summary>
     public class Bracket
     {
-        #region Class
+        #region Array
 
         public class Array : Energy.Base.Collection.Array<Bracket>
         {
@@ -53,6 +53,11 @@ namespace Energy.Base
             _Prefix = prefix;
             _Suffix = suffix;
             _CharacterClass = characterClass;
+        }
+
+        public static implicit operator Bracket(string enclosure)
+        {
+            return new Bracket(enclosure);
         }
 
         #endregion
@@ -98,7 +103,7 @@ namespace Energy.Base
         }
 
         private string _Enclosure = null;
-        /// <summary>Suffix</summary>
+        /// <summary>Enclosure</summary>
         public string Enclosure
         {
             get
@@ -220,7 +225,7 @@ namespace Energy.Base
         /// </summary>
         /// <returns></returns>
         public string GetMatchExpression()
-        {            
+        {
             List<string> list = new List<string>();
             bool allowEmpty = true;
             if (!string.IsNullOrEmpty(_Prefix))
@@ -260,7 +265,7 @@ namespace Energy.Base
         }
 
         private Regex _MatchRegex = null;
-        
+
         private Regex MatchRegex
         {
             get
@@ -350,5 +355,74 @@ namespace Energy.Base
                 return Value;
             }
         }
+
+        #region GetPrefixText
+
+        /// <summary>
+        /// Get prefix text selecting from single enclosure or empty string if null.
+        /// </summary>
+        /// <returns></returns>
+        public string GetPrefixText()
+        {
+            if (_Prefix != null)
+                return _Prefix;
+            else
+                return "";
+        }
+
+        #endregion
+
+        #region GetSuffixText
+
+        /// <summary>
+        /// Get suffix text selecting from single enclosure or empty string if null.
+        /// </summary>
+        /// <returns></returns>
+        private string GetSuffixText()
+        {
+            if (_Suffix != null)
+                return _Suffix;
+            else
+                return "";
+        }
+
+        #endregion
+
+        #region GetIncludeText
+
+        /// <summary>
+        /// Get include text selecting from single enclosure or empty string if null.
+        /// </summary>
+        /// <returns></returns>
+        private string GetIncludeText()
+        {
+            if (_Include != null)
+                return _Include;
+            else
+                return "";
+        }
+
+        #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Quote text using bracket settings.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public string Quote(string text)
+        {
+            string prefix = GetPrefixText();
+            string suffix = GetSuffixText();
+            string include = GetIncludeText();
+
+            if (include.Length > 0)
+                text = text.Replace(suffix, include);
+
+            return string.Concat(prefix, text, suffix);
+        }
+
+        #endregion
     }
 }

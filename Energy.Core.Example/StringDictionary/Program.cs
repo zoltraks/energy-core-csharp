@@ -44,7 +44,38 @@ namespace StringDictionary
 
             PrintMemoryUsage();
 
+            TestC1();
+
             Console.ReadLine();   
+        }
+
+        private static void TestC1()
+        {
+            Energy.Base.Collection.StringDictionary x = new Energy.Base.Collection.StringDictionary();
+            x.Add("111-222-333", "111-222-333");
+            x.Add("111-88888888-333", "111-88888888-333");
+            x.Add("111-222", "111-222");
+            x.Add("555-ABC-XYZ", "555-ABC-XYZ");
+            x.Add("Ąę€", "Ąę€");
+
+            string[] filters;
+            Energy.Base.Collection.StringDictionary y;
+
+            filters = new string[] { "111-" };
+
+            y = x.Filter(Energy.Enumeration.MatchMode.Simple, true, filters);
+
+            Console.WriteLine(y.ToString(": "));
+            Console.WriteLine();
+
+            filters = new string[] { "111-222" };
+            y = x.Filter(Energy.Enumeration.MatchMode.Same, true, filters);
+            Console.WriteLine(y.ToString(": "));
+            Console.WriteLine();
+
+            y = x.Filter(Energy.Enumeration.MatchMode.Simple, true, filters);
+            Console.WriteLine(y.ToString(": "));
+            Console.WriteLine();
         }
 
         private static void PrintMemoryUsage()

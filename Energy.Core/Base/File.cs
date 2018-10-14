@@ -309,8 +309,10 @@ namespace Energy.Base
             return String.Concat(path, file);
         }
 
+        #region IsRelativePath
+
         /// <summary>
-        /// Check if file or directory path is relative or absolute
+        /// Check if file or directory path is relative or absolute.
         /// </summary>
         /// <param name="path">string</param>
         /// <param name="separator">Separator list</param>
@@ -338,7 +340,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Check if file or directory path is relative or absolute
+        /// Check if file or directory path is relative or absolute.
         /// </summary>
         /// <param name="path">string</param>
         /// <returns>bool</returns>
@@ -347,8 +349,12 @@ namespace Energy.Base
             return IsRelativePath(path, null);
         }
 
+        #endregion
+
+        #region Locate
+
         /// <summary>
-        /// Locate file
+        /// Locate executable file.
         /// </summary>
         /// <param name="command">string</param>
         /// <returns>string</returns>
@@ -358,7 +364,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate command file
+        /// Locate command file.
         /// </summary>
         /// <param name="command">string</param>
         /// <param name="search">string[]</param>
@@ -371,7 +377,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it
+        /// Locate file with one of possible extensions in any directory and return full path to it.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -383,7 +389,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it
+        /// Locate file with one of possible extensions in any directory and return full path to it.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -509,6 +515,8 @@ namespace Energy.Base
 
             return "";
         }
+
+        #endregion
 
         #region Make directory
 

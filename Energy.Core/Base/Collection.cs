@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -230,6 +231,42 @@ namespace Energy.Base
                     return base.ToArray();
                 }
             }
+
+            /// <summary>
+            /// Get sub array from an existing one.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="start"></param>
+            /// <param name="count"></param>
+            /// <returns></returns>
+            public static T[] SubArray(T[] array, int start, int count)
+            {
+                return SubArray(array, start, count, false);
+            }
+
+            /// <summary>
+            /// Get sub array from an existing one.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="start"></param>
+            /// <param name="count"></param>
+            /// <param name="pad"></param>
+            /// <returns></returns>
+            public static T[] SubArray(T[] array, int start, int count, bool pad)
+            {
+                if (array == null)
+                    return null;
+                if (start == 0 && array.Length == count)
+                    return array;
+                bool enough = array.Length >= start + count;
+                if (!enough && !pad)
+                    count = array.Length - start;
+                T[] data = new T[count];
+                if (!enough && pad)
+                    count = array.Length - start;
+                Array.Copy(array, start, data, 0, count);
+                return data;
+            }
         }
 
         #endregion
@@ -316,7 +353,7 @@ namespace Energy.Base
 
         #region StringArray
 
-        public class StringArray
+        public class StringArray : Energy.Interface.IStringList
         {
             private string[] _Array;
 
@@ -325,6 +362,14 @@ namespace Energy.Base
             public StringArray(string[] array)
             {
                 _Array = array;
+            }
+
+            public StringArray(List<string> list)
+            {
+                if (list != null)
+                {
+                    _Array = list.ToArray();
+                }
             }
 
             public int TotalLength
@@ -347,6 +392,61 @@ namespace Energy.Base
                     length += array[i].Length;
                 }
                 return length;
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <returns></returns>
+            public bool HasDuplicates()
+            {
+                return HasDuplicates(_Array, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public bool HasDuplicates(bool ignoreCase)
+            {
+                return HasDuplicates(_Array, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(string[] array)
+            {
+                return HasDuplicates(array, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(string[] array, bool ignoreCase)
+            {
+                if (array == null || array.Length < 2)
+                    return false;
+
+                List<string> check = new List<string>();
+                for (int i = 0; i < array.Length - 1; i++)
+                {
+                    if (i > 0 && check.Count > 0 && check.Contains(array[i]))
+                        continue;
+                    for (int j = i + 1; j < array.Length; j++)
+                    {
+                        if (0 == string.Compare(array[i], array[j], ignoreCase))
+                            return true;
+                    }
+                    check.Add(array[i]);
+                }
+                return false;
             }
         }
 
@@ -418,7 +518,7 @@ namespace Energy.Base
 
             private string _XmlEscapeString = "_";
 
-            private readonly object _XmlSpecialCharacterLock = new object();       
+            private readonly object _XmlSpecialCharacterLock = new object();
 
             /// <summary>XmlSpecialCharacter</summary>
             public string XmlEscapeString { get { lock (_XmlSpecialCharacterLock) return _XmlEscapeString; } set { lock (_XmlSpecialCharacterLock) _XmlEscapeString = value; } }
@@ -716,20 +816,117 @@ namespace Energy.Base
                 {
                     list.Add(string.Concat(e.Key, glue, Energy.Base.Cast.ObjectToString(e.Value)));
                 }
-                return string.Join(Environment.NewLine, list.ToArray());
+                return string.Join(Energy.Base.Text.NL, list.ToArray());
+            }
+
+            /// <summary>
+            /// Get array of keys
+            /// </summary>
+            /// <returns></returns>
+            public string[] GetKeyArray()
+            {
+                lock (_Lock)
+                {
+                    string[] array = new string[Count];
+                    this.Keys.CopyTo(array, 0);
+                    return array;
+                }
+            }
+
+            /// <summary>
+            /// Get array of values
+            /// </summary>
+            /// <returns></returns>
+            public T[] GetValueArray()
+            {
+                lock (_Lock)
+                {
+                    T[] array = new T[Count];
+                    this.Values.CopyTo(array, 0);
+                    return array;
+                }
+            }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching style and mode.
+            /// </summary>
+            /// <param name="matchStyle"></param>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public StringDictionary<T> Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                lock (_Lock)
+                {
+                    StringDictionary<T> dictionary = new StringDictionary<T>();
+                    foreach (KeyValuePair<string, T> pair in this)
+                    {
+                        if (!Energy.Base.Text.Check(pair.Key, matchStyle, matchMode, ignoreCase, filters))
+                            continue;
+                        dictionary.Add(pair.Key, pair.Value);
+                    }
+                    return dictionary;
+                }
+            }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching mode.
+            /// </summary>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public StringDictionary<T> Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
             }
         }
 
         [Serializable]
         public class StringDictionary : StringDictionary<string>
         {
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching style and mode.
+            /// </summary>
+            /// <param name="matchStyle"></param>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public new StringDictionary Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                StringDictionary<string> filteredDictionary = base.Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                StringDictionary dictionary = new StringDictionary();
+                foreach (KeyValuePair<string, string> pair in filteredDictionary)
+                {
+                    dictionary.Add(pair.Key, pair.Value);
+                }
+                return dictionary;
+            }
+
+            /// <summary>
+            /// Filter out dictionary by one or more filters
+            /// using specified matching mode.
+            /// </summary>
+            /// <param name="matchMode"></param>
+            /// <param name="ignoreCase"></param>
+            /// <param name="filters"></param>
+            /// <returns></returns>
+            public new StringDictionary Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            {
+                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+            }
         }
 
         #endregion
 
         #region StringList
 
-        public class StringList : System.Collections.Generic.List<string>
+        public class StringList : System.Collections.Generic.List<string>, Energy.Interface.IStringList
         {
             public int TotalLength
             {
@@ -751,6 +948,61 @@ namespace Energy.Base
                     length += list[i].Length;
                 }
                 return length;
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <returns></returns>
+            public bool HasDuplicates()
+            {
+                return HasDuplicates(this, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public bool HasDuplicates(bool ignoreCase)
+            {
+                return HasDuplicates(this, ignoreCase);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(System.Collections.Generic.List<string> array)
+            {
+                return HasDuplicates(array, false);
+            }
+
+            /// <summary>
+            /// Check if list contains any duplicates.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static bool HasDuplicates(System.Collections.Generic.List<string> array, bool ignoreCase)
+            {
+                if (array == null || array.Count < 2)
+                    return false;
+
+                List<string> check = new List<string>();
+                for (int i = 0; i < array.Count - 1; i++)
+                {
+                    if (i > 0 && check.Count > 0 && check.Contains(array[i]))
+                        continue;
+                    for (int j = i + 1; j < array.Count; j++)
+                    {
+                        if (0 == string.Compare(array[i], array[j], ignoreCase))
+                            return true;
+                    }
+                    check.Add(array[i]);
+                }
+                return false;
             }
         }
 

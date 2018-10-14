@@ -35,7 +35,10 @@ namespace Energy.Base
                                 try
                                 {
                                     _Default = Activator.CreateInstance<T>();
-                                    Energy.Core.Bug.Write("Default instance of {0} created", typeof(T).FullName);
+                                    Energy.Core.Bug.Write("C011", () =>
+                                    {
+                                        return string.Format("Default instance of {0} created", typeof(T).FullName);
+                                    });
                                 }
                                 catch (Exception exception)
                                 {
@@ -46,6 +49,48 @@ namespace Energy.Base
                     }
                     return _Default;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Singleton pattern
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public class Singleton<T>
+        {
+            private static T _Instance;
+
+            private readonly static object _InstanceLock = new object();
+
+            public T Instance
+            {
+                get
+                {
+                    return GetInstance();
+                }
+            }
+
+            public T GetInstance()
+            {
+                if (_Instance == null)
+                {
+                    lock (_InstanceLock)
+                    {
+                        if (_Instance == null)
+                        {
+                            try
+                            {
+                                _Instance = Activator.CreateInstance<T>();
+                                Energy.Core.Bug.Write(string.Format("Singleton {0} created", typeof(T).FullName));
+                            }
+                            catch (Exception exception)
+                            {
+                                Energy.Core.Bug.Catch(exception);
+                            }
+                        }
+                    }
+                }
+                return _Instance;
             }
         }
     }

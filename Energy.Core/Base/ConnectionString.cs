@@ -161,5 +161,143 @@ namespace Energy.Base
             }
             return value;
         }
+
+        /// <summary>Catalog</summary>
+        public string Catalog { get { return GetCatalog(); } set { SetCatalog(value); } }
+
+        /// <summary>Server</summary>
+        public string Server { get { return GetServer(); } set { SetServer(value); } }
+
+        private readonly string[] _ServerAlternatives = new string[]
+        {
+                "Data Source", "Server", "DataSource", "Server Name", "Dbq",
+        };
+
+        private readonly string[] _CatalogAlternatives = new string[]
+        {
+                "Database", "Database Name", "Initial Catalog",
+        };
+
+        private string GetServer()
+        {
+            return FindValue(_ServerAlternatives);
+        }
+
+        private void SetServer(string value)
+        {
+            string key = FindKey(_ServerAlternatives);
+            if (key == null)
+                key = _ServerAlternatives[0];
+            this[key] = value;
+        }
+
+        private string GetCatalog()
+        {
+            return FindValue(_CatalogAlternatives);
+        }
+
+        private void SetCatalog(string value)
+        {
+            string key = FindKey(_CatalogAlternatives);
+            if (key == null)
+                key = _CatalogAlternatives[0];
+            this[key] = value;
+        }
+
+        private string _Protocol;
+        /// <summary>Protocol</summary>
+        public string Protocol { get { return _Protocol; } set { _Protocol = value; } }
+
+        #region FindKey
+
+        public string FindKey(string name)
+        {
+            List<string> search = new List<string>(this.Keys);
+            foreach (string needle in search)
+            {
+                if (0 == string.Compare(needle, name, true))
+                {
+                    return needle;
+                }
+            }
+            return null;
+        }
+
+        public string FindKey(params string[] names)
+        {
+            List<string> search = new List<string>(this.Keys);
+            foreach (string name in names)
+            {
+                foreach (string needle in search)
+                {
+                    if (0 == string.Compare(needle, name, true))
+                    {
+                        return needle;
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region FindValue
+
+        public string FindValue(string name)
+        {
+            List<string> search = new List<string>(this.Keys);
+            foreach (string needle in search)
+            {
+                if (0 == string.Compare(needle, name, true))
+                {
+                    return this[needle];
+                }
+            }
+            return null;
+        }
+
+        public string FindValue(params string[] names)
+        {
+            List<string> search = new List<string>(this.Keys);
+            foreach (string name in names)
+            {
+                foreach (string needle in search)
+                {
+                    if (0 == string.Compare(needle, name, true))
+                    {
+                        return this[needle];
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Represent ODBC Connection String as DSN.
+        /// </summary>
+        /// <returns></returns>
+        public string ToDsnString()
+        {
+            List<string> list = new List<string>();
+            if (!string.IsNullOrEmpty(_Protocol))
+            {
+                list.Add(_Protocol);
+                list.Add(":/");
+            }
+            string server = this.Server;
+            if (!string.IsNullOrEmpty(server))
+            {
+                list.Add(server);
+            }
+            string catalog = this.Catalog;
+            if (!string.IsNullOrEmpty(catalog))
+            {
+                list.Add(catalog);
+            }
+            string dsn = string.Join("/", list.ToArray());
+            return dsn;
+        }
     }
 }

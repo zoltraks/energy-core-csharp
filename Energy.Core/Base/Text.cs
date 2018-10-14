@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -10,6 +11,53 @@ namespace Energy.Base
     // TODO This class probably should be renamed to avoid conflicts and allow to add using Energy.Base
     public class Text
     {
+        #region Constants
+
+        private static string _BR = "<br>";
+        /// <summary>HTML break</summary>
+        public static string BR { get { return _BR; } private set { _BR = value; } }
+
+        private static string _NL;
+        /// <summary>New line "character"</summary>
+        public static string NL
+        {
+            get
+            {
+                if (_NL == null)
+                {
+                    if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+                        _NL = "\r\n";
+                    else
+                        _NL = "\n";
+                }
+                return _NL;
+            }
+            private set
+            {
+                _NL = value;
+            }
+        }
+
+        private static string _WS;
+        /// <summary>Whitespace characters string</summary>
+        public static string WS
+        {
+            get
+            {
+                if (_WS == null)
+                {
+                    _WS = " \t\r\n\v";
+                }
+                return _WS;
+            }
+            private set
+            {
+                _WS = value;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Exchange texts between each other
         /// </summary>
@@ -36,8 +84,10 @@ namespace Energy.Base
             return null;
         }
 
+        #region Surround
+
         /// <summary>
-        /// Surround text with delimiters if contains delimiter itself or any of special characters
+        /// Surround text with delimiters if contains delimiter itself or any of special characters.
         /// </summary>
         /// <param name="value">Text value</param>
         /// <param name="delimiter">Delimiter like ' or "</param>
@@ -89,6 +139,42 @@ namespace Energy.Base
             return Surround(value, delimiter, null);
         }
 
+        /// <summary>
+        /// Surround text with prefix and suffix, optionally adding prefix only when needed.
+        /// </summary>
+        /// <param name="text">Text to surround</param>
+        /// <param name="prefix">Prefix to add at begining</param>
+        /// <param name="suffix">Suffix to add at ending</param>
+        /// <param name="optional">Add prefix and suffix only when needed</param>
+        /// <returns></returns>
+        public static string Surround(string text, string prefix, string suffix, bool optional)
+        {
+            if (String.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (!optional)
+            {
+                return String.Concat(prefix, text, suffix);
+            }
+            else
+            {
+                if (!text.StartsWith(prefix))
+                    text = prefix + text;
+                if (!text.EndsWith(suffix))
+                    text = text + suffix;
+                return text;
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Repeat string pattern to specified amount of characters length.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string Texture(string pattern, int size)
         {
             if (string.IsNullOrEmpty(pattern))
@@ -97,7 +183,9 @@ namespace Energy.Base
                 return pattern;
             if (size < pattern.Length)
                 return pattern.Substring(0, size);
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            if (pattern.Length == 1)
+                return new string(pattern[0], size);
+            System.Text.StringBuilder s = new System.Text.StringBuilder(size);
             while (s.Length < size)
                 s.Append(s.Length == 0 ? pattern : s.ToString());
             if (s.Length == size)
@@ -113,8 +201,205 @@ namespace Energy.Base
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
         {
-            return string.IsNullOrEmpty(value) ? value : value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+            if (value == null || value.Length == 0)
+            {
+                return value;
+            }
+            else
+            {
+                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
+                return value;
+            }
         }
+
+        #region Is
+
+        /// <summary>
+        /// Check if string contains one of wild characters ("*" or "?")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsWild(string text)
+        {
+            return text.Contains("*") || text.Contains("?");
+        }
+
+        /// <summary>
+        /// Check if string contains one of characters used in LIKE ("%" or "_")
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>bool</returns>
+        public static bool IsLike(string text)
+        {
+            return text.Contains("%") || text.Contains("_");
+        }
+
+        #endregion
+
+        #region Check
+
+        public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+        {
+            switch (matchStyle)
+            {
+                default:
+                    return false;
+                case MatchStyle.All:
+                    return CheckAll(input, matchMode, ignoreCase, filters);
+                case MatchStyle.Not:
+                    return CheckNot(input, matchMode, ignoreCase, filters);
+                case MatchStyle.Any:
+                    return CheckAny(input, matchMode, ignoreCase, filters);
+                case MatchStyle.One:
+                    return CheckOne(input, matchMode, ignoreCase, filters);
+            }
+        }
+
+        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (!Check(input, matchMode, ignoreCase, filter))
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        {
+            if (input == null || filters == null)
+                return false;
+            bool found = false;
+            foreach (string filter in filters)
+            {
+                if (Check(input, matchMode, ignoreCase, filter))
+                {
+                    if (found)
+                        return false;
+                    else
+                        found = true;
+                }
+            }
+            return found;
+        }
+
+        public static bool Check(string input, MatchMode matchMode, bool ignoreCase, string filter)
+        {
+            if (input == null || filter == null)
+                return false;
+
+            switch (matchMode)
+            {
+                default:
+                case MatchMode.None:
+                    return false;
+                case MatchMode.Same:
+                    return CheckSame(input, filter, ignoreCase);
+                case MatchMode.Simple:
+                    return CheckSimple(input, filter, ignoreCase);
+                case MatchMode.Regex:
+                    return CheckRegex(input, filter, ignoreCase);
+                case MatchMode.Wild:
+                    return CheckWild(input, filter, ignoreCase);
+            }
+        }
+
+        [Energy.Attribute.Code.Wrapper]
+        public static bool CheckRegex(string input, string pattern, RegexOptions options)
+        {
+            try
+            {
+                return Regex.Match(input, pattern, options).Success;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Catch(exception);
+                return false;
+            }
+        }
+
+        public static bool CheckRegex(string input, string pattern, bool ignoreCase)
+        {
+            RegexOptions options = RegexOptions.CultureInvariant;
+            if (ignoreCase)
+                options |= RegexOptions.IgnoreCase;
+            return CheckRegex(input, pattern, options);
+        }
+
+
+        public static bool CheckWild(string input, string wild, bool ignoreCase)
+        {
+            RegexOptions options = RegexOptions.CultureInvariant;
+            if (ignoreCase)
+                options |= RegexOptions.IgnoreCase;
+            string pattern = Energy.Base.Text.WildToRegex(wild);
+            return CheckRegex(input, pattern, options);
+        }
+
+        public static bool CheckSame(string input, string filter, bool ignoreCase)
+        {
+            return 0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Check if input string is equal or starts or ends with filter string.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="filter"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool CheckSimple(string input, string filter, bool ignoreCase)
+        {
+            if (0 == string.Compare(input, filter, ignoreCase, System.Globalization.CultureInfo.InvariantCulture))
+                return true;
+            if (!ignoreCase)
+            {
+                return input.StartsWith(filter) || input.EndsWith(filter);
+            }
+            else
+            {
+                string insensitiveInput = input.ToUpperInvariant();
+                string insensitiveFilter = filter.ToUpperInvariant();
+                if (insensitiveInput.StartsWith(insensitiveFilter))
+                    return true;
+                else if (insensitiveInput.EndsWith(insensitiveFilter))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        #endregion
 
         #region Join
 
@@ -124,7 +409,7 @@ namespace Energy.Base
         /// <param name="with">Separator string</param>
         /// <param name="array">Parts to join</param>
         /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string JoinWith(string with, params string[] array)
+        public static string Join(string with, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             for (int i = 0; i < array.Length; i++)
@@ -136,7 +421,19 @@ namespace Energy.Base
                     continue;
                 list.Add(trim);
             }
-            return String.Join(with, list.ToArray());
+            return string.Join(with, list.ToArray());
+        }
+
+        /// <summary>
+        /// Join non empty strings into one list with separator
+        /// </summary>
+        /// <param name="with">Separator string</param>
+        /// <param name="array">Parts to join</param>
+        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
+        [Energy.Attribute.Code.Obsolete("Use shorter version Join()")]
+        public static string JoinWith(string with, params string[] array)
+        {
+            return Join(with, array);
         }
 
         #endregion
@@ -183,8 +480,6 @@ namespace Energy.Base
                 list.Add(line);
             return list.ToArray();
         }
-
-        #endregion
 
         /// <summary>
         /// Split string to array by separators with optional quoted elements.
@@ -257,6 +552,10 @@ namespace Energy.Base
             return null;
         }
 
+        #endregion
+
+        #region Convert
+
         /// <summary>
         /// Test function delegate
         /// </summary>
@@ -282,6 +581,28 @@ namespace Energy.Base
             }
             return a.ToArray();
         }
+
+        #endregion
+
+        #region Contains
+
+        /// <summary>
+        /// Check if object as string contains searched string.
+        /// </summary>
+        /// <param name="o">Object</param>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        public static bool Contains(object o, string search)
+        {
+            if (o == null)
+                return false;
+            string str = o as string;
+            if (str == null)
+                str = o.ToString();
+            return str.Contains(search);
+        }
+
+        #endregion
 
         private static char GetMiddleStringPatternChar(string pattern)
         {
@@ -345,6 +666,62 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #region RemoveWhiteSpace
+
+        /// <summary>
+        /// Remove whitespace characters from entire string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string RemoveWhitespace(string value)
+        {
+            if (value == null || value.Length == 0)
+                return value;
+            string white = Energy.Base.Text.WS;
+            char[] charArray = value.ToCharArray();
+            if (!Energy.Base.Text.ContainsWhitespace(charArray))
+            {
+                return value;
+            }
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                if (white.IndexOf(charArray[i]) >= 0)
+                    continue;
+                else
+                    sb.Append(charArray[i]);
+            }
+            return sb.ToString();
+        }
+
+        #endregion
+
+        #region ContainsWhitespace
+
+        /// <summary>
+        /// Check if array contains any of whitespace character.
+        /// </summary>
+        /// <param name="charArray"></param>
+        /// <returns></returns>
+        public static bool ContainsWhitespace(char[] charArray)
+        {
+            if (null == charArray)
+                return false;
+            if (0 == charArray.Length)
+                return false;
+            string white = Energy.Base.Text.WS;
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                if (0 <= white.IndexOf(charArray[i]))
+                    return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region Limit
 
         /// <summary>
         /// Limit string to have maximum count of characters.
@@ -433,6 +810,10 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region Wild
+
         /// <summary>
         /// Convert text containing wild characters (?, *) to SQL like format (_, %).
         /// </summary>
@@ -455,10 +836,74 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert string containing wild characters (*, ?) into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
+        public static string WildToRegex(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    "\\", "\\\\",
+                    ".", "\\.",
+                    "(", "\\(",
+                    "?", ".",
+                    "*", ".*",
+                });
+
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
+
+        #endregion
+
+        #region Like
+
+        /// <summary>
+        /// Convert LIKE string into Regex pattern.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
+        [Energy.Attribute.Code.Extend]
+        public static string LikeToRegex(string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                List<string> tab = new List<string>();
+                tab.AddRange(new string[] {
+                    ".", "\\.",
+                    "*", "\\*",
+                    "(", "\\(",
+                    "_", ".",
+                    "%", ".*",
+                    "?", ".",
+                    "*", ".*",
+                });
+                for (int i = 0; i < tab.Count; i++)
+                {
+                    value = value.Replace(tab[i], tab[i++ + 1]);
+                }
+            }
+            return value;
+        }
+
+        #endregion
+
+        /// <summary>
         /// Remove empty lines from string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
+        [Energy.Attribute.Code.Verify]
         public static string RemoveEmptyLines(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -467,7 +912,7 @@ namespace Energy.Base
             string pattern = @"^[\s\t\v\ ]*(?:\r\n|\n|\r)+";
             string result = Regex.Replace(text, pattern, "", RegexOptions.Multiline);
             if (eol)
-                result += Environment.NewLine;
+                result += Energy.Base.Text.NL;
             return result;
         }
 
@@ -601,36 +1046,115 @@ namespace Energy.Base
 
         #endregion
 
-        #region Naming convention
+        #region Case
 
         /// <summary>
-        /// Capitalize string by uppercasing the first letter,
-        /// remaining the rest unchanged
+        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
         /// </summary>
-        /// <remarks>
-        /// You will want to call String.ToLower() before
-        /// calling this method
-        /// </remarks>
         /// <param name="word">Word</param>
         /// <returns>Word</returns>
-        public static string UppercaseFirst(string word)
+        public static string UpperFirst(string word)
         {
             if (string.IsNullOrEmpty(word))
                 return word;
-            if (word.Length == 0)
+            if (word.Length == 1)
                 return char.ToUpperInvariant(word[0]).ToString();
             return string.Concat(char.ToUpperInvariant(word[0])
                 , word.Substring(1).ToLowerInvariant());
         }
 
         /// <summary>
-        /// Return words as a string separated with hyphen character
+        /// Upper case conversion for string array.
+        /// </summary>
+        /// <param name="words">Words list</param>
+        /// <returns>Words list</returns>
+        public static string[] Upper(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return words;
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (null == words[i])
+                    continue;
+                words[i] = words[i].ToUpperInvariant();
+            }
+            return words;
+        }
+
+        /// <summary>
+        /// Upper case conversion for string.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Words list</returns>
+        public static string Upper(string word)
+        {
+            return word == null ? null : word.ToUpperInvariant();
+        }
+
+        /// <summary>
+        /// Lower case conversion for string array.
+        /// </summary>
+        /// <param name="words">Words list</param>
+        /// <returns>Words list</returns>
+        public static string[] Lower(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return words;
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (null == words[i])
+                    continue;
+                words[i] = words[i].ToLowerInvariant();
+            }
+            return words;
+        }
+
+        /// <summary>
+        /// Lower case conversion for string.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Words list</returns>
+        public static string Lower(string word)
+        {
+            return word == null ? null : word.ToLowerInvariant();
+        }
+
+        #endregion
+
+        #region Naming convention
+
+        /// <summary>
+        /// Return words lower case, separated with hyphen character.
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string DashCase(string[] words)
+        {
+            return string.Join("-", words);
+        }
+
+        /// <summary>
+        /// Return words as a string separated with hyphen minus (dash) character
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
         public static string HyphenCase(string[] words)
         {
-            return string.Join("-", words);
+            if (words == null || words.Length == 0)
+                return "";
+            return string.Join("-", Lower(words));
+        }
+
+        /// <summary>
+        /// Return words lower case, separated with hyphen character.
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string SnakeCase(string[] words)
+        {
+            if (words == null || words.Length == 0)
+                return "";
+            return string.Join("-", Lower(words));
         }
 
         /// <summary>
@@ -654,7 +1178,7 @@ namespace Energy.Base
                 return "";
             for (int i = 0; i < words.Length; i++)
             {
-                words[i] = UppercaseFirst(words[i]);
+                words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
         }
@@ -679,9 +1203,34 @@ namespace Energy.Base
             words[0] = words[0].ToLowerInvariant();
             for (int i = 1; i < words.Length; i++)
             {
-                    words[i] = UppercaseFirst(words[i]);
+                    words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
+        }
+
+        /// <summary>
+        /// Convert PascalCase to dash-case
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string PascalCaseToDashCase(string name)
+        {
+            string pattern = @"[A-Z]{2,}|[A-Z][^A-Z\s]*";
+            MatchCollection matches = Regex.Matches(name, pattern);
+            List<string> pieces = new List<string>();
+            foreach (Match match in matches)
+            {
+                string value = match.Value;
+                if (string.IsNullOrEmpty(value))
+                    continue;
+                value = value.Trim();
+                if (value == "")
+                    continue;
+                pieces.Add(value);
+            }
+            string text = string.Join("-", pieces.ToArray());
+            text = text.ToLowerInvariant();
+            return text;
         }
 
         #endregion
@@ -778,7 +1327,7 @@ namespace Energy.Base
                 , RegexOptions.IgnoreCase).Success)
             {
                 return System.Text.Encoding.BigEndianUnicode;
-            }            
+            }
             int number = Energy.Base.Cast.StringToInteger(encoding);
             try
             {
@@ -795,6 +1344,599 @@ namespace Energy.Base
             {
                 return System.Text.Encoding.UTF8;
             }
+        }
+
+        #endregion
+
+        #region Newline endings
+
+        /// <summary>
+        /// Convert newline delimiter to specified one
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="newLine"></param>
+        /// <returns></returns>
+        public static string ConvertNewLine(string text, string newLine)
+        {
+            Regex re = new Regex(@"\r\n|\r|\n");
+            text = re.Replace(text, newLine);
+            return text;
+        }
+
+        /// <summary>
+        /// Convert newline delimiter to environment default
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>string[]</returns>
+        public static string ConvertNewLine(string text)
+        {
+            return ConvertNewLine(text, Energy.Base.Text.NL);
+        }
+
+        #endregion
+
+        #region Uniquify
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// and optional text between element and number.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="ignoreCase">Case insensitive</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <param name="subText">Optional text between element and number</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, bool ignoreCase, int initialNumber, string subText)
+        {
+            if (array == null || array.Length < 2)
+                return array;
+            Dictionary<string, int> next = new Dictionary<string, int>();
+            List<string> index = new List<string>();
+            List<string> output = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                string needle = ignoreCase ? Upper(array[i]) : array[i];
+                if (index.Count == 0)
+                {
+                    index.Add(needle);
+                    output.Add(array[i]);
+                    continue;
+                }
+                if (index.Contains(needle))
+                {
+                    if (needle == null)
+                        continue;
+                    int number = initialNumber;
+                    if (next.ContainsKey(needle))
+                        number = next[needle];
+                    while (true)
+                    {
+                        string candidate = string.Concat(array[i], subText, number++);
+                        bool found = false;
+                        for (int j = 0; j < array.Length; j++)
+                        {
+                            if (0 == string.Compare(array[j], candidate, ignoreCase))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            output.Add(candidate);
+                            index.Add(ignoreCase ? Upper(candidate) : candidate);
+                            next[needle] = number;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    output.Add(array[i]);
+                    index.Add(needle);
+                }
+            }
+            return output.ToArray();
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// after text.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="ignoreCase">Case insensitive</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, bool ignoreCase, int initialNumber)
+        {
+            return Uniquify(array, ignoreCase, initialNumber, "");
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// after text.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, int initialNumber)
+        {
+            return Uniquify(array, false, initialNumber, "");
+        }
+
+        /// <summary>
+        /// Uniquify array of strings by adding sequential numbers
+        /// and optional text between element and number.
+        /// </summary>
+        /// <param name="array">Array of strings to make unique</param>
+        /// <param name="initialNumber">Initial number to add on duplicate</param>
+        /// <param name="subText">Optional text between element and number</param>
+        /// <returns></returns>
+        public static string[] Uniquify(string[] array, int initialNumber, string subText)
+        {
+            return Uniquify(array, false, initialNumber, subText);
+        }
+
+        #endregion
+
+        #region Compare
+
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2, bool ignoreCase)
+        {
+            if (array1 == null && array2 == null)
+                return 0;
+            if (array1 == null && array2 != null)
+                return -1;
+            if (array1 != null && array2 == null)
+                return 1;
+            if (array1.Length < array2.Length)
+                return -1;
+            if (array1.Length > array2.Length)
+                return 1;
+            for (int i = 0; i < array1.Length; i++)
+            {
+                int c = string.Compare(array1[i], array2[i], ignoreCase);
+                if (c != 0)
+                    return c;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Compare arrays of strings.
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static int Compare(string[] array1, string[] array2)
+        {
+            return Compare(array1, array2, false);
+        }
+
+        #endregion
+
+        #region Chop
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static T Chop<T>(ref T[] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            T first = array[0];
+            List<T> list = new List<T>(array.Length);
+            list.AddRange(array);
+            list.RemoveAt(0);
+            array = list.ToArray();
+            return first;
+
+        }
+
+        /// <summary>
+        /// Cut first element of string array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string Chop(ref string[] array)
+        {
+            return Chop<string>(ref array);
+        }
+
+        /// <summary>
+        /// Cut first element of object array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static object Chop(ref object[] array)
+        {
+            return Chop<object>(ref array);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index)
+        {
+            return GetElementOrEmpty<string>(array, index, "");
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static string GetElementOrEmpty(string[] array, int index, string emptyValue)
+        {
+            return GetElementOrEmpty<string>(array, index, emptyValue);
+        }
+
+        /// <summary>
+        /// Get element from array if exists or empty if not.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="emptyValue"></param>
+        /// <returns></returns>
+        public static T GetElementOrEmpty<T>(T[] array, int index, T emptyValue)
+        {
+            if (array == null || array.Length == 0)
+                return emptyValue;
+            else if (array.Length <= index)
+                return emptyValue;
+            else
+                return array[index];
+        }
+
+        #endregion
+
+        #region TryParse
+
+        public static bool TryParse(string text, out bool boolean)
+        {
+            boolean = Energy.Base.Cast.StringToBool(text);
+            return true;
+        }
+
+        private static bool? _TypeInt32HasTryParse = null;
+        private static bool? _TypeUInt32HasTryParse = null;
+        private static bool? _TypeInt64HasTryParse = null;
+        private static bool? _TypeUInt64HasTryParse = null;
+
+        public static bool TryParse(string text, out int signedInteger)
+        {
+            if (text == null || text.Length == 0)
+            {
+                signedInteger = 0;
+                return false;
+            }
+            if (_TypeInt32HasTryParse == null)
+            {
+                Type type = typeof(int);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt32HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt32HasTryParse)
+            {
+                return int.TryParse(text, out signedInteger);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i == 0 && text[0] == '-')
+                    {
+                        if (text.Length == 1)
+                        {
+                            signedInteger = 0;
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        signedInteger = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    signedInteger = System.Convert.ToInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    signedInteger = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    signedInteger = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out uint unsignedInteger)
+        {
+            if (text == null || text.Length == 0)
+            {
+                unsignedInteger = 0;
+                return false;
+            }
+            if (_TypeUInt32HasTryParse == null)
+            {
+                Type type = typeof(uint);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt32HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt32HasTryParse)
+            {
+                return uint.TryParse(text, out unsignedInteger);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        unsignedInteger = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    unsignedInteger = System.Convert.ToUInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    unsignedInteger = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    unsignedInteger = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out long signedLong)
+        {
+            if (text == null || text.Length == 0)
+            {
+                signedLong = 0;
+                return false;
+            }
+            if (_TypeInt64HasTryParse == null)
+            {
+                Type type = typeof(long);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeInt64HasTryParse = method != null;
+            }
+            if ((bool)_TypeInt64HasTryParse)
+            {
+                return long.TryParse(text, out signedLong);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i == 0 && text[0] == '-')
+                    {
+                        if (text.Length == 1)
+                        {
+                            signedLong = 0;
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        signedLong = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    signedLong = System.Convert.ToInt64(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    signedLong = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    signedLong = 0;
+                    return false;
+                }
+            }
+        }
+
+        public static bool TryParse(string text, out ulong unsignedLong)
+        {
+            if (text == null || text.Length == 0)
+            {
+                unsignedLong = 0;
+                return false;
+            }
+            if (_TypeUInt64HasTryParse == null)
+            {
+                Type type = typeof(ulong);
+                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+                    , null
+                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+                    , null
+                    );
+                _TypeUInt64HasTryParse = method != null;
+            }
+            if ((bool)_TypeUInt64HasTryParse)
+            {
+                return ulong.TryParse(text, out unsignedLong);
+            }
+            else
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] < '0' || text[i] > '9')
+                    {
+                        unsignedLong = 0;
+                        return false;
+                    }
+                }
+                try
+                {
+                    unsignedLong = System.Convert.ToUInt32(text);
+                    return true;
+                }
+                catch (FormatException)
+                {
+                    unsignedLong = 0;
+                    return false;
+                }
+                catch (OverflowException)
+                {
+                    unsignedLong = 0;
+                    return false;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Quote(string text)
+        {
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with)
+        {
+            return Quote(text, with, with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape)
+        {
+            return string.Concat(with, text.Replace(with, escape + with), with);
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, string escape, bool optional)
+        {
+            if (optional && !text.Contains(with))
+                return text;
+            return Quote(text, with, escape);
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Strip(string text)
+        {
+            return Strip(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with)
+        {
+            return Strip(text, with, with);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string with, string escape)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            int a = 0;
+            int b = text.Length;
+            if (text.StartsWith(with))
+            {
+                a = with.Length;
+                b -= with.Length;
+            }
+            if (text.EndsWith(with))
+            {
+                b -= with.Length;
+            }
+            string cut = text.Substring(a, b);
+            return cut.Replace(escape + with, with);
         }
 
         #endregion

@@ -44,5 +44,163 @@ namespace Energy.Core.Test.Base
                 Assert.AreSame(System.Text.Encoding.BigEndianUnicode, encoding, $"Test for {ucs2be}");
             }
         }
+
+        [TestMethod]
+        public void TextCheck()
+        {
+            string inputText = "555-12345678-123";
+            string filterText1 = "555-";
+            string filterText2 = "-123";
+            string filterText3 = "666";
+            bool ignoreCase = false;
+            bool check;
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterText1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2, filterText3);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText3, filterText2);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterText1, filterText2, filterText3);
+            Assert.AreEqual(false, check);
+
+            string[] filterArray1 = new string[] { filterText1, filterText2, };
+            check = Energy.Base.Text.CheckAll(inputText, Energy.Enumeration.MatchMode.Same, ignoreCase, filterArray1);
+            Assert.AreEqual(false, check);
+
+            check = Energy.Base.Text.CheckAny(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterArray1);
+            Assert.AreEqual(true, check);
+
+            check = Energy.Base.Text.CheckOne(inputText, Energy.Enumeration.MatchMode.Simple, ignoreCase, filterArray1);
+            Assert.AreEqual(false, check);
+
+            string filterText4 = "[1-9]{9}";
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Regex, ignoreCase, filterText4);
+            Assert.AreEqual(false, check);
+
+            string filterText5 = "[1-9]{8}";
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Regex, ignoreCase, filterText5);
+            Assert.AreEqual(true, check);
+
+            string filterText6 = "5?5-*";
+            Energy.Core.Bug.Write(filterText6);
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Wild, ignoreCase, filterText6);
+            Assert.AreEqual(true, check);
+
+            string filterText7 = "555?-*";
+            Energy.Core.Bug.Write(filterText7);
+            check = Energy.Base.Text.Check(inputText, Energy.Enumeration.MatchMode.Wild, ignoreCase, filterText7);
+            Assert.AreEqual(false, check);
+        }
+
+        [TestMethod]
+        public void TextUniquify()
+        {
+            string[] array;
+            array = new string[] { "A", "a", "A" };
+            string[] result;
+            result = Energy.Base.Text.Uniquify(array, true, 1, " - ");
+            int compare;
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreNotEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a - 1", "A - 2" };
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a", "A", "a:1", "a", "a:2", "a" };
+            result = Energy.Base.Text.Uniquify(array, false, 0, ":");
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreNotEqual(0, compare, "Uniquify error");
+            array = new string[] { "A", "a", "A:0", "a:1", "a:0", "a:2", "a:3" };
+            compare = Energy.Base.Text.Compare(array, result, false);
+            Assert.AreEqual(0, compare, "Uniquify error");
+        }
+
+        [TestMethod]
+        public void TextChop()
+        {
+            string[] array;
+            array = new string[] { "A", "B", "C" };
+            string[] result;
+            result = new string[] { "B", "C" };
+            string chop;
+            chop = Energy.Base.Text.Chop(ref array);
+            Assert.AreEqual("A", chop);
+            Assert.AreEqual(0, Energy.Base.Text.Compare(array, result), chop);
+        }
+
+        [TestMethod]
+        public void TextQuote()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "''";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "\"";
+            result = Energy.Base.Text.Quote(value);
+            expect = "\"\"\"\"";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'");
+            expect = "'\"'";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Quote(value, "'", "'", true);
+            expect = "\"";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextStrip()
+        {
+            string expect;
+            string value;
+            string result;
+            value = "";
+            result = Energy.Base.Text.Strip(value);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "'X\\'Y'";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+            value = "X\\'Y";
+            result = Energy.Base.Text.Strip(value, "'", "\\");
+            expect = "X'Y";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextSurround()
+        {
+            string text1, text2, text3;
+            string q;
+            q = '"'.ToString();
+            text1 = "Just..." + q;
+            text2 = Energy.Base.Text.Surround(text1, q, q, false);
+            text3 = q + text1 + q;
+            Assert.AreEqual(text3, text2);
+            text2 = Energy.Base.Text.Surround(text1, q, q, true);
+            text3 = q + text1;
+            Assert.AreEqual(text3, text2);
+        }
     }
 }

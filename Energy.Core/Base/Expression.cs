@@ -54,9 +54,9 @@ namespace Energy.Base
 ";
 
         /// <summary>
-        /// Date pattern (year + month + day)
+        /// Date pattern for YYYY-MM-DD, DD-MM-YYYY, DD.MM.YYYY, MM/DD/YYYY or YYYY/MM/DD formats.
         /// </summary>
-        public static readonly string Date = @"(?<year>\d{4})\-(?<month>\d{1,2})\-(?<day>\d{1,2})|(?<day>\d{1,2})\-(?<month>\d{1,2})\-(?<year>\d{4})";
+        public static readonly string Date = @"(?<year>\d{4})\-(?<month>\d{1,2})\-(?<day>\d{1,2})|(?<day>\d{1,2})\-(?<month>\d{1,2})\-(?<year>\d{4})|(?<day>\d{1,2})\.(?<month>\d{1,2})\.(?<year>\d{4})|(?<month>\d{1,2})\/(?<day>\d{1,2})\/(?<year>\d{4})|(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2})";
 
         /// <summary>
         /// Time pattern (hour + minute + second + fraction)
@@ -64,14 +64,9 @@ namespace Energy.Base
         public static readonly string Time = @"(((?<hour>\d{1,2}):)?(?<minute>\d{1,2}):)?(?<second>\d{1,2})[,\.](?<fraction>\d{1,6})|((?<hour>\d{1,2}):(?<minute>\d{1,2}))(:(?<second>\d{1,2}))?";
 
         /// <summary>
-        /// URL pattern (protocol + host + port + address)
-        /// </summary>
-        public static readonly string Url = @"(?:(?<protocol>\w+)://)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^\r\n]*))?";
-
-        /// <summary>
         /// URI pattern (scheme + user + password + host + port + path + query + fragment)
         /// </summary>
-        public static readonly string Uri = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
+        public static readonly string Url = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
 
         /// <summary>
         /// Matching for "VARCHAR(50) NOT NULL" or "DECIMAL(20, 3) NULL DEFAULT = '';"

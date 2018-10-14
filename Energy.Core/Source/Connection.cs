@@ -80,6 +80,20 @@ namespace Energy.Source
 
         #endregion
 
+        #region Empty
+
+        /// <summary>
+        /// Represents empty object
+        /// </summary>
+        public static Connection Empty { get { return GetEmpty(); } }
+
+        private static Connection GetEmpty()
+        {
+            return new Connection();
+        }
+
+        #endregion
+
         #region Property
 
         private string _ConnectionString;
@@ -130,6 +144,24 @@ namespace Energy.Source
         /// Dialects
         /// </summary>
         public Energy.Interface.IDialect Dialect { get { lock (_Lock) return _Dialect; } set { lock (_Lock) _Dialect = value; } }
+
+        #region Option
+
+        private bool? _ThreadOpen;
+
+        /// <summary>
+        /// Persistent connection
+        /// </summary>
+        public bool ThreadOpen { get { return GetThreadOpen(); } set { SetThreadOpen(value); } }
+
+        private bool _ThreadEvent;
+
+        /// <summary>
+        /// Persistent connection
+        /// </summary>
+        public bool ThreadEvent { get { return GetThreadEvent(); } set { SetThreadEvent(value); } }
+
+        #endregion
 
         private int _ErrorNumber = 0;
 
@@ -226,6 +258,32 @@ namespace Energy.Source
             }
         }
 
+        private bool GetThreadOpen()
+        {
+            lock (_Lock)
+            {
+                if (_ThreadOpen == null)
+                {
+                    bool result = true;
+
+                    // MS Sqlite can't open on background thread.
+                    if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
+                        result = false;
+
+                    return result;
+                }
+                else
+                {
+                    return (bool)_ThreadOpen;
+                }
+            }
+        }
+
+        private void SetThreadOpen(bool value)
+        {
+            _ThreadOpen = value;
+        }
+
         private bool GetActive()
         {
             lock (_Lock)
@@ -236,15 +294,98 @@ namespace Energy.Source
             }
         }
 
+        private void SetThreadEvent(bool value)
+        {
+            lock (_Lock)
+            {
+                _ThreadEvent = value;
+            }
+        }
+
+        private bool GetThreadEvent()
+        {
+            lock (_Lock)
+            {
+                return _ThreadEvent;
+            }
+        }
+
         #endregion
 
         #region Event
 
+        /// <summary>
+        /// Event fired when vendor connection object is created by Activator.
+        /// </summary>
         public event EventHandler OnCreate;
 
         public event EventHandler OnOpen;
 
         public event EventHandler OnClose;
+
+        #endregion
+
+        #region Fire
+
+        private void FireOnCreate()
+        {
+            if (null != OnCreate)
+            {
+                if (ThreadEvent)
+                {
+                    Thread thread = new Thread(() => OnCreate(this, null))
+                    {
+                        IsBackground = true,
+                        Name = "Energy.Source.Connection.OnCreate",
+                    };
+                    thread.Start();
+                }
+                else
+                {
+                    OnCreate(this, null);
+                }
+            }
+        }
+
+        private void FireOnOpen()
+        {
+            if (OnOpen != null)
+            {
+                if (ThreadEvent)
+                {
+                    Thread thread = new Thread(() => OnOpen(this, null))
+                    {
+                        IsBackground = true,
+                        Name = "Energy.Source.Connection.OnOpen",
+                    };
+                    thread.Start();
+                }
+                else
+                {
+                    OnOpen(this, null);
+                }
+            }
+        }
+
+        private void FireOnClose()
+        {
+            if (OnClose != null)
+            {
+                if (ThreadEvent)
+                {
+                    Thread thread = new Thread(() => OnClose(this, null))
+                    {
+                        IsBackground = true,
+                        Name = "Energy.Source.Connection.OnClose",
+                    };
+                    thread.Start();
+                }
+                else
+                {
+                    OnClose(this, null);
+                }
+            }
+        }
 
         #endregion
 
@@ -329,8 +470,7 @@ namespace Energy.Source
             }
             finally
             {
-                if (OnCreate != null)
-                    OnCreate(this, null);
+                FireOnCreate();
             }
             return _;
         }
@@ -352,10 +492,7 @@ namespace Energy.Source
 
             bool success = false;
 
-            bool openOnBackgroundThread = true;
-            // MS Sqlite can't open on background thread.
-            if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
-                openOnBackgroundThread = false;
+            bool openOnBackgroundThread = this.ThreadOpen;
 
             // Open connection in separate thread
             if (openOnBackgroundThread)
@@ -367,6 +504,10 @@ namespace Energy.Source
                         connection.Open();
                         success = true;
                     }
+                    catch (ThreadAbortException)
+                    {
+                        Energy.Core.Bug.Write("C081", "ThreadAbortException");
+                    }
                     catch (Exception x)
                     {
                         SetError(x);
@@ -375,11 +516,14 @@ namespace Energy.Source
                 {
                     // Make sure it's marked as a background thread
                     // so it'll get cleaned up automatically
-                    IsBackground = true,
+                    IsBackground = true, // don't block app
                     CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
                 };
                 thread.Start();
-                thread.Join(timeout * 1000);
+                if (!thread.Join(timeout * 1000))
+                {
+                    thread.Abort();
+                }
             }
             else
             // Open connection in main thread
@@ -404,8 +548,7 @@ namespace Energy.Source
             if (!success)
                 connection = null;
 
-            if (OnOpen != null)
-                OnOpen(this, null);
+            FireOnOpen();
 
             return connection;
         }
@@ -416,13 +559,21 @@ namespace Energy.Source
             {
                 if (_Persistent)
                 {
-                    Close();
+                    if (Active)
+                        Close();
+                    else
+                        Clear();
                     _Connection = Open(Create());
                     return _Connection;
                 }
             }
 
             return Open(Create());
+        }
+
+        private void Clear()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -449,17 +600,24 @@ namespace Energy.Source
                 }
                 try
                 {
+                    _Connection.Close();
+                }
+                catch
+                {
+                    Energy.Core.Bug.Write("Exception during connection Close...");
+                }
+                try
+                {
                     _Connection.Dispose();
                 }
                 catch
                 {
-                    Energy.Core.Bug.Write("Exception during connection dispose...");
+                    Energy.Core.Bug.Write("Exception during connection Dispose...");
                 }
                 finally
                 {
                     _Connection = null;
-                    if (OnClose != null)
-                        OnClose(this, null);
+                    FireOnClose();
                 }
             }
         }
@@ -482,7 +640,7 @@ namespace Energy.Source
         #region Active
 
         /// <summary>
-        /// Check if database connection is active.
+        /// Check if database connection is active
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
@@ -490,6 +648,7 @@ namespace Energy.Source
         {
             if (connection == null)
                 return false;
+
             switch (connection.State)
             {
                 case ConnectionState.Open:
@@ -498,7 +657,29 @@ namespace Energy.Source
                     return true;
                 default:
                 case ConnectionState.Broken:
+                    Energy.Core.Bug.Write("C083", "Connection state is Broken");
+                    return false;
                 case ConnectionState.Closed:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if database connection is actually working
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        public static bool IsRunning(IDbConnection connection)
+        {
+            if (connection == null)
+                return false;
+
+            switch (connection.State)
+            {
+                case ConnectionState.Executing:
+                case ConnectionState.Fetching:
+                    return true;
+                default:
                     return false;
             }
         }
@@ -686,8 +867,8 @@ namespace Energy.Source
         public DataTable Load(string query)
         {
             ClearError();
-            int repeat = Repeat;
-            while (repeat-- >= 0)
+            int attempt = Repeat;
+            while (attempt-- >= 0)
             {
                 if (Persistent)
                 {
@@ -733,11 +914,25 @@ namespace Energy.Source
 
         #region Read
 
+        /// <summary>
+        /// Read query results into DataTable.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         private DataTable Read(IDbCommand command)
         {
             using (IDataReader reader = command.ExecuteReader())
             {
-                DataTable schema = reader.GetSchemaTable();
+                DataTable schema = null;
+
+                try
+                {
+                    reader.GetSchemaTable();
+                }
+                catch (Exception eSchema)
+                {
+                    Energy.Core.Bug.Write(eSchema);
+                }
 
                 if (schema == null)
                     return null;
@@ -775,6 +970,12 @@ namespace Energy.Source
             }
         }
 
+        /// <summary>
+        /// Read query results into DataTable.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         private DataTable Read(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
@@ -784,43 +985,29 @@ namespace Energy.Source
         }
 
         /// <summary>
-        /// Read query results into DataTable
+        /// Read query results into DataTable.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public DataTable Read(string query)
         {
             ClearError();
-            int repeat = Repeat;
-            while (repeat-- >= 0)
+            int attempt = Repeat;
+            int repeat = 0;
+            try
             {
-                if (Persistent)
+                while (attempt-- >= 0)
                 {
-                    if (!Active && Open() == null)
-                        return null;
-                    try
+                    if (Persistent)
                     {
-                        lock (_Lock)
-                        {
-                            return Read(_Connection, query);
-                        }
-                    }
-                    catch (Exception x)
-                    {
-                        SetError(x);
-                        if (!Catch(x))
-                            return null;
-                    }
-                }
-                else
-                {
-                    using (IDbConnection connection = Open())
-                    {
-                        if (connection == null)
+                        if (!Active && Open() == null)
                             return null;
                         try
                         {
-                            return Read(connection, query);
+                            lock (_Lock)
+                            {
+                                return Read(_Connection, query);
+                            }
                         }
                         catch (Exception x)
                         {
@@ -829,6 +1016,32 @@ namespace Energy.Source
                                 return null;
                         }
                     }
+                    else
+                    {
+                        using (IDbConnection connection = Open())
+                        {
+                            if (connection == null)
+                                return null;
+                            try
+                            {
+                                return Read(connection, query);
+                            }
+                            catch (Exception x)
+                            {
+                                SetError(x);
+                                if (!Catch(x))
+                                    return null;
+                            }
+                        }
+                    }
+                    repeat++;
+                }
+            }
+            finally
+            {
+                if (repeat > 0)
+                {
+                    Energy.Core.Bug.Write("C084", "Command repeated in Read");
                 }
             }
             return null;
@@ -953,44 +1166,64 @@ namespace Energy.Source
         public object Scalar(string query)
         {
             ClearError();
-            int repeat = Repeat;
-            while (repeat-- >= 0)
+            int attempt = Repeat;
+            if (attempt < 0)
+                attempt = 0;
+            int repeat = 0;
+            try
             {
-                if (Persistent)
+                while (attempt-- >= 0)
                 {
-                    if (!Active && Open() == null)
-                        return null;
-                    try
+                    if (Persistent)
                     {
-                        lock (_Lock)
-                        {
-                            return Scalar(_Connection, query);
-                        }
-                    }
-                    catch (Exception x)
-                    {
-                        SetError(x);
-                        if (!Catch(x))
-                            return null;
-                    }
-                }
-                else
-                {
-                    using (IDbConnection connection = Open())
-                    {
-                        if (connection == null)
-                            return null;
+                        if (!Active)
+                            if (null == Open())
+                                return null;
                         try
                         {
-                            return Scalar(connection, query);
+                            lock (_Lock)
+                            {
+                                return Scalar(_Connection, query);
+                            }
                         }
                         catch (Exception x)
                         {
                             SetError(x);
+
                             if (!Catch(x))
                                 return null;
                         }
                     }
+                    else
+                    {
+                        using (IDbConnection connection = Open())
+                        {
+                            if (connection == null)
+                                return null;
+                            try
+                            {
+                                return Scalar(connection, query);
+                            }
+                            catch (Exception x)
+                            {
+                                SetError(x);
+                                if (!Catch(x))
+                                    return null;
+                            }
+                            finally
+                            {
+                                FireOnClose();
+                            }
+                        }
+                    }
+                    repeat++;
+                }
+            }
+            finally
+            {
+                if (repeat > 0)
+                {
+                    Energy.Core.Bug.Write("C086", "Command repeat");
                 }
             }
             return null;
@@ -1011,13 +1244,15 @@ namespace Energy.Source
             Energy.Source.Connection copy = new Energy.Source.Connection();
             lock (_Lock)
             {
-                copy.ConnectionString = _ConnectionString;
-                copy.Vendor = _Vendor;
-                copy.Timeout = _Timeout;
-                copy.Repeat = _Repeat;
-                copy.Persistent = _Persistent;
-                copy.Log = _Log;
-                copy.Dialect = _Dialect;
+                copy.ConnectionString = this._ConnectionString;
+                copy.Vendor = this._Vendor;
+                copy.Timeout = this._Timeout;
+                copy.Repeat = this._Repeat;
+                copy.Persistent = this._Persistent;
+                copy.Log = this._Log;
+                copy.Dialect = this._Dialect;
+                if (this._ThreadOpen != null)
+                    copy.ThreadOpen = (bool)this._ThreadOpen;
             }
             return copy;
         }
@@ -1029,6 +1264,16 @@ namespace Energy.Source
         public object Clone()
         {
             return Copy();
+        }
+
+        #endregion
+
+        #region ToString
+
+        public override string ToString()
+        {
+
+            return base.ToString();
         }
 
         #endregion

@@ -12,48 +12,122 @@ namespace Energy.Query
     /// </summary>
     public class Format
     {
-        public Energy.Base.Format.Quote LiteralQuote; // 'text'
+        #region Class
 
-        public Energy.Base.Format.Quote ObjectQuote; // "column"
+        public class Class
+        {
+            public class Bracket
+            {
+                /// <summary>
+                /// Literal bracket for values.
+                /// </summary>
+                public Energy.Base.Bracket Literal; // 'text'
+
+                /// <summary>
+                /// Object bracket for database objects.
+                /// </summary>
+                public Energy.Base.Bracket Object; // "column"
+            }
+        }
+
+        #endregion
+
+        #region Property
+
+        /// <summary>
+        /// Quotation settings
+        /// </summary>
+        public Class.Bracket Bracket = new Class.Bracket();
 
         /// <summary>Use TZ format for DATETIME.</summary>
         public bool UseT;
 
-        public string CurrentTimestamp;
+        public string CurrentStamp;
 
-        #region Implicit
+        #endregion
 
-        public static implicit operator Format(Energy.Enumeration.SqlDialect dialect)
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public Format()
+        {
+            Bracket.Literal = "'";
+            Bracket.Object = "\"";
+
+            CurrentStamp = "CURRENT_TIMESTAMP";
+        }
+
+        /// <summary>
+        /// Parametrized constructor
+        /// </summary>
+        /// <param name="dialect">Database SQL dialect to use for defaults</param>
+        public Format(string dialect)
         {
             Format format = new Format();
-            switch (dialect)
+            format.SetDialect(dialect);
+        }
+
+        private void SetDialect(string dialect)
+        {
+            if (dialect == null)
+                dialect = "";
+            string literal = "'";
+            string special = "\"";
+            string current = "";
+            bool useT = false;
+            switch (dialect.Trim().ToUpper())
             {
+                case "ANSI":
                 default:
-                    format.CurrentTimestamp = "CURRENT_TIMESTAMP";
-                    format.LiteralQuote = "'";
-                    format.ObjectQuote = "\"";
+                    literal = "'";
+                    special = "\"";
+                    current = "CURRENT_TIMESTAMP";
                     break;
 
-                case Enumeration.SqlDialect.MYSQL:
-                    format.LiteralQuote = "'";
-                    format.ObjectQuote = "`";
-                    format.CurrentTimestamp = "CURRENT_TIMESTAMP()";
+                case "MYSQL":
+                    literal = "'";
+                    special = "`";
+                    current = "CURRENT_TIMESTAMP()";
                     break;
 
-                case Enumeration.SqlDialect.SQLSERVER:
-                    format.LiteralQuote = "'";
-                    format.ObjectQuote = "[]";
-                    format.CurrentTimestamp = "GETDATE()";
+                case "SQLSERVER":
+                    literal = "'";
+                    special = "[]";
+                    current = "GETDATE()";
+                    useT = true;
                     break;
 
-                case Enumeration.SqlDialect.SQLITE:
-                    format.LiteralQuote = "'";
-                    format.ObjectQuote = "\"";
-                    format.CurrentTimestamp = "(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))";
+                case "SQLITE":
+                    literal = "'";
+                    special = "\"";
+                    current = "(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))";
                     break;
             }
 
-            return format;
+            this.Bracket.Literal = literal;
+            this.Bracket.Object = special;
+            this.CurrentStamp = current;
+            this.UseT = useT;
+        }
+
+        /// <summary>
+        /// Create object from SqlDialect enumeration
+        /// </summary>
+        /// <param name="dialect"></param>
+        public static implicit operator Format(Energy.Enumeration.SqlDialect dialect)
+        {
+            return dialect.ToString();
+        }
+
+        /// <summary>
+        /// Create object from string
+        /// </summary>
+        /// <param name="dialect"></param>
+        public static implicit operator Format(string dialect)
+        {
+            return new Format(dialect);
         }
 
         #endregion
@@ -73,12 +147,7 @@ namespace Energy.Query
                     {
                         if (_Default == null)
                         {
-                            _Default = new Energy.Query.Format()
-                                {
-                                    LiteralQuote = "'",
-                                    ObjectQuote = @"""", 
-                                }
-                                ;
+                            _Default = new Energy.Query.Format();
                         }
                     }
                 }
@@ -100,7 +169,7 @@ namespace Energy.Query
             if (string.IsNullOrEmpty(value))
                 return value;
             else
-                return ObjectQuote.Surround(value);
+                return Bracket.Object.Quote(value);
         }
 
         /// <summary>
@@ -158,7 +227,7 @@ namespace Energy.Query
         {
             if (value == null)
                 return "NULL";
-            return LiteralQuote.Surround(value);
+            return Bracket.Literal.Quote(value);
         }
 
         /// <summary>
@@ -173,7 +242,7 @@ namespace Energy.Query
         {
             if (nullify && value == null)
                 return "NULL";
-            return LiteralQuote.Surround(value);
+            return Bracket.Literal.Quote(value);
         }
 
         /// <summary>
@@ -234,9 +303,19 @@ namespace Energy.Query
         /// Format as NUMBER.
         /// </summary>
         /// <param name="value"></param>
+        /// <returns></returns>
+        public string Number(object value)
+        {
+            return Number(value, false);
+        }
+
+        /// <summary>
+        /// Format as NUMBER.
+        /// </summary>
+        /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns></returns>
-        public string Number(object value, bool nullify = false)
+        public string Number(object value, bool nullify)
         {
             if (value == null)
                 return nullify ? "NULL" : "0";
@@ -262,22 +341,20 @@ namespace Energy.Query
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (value is decimal)
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
-            if (value is string)
-            {
-                string v = ((string)value).Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
-                long l;
-                if (long.TryParse(v, out l))
-                    return Number(l);
-                double d;
-                if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.InvariantCulture, out d))
-                    return Number(d);
-                if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture, out d))
-                    return Number(d);
-                return nullify ? "NULL" : "0";
-            }
-            throw new NotImplementedException();
+
+            string s = value is string ? (string)value : value.ToString();
+            string v = s.Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
+            long l;
+            if (long.TryParse(v, out l))
+                return Number(l);
+            double d;
+            if (double.TryParse(v, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.InvariantCulture, out d))
+                return Number(d);
+            if (double.TryParse(v, System.Globalization.NumberStyles.Float
+                , System.Globalization.CultureInfo.CurrentCulture, out d))
+                return Number(d);
+            return nullify ? "NULL" : "0";
         }
 
         #endregion
@@ -289,9 +366,44 @@ namespace Energy.Query
         /// </summary>
         /// <param name="number">decimal</param>
         /// <returns>string</returns>
-        public static string Integer(decimal number)
+        public string Integer(decimal number)
         {
-            return ((long)Math.Floor(number)).ToString();
+            return Number(Math.Floor(number));
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(double number)
+        {
+            return Number(Math.Floor(number));
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(int number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="nullify"></param>
+        /// <returns>string</returns>
+        public string Integer(object number, bool nullify)
+        {
+            if (number == null)
+                return Number(number, nullify);
+            if (number is decimal)
+                return Number((decimal)number, nullify);
+            return Number(Energy.Base.Cast.ObjectToLong(number), nullify);
         }
 
         #endregion
@@ -305,7 +417,7 @@ namespace Energy.Query
         /// <returns></returns>
         public string Date(DateTime value)
         {
-            return LiteralQuote.Surround(value.ToString("yyyy-MM-dd"));
+            return Bracket.Literal.Quote(value.ToString("yyyy-MM-dd"));
         }
 
         /// <summary>
@@ -333,7 +445,7 @@ namespace Energy.Query
                 ? value.ToString("HH:mm:ss")
                 : value.ToString("HH:mm:ss.fff")
                 ;
-            return LiteralQuote.Surround(text);
+            return Bracket.Literal.Quote(text);
         }
 
         /// <summary>
@@ -368,7 +480,7 @@ namespace Energy.Query
             if (UseT)
                 text = text.Replace(' ', 'T');
 
-            return LiteralQuote.Surround(text);
+            return Bracket.Literal.Quote(text);
         }
 
         /// <summary>
@@ -382,5 +494,19 @@ namespace Energy.Query
         }
 
         #endregion
+
+        #region Now
+
+        /// <summary>
+        /// Format as current time equivalent.
+        /// </summary>
+        /// <returns>string</returns>
+        public string Now()
+        {
+            return this.CurrentStamp;
+        }
+
+        #endregion
+
     }
 }

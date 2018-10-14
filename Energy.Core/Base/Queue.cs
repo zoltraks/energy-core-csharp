@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Energy.Base
 {
@@ -10,9 +11,11 @@ namespace Energy.Base
 
         public Queue()
         {
+            _PushResetEvent = new ManualResetEvent(false);
         }
 
         public Queue(T[] list)
+            : this()
         {
             _List.AddRange(list);
         }
@@ -37,6 +40,24 @@ namespace Energy.Base
             }
         }
 
+        private int _Limit;
+
+        public int Name { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
+
+        private bool _Circular;
+
+        public bool Circular { get { lock (_List) return _Circular; } set { lock (_List) _Circular = value; } }
+
+        private ManualResetEvent _PushResetEvent;
+
+        public void Clear()
+        {
+            lock (_List)
+            {
+                _List.Clear();
+            }
+        }
+
         /// <summary>
         /// Return number of elements in queue
         /// </summary>
@@ -51,15 +72,38 @@ namespace Energy.Base
             }
         }
 
+        public int Limit { get; set; }
+
         /// <summary>
         /// Put element at the end of queue
         /// </summary>
         /// <param name="item">Element</param>
-        public void Push(T item)
+        /// <returns></returns>
+        public bool Push(T item)
         {
-            lock (_List)
+            try
             {
-                _List.Add(item);
+                lock (_List)
+                {
+                    if (Limit > 0 && _List.Count >= Limit)
+                    {
+                        if (Circular)
+                        {
+                            int count = 1 + Limit - _List.Count;
+                            _List.RemoveRange(0, count);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    _List.Add(item);
+                    return true;
+                }
+            }
+            finally
+            {
+                _PushResetEvent.Set();
             }
         }
 
@@ -68,11 +112,34 @@ namespace Energy.Base
         /// </summary>
         /// <remarks>Using one element instead of array may be more efficient.</remarks>
         /// <param name="array">Array of elements</param>
-        public void Push(T[] array)
+        /// <returns></returns>
+        public bool Push(T[] array)
         {
-            lock (_List)
+            if (array == null || array.Length == 0)
+                return false;
+            try
             {
-                _List.AddRange(array);
+                lock (_List)
+                {
+                    if (Limit > 0 && _List.Count + array.Length > Limit)
+                    {
+                        if (Circular)
+                        {
+                            int count = 1 + Limit - _List.Count - array.Length;
+                            _List.RemoveRange(0, count);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    _List.AddRange(array);
+                    return false;
+                }
+            }
+            finally
+            {
+                _PushResetEvent.Set();
             }
         }
 
@@ -82,13 +149,20 @@ namespace Energy.Base
         /// <returns>Element</returns>
         public T Pull()
         {
-            lock (_List)
+            try
             {
-                if (_List.Count == 0)
-                    return default(T);
-                T item = _List[0];
-                _List.RemoveAt(0);
-                return item;
+                lock (_List)
+                {
+                    if (_List.Count == 0)
+                        return default(T);
+                    T item = _List[0];
+                    _List.RemoveAt(0);
+                    return item;
+                }
+            }
+            finally
+            {
+                //_PushResetEvent.Reset();
             }
         }
 
@@ -100,30 +174,95 @@ namespace Energy.Base
         /// <returns>Array of elements</returns>
         public T[] Pull(int count)
         {
-            lock (_List)
+            try
             {
-                int max = _List.Count;
-                if (count == 0 || count > max)
-                    count = max;
-                System.Collections.Generic.List<T> list = new System.Collections.Generic.List<T>();
-                while (count-- > 0)
+                lock (_List)
                 {
-                    list.Add(_List[0]);
-                    _List.RemoveAt(0);
+                    int max = _List.Count;
+                    if (count == 0 || count > max)
+                        count = max;
+                    System.Collections.Generic.List<T> list = new System.Collections.Generic.List<T>();
+                    while (count-- > 0)
+                    {
+                        list.Add(_List[0]);
+                        _List.RemoveAt(0);
+                    }
+                    return list.ToArray();
                 }
-                return list.ToArray();
+            }
+            finally
+            {
+                //_PushResetEvent.Reset();
             }
         }
 
         /// <summary>
-        /// Put element back to queue, at begining. This element will be taken first.
+        /// Take element from queue with specified time limit to wait
+        /// for new item to come.
+        /// It will pause invoking thread as it is expected to do so.
         /// </summary>
-        /// <param name="item">Element</param>
-        public void Back(T item)
+        /// <param name="timeout">Time limit in seconds</param>
+        /// <returns>Element or default (null) if no elements in queue</returns>
+        public T Pull(double timeout)
         {
-            lock (_List)
+            try
             {
-                _List.Insert(0, item);
+                lock (_List)
+                {
+                    if (_List.Count != 0)
+                    {
+                        T item = _List[0];
+                        _List.RemoveAt(0);
+                        return item;
+                    }
+                }
+
+                _PushResetEvent.Reset();
+
+                if (!_PushResetEvent.WaitOne(TimeSpan.FromSeconds(timeout)))
+                {
+                    return default(T);
+                }
+                else
+                {
+                    lock (_List)
+                    {
+                        if (_List.Count == 0)
+                        {
+                            return default(T);
+                        }
+                        else
+                        {
+                            T item = _List[0];
+                            _List.RemoveAt(0);
+                            return item;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                //_PushResetEvent.Reset();
+            }
+        }
+
+            /// <summary>
+            /// Put element back to queue, at begining. This element will be taken first.
+            /// </summary>
+            /// <param name="item">Element</param>
+            public void Back(T item)
+        {
+            try
+            {
+                lock (_List)
+                {
+                    _List.Insert(0, item);
+
+                }
+            }
+            finally
+            {
+                //_PushResetEvent.Set();
             }
         }
 
@@ -133,12 +272,19 @@ namespace Energy.Base
         /// <param name="list">Array of elements</param>
         public void Back(T[] list)
         {
-            lock (_List)
+            try
             {
-                for (int i = 0; i < list.Length; i++)
+                lock (_List)
                 {
-                    _List.Insert(i, list[i]);
+                    for (int i = 0; i < list.Length; i++)
+                    {
+                        _List.Insert(i, list[i]);
+                    }
                 }
+            }
+            finally
+            {
+               // _PushResetEvent.Set();
             }
         }
 

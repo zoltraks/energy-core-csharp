@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstract\Network.cs" />
+    <Compile Include="Attribute\Application.cs" />
+    <Compile Include="Attribute\Code.cs" />
     <Compile Include="Attribute\Command.cs" />
     <Compile Include="Attribute\Data.cs" />
     <Compile Include="Attribute\Markdown.cs" />
@@ -72,12 +75,15 @@
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\History.cs" />
+    <Compile Include="Base\Http.cs" />
     <Compile Include="Base\Ini.cs" />
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Language.cs" />
+    <Compile Include="Base\Library.cs" />
     <Compile Include="Base\Lock.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Money.cs" />
+    <Compile Include="Base\Network.cs" />
     <Compile Include="Base\Nibble.cs" />
     <Compile Include="Base\Number.cs" />
     <Compile Include="Base\Path.cs" />
@@ -92,6 +98,7 @@
     <Compile Include="Base\Table.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Time.cs" />
+    <Compile Include="Base\Trap.cs" />
     <Compile Include="Base\Tree.cs" />
     <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Variant.cs" />
@@ -120,6 +127,7 @@
     <Compile Include="Core\Worker.cs" />
     <Compile Include="Enumeration\GrammaticalGender.cs" />
     <Compile Include="Enumeration\LocateBehaviour.cs" />
+    <Compile Include="Enumeration\MatchMode.cs" />
     <Compile Include="Enumeration\SortOrder.cs" />
     <Compile Include="Enumeration\BooleanStyle.cs" />
     <Compile Include="Enumeration\CharacterCasing.cs" />
@@ -133,6 +141,9 @@
     <Compile Include="Interface\ICopy.cs" />
     <Compile Include="Interface\IDialect.cs" />
     <Compile Include="Interface\ISocketClient.cs" />
+    <Compile Include="Interface\ISocketConnection.cs" />
+    <Compile Include="Interface\ISocketServer.cs" />
+    <Compile Include="Interface\IStringList.cs" />
     <Compile Include="Interface\IXmlSerializable.cs" />
     <Compile Include="Interface\IEncapsulation.cs" />
     <Compile Include="Interface\IEscape.cs" />
@@ -144,9 +155,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\Builder.cs" />
     <Compile Include="Query\Configuration.cs" />
+    <Compile Include="Query\Dialect1.cs" />
     <Compile Include="Query\Dialect\SQLITE.cs" />
     <Compile Include="Query\Format.cs" />
     <Compile Include="Query\Insert.cs" />
+    <Compile Include="Query\Layer2\ANSI.cs" />
+    <Compile Include="Query\Layer2\Generic.cs" />
+    <Compile Include="Query\Layer2\MySQL.cs" />
+    <Compile Include="Query\Layer2\SQLite.cs" />
+    <Compile Include="Query\Layer2\SqlServer.cs" />
     <Compile Include="Query\Script.cs" />
     <Compile Include="Query\Select.cs" />
     <Compile Include="Query\Type.cs" />
@@ -159,9 +176,11 @@
     <Compile Include="Query\Parameter.cs" />
     <Compile Include="Source\Schema.cs" />
     <Compile Include="Source\Structure.cs" />
+    <Compile Include="Support\CompactFramework.cs" />
     <Compile Include="Support\WinApi.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Query\Script\" />
     <Folder Include="Query\Standard\" />
     <Folder Include="Query\Virtual\" />
   </ItemGroup>

@@ -22,6 +22,32 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void CastStringToInteger()
+        {
+            string str1 = "15,001";
+            int num1 = Energy.Base.Cast.StringToInteger(str1);
+            Assert.AreEqual(15, num1);
+            string str2 = " 15.000000001 ";
+            double num2 = Energy.Base.Cast.StringToInteger(str2);
+            Assert.AreEqual(15, num2);
+            string str3 = " -1,234 ";
+            double num3 = Energy.Base.Cast.StringToInteger(str3);
+            Assert.AreEqual(-1, num3);
+            string str4 = " 81985529216486895 ";
+            double num4 = Energy.Base.Cast.StringToInteger(str4);
+            Assert.AreEqual(0, num4);
+            string str5 = int.MaxValue.ToString();
+            double num5 = Energy.Base.Cast.StringToInteger(str5);
+            Assert.AreEqual(int.MaxValue, num5);
+            string str6 = int.MinValue.ToString();
+            double num6 = Energy.Base.Cast.StringToInteger(str6);
+            Assert.AreEqual(int.MinValue, num6);
+            string str7 = long.MaxValue.ToString();
+            double num7 = Energy.Base.Cast.StringToInteger(str7);
+            Assert.AreEqual(0, num7);
+        }
+
+        [TestMethod]
         public void CastStringToDoubleSmart()
         {
             string str1 = "15,001_002";
@@ -87,6 +113,19 @@ namespace Energy.Core.Test.Base
                 );
             DateTime mawsonDateTime = TimeZoneInfo.ConvertTimeFromUtc(dt2, mawson);
             string jsonStringMawson = Energy.Base.Cast.DateTimeToISO8601(mawsonDateTime);
+        }
+
+        [TestMethod]
+        public void Base64ToByteArray()
+        {
+            string s1 = "Ąę";
+            Assert.AreEqual("xITEmQ==", Energy.Base.Cast.StringToBase64(s1));
+            byte[] b1 = new byte[] { 0xff, 0xff };
+            string s2 = Energy.Base.Cast.ByteArrayToBase64(b1);
+            Assert.AreEqual("//8=", s2);
+            byte[] b2 = Energy.Base.Cast.Base64ToByteArray("//8=");
+            int c1 = Energy.Base.ByteArrayBuilder.Compare(b1, b2);
+            Assert.AreEqual(0, c1);
         }
     }
 }

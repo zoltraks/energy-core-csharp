@@ -98,7 +98,7 @@ namespace Energy.Query
 					list.Add (line);
 				}
 
-				script.Append (string.Concat ("\t", string.Join (" ," + Environment.NewLine + "\t", list.ToArray ()), Environment.NewLine));
+				script.Append (string.Concat ("\t", string.Join (" ," + Energy.Base.Text.NL + "\t", list.ToArray ()), Energy.Base.Text.NL));
 				script.Append (")");
 				script.AppendLine ();
 				string engine = string.IsNullOrEmpty (table.Engine) ? DefaultEngine : table.Engine;
@@ -141,7 +141,7 @@ namespace Energy.Query
                 script.Add("");
                 script.Add("GO");
 
-                return String.Join(Environment.NewLine, script.ToArray());
+                return String.Join(Energy.Base.Text.NL, script.ToArray());
             }
 
             #endregion
