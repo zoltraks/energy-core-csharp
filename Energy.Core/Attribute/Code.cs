@@ -47,22 +47,8 @@ namespace Energy.Attribute
         /// <summary>
         /// Code is temporary here and should be moved to another location
         /// </summary>
-        public class TemporaryAttribute : System.Attribute
+        public class TemporaryAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -76,7 +62,7 @@ namespace Energy.Attribute
             public TemporaryAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -85,29 +71,15 @@ namespace Energy.Attribute
             public TemporaryAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code is probably misplaced and should exist in another location
         /// </summary>
-        public class MisplacedAttribute : System.Attribute
+        public class MisplacedAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -122,7 +94,7 @@ namespace Energy.Attribute
             public MisplacedAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -133,29 +105,15 @@ namespace Energy.Attribute
             public MisplacedAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code is obsolete and should be removed
         /// </summary>
-        public class ObsoleteAttribute : System.Attribute
+        public class ObsoleteAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             private bool error;
 
             /// <summary>
@@ -176,7 +134,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             public ObsoleteAttribute(string description)
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -187,29 +145,15 @@ namespace Energy.Attribute
             public ObsoleteAttribute(string description, bool error)
                 : this(description)
             {
-                this.error = error;
+                this.Error = error;
             }
         }
 
         /// <summary>
         /// Code is to be written in future
         /// </summary>
-        public class FutureAttribute : System.Attribute
+        public class FutureAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             private string expected;
 
             /// <summary>
@@ -230,7 +174,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             public FutureAttribute(string description)
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -241,7 +185,7 @@ namespace Energy.Attribute
             public FutureAttribute(string description, string help)
                 : this(description)
             {
-                this.expected = help;
+                this.Help = help;
             }
 
             /// <summary>
@@ -253,29 +197,15 @@ namespace Energy.Attribute
             public FutureAttribute(string description, string help, string expected)
                 : this(description, help)
             {
-                this.expected = expected;
+                this.Expected = expected;
             }
         }
 
         /// <summary>
         /// Code is bad
         /// </summary>
-        public class BadAttribute : System.Attribute
+        public class BadAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -289,7 +219,7 @@ namespace Energy.Attribute
             public BadAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -298,29 +228,15 @@ namespace Energy.Attribute
             public BadAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code needs some additional verification
         /// </summary>
-        public class VerifyAttribute : System.Attribute
+        public class VerifyAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             private string expected;
 
             /// <summary>
@@ -341,7 +257,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             public VerifyAttribute(string description)
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -352,29 +268,15 @@ namespace Energy.Attribute
             public VerifyAttribute(string description, string help)
                 : this(help)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code needs to be extended
         /// </summary>
-        public class ExtendAttribute : System.Attribute
+        public class ExtendAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             private string expected;
 
             /// <summary>
@@ -395,7 +297,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             public ExtendAttribute(string description)
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -406,29 +308,15 @@ namespace Energy.Attribute
             public ExtendAttribute(string description, string help)
                 : this(help)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code is a wrapper function whose purpose is to call another funtion
         /// </summary>
-        public class WrapperAttribute : System.Attribute
+        public class WrapperAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -442,7 +330,7 @@ namespace Energy.Attribute
             public WrapperAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -451,29 +339,15 @@ namespace Energy.Attribute
             public WrapperAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code may be a reproduction of another one, which probably needs special attention
         /// </summary>
-        public class DuplicationAttribute : System.Attribute
+        public class DuplicationAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -487,7 +361,7 @@ namespace Energy.Attribute
             public DuplicationAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -496,29 +370,15 @@ namespace Energy.Attribute
             public DuplicationAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code needs special attention
         /// </summary>
-        public class AttentionAttribute : System.Attribute
+        public class AttentionAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -532,7 +392,7 @@ namespace Energy.Attribute
             public AttentionAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -541,29 +401,15 @@ namespace Energy.Attribute
             public AttentionAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 
         /// <summary>
         /// Code safety warning
         /// </summary>
-        public class SafetyAttribute : System.Attribute
+        public class SafetyAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             private bool error;
 
             /// <summary>
@@ -585,7 +431,7 @@ namespace Energy.Attribute
             public SafetyAttribute(string description)
                 : this()
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -595,7 +441,7 @@ namespace Energy.Attribute
             public SafetyAttribute(bool error)
                 : this()
             {
-                this.error = error;
+                this.Error = error;
             }
 
             /// <summary>
@@ -606,7 +452,7 @@ namespace Energy.Attribute
             public SafetyAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
 
             /// <summary>
@@ -617,7 +463,7 @@ namespace Energy.Attribute
             public SafetyAttribute(string description, bool error)
                 : this(description)
             {
-                this.error = error;
+                this.Error = error;
             }
 
             /// <summary>
@@ -629,29 +475,15 @@ namespace Energy.Attribute
             public SafetyAttribute(string description, string help, bool error)
                 : this(description, help)
             {
-                this.error = error;
+                this.Error = error;
             }
         }
 
         /// <summary>
         /// Code was originally used somewhere else
         /// </summary>
-        public class OriginAttribute : System.Attribute
+        public class OriginAttribute : CodeAttribute
         {
-            private string help;
-
-            /// <summary>
-            /// Help text
-            /// </summary>
-            public string Help { get { return help; } set { help = value; } }
-
-            private string description;
-
-            /// <summary>
-            /// Description text
-            /// </summary>
-            public string Description { get { return description; } set { description = value; } }
-
             /// <summary>
             /// Constructor
             /// </summary>
@@ -665,7 +497,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             public OriginAttribute(string description)
             {
-                this.description = description;
+                this.Description = description;
             }
 
             /// <summary>
@@ -676,7 +508,7 @@ namespace Energy.Attribute
             public OriginAttribute(string description, string help)
                 : this(description)
             {
-                this.help = help;
+                this.Help = help;
             }
         }
 

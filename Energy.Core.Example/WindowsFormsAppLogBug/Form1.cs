@@ -27,8 +27,8 @@ namespace WindowsFormsAppLogBug
 
         private void buttonAddMessage_Click(object sender, EventArgs e)
         {
-            Energy.Core.Log.Default
-            textBoxMessage.Text
+            //Energy.Core.Log.Default.Destination.Add(new Energy.Core.Log.Target.Event())
+            Energy.Core.Log.Default.Write(textBoxMessage.Text, Energy.Enumeration.LogLevel.Message);
         }
     }
 }

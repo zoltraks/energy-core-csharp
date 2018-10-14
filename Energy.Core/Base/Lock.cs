@@ -21,7 +21,10 @@ namespace Energy.Base
         {
             Energy.Core.Bug.Write("C002", () =>
             {
-                return string.Format("Lock created {0} {1}", this.GetHashCode(), Energy.Core.Bug.CallingMethod(3));
+                return string.Format("Lock created {0} {1}"
+                    , Energy.Base.Hex.IntegerToHex(this.GetHashCode())
+                    , Energy.Core.Bug.CallingMethod(3)
+                    );
             });
         }
     }
