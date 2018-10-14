@@ -62,6 +62,7 @@ namespace Energy.Core
         /// <summary>
         /// Singleton
         /// </summary>
+        [Energy.Attribute.Code.Rename(Target = "Global", Comment = "Change design pattern 'Default' into 'Global'")]
         public static Log Default
         {
             get
