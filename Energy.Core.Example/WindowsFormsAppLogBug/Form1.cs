@@ -24,5 +24,11 @@ namespace WindowsFormsAppLogBug
             Energy.Core.Log logger = new Energy.Core.Log();
             logger.Maximum = 10;     
         }
+
+        private void buttonAddMessage_Click(object sender, EventArgs e)
+        {
+            Energy.Core.Log.Default
+            textBoxMessage.Text
+        }
     }
 }
