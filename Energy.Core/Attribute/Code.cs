@@ -9,6 +9,41 @@ namespace Energy.Attribute
     /// </summary>
     public class Code
     {
+        #region Abstract
+
+        public abstract class CodeAttribute : System.Attribute
+        {
+            private string help;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Help { get { return help; } set { help = value; } }
+
+            private string description;
+
+            /// <summary>
+            /// Description text
+            /// </summary>
+            public string Description { get { return description; } set { description = value; } }
+
+            private string comment;
+
+            /// <summary>
+            /// Help text
+            /// </summary>
+            public string Comment { get { return comment; } set { comment = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public CodeAttribute()
+            {
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Code is temporary here and should be moved to another location
         /// </summary>
@@ -642,6 +677,45 @@ namespace Energy.Attribute
                 : this(description)
             {
                 this.help = help;
+            }
+        }
+
+        /// <summary>
+        /// Should be renamed
+        /// </summary>
+        public class RenameAttribute : CodeAttribute
+        {
+            private string target;
+
+            /// <summary>
+            /// Target name
+            /// </summary>
+            public string Target { get { return target; } set { target = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public RenameAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public RenameAttribute(string target, string description)
+                : this()
+            {
+                this.Target = target;
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public RenameAttribute(string target, string description, string help)
+                : this(target, description)
+            {
+                this.Help = help;
             }
         }
     }
