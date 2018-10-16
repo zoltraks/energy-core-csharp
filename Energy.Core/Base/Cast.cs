@@ -81,14 +81,7 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static int AsInteger(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return 0;
-            string stringValue = "";
-            if (value is string)
-                stringValue = (string)value;
-            else
-                stringValue = value.ToString();
-            return Energy.Base.Cast.StringToInteger((string)value);
+            return Energy.Base.Cast.ObjectToInteger(value);
         }
 
         #endregion
@@ -1668,31 +1661,29 @@ namespace Energy.Base
             if (value == null)
                 return 0;
 
-            if (value is long)
+            if (value is long || value is long?)
                 return (int)(long)value;
-            if (value is int)
-                return (int)(int)value;
-            if (value is double)
-                return (int)(double)value;
-            if (value is uint)
-                return (int)(uint)value;
-            if (value is ulong)
+            if (value is ulong || value is ulong?)
                 return (int)(ulong)value;
-            if (value is decimal)
+            if (value is int || value is int?)
+                return (int)(int)value;
+            if (value is uint || value is uint?)
+                return (int)(uint)value;
+            if (value is double || value is double?)
+                return (int)(double)value;
+            if (value is float || value is float?)
+                return (int)(float)value;
+            if (value is decimal || value is decimal?)
                 return (int)(decimal)value;
-
-            if (value is Int16)
-                return (int)(Int16)value;
-            if (value is UInt16)
-                return (int)(UInt16)value;
-
-            if (value is short)
+            if (value is short || value is short?)
                 return (int)(short)value;
-            if (value is ushort)
+            if (value is ushort || value is ushort?)
                 return (int)(ushort)value;
-            if (value is byte)
+            if (value is byte || value is byte?)
                 return (int)(byte)value;
-            if (value is char)
+            if (value is sbyte || value is sbyte?)
+                return (int)(sbyte)value;
+            if (value is char || value is char?)
                 return (int)(char)value;
 
             string s = null;
@@ -1714,29 +1705,29 @@ namespace Energy.Base
             if (value == null)
                 return 0;
 
-            if (value is System.Int64)
-                return (long)(System.Int64)value;
-            if (value is System.Int32)
-                return (long)(System.Int32)value;
-            if (value is double)
+            if (value is long || value is long?)
+                return (long)(long)value;
+            if (value is ulong || value is ulong?)
+                return (long)(ulong)value;
+            if (value is int || value is int?)
+                return (long)(int)value;
+            if (value is uint || value is uint?)
+                return (long)(uint)value;
+            if (value is double || value is double?)
                 return (long)(double)value;
-            if (value is float)
+            if (value is float || value is float?)
                 return (long)(float)value;
-            if (value is System.UInt32)
-                return (long)(System.UInt32)value;
-            if (value is System.UInt64)
-                return (long)(System.UInt64)value;
-            if (value is decimal)
+            if (value is decimal || value is decimal?)
                 return (long)(decimal)value;
-
-            if (value is Int16)
-                return (long)(Int16)value;
-            if (value is UInt16)
-                return (long)(UInt16)value;
-
-            if (value is byte)
+            if (value is short || value is short?)
+                return (long)(short)value;
+            if (value is ushort || value is ushort?)
+                return (long)(ushort)value;
+            if (value is byte || value is byte?)
                 return (long)(byte)value;
-            if (value is char)
+            if (value is sbyte || value is sbyte?)
+                return (long)(sbyte)value;
+            if (value is char || value is char?)
                 return (long)(char)value;
 
             string s = null;

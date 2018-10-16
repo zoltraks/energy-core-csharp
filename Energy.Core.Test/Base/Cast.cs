@@ -48,6 +48,24 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void CastObjectToInteger()
+        {
+            object source;
+            int result;
+            int expect;
+            int? someNullable = null;
+            source = someNullable;
+            expect = 0;
+            result = Energy.Base.Cast.AsInteger(source);
+            Assert.AreEqual(expect, result);
+            someNullable = 1;
+            source = someNullable;
+            expect = 1;
+            result = Energy.Base.Cast.AsInteger(source);
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
         public void CastStringToDoubleSmart()
         {
             string str1 = "15,001_002";
