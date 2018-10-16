@@ -464,13 +464,29 @@ namespace Energy.Base
         private static readonly string[] _NewLine = new string[] { "\r\n", "\n", "\r" };
 
         /// <summary>
-        /// Split string to array by new line characters. Elements will not include new line itself.
+        /// Split string to array by new line characters.
+        /// Elements will not include new line itself.
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
         public static string[] SplitNewLine(string content)
         {
             return content.Split(_NewLine, StringSplitOptions.None);
+        }
+
+        /// <summary>
+        /// Split string to array by new line characters.
+        /// Elements will not include new line itself.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="removeEmptyEntries"></param>
+        /// <returns></returns>
+        public static string[] SplitNewLine(string content, bool removeEmptyEntries)
+        {
+            string[] split = content.Split(_NewLine
+                , removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
+                );
+            return split;
         }
 
         public static string[] Split(string input)
