@@ -8,6 +8,8 @@ namespace Energy.Base
 {
     public class Class
     {
+        #region Static utility functions
+
         #region GetDefault
 
         public static object GetDefault(Type type)
@@ -22,6 +24,8 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region GetFieldsAndProperties
 
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
@@ -75,6 +79,10 @@ namespace Energy.Base
         {
             return GetFieldsAndProperties(type, includePrivate, true);
         }
+
+        #endregion
+
+        #region GetFieldOrPropertyAttribute...
 
         /// <summary>
         /// Get attribute for a field or property of desired class.
@@ -217,6 +225,10 @@ namespace Energy.Base
             return GetFieldOrPropertyAttributes(type, field, filter, true, false);
         }
 
+        #endregion
+
+        #region FindFieldInfo / FindPropertyInfo
+
         /// <summary>
         /// Find field in a class optionally including private or return null if field was not found.
         /// </summary>
@@ -263,6 +275,10 @@ namespace Energy.Base
             }
             return null;
         }
+
+        #endregion
+
+        #region GetFieldValue / GetPropertyValue / GetFieldOrPropertyValue
 
         /// <summary>
         /// Get field value of object.
@@ -351,6 +367,10 @@ namespace Energy.Base
             return GetFieldOrPropertyValue(o, name, true, false);
         }
 
+        #endregion
+
+        #region ObjectToStringArray
+
         /// <summary>
         /// Represent values of fields and properties of object as string array.
         /// If names should be included, array will be returned as a set of key and value pairs
@@ -384,6 +404,10 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        #endregion
+
+        #region GetClassAttribute
+
         /// <summary>
         /// Get desired attribute for a class or null if not found.
         /// </summary>
@@ -404,6 +428,9 @@ namespace Energy.Base
             return null;
         }
 
+        #endregion
+
+        #region GetValueWithAttribute / GetValuesWithAttribute
         /// <summary>
         /// Get value of a first field or property of object with custom attribute.
         /// </summary>
@@ -468,6 +495,10 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        #endregion
+
+        #region GetObjectsOfType
+
         /// <summary>
         /// Get list of objects of specified type from list.
         /// </summary>
@@ -487,6 +518,10 @@ namespace Energy.Base
             }
             return l;
         }
+
+        #endregion
+
+        #endregion
 
         #region Class information
 
@@ -661,20 +696,139 @@ namespace Energy.Base
         /// </summary>
         public class Repository
         {
+            #region Private
+
+            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
             private Dictionary<System.Type, Energy.Base.Class.Information> _Information;
-            /// <summary>Information</summary>
+
+            #endregion
+
+            #region Property
+
             public Dictionary<System.Type, Energy.Base.Class.Information> Information { get { return _Information; } set { _Information = value; } }
+
+            public Energy.Base.Class.Information this[System.Type type]
+            {
+                get
+                {
+                    return Get(type);
+                }
+            }
+
+            #endregion
+
+            #region Constructor
 
             public Repository()
             {
                 _Information = new Dictionary<System.Type, Energy.Base.Class.Information>();
             }
 
-            public void Scan(System.Type type)
+            #endregion
+
+            #region Global
+
+            private static Repository _Global;
+
+            private static readonly Energy.Base.Lock _GlobalLock = new Energy.Base.Lock();
+
+            /// <summary>Global</summary>
+            public static Repository Global
             {
-                Energy.Base.Class.Information information = Energy.Base.Class.Information.Create(type);
-                _Information[type] = information;
+                get
+                {
+                    if (_Global == null)
+                    {
+                        lock (_GlobalLock)
+                        {
+                            if (_Global == null)
+                            {
+                                _Global = new Repository();
+                            }
+                        }
+                    }
+                    return _Global;
+                }
             }
+
+            #endregion
+
+            #region Scan
+
+            /// <summary>
+            /// Scan type and store information in a repository.
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns>Returns information object</returns>
+            public Energy.Base.Class.Information Scan(System.Type type)
+            {
+                lock (_Lock)
+                {
+                    Energy.Base.Class.Information information = Energy.Base.Class.Information.Create(type);
+                    _Information[type] = information;
+                    return information;
+                }
+            }
+
+            /// <summary>
+            /// Scan types and store information in a repository.
+            /// </summary>
+            /// <param name="types"></param>
+            /// <returns></returns>
+            public Energy.Base.Class.Information[] Scan(System.Type[] types)
+            {
+                List<Energy.Base.Class.Information> list = new List<Energy.Base.Class.Information>();
+                Dictionary<Energy.Base.Class.Information, System.Type> map = new Dictionary<Energy.Base.Class.Information, System.Type>();
+                for (int i = 0; i < types.Length; i++)
+                {
+                    System.Type type = types[i];
+                    Energy.Base.Class.Information information = Energy.Base.Class.Information.Create(type);
+                    list.Add(information);
+                    map[information] = type;
+                }
+                lock (_Lock)
+                {
+                    foreach (KeyValuePair<Energy.Base.Class.Information, System.Type> e in map)
+                    {
+                        Energy.Base.Class.Information information = e.Key;
+                        System.Type type = e.Value;
+                        _Information[type] = information;
+                    }
+                }
+                return list.ToArray();
+            }
+
+            /// <summary>
+            /// Scan types from assembly and store information in a repository.
+            /// </summary>
+            /// <param name="assembly"></param>
+            /// <returns></returns>
+            public Energy.Base.Class.Information[] Scan(Assembly assembly)
+            {
+                return Scan(assembly.GetTypes());
+            }
+
+            #endregion
+
+            #region Get
+
+            /// <summary>
+            ///
+            /// </summary>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            public Energy.Base.Class.Information Get(System.Type type)
+            {
+                lock (_Information)
+                {
+                    if (_Information.ContainsKey(type))
+                        return _Information[type];
+                }
+                return Scan(type);
+            }
+
+            #endregion
         }
 
         #endregion
