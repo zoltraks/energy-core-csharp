@@ -431,6 +431,7 @@ namespace Energy.Base
         #endregion
 
         #region GetValueWithAttribute / GetValuesWithAttribute
+
         /// <summary>
         /// Get value of a first field or property of object with custom attribute.
         /// </summary>
