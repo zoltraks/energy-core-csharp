@@ -150,7 +150,7 @@ namespace Energy.Core.Test.Base
             string s5 = "=";
             Assert.AreEqual(null, Energy.Base.Cast.Base64ToString(s5));
             // wrong much more with valid BASE64 but invalid UTF-8
-            byte[] b1 = new byte[] { 0xfe , 0xff, 0xff, 0xf0, 0x90, 0xbc };
+            byte[] b1 = new byte[] { 0xfe, 0xff, 0xff, 0xf0, 0x90, 0xbc };
             string s6 = Convert.ToBase64String(b1);
             string s7 = Energy.Base.Cast.Base64ToString(s6);
             byte[] b2 = System.Text.Encoding.Unicode.GetBytes(s7);
@@ -191,6 +191,15 @@ namespace Energy.Core.Test.Base
             byte[] b2 = Energy.Base.Cast.Base64ToByteArray("//8=");
             int c1 = Energy.Base.ByteArrayBuilder.Compare(b1, b2);
             Assert.AreEqual(0, c1);
+        }
+
+        [TestMethod]
+        public void As()
+        {
+            object test = "123.456";
+            Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
+            Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
+            Assert.AreEqual((char)123, Energy.Base.Cast.As<char>(test));
         }
     }
 }

@@ -33,6 +33,8 @@ namespace Energy.Base
 
             if (r == typeof(string))
                 return (T)(object)(ObjectToString(value));
+            if (r == typeof(byte))
+                return (T)(object)(ObjectToByte(value));
 
             return default(T);
         }
@@ -933,10 +935,21 @@ namespace Energy.Base
             if (byte.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (byte.TryParse(value, out result))
-                return result;
+            if (trim.Length != value.Length)
+            {
+                if (byte.TryParse(value, out result))
+                    return result;
+            }
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            decimal number = 0;
+            if (decimal.TryParse(value, out number))
+            {
+                if (number < byte.MinValue || number > byte.MaxValue)
+                    return 0;
+                else
+                    return (byte)number;
+            }
             return 0;
         }
 
@@ -1231,7 +1244,7 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
         {
             int truncate = (int)seconds;
             double fractional = seconds - truncate;
@@ -1276,9 +1289,9 @@ namespace Energy.Base
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
         }
 
         /// <summary>
@@ -1287,9 +1300,9 @@ namespace Energy.Base
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMilliseconds, true, true);
         }
 
         /// <summary>
@@ -1297,9 +1310,9 @@ namespace Energy.Base
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds)
+        public static string TimeSpanToStringMilliseconds(double seconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, true, true, true);
         }
 
         /// <summary>
@@ -1310,10 +1323,10 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
         }
 
         /// <summary>
@@ -1323,10 +1336,10 @@ namespace Energy.Base
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
         }
 
         /// <summary>
@@ -1335,10 +1348,10 @@ namespace Energy.Base
         /// <param name="timeSpan">TimeSpan object</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, true, true);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, true, true);
         }
 
         /// <summary>
@@ -1346,10 +1359,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="timeSpan">TimeSpan object</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, true, true, true);
+            return TimeSpanToStringMilliseconds(seconds, true, true, true);
         }
 
         /// <summary>
@@ -1360,7 +1373,7 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
             int truncate = (int)seconds;
             double fractional = seconds - truncate;
@@ -1405,9 +1418,9 @@ namespace Energy.Base
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
         }
 
         /// <summary>
@@ -1416,9 +1429,9 @@ namespace Energy.Base
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, true, true);
         }
 
         /// <summary>
@@ -1426,9 +1439,9 @@ namespace Energy.Base
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds)
+        public static string TimeSpanToStringMicroseconds(double seconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, true, true, true);
         }
 
         /// <summary>
@@ -1439,10 +1452,10 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
         }
 
         /// <summary>
@@ -1452,10 +1465,10 @@ namespace Energy.Base
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
         }
 
         /// <summary>
@@ -1464,10 +1477,10 @@ namespace Energy.Base
         /// <param name="timeSpan">TimeSpan object</param>
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, true, true);
         }
 
         /// <summary>
@@ -1475,10 +1488,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="timeSpan">TimeSpan object</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, true, true, true);
         }
 
         #endregion
@@ -1614,37 +1627,14 @@ namespace Energy.Base
 
         /// <summary>
         /// Represent object as string by using conversions or ToString() method.
-        /// Returns empty string ("") if object is null or represents nonexisting value.
         /// </summary>
         /// <param name="value">Object instance</param>
         /// <returns>String representation</returns>
         public static string ObjectToString(object value)
         {
-            return ObjectToString(value, "");
-        }
-
-        /// <summary>
-        /// Represent object as string by using conversions or ToString() method.
-        /// </summary>
-        /// <param name="value">Object instance</param>
-        /// <param name="emptyIfNull">Return empty string ("") if object is null or represents nonexisting value</param>
-        /// <returns>String representation</returns>
-        public static string ObjectToString(object value, bool emptyIfNull)
-        {
-            return ObjectToString(value, emptyIfNull ? "" : null);
-        }
-
-        /// <summary>
-        /// Represent object as string by using conversions or ToString() method.
-        /// </summary>
-        /// <param name="value">Object instance</param>
-        /// <param name="nullString">Value to be returned if object is null or represents nonexisting value</param>
-        /// <returns>String representation</returns>
-        public static string ObjectToString(object value, string nullString)
-        {
             // treat DBNull as empty string //
             if (value == null || value == System.DBNull.Value)
-                return nullString;
+                return null;
             // maybe it is already string? //
             if (value is string)
                 return (string)value;
@@ -1661,6 +1651,10 @@ namespace Energy.Base
             // works with nullable version DateTime? //
             if (value is DateTime)
             {
+                if ((DateTime)value == DateTime.MinValue)
+                {
+                    return null;
+                }
                 if (((DateTime)value).Date == DateTime.MinValue.Date)
                 {
                     return ((DateTime)value).ToString("HH:mm:ss");
@@ -1669,7 +1663,15 @@ namespace Energy.Base
                 {
                     return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.fff");
                 }
-                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                else
+                {
+                    return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                }
+            }
+            // works with nullable version TimeSpan? //
+            if (value is TimeSpan)
+            {
+                return TimeSpanToStringMilliseconds((TimeSpan)value, true, true, true);
             }
             // return default string representation //
             return value.ToString();
@@ -1725,6 +1727,57 @@ namespace Energy.Base
             string s = value is string ? (string)value : value.ToString();
 
             return StringToInteger(s);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int ObjectToByte(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is byte)
+                return (byte)(byte)value;
+            if (value is char)
+                return (byte)(char)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (byte)(Int16)value;
+                if (value is Int32)
+                    return (byte)(Int32)value;
+                if (value is Int64)
+                    return (byte)(Int64)value;
+                if (value is UInt16)
+                    return (byte)(UInt16)value;
+                if (value is UInt32)
+                    return (byte)(UInt32)value;
+                if (value is UInt64)
+                    return (byte)(UInt64)value;
+                if (value is double)
+                    return (byte)(double)value;
+                if (value is float)
+                    return (byte)(float)value;
+                if (value is decimal)
+                    return (byte)(decimal)value;
+                if (value is sbyte)
+                    return (byte)(sbyte)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToByte(s);
         }
 
         /// <summary>
@@ -1911,22 +1964,6 @@ namespace Energy.Base
                 return (decimal)d;
 
             return 0;
-        }
-
-        /// <summary>
-        /// Convert object to unsigned byte.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static byte ObjectToByte(object value)
-        {
-            if (value == null)
-                return (byte)0;
-            if (value is byte)
-                return (byte)value;
-            if (value is string)
-                return StringToByte((string)value);
-            return (byte)(ObjectToInteger(value) % 256);
         }
 
         public static DateTime ObjectToDateTime(object value)
