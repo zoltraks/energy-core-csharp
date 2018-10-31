@@ -459,6 +459,7 @@ namespace Energy.Base
         /// Convert string to integer value without exception.
         /// Allows to convert floating point values resulting in decimal part.
         /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
@@ -505,11 +506,15 @@ namespace Energy.Base
         /// <returns></returns>
         public static short IntegerToShort(int value)
         {
+            if (value < short.MinValue || value > short.MaxValue)
+                return 0;
             return (short)value;
         }
 
         public static byte IntegerToByte(int value)
         {
+            if (value < byte.MinValue || value > byte.MaxValue)
+                return 0;
             return (byte)value;
         }
 
@@ -1671,7 +1676,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to integer number.
+        /// Convert string to integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
         /// Returns zero on overflow.
         /// </summary>
         /// <param name="value"></param>
