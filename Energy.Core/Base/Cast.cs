@@ -273,10 +273,12 @@ namespace Energy.Base
 
         #endregion
 
-        #region Class
+        #region RemoveNumericalDifferences
 
         /// <summary>
         /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -455,6 +457,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
@@ -476,14 +480,10 @@ namespace Energy.Base
             decimal number = 0;
             if (decimal.TryParse(value, out number))
             {
-                try
-                {
-                    return (int)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < int.MinValue || number > int.MaxValue)
                     return 0;
-                }
+                else
+                    return (int)number;
             }
             return 0;
         }
@@ -668,7 +668,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to decimal value without exception.
-        /// Treat comma character as dot
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>decimal</returns>
@@ -685,6 +685,14 @@ namespace Energy.Base
             return 0;
         }
 
+        /// <summary>
+        /// Convert string to decimal value without exception.
+        /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static decimal StringToDecimalSmart(string value)
         {
             return StringToDecimal(RemoveNumericalDifferences(value));
@@ -696,14 +704,17 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to double value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>double</returns>
         public static double StringToDouble(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (value == null)
                 return 0;
             value = Energy.Base.Text.Trim(value);
+            if (value.Length == 0)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             double result = 0;
@@ -713,6 +724,14 @@ namespace Energy.Base
             return result;
         }
 
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double StringToDoubleSmart(string value)
         {
             return StringToDouble(RemoveNumericalDifferences(value));
@@ -1653,6 +1672,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert object to integer number.
+        /// Returns zero on overflow.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -1661,36 +1681,41 @@ namespace Energy.Base
             if (value == null)
                 return 0;
 
-            if (value is long || value is long?)
-                return (int)(long)value;
-            if (value is ulong || value is ulong?)
-                return (int)(ulong)value;
-            if (value is int || value is int?)
-                return (int)(int)value;
-            if (value is uint || value is uint?)
-                return (int)(uint)value;
-            if (value is double || value is double?)
-                return (int)(double)value;
-            if (value is float || value is float?)
-                return (int)(float)value;
-            if (value is decimal || value is decimal?)
-                return (int)(decimal)value;
-            if (value is short || value is short?)
-                return (int)(short)value;
-            if (value is ushort || value is ushort?)
-                return (int)(ushort)value;
-            if (value is byte || value is byte?)
+            if (value is Int16)
+                return (int)(Int16)value;
+            if (value is Int32)
+                return (int)(Int32)value;
+            if (value is Int64)
+                return (int)(Int64)value;
+            if (value is UInt16)
+                return (int)(UInt16)value;
+
+            try
+            {
+                if (value is UInt32)
+                    return (int)(UInt32)value;
+                if (value is UInt64)
+                    return (int)(UInt64)value;
+                if (value is double)
+                    return (int)(double)value;
+                if (value is float)
+                    return (int)(float)value;
+                if (value is decimal)
+                    return (int)(decimal)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is byte)
                 return (int)(byte)value;
-            if (value is sbyte || value is sbyte?)
+            if (value is sbyte)
                 return (int)(sbyte)value;
-            if (value is char || value is char?)
+            if (value is char)
                 return (int)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
+            string s = value is string ? (string)value : value.ToString();
 
             return StringToInteger(s);
         }
@@ -1786,25 +1811,26 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to double number.
+        /// Convert object to decimal value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static double ObjectToDouble(object value)
         {
-            if (value == null)
+            if (value == null || value == System.DBNull.Value)
                 return 0;
 
-            if (value is long)
-                return (double)(long)value;
-            if (value is int)
-                return (double)(int)value;
+            if (value is Int64)
+                return (double)(Int64)value;
+            if (value is Int32)
+                return (double)(Int32)value;
             if (value is double)
                 return (double)(double)value;
-            if (value is uint)
-                return (double)(uint)value;
-            if (value is ulong)
-                return (double)(ulong)value;
+            if (value is UInt32)
+                return (double)(UInt32)value;
+            if (value is UInt64)
+                return (double)(UInt64)value;
             if (value is decimal)
                 return (double)(decimal)value;
 
@@ -1813,31 +1839,16 @@ namespace Energy.Base
             if (value is UInt16)
                 return (double)(UInt16)value;
 
-            if (value is short)
-                return (double)(short)value;
-            if (value is ushort)
-                return (double)(ushort)value;
             if (value is byte)
                 return (double)(byte)value;
+            if (value is sbyte)
+                return (double)(sbyte)value;
             if (value is char)
                 return (long)(char)value;
 
             string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (s == null || s.Length == 0)
-                return 0;
 
-            long l = 0;
-            double d = 0;
-
-            if (long.TryParse(s, out l))
-                return (double)l;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (long)d;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (long)d;
-
-            return 0;
+            return StringToDouble(s);
         }
 
         /// <summary>

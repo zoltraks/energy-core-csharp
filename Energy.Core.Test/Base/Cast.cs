@@ -13,12 +13,41 @@ namespace Energy.Core.Test.Base
             string str1 = "15,001";
             double num1 = Energy.Base.Cast.StringToDouble(str1);
             Assert.AreEqual(15.001, num1);
+            num1 = Energy.Base.Cast.ObjectToDouble(str1);
+            Assert.AreEqual(15.001, num1);
             string str2 = " 15.000000001 ";
             double num2 = Energy.Base.Cast.StringToDouble(str2);
+            Assert.AreEqual(15.000000001, num2);
+            num2 = Energy.Base.Cast.ObjectToDouble(str2);
             Assert.AreEqual(15.000000001, num2);
             string str3 = " -1,234 ";
             double num3 = Energy.Base.Cast.StringToDouble(str3);
             Assert.AreEqual(-1.234, num3);
+            num3 = Energy.Base.Cast.ObjectToDouble(str3);
+            Assert.AreEqual(-1.234, num3);
+        }
+
+        [TestMethod]
+        public void CastObjectToDouble()
+        {
+            string s;
+            object o;
+            double n, x;
+            byte? bn;
+            s = " 15,001 ";
+            o = s;
+            x = 15.001;
+            n = Energy.Base.Cast.ObjectToDouble(o);
+            Assert.AreEqual(x, n);
+            bn = 255;
+            o = bn;
+            x = 255;
+            n = Energy.Base.Cast.ObjectToDouble(o);
+            Assert.AreEqual(x, n);
+            o = System.DBNull.Value;
+            x = 0;
+            n = Energy.Base.Cast.ObjectToDouble(o);
+            Assert.AreEqual(x, n);
         }
 
         [TestMethod]
@@ -47,6 +76,12 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, num7);
         }
 
+        private class ExampleTypeStructure
+        {
+            private Int64? _NInt64;
+            public Int64? NInt64 { get { return _NInt64; } set { _NInt64 = value; } }
+        }
+
         [TestMethod]
         public void CastObjectToInteger()
         {
@@ -62,6 +97,18 @@ namespace Energy.Core.Test.Base
             source = someNullable;
             expect = 1;
             result = Energy.Base.Cast.AsInteger(source);
+            Assert.AreEqual(expect, result);
+            source = "12345678,12345";
+            expect = 12345678;
+            result = Energy.Base.Cast.AsInteger(source);
+            Assert.AreEqual(expect, result);
+            source = 12345678901234567890m;
+            expect = 0;
+            result = Energy.Base.Cast.ObjectToInteger(source);
+            Assert.AreEqual(expect, result);
+            source = "12345678901234567890";
+            expect = 0;
+            result = Energy.Base.Cast.ObjectToInteger(source);
             Assert.AreEqual(expect, result);
         }
 
