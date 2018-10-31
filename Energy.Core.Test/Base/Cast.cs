@@ -199,7 +199,7 @@ namespace Energy.Core.Test.Base
             object test = "123.456";
             Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
             Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
-            Assert.AreEqual((char)123, Energy.Base.Cast.As<char>(test));
+            Assert.AreEqual('1', Energy.Base.Cast.As<char>(test));
         }
     }
 }

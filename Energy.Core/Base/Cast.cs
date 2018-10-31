@@ -25,18 +25,9 @@ namespace Energy.Base
             if (value == null)
                 return default(T);
 
-            Type r = typeof(T);
-            Type t = value.GetType();
+            Type type = typeof(T);
 
-            if (t == r)
-                return (T)value;
-
-            if (r == typeof(string))
-                return (T)(object)(ObjectToString(value));
-            if (r == typeof(byte))
-                return (T)(object)(ObjectToByte(value));
-
-            return default(T);
+            return (T)As(type, value);
         }
 
         /// <summary>
@@ -57,7 +48,13 @@ namespace Energy.Base
                 return value;
 
             if (r == typeof(string))
-                return (object)(ObjectToString(value));
+                return ObjectToString(value);
+            if (r == typeof(byte))
+                return ObjectToByte(value);
+            if (r == typeof(sbyte))
+                return ObjectToSignedByte(value);
+            if (r == typeof(char))
+                return ObjectToChar(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
@@ -955,6 +952,37 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
+        public static sbyte StringToSignedByte(string value)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            sbyte result = 0;
+            if (sbyte.TryParse(value, out result))
+                return result;
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length != value.Length)
+            {
+                if (sbyte.TryParse(value, out result))
+                    return result;
+            }
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            decimal number = 0;
+            if (decimal.TryParse(value, out number))
+            {
+                if (number < sbyte.MinValue || number > sbyte.MaxValue)
+                    return 0;
+                else
+                    return (sbyte)number;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
         /// Allows use of hexadecimal with 0x / 0X and $ characters.
         /// </summary>
         /// <param name="value">String value</param>
@@ -1737,7 +1765,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static int ObjectToByte(object value)
+        public static byte ObjectToByte(object value)
         {
             if (value == null)
                 return 0;
@@ -1780,6 +1808,107 @@ namespace Energy.Base
             return StringToByte(s);
         }
 
+        /// <summary>
+        /// Convert string to signed byte value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static sbyte ObjectToSignedByte(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is sbyte)
+                return (sbyte)(sbyte)value;
+            if (value is char)
+                return (sbyte)(char)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (sbyte)(Int16)value;
+                if (value is Int32)
+                    return (sbyte)(Int32)value;
+                if (value is Int64)
+                    return (sbyte)(Int64)value;
+                if (value is UInt16)
+                    return (sbyte)(UInt16)value;
+                if (value is UInt32)
+                    return (sbyte)(UInt32)value;
+                if (value is UInt64)
+                    return (sbyte)(UInt64)value;
+                if (value is double)
+                    return (sbyte)(double)value;
+                if (value is float)
+                    return (sbyte)(float)value;
+                if (value is decimal)
+                    return (sbyte)(decimal)value;
+                if (value is byte)
+                    return (sbyte)(byte)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToSignedByte(s);
+        }
+
+        /// <summary>
+        /// Convert string to char value without exception.
+        /// Allows to convert floating point values resulting in decimal part for character code.
+        /// For a string return first character.
+        /// Returns '\0' on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static char ObjectToChar(object value)
+        {
+            if (value == null)
+                return '\0';
+
+            if (value is char)
+                return (char)(char)value;
+            if (value is byte)
+                return (char)(byte)value;
+            if (value is sbyte)
+                return (char)(sbyte)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (char)(Int16)value;
+                if (value is Int32)
+                    return (char)(Int32)value;
+                if (value is Int64)
+                    return (char)(Int64)value;
+                if (value is UInt16)
+                    return (char)(UInt16)value;
+                if (value is UInt32)
+                    return (char)(UInt32)value;
+                if (value is UInt64)
+                    return (char)(UInt64)value;
+                if (value is double)
+                    return (char)(double)value;
+                if (value is float)
+                    return (char)(float)value;
+                if (value is decimal)
+                    return (char)(decimal)value;
+            }
+            catch (OverflowException)
+            {
+                return '\0';
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToChar(s);
+        }
         /// <summary>
         /// Convert object to long integer number.
         /// </summary>
