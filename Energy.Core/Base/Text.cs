@@ -1242,7 +1242,7 @@ namespace Energy.Base
             words[0] = words[0].ToLowerInvariant();
             for (int i = 1; i < words.Length; i++)
             {
-                    words[i] = UpperFirst(words[i]);
+                words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
         }
@@ -1976,6 +1976,58 @@ namespace Energy.Base
             }
             string cut = text.Substring(a, b);
             return cut.Replace(escape + with, with);
+        }
+
+        #endregion
+
+        #region InArray
+
+        /// <summary>
+        /// Check if string element is a part of string array.
+        /// If array is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="element"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string element, bool ignoreCase)
+        {
+            if (array == null || array.Length == 0)
+                return false;
+            if (element == null)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array[i] == null)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (0 == string.Compare(array[i], element, ignoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if string element is a part of string array.
+        /// If array is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string element)
+        {
+            return InArray(array, element, false);
         }
 
         #endregion
