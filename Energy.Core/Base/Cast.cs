@@ -55,6 +55,12 @@ namespace Energy.Base
                 return ObjectToSignedByte(value);
             if (r == typeof(char))
                 return ObjectToChar(value);
+            if (r == typeof(float))
+                return ObjectToFloat(value);
+            if (r == typeof(double))
+                return ObjectToDouble(value);
+            if (r == typeof(decimal))
+                return ObjectToDecimal(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
@@ -109,7 +115,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Decimal
+        #region AsDecimal
 
         /// <summary>
         /// Convert string to decimal value without exception.
@@ -130,7 +136,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Double
+        #region AsDouble
 
         /// <summary>
         /// Convert string to double value without exception.
@@ -139,14 +145,41 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static double AsDouble(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return 0;
-            string stringValue = "";
-            if (value is string)
-                stringValue = (string)value;
-            else
-                stringValue = value.ToString();
-            return StringToDouble((string)value);
+            return ObjectToDouble(value);
+        }
+
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsDouble(string value)
+        {
+            return StringToDouble(value);
+        }
+
+        #endregion
+
+        #region AsFloat
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsFloat(object value)
+        {
+            return ObjectToFloat(value);
+        }
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsFloat(string value)
+        {
+            return StringToFloat(value);
         }
 
         #endregion
@@ -722,10 +755,16 @@ namespace Energy.Base
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             double result = 0;
-            double.TryParse(value, System.Globalization.NumberStyles.Float
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
-                , out result);
-            return result;
+                , out result))
+            {
+                return 0;
+            }
+            else
+            {
+                return result;
+            }
         }
 
         /// <summary>
@@ -836,20 +875,24 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static float StringToFloat(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            if (value == null)
                 return 0;
-            float result = 0;
             value = Energy.Base.Text.Trim(value);
+            if (value.Length == 0)
+                return 0;
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            float result = 0;
             if (!float.TryParse(value, System.Globalization.NumberStyles.Float
                 , System.Globalization.CultureInfo.InvariantCulture
                 , out result))
             {
-                float.TryParse(value, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture
-                    , out result);
+                return 0;
             }
-
-            return result;
+            else
+            {
+                return result;
+            }
         }
 
         /// <summary>
@@ -2000,7 +2043,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to decimal value without exception.
+        /// Convert object to double value without exception.
         /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value"></param>
@@ -2041,6 +2084,21 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert object to float value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static float ObjectToFloat(object value)
+        {
+            double x = ObjectToDouble(value);
+            if (x < float.MinValue || x > float.MaxValue)
+                return 0;
+            else
+                return (float)x;
+        }
+
+        /// <summary>
         /// Convert object to double number.
         /// </summary>
         /// <param name="value"></param>
@@ -2078,21 +2136,8 @@ namespace Energy.Base
                 return (decimal)(char)value;
 
             string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (s == null || s.Length == 0)
-                return 0;
 
-            long l = 0;
-            decimal d = 0;
-
-            if (long.TryParse(s, out l))
-                return (decimal)l;
-            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (decimal)d;
-            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (decimal)d;
-
-            return 0;
+            return StringToDecimal(s);
         }
 
         public static DateTime ObjectToDateTime(object value)

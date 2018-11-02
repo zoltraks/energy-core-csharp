@@ -196,10 +196,15 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void As()
         {
-            object test = "123.456";
-            Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
-            Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
-            Assert.AreEqual('1', Energy.Base.Cast.As<char>(test));
+            foreach (object test in new object[] { "123.456", "123,456 " })
+            {
+                Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
+                Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
+                Assert.AreEqual('1', Energy.Base.Cast.As<char>(test));
+                Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(test));
+                Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(test));
+                Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(test));
+            }
         }
     }
 }
