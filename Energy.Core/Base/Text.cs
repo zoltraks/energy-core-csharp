@@ -929,6 +929,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region RemoveEmptyLines
+
         /// <summary>
         /// Remove empty lines from string.
         /// </summary>
@@ -946,6 +948,10 @@ namespace Energy.Base
                 result += Energy.Base.Text.NL;
             return result;
         }
+
+        #endregion
+
+        #region EscapeExpression
 
         private static string[] _EscapeExpressionStringArray;
 
@@ -1016,6 +1022,8 @@ namespace Energy.Base
             }
             return s == null ? text : s.ToString();
         }
+
+        #endregion
 
         #region Random
 
