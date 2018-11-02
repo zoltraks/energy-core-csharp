@@ -202,5 +202,37 @@ namespace Energy.Core.Test.Base
             text3 = q + text1;
             Assert.AreEqual(text3, text2);
         }
+
+        [TestMethod]
+        public void TextMiddleString()
+        {
+            string p0 = "";
+            string p1 = "#";
+            string p2 = "{}";
+            string p3 = "{#}";
+            string p4 = "<<>>";
+            string p5 = "xxyzz";
+
+            Assert.AreEqual('\0', Energy.Base.Text.GetMiddleStringPatternChar(p0));
+            Assert.AreEqual('#', Energy.Base.Text.GetMiddleStringPatternChar(p1));
+            Assert.AreEqual('\0', Energy.Base.Text.GetMiddleStringPatternChar(p2));
+            Assert.AreEqual('#', Energy.Base.Text.GetMiddleStringPatternChar(p3));
+            Assert.AreEqual('\0', Energy.Base.Text.GetMiddleStringPatternChar(p4));
+            Assert.AreEqual('y', Energy.Base.Text.GetMiddleStringPatternChar(p5));
+
+            Assert.AreEqual("", Energy.Base.Text.GetMiddleStringPrefix(p0));
+            Assert.AreEqual("#", Energy.Base.Text.GetMiddleStringPrefix(p1));
+            Assert.AreEqual("{", Energy.Base.Text.GetMiddleStringPrefix(p2));
+            Assert.AreEqual("{", Energy.Base.Text.GetMiddleStringPrefix(p3));
+            Assert.AreEqual("<<", Energy.Base.Text.GetMiddleStringPrefix(p4));
+            Assert.AreEqual("xx", Energy.Base.Text.GetMiddleStringPrefix(p5));
+
+            Assert.AreEqual("", Energy.Base.Text.GetMiddleStringSuffix(p0));
+            Assert.AreEqual("#", Energy.Base.Text.GetMiddleStringSuffix(p1));
+            Assert.AreEqual("}", Energy.Base.Text.GetMiddleStringSuffix(p2));
+            Assert.AreEqual("}", Energy.Base.Text.GetMiddleStringSuffix(p3));
+            Assert.AreEqual(">>", Energy.Base.Text.GetMiddleStringSuffix(p4));
+            Assert.AreEqual("zz", Energy.Base.Text.GetMiddleStringSuffix(p5));
+        }
     }
 }

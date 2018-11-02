@@ -620,7 +620,15 @@ namespace Energy.Base
 
         #endregion
 
-        private static char GetMiddleStringPatternChar(string pattern)
+        #region MiddleString
+
+        /// <summary>
+        /// Get middle character from a pattern string.
+        /// If the length of pattern text is even or empty, function will return an empty character.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static char GetMiddleStringPatternChar(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return '\0';
@@ -639,7 +647,12 @@ namespace Energy.Base
             }
         }
 
-        private static string GetMiddleStringPrefix(string pattern)
+        /// <summary>
+        /// Get left part from a pattern string.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static string GetMiddleStringPrefix(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return pattern;
@@ -659,11 +672,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return character or two characters string from the middle of text.
+        /// Get right part from a pattern string.
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        private static string GetMiddleStringSuffix(string pattern)
+        public static string GetMiddleStringSuffix(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return pattern;
@@ -682,6 +695,8 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #endregion
 
         #region RemoveWhiteSpace
 
