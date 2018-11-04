@@ -235,11 +235,56 @@ namespace Energy.Base
         /// <summary>
         /// Log destination targets list
         /// </summary>
-        public class Destination : Energy.Base.Collection.Array<Target>
+        public class Destination : Energy.Base.Collection.Array<Energy.Base.Log.Target>
         {
             #region Constructor
 
             public Destination() { }
+
+            #endregion
+
+            #region Accessor
+
+            public Energy.Base.Log.Target this[Type target]
+            {
+                get
+                {
+                    return GetFirstByType(target);
+                }
+                private set
+                {
+                    SetFirstByType(target, value);
+                }
+            }
+
+            private Target GetFirstByType(Type type)
+            {
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (this[i].GetType() == type)
+                        return this[i];
+                }
+                object a = Activator.CreateInstance(type);
+                Energy.Base.Log.Target target = a as Energy.Base.Log.Target;
+                if (target == null)
+                    return null;
+                else
+                    this.Add(target);
+                return target;
+            }
+
+            private void SetFirstByType(Type type, Target target)
+            {
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (this[i].GetType() == type)
+                    {
+                        this[i] = target;
+                        return;
+                    }
+                }
+                this.Add(target);
+            }
 
             #endregion
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -12,6 +13,50 @@ namespace Energy.Core
     /// </summary>
     public partial class Log
     {
+        #region Lock
+
+        #endregion
+
+        #region Setup
+
+        /// <summary>
+        /// Make default log setup
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="console"></param>
+        /// <param name="eventHandler"></param>
+        public bool Setup(string file, bool console, EventHandler eventHandler)
+        {
+            if (console)
+            {
+                Energy.Core.Log.Target.Console consoleTarget = new Energy.Core.Log.Target.Console()
+                {
+                    Immediate = true,
+                    Background = true,
+                };
+                this.Destination.Add(consoleTarget);
+            }
+            if (!string.IsNullOrEmpty(file))
+            {
+                Energy.Core.Log.Target.File fileTarget = new Energy.Core.Log.Target.File() {
+                    Path = file,
+                    Immediate = true,
+                };
+                this.Destination.Add(fileTarget);
+            }
+            if (eventHandler != null)
+            {
+                Energy.Core.Log.Target.Event eventTarget = new Energy.Core.Log.Target.Event(eventHandler)
+                {
+                    Immediate = true,
+                };
+                this.Destination.Add(eventTarget);
+            }
+            return true;
+        }
+
+        #endregion
+
         /// <summary>
         /// Destination
         /// </summary>
@@ -338,7 +383,7 @@ namespace Energy.Core
                 /// <summary>
                 /// File path
                 /// </summary>
-                public string Path;
+                public string Path { get; set; }
 
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
@@ -459,6 +504,62 @@ namespace Energy.Core
             #endregion
 
             #region Event
+
+            public class Event : Energy.Base.Log.Target
+            {
+                public Event(EventHandler eventHandler)
+                {
+                    EventHandler = eventHandler;
+                }
+
+                public EventHandler EventHandler { get; set; }
+
+                private bool WriteUnsafe(Energy.Base.Log.Entry[] log)
+                {
+                    if (log == null)
+                        return false;
+                    if (EventHandler == null)
+                        return true;
+                    for (int i = 0; i < log.Length; i++)
+                    {
+                        Energy.Base.Log.Entry entry = log[i];
+                        if (entry.Store.Contains(this))
+                            continue;
+                        if (Accept(log[i]))
+                        {
+                            try
+                            {
+                                this.EventHandler(log[i], null);
+                            }
+                            catch (Exception exception)
+                            {
+                                Energy.Core.Bug.Write("E0017", exception);
+                                return false;
+                            }
+                        }
+                        entry.Store.Add(this);
+                    }
+                    return true;
+                }
+
+                public override bool Write(Energy.Base.Log.Entry[] log)
+                {
+                    if (!Background)
+                    {
+                        return WriteUnsafe(log);
+                    }
+                    else
+                    {
+                        Thread thread = new Thread(() => { WriteUnsafe(log); })
+                        {
+                            IsBackground = true,
+                            CurrentUICulture = Energy.Core.Application.GetCurrentUICulture(),
+                        };
+                        thread.Start();
+                        return true;
+                    }
+                }
+            }
 
             #endregion
         }

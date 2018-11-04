@@ -48,6 +48,30 @@ namespace Energy.Core
             }
         }
 
+        private static string _ExceptionMessageAppendNameFormat = " ( {0} )";
+
+        private static string ExceptionMessageAppendNameFormat
+        {
+            get
+            {
+                return GetExceptionMessageAppendNameFormat();
+            }
+            set
+            {
+                SetExceptionMessageAppendNameFormat(value);
+            }
+        }
+
+        private static string GetExceptionMessageAppendNameFormat()
+        {
+            return _ExceptionMessageAppendNameFormat;
+        }
+
+        public static void SetExceptionMessageAppendNameFormat(string value)
+        {
+            _ExceptionMessageAppendNameFormat = value;
+        }
+
         #endregion
 
         #region Constructor
@@ -219,6 +243,27 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string ExceptionMessage(Exception exception, bool trace)
         {
+            return GetExceptionMessage(exception, trace);
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>string</returns>
+        public static string ExceptionMessage(Exception exception)
+        {
+            return GetExceptionMessage(exception, (bool)TraceLogging);
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <param name="trace">Include stack trace</param>
+        /// <returns>string</returns>
+        public static string GetExceptionMessage(Exception exception, bool trace)
+        {
             if (exception == null)
             {
                 return "";
@@ -255,14 +300,15 @@ namespace Energy.Core
             return string.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
         }
 
-        /// <summary>
-        /// Return exception message
-        /// </summary>
-        /// <param name="exception">Exception object</param>
-        /// <returns>string</returns>
-        public static string ExceptionMessage(Exception exception)
+        public static string GetExceptionMessage(Exception exception, bool trace, string name)
         {
-            return ExceptionMessage(exception, (bool)TraceLogging);
+            string message = GetExceptionMessage(exception, trace);
+            if (!string.IsNullOrEmpty(name))
+            {
+                string textSuffix = string.Format(ExceptionMessageAppendNameFormat, name);
+                message = new Energy.Base.Text.Editor().AppendAfterFirstLine(message, textSuffix);
+            }
+            return message;
         }
 
         #endregion
@@ -492,7 +538,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Exception exception)
         {
-            Write(ExceptionMessage(exception));
+            Write(GetExceptionMessage(exception, false, exception.GetType().Name));
         }
 
         /// <summary>

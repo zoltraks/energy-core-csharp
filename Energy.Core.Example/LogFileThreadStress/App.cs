@@ -13,18 +13,23 @@ namespace LogFileThreadStress
 
         public bool Run(string[] args)
         {
-            throw new NotImplementedException();
+            Energy.Core.Tilde.Pause();
+            return true;
         }
 
         public bool Setup(string[] args)
         {
+            Energy.Core.Bug.Log = Energy.Core.Log.Default;
+
             Energy.Core.Log.Logger logger = new Energy.Core.Log.Logger();
 
-            string path = Energy.Core.Application.GetExecutionPath(System.Reflection.Assembly.GetExecutingAssembly());
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            string executionPath = Energy.Core.Application.GetExecutionPath(assembly);
+            Energy.Core.Log.Default.Setup(System.IO.Path.ChangeExtension(assembly.Location, ".log"), true, null);
 
             logger.Destination.Add(new Energy.Core.Log.Target.File()
             {
-                Path = path,
+                Path = System.IO.Path.Combine(executionPath, "New.log"),
                 Immediate = true,
                 Background = true,
             });
