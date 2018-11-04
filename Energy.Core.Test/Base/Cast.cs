@@ -332,7 +332,13 @@ namespace Energy.Core.Test.Base
             _double = double.MinValue;
             Assert.AreEqual("-1.7976931348623157E+308", Energy.Base.Cast.DoubleToString(_double));
             Assert.AreEqual("-1.79769E+308", Energy.Base.Cast.DoubleToString(_double, 5, false));
+            // TODO Should be rounded up
             Assert.AreEqual("-1.7976E+308", Energy.Base.Cast.DoubleToString(_double, 4, false));
+            _double = -1.7976931348623157;
+            Assert.AreEqual("-1.7976931348623157", Energy.Base.Cast.DoubleToString(_double));
+            Assert.AreEqual("-1.79769", Energy.Base.Cast.DoubleToString(_double, 5, false));
+            // TODO Should be rounded up
+            Assert.AreEqual("-1.7976", Energy.Base.Cast.DoubleToString(_double, 4, false));
         }
     }
 }
