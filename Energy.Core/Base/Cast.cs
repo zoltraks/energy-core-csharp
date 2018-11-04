@@ -16,6 +16,20 @@ namespace Energy.Base
 
         private const bool BYTE_ALLOW_DECIMAL = true;
 
+        private const NumberStyles DECIMAL_NUMBER_STYLES = NumberStyles.Float;
+
+        private readonly static string DOUBLE_MIN_STRING = double.MinValue.ToString(CultureInfo.InvariantCulture);
+
+        private readonly static string DOUBLE_MAX_STRING = double.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+        private readonly static string DOUBLE_MAX_STRING_PLUS = "+" + DOUBLE_MAX_STRING;
+
+        private readonly static string DECIMAL_MIN_STRING = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
+
+        private readonly static string DECIMAL_MAX_STRING = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+        private readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
+
         #endregion
 
         #region As
@@ -32,7 +46,6 @@ namespace Energy.Base
         {
             if (value == null)
                 return default(T);
-
             Type type = typeof(T);
             return (T)As(type, value);
         }
@@ -933,14 +946,41 @@ namespace Energy.Base
         /// <returns>decimal</returns>
         public static decimal StringToDecimal(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            return StringToDecimal(value, DECIMAL_NUMBER_STYLES);
+        }
+
+        /// <summary>
+        /// Convert string to decimal value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>decimal</returns>
+        public static decimal StringToDecimal(string value, NumberStyles numberStyles)
+        {
+            if (null == value || 0 == value.Length)
                 return 0;
-            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal result = 0;
-            if (decimal.TryParse(value, out result))
+            decimal result;
+            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
                 return result;
+            string trim = Energy.Base.Text.Trim(value);
+            bool hasComma = value.IndexOf(',') >= 0;
+            if (trim.Length == value.Length && !hasComma)
+                return 0;
+            if (hasComma)
+                value = value.Replace(',', '.');
+            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
+                return result;
+            double _double = 0;
+            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out _double))
+            {
+                if (_double < (double)decimal.MinValue)
+                    return decimal.MinValue;
+                if (_double > (double)decimal.MaxValue)
+                    return decimal.MaxValue;
+                else
+                    return 0;
+            }
             return 0;
         }
 
@@ -992,6 +1032,7 @@ namespace Energy.Base
 
         #region Double
 
+
         /// <summary>
         /// Convert string to double value without exception.
         /// Treat comma "," the same as dot "." as decimal point.
@@ -1000,24 +1041,38 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static double StringToDouble(string value)
         {
-            if (value == null)
+            return StringToDouble(value, DECIMAL_NUMBER_STYLES);
+        }
+
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>double</returns>
+        public static double StringToDouble(string value, NumberStyles numberStyles)
+        {
+            if (null == value || 0 == value.Length)
                 return 0;
-            value = Energy.Base.Text.Trim(value);
-            if (value.Length == 0)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            double result = 0;
-            if (!double.TryParse(value, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture
-                , out result))
-            {
-                return 0;
-            }
-            else
-            {
+            double result;
+            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
                 return result;
-            }
+            string trim = Energy.Base.Text.Trim(value);
+            bool hasComma = value.IndexOf(',') >= 0;
+            if (trim.Length == value.Length && !hasComma && value.IndexOf('.') < 0)
+                return 0;
+            if (hasComma)
+                value = value.Replace(',', '.');
+            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
+                return result;
+            if (0 == string.Compare(DOUBLE_MIN_STRING, value, true))
+                return double.MinValue;
+            if (0 == string.Compare(DOUBLE_MAX_STRING, value, true))
+                return double.MaxValue;
+            if (0 == string.Compare(DOUBLE_MAX_STRING_PLUS, value, true))
+                return double.MaxValue;
+            return 0;
         }
 
         /// <summary>
@@ -1128,24 +1183,28 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static float StringToFloat(string value)
         {
-            if (value == null)
-                return 0;
-            value = Energy.Base.Text.Trim(value);
-            if (value.Length == 0)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            float result = 0;
-            if (!float.TryParse(value, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture
-                , out result))
-            {
-                return 0;
-            }
+            double number = StringToDouble(value);
+            if (number < float.MinValue)
+                return float.MinValue;
+            else if (number > float.MaxValue)
+                return float.MaxValue;
             else
-            {
-                return result;
-            }
+                return (float)number;
+        }
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>double</returns>
+        public static float StringToFloat(string value, NumberStyles numberStyles)
+        {
+            double number = StringToDouble(value, numberStyles);
+            if (number < float.MinValue || number > float.MaxValue)
+                return 0;
+            else
+                return (float)number;
         }
 
         /// <summary>
@@ -2535,8 +2594,10 @@ namespace Energy.Base
         public static float ObjectToFloat(object value)
         {
             double x = ObjectToDouble(value);
-            if (x < float.MinValue || x > float.MaxValue)
-                return 0;
+            if (x < float.MinValue)
+                return float.MinValue;
+            else if (x > float.MaxValue)
+                return float.MaxValue;
             else
                 return (float)x;
         }

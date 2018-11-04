@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -263,6 +264,32 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number));
                 Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
                 Assert.AreEqual("#0.", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+
+                // double + decimal + float
+
+                string _double;
+                _double = double.MinValue.ToString(CultureInfo.InvariantCulture);
+                Assert.AreEqual(double.MinValue, Energy.Base.Cast.As<double>(_double));
+                _double = double.MaxValue.ToString(CultureInfo.InvariantCulture);
+                Assert.AreEqual(double.MaxValue, Energy.Base.Cast.As<double>(_double));
+                _double = test as string;
+                Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(_double));
+
+                string _decimal;
+                _decimal = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
+                Assert.AreEqual(decimal.MinValue, Energy.Base.Cast.As<decimal>(_decimal));
+                _decimal = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+                Assert.AreEqual(decimal.MaxValue, Energy.Base.Cast.As<decimal>(_decimal));
+                _decimal = test as string;
+                Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(_decimal));
+
+                string _float;
+                _float = "3.40282347E+38";
+                Assert.AreEqual(float.MaxValue, Energy.Base.Cast.As<float>(_float));
+                _float = "-3.40282347E+38";
+                Assert.AreEqual(float.MinValue, Energy.Base.Cast.As<float>(_float));
+                _float = test as string;
+                Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(_float));
             }
         }
 
