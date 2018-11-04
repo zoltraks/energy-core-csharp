@@ -59,27 +59,6 @@ namespace Energy.Base
             return list.ToArray();
         }
 
-        public static Type GetClassInterface(Type classType, Type interfaceType)
-        {
-            if (classType == interfaceType)
-                return interfaceType;
-            Type[] interfaceTypes = classType.GetInterfaces();
-            for (int i = 0; i < interfaceTypes.Length; i++)
-            {
-                if (interfaceTypes[i] == interfaceType)
-                    return interfaceTypes[i];
-            }
-            return null;
-        }
-
-        public static Type GetClassInterface(Type classType, string interfaceName)
-        {
-            if (classType.Name == interfaceName)
-                return classType;
-            Type type = classType.GetInterface(interfaceName);
-            return type;
-        }
-
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
         /// </summary>
@@ -543,6 +522,71 @@ namespace Energy.Base
 
         #endregion
 
+        #region GetClassInterface
+
+        public static Type GetClassInterface(Type classType, Type interfaceType)
+        {
+            if (classType == interfaceType)
+                return interfaceType;
+            Type[] interfaceTypes = classType.GetInterfaces();
+            for (int i = 0; i < interfaceTypes.Length; i++)
+            {
+                if (interfaceTypes[i] == interfaceType)
+                    return interfaceTypes[i];
+            }
+            return null;
+        }
+
+        public static Type GetClassInterface(Type classType, string interfaceName)
+        {
+            if (classType.Name == interfaceName)
+                return classType;
+            Type type = classType.GetInterface(interfaceName);
+            return type;
+        }
+
+        #endregion
+
+        #region GetTypes
+
+        public delegate bool TypeFilter(Type type);
+
+        public static Type[] GetTypes(Assembly[] assemblies, TypeFilter filter)
+        {
+            if (assemblies == null)
+                return null;
+            if (assemblies.Length == 0)
+                return new Type[] { };
+            List<Type> list = new List<Type>();
+            for (int i = 0; i < assemblies.Length; i++)
+            {
+                Assembly a = assemblies[i];
+                Type[] typeList = a.GetTypes();
+                if (filter == null)
+                {
+                    list.AddRange(typeList);
+                }
+                else
+                {
+                    for (int n = 0; n < typeList.Length; n++)
+                    {
+                        Type type = typeList[n];
+                        if (!filter(type))
+                            continue;
+                        list.Add(type);
+                    }
+                }
+            }
+            return list.ToArray();
+        }
+
+        public static Type[] GetTypes(Assembly[] assemblies)
+        {
+            return GetTypes(assemblies, null);
+        }
+
+        #endregion
+
         #endregion
 
         #region Class information
@@ -550,7 +594,7 @@ namespace Energy.Base
         /// <summary>
         /// Object class information.
         /// </summary>
-        public class Information: List<Information.Field>
+        public class Information : List<Information.Field>
         {
             public Type Type { get; set; }
 
