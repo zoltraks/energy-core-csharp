@@ -28,5 +28,13 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Class.GetDefault<ExampleStruct>();
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void ClassFilter()
+        {
+            Type[] classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
+                , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
+            Assert.IsTrue(classList.Length > 0);
+        }
     }
 }
