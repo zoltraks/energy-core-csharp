@@ -554,6 +554,8 @@ namespace Energy.Base
                     bool allZeroes = true;
                     for (int i = 2; i < value.Length; i++)
                     {
+                        if (value[i] == 'e' || value[i] == 'E')
+                            break;
                         if (value[i] != '0')
                         {
                             allZeroes = false;

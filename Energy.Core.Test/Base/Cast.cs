@@ -264,6 +264,14 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number));
                 Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
                 Assert.AreEqual("#0.", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+                _number = "0.e+12";
+                Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number));
+                Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+                Assert.AreEqual("#0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+                _number = "0.0e+12";
+                Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number));
+                Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+                Assert.AreEqual("#0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
 
                 // double + decimal + float
 
