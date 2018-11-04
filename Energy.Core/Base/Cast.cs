@@ -10,6 +10,14 @@ namespace Energy.Base
     /// </summary>
     public static class Cast
     {
+        #region Constant
+
+        private const bool INTEGER_ALLOW_DECIMAL = true;
+
+        private const bool BYTE_ALLOW_DECIMAL = true;
+
+        #endregion
+
         #region As
 
         #region Generic
@@ -107,7 +115,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static long AsLong(string value)
         {
-            return Energy.Base.Cast.StringToLong(value);
+            return Energy.Base.Cast.StringToLong(value, INTEGER_ALLOW_DECIMAL);
         }
 
         /// <summary>
@@ -492,6 +500,78 @@ namespace Energy.Base
 
         #endregion
 
+        #region Number
+
+        /// <summary>
+        /// Represent number string as prefixed with positive sign and empty on zero.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string NumberToStringSign(string value)
+        {
+            return NumberToStringSign(value, null);
+        }
+
+        /// <summary>
+        /// Represent number string as prefixed with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string NumberToStringSign(string value, string sign)
+        {
+            if (string.IsNullOrEmpty(sign))
+                sign = "+";
+
+            if (string.IsNullOrEmpty(value))
+                value = "0";
+
+            bool isZero = value == "0";
+
+            if (!isZero)
+            {
+                if (value[0] == '0' && value.Length > 1 
+                    && (value[1] == '.' || value[1] == ',')
+                    )
+                {
+                    bool allZeroes = true;
+                    for (int i = 2; i < value.Length; i++)
+                    {
+                        if (value[i] != '0')
+                        {
+                            allZeroes = false;
+                            break;
+                        }
+                    }
+                    if (allZeroes)
+                        isZero = true;
+                }
+            }
+
+            if (isZero)
+            {
+                char signZero = sign.Length <= 2 ? '\0' : sign[2];
+                if (signZero == '\0')
+                    signZero = ' ';
+                return string.Concat(signZero, value);
+            }
+            else if (value.StartsWith("-"))
+            {
+                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
+                if (signNegative == '\0' || signNegative == '-')
+                    return value;
+                else
+                    return string.Concat(signNegative, value.Substring(1));
+            }
+            else
+            {
+                char signPositive = sign[0];
+                return string.Concat(signPositive, value);
+            }
+        }
+
+        #endregion
+
         #region Integer
 
         /// <summary>
@@ -504,6 +584,20 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static int StringToInteger(string value)
         {
+            return StringToInteger(value, true);
+        }
+
+        /// <summary>
+        /// Convert string to integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInteger(string value, bool allowDecimal)
+        {
             if (null == value || 0 == value.Length)
                 return 0;
             int result;
@@ -511,28 +605,33 @@ namespace Energy.Base
                 return result;
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length != value.Length)
-            {
                 if (int.TryParse(value, out result))
                     return result;
-            }
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
                 if (number < int.MinValue || number > int.MaxValue)
                     return 0;
                 else
                     return (int)number;
-            }
             return 0;
         }
 
+        /// <summary>
+        /// Convert string to integer value removing numerical differences without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
         public static int StringToIntegerSmart(string value)
         {
-            return StringToInteger(RemoveNumericalDifferences(value));
+            return StringToInteger(RemoveNumericalDifferences(value), true);
         }
-
 
         /// <summary>
         /// Convert string to long integer value without exception.
@@ -541,7 +640,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static uint StringToUnsignedInteger(string value)
         {
-            long x = StringToLong(value);
+            long x = StringToLong(value, true);
             if (x < uint.MinValue || x > uint.MaxValue)
                 return 0;
             else
@@ -565,7 +664,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string IntegerToStringSign(int value)
         {
-            return IntegerToStringSign(value, null);
+            return NumberToStringSign(value.ToString(), null);
         }
 
         /// <summary>
@@ -576,28 +675,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string IntegerToStringSign(int value, string sign)
         {
-            if (string.IsNullOrEmpty(sign))
-                sign = "+";
-            if (value == 0)
-            {
-                char signZero = sign.Length <= 2 ? '\0' : sign[2];
-                if (signZero == '\0')
-                    signZero = ' ';
-                return string.Concat(signZero, '0');
-            }
-            else if (value < 0)
-            {
-                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
-                if (signNegative == '\0' || signNegative == '-')
-                    return value.ToString();
-                else
-                    return string.Concat(signNegative, value.ToString().Substring(1));
-            }
-            else
-            {
-                char signPositive = sign[0];
-                return string.Concat(signPositive, value.ToString());
-            }
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         /// <summary>
@@ -659,10 +737,22 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to long integer value without exception.
+        /// Allows decimal numbers by default.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Long number</returns>
         public static long StringToLong(string value)
+        {
+            return StringToLong(value, INTEGER_ALLOW_DECIMAL);
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Long number</returns>
+        public static long StringToLong(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -673,6 +763,8 @@ namespace Energy.Base
             if (trim.Length != value.Length)
                 if (long.TryParse(value, out result))
                     return result;
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
@@ -686,10 +778,22 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to long integer value without exception.
+        /// Allows decimal numbers by default.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Long number</returns>
         public static ulong StringToUnsignedLong(string value)
+        {
+            return StringToUnsignedLong(value, INTEGER_ALLOW_DECIMAL);
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal number</param>
+        /// <returns>Long number</returns>
+        public static ulong StringToUnsignedLong(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -700,6 +804,8 @@ namespace Energy.Base
             if (trim.Length != value.Length)
                 if (ulong.TryParse(value, out result))
                     return result;
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
@@ -711,11 +817,28 @@ namespace Energy.Base
             return 0;
         }
 
+        /// <summary>
+        /// Convert string to long integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
         public static long StringToLongSmart(string value)
         {
-            return StringToLong(RemoveNumericalDifferences(value));
+            return StringToLong(RemoveNumericalDifferences(value), true);
         }
-        
+
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static ulong StringToUsignedLongSmart(string value)
+        {
+            return StringToUnsignedLong(RemoveNumericalDifferences(value), true);
+        }
+
         /// <summary>
         /// Check if value is long number with or without negative minus sign.
         /// </summary>
@@ -753,7 +876,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string LongToStringSign(long value)
         {
-            return DecimalToStringSign((decimal)value, null);
+            return NumberToStringSign(value.ToString(), null);
         }
 
         /// <summary>
@@ -764,7 +887,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string LongToStringSign(long value, string sign)
         {
-            return DecimalToStringSign((decimal)value, sign);
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         /// <summary>
@@ -784,7 +907,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string UnsignedLongToStringSign(ulong value)
         {
-            return DecimalToStringSign((decimal)value, null);
+            return NumberToStringSign(value.ToString(), null);
         }
 
         /// <summary>
@@ -795,7 +918,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string UnsignedLongToStringSign(ulong value, string sign)
         {
-            return DecimalToStringSign((decimal)value, sign);
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         #endregion
@@ -851,7 +974,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string DecimalToStringSign(decimal value)
         {
-            return DecimalToStringSign(value, null);
+            return NumberToStringSign(DecimalToString(value), null);
         }
 
         /// <summary>
@@ -862,28 +985,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string DecimalToStringSign(decimal value, string sign)
         {
-            if (string.IsNullOrEmpty(sign))
-                sign = "+";
-            if (value == 0)
-            {
-                char signZero = sign.Length <= 2 ? '\0' : sign[2];
-                if (signZero == '\0')
-                    signZero = ' ';
-                return string.Concat(signZero, '0');
-            }
-            else if (value < 0)
-            {
-                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
-                if (signNegative == '\0' || signNegative == '-')
-                    return value.ToString();
-                else
-                    return string.Concat(signNegative, value.ToString().Substring(1));
-            }
-            else
-            {
-                char signPositive = sign[0];
-                return string.Concat(signPositive, value.ToString());
-            }
+            return NumberToStringSign(DecimalToString(value), sign);
         }
 
         #endregion
@@ -1115,10 +1217,22 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to byte value without exception.
+        /// Allows decimal numbers by default.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
         public static byte StringToByte(string value)
+        {
+            return StringToByte(value, BYTE_ALLOW_DECIMAL);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static byte StringToByte(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -1131,6 +1245,8 @@ namespace Energy.Base
                 if (byte.TryParse(value, out result))
                     return result;
             }
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
@@ -1144,12 +1260,24 @@ namespace Energy.Base
             return 0;
         }
 
+
         /// <summary>
         /// Convert string to byte value without exception.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
         public static sbyte StringToSignedByte(string value)
+        {
+            return StringToSignedByte(value, BYTE_ALLOW_DECIMAL);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static sbyte StringToSignedByte(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -1158,20 +1286,18 @@ namespace Energy.Base
                 return result;
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length != value.Length)
-            {
                 if (sbyte.TryParse(value, out result))
                     return result;
-            }
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
                 if (number < sbyte.MinValue || number > sbyte.MaxValue)
                     return 0;
                 else
                     return (sbyte)number;
-            }
             return 0;
         }
 
@@ -1244,7 +1370,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string ByteToStringSign(byte value)
         {
-            return IntegerToStringSign((int)value, null);
+            return NumberToStringSign(value.ToString(), null);
         }
 
         /// <summary>
@@ -1255,7 +1381,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string ByteToStringSign(byte value, string sign)
         {
-            return IntegerToStringSign((int)value, sign);
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         /// <summary>
@@ -1275,7 +1401,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string SignedByteToStringSign(sbyte value)
         {
-            return IntegerToStringSign((int)value, null);
+            return NumberToStringSign(value.ToString(), null);
         }
 
         /// <summary>
@@ -1286,7 +1412,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string SignedByteToStringSign(sbyte value, string sign)
         {
-            return IntegerToStringSign((int)value, sign);
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         #endregion
@@ -2158,7 +2284,7 @@ namespace Energy.Base
 
             string s = value is string ? (string)value : value.ToString();
 
-            return StringToSignedByte(s);
+            return StringToSignedByte(s, BYTE_ALLOW_DECIMAL);
         }
 
         /// <summary>
