@@ -207,6 +207,12 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(test));
                 Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(test));
                 Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(test));
+                Assert.AreEqual((Int16)123, Energy.Base.Cast.As<Int16>(test));
+                Assert.AreEqual((UInt16)123, Energy.Base.Cast.As<UInt16>(test));
+                Assert.AreEqual((Int32)123, Energy.Base.Cast.As<Int32>(test));
+                Assert.AreEqual((UInt32)123, Energy.Base.Cast.As<UInt32>(test));
+                Assert.AreEqual((Int64)123, Energy.Base.Cast.As<Int64>(test));
+                Assert.AreEqual((UInt64)123, Energy.Base.Cast.As<UInt64>(test));
 
                 // int + uint
 

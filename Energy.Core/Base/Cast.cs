@@ -85,6 +85,10 @@ namespace Energy.Base
                 return ObjectToDouble(value);
             if (r == typeof(decimal))
                 return ObjectToDecimal(value);
+            if (r == typeof(Int16))
+                return ObjectToWord(value);
+            if (r == typeof(UInt16))
+                return ObjectToUnsignedWord(value);
             if (r == typeof(Int32))
                 return ObjectToInteger(value);
             if (r == typeof(UInt32))
@@ -2719,6 +2723,28 @@ namespace Energy.Base
             string s = value is string ? (string)value : value.ToString();
 
             return StringToDecimal(s);
+        }
+
+        public static Int16 ObjectToWord(object value)
+        {
+            int number = ObjectToInteger(value);
+            if (number < Int16.MinValue)
+                return Int16.MinValue;
+            else if (number > Int16.MaxValue)
+                return Int16.MaxValue;
+            else
+                return (Int16)number;
+        }
+
+        public static UInt16 ObjectToUnsignedWord(object value)
+        {
+            int number = ObjectToInteger(value);
+            if (number <= 0)
+                return 0;
+            else if (number > UInt16.MaxValue)
+                return UInt16.MaxValue;
+            else
+                return (UInt16)number;
         }
 
         public static DateTime ObjectToDateTime(object value)
