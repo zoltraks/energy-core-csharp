@@ -235,5 +235,18 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual((ulong)long.MaxValue + 1, Energy.Base.Cast.As<ulong>(_long));
             }
         }
+
+        [TestMethod]
+        public void CastIntegerToString()
+        {
+            int _int;
+            _int = int.MaxValue; // test for +‭2147483647‬ $7FFFFFFF
+            Assert.AreEqual("2147483647", Energy.Base.Cast.IntegerToString(_int));
+            Assert.AreEqual("+2147483647", Energy.Base.Cast.IntegerToStringSign(_int));
+            Assert.AreEqual(".2147483647", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
+            _int = int.MinValue; // test for -2147483648 $FFFFFFFF
+            Assert.AreEqual("-2147483648", Energy.Base.Cast.IntegerToString(_int));
+            Assert.AreEqual("$2147483648", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
+        }
     }
 }

@@ -548,9 +548,56 @@ namespace Energy.Base
                 return (uint)x;
         }
 
+        /// <summary>
+        /// Represent integer number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToString(int value)
         {
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent integer number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string IntegerToStringSign(int value)
+        {
+            return IntegerToStringSign(value, null);
+        }
+
+        /// <summary>
+        /// Represent integer number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string IntegerToStringSign(int value, string sign)
+        {
+            if (string.IsNullOrEmpty(sign))
+                sign = "+";
+            if (value == 0)
+            {
+                char signZero = sign.Length <= 2 ? '\0' : sign[2];
+                if (signZero == '\0')
+                    signZero = ' ';
+                return string.Concat(signZero, '0');
+            }
+            else if (value < 0)
+            {
+                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
+                if (signNegative == '\0' || signNegative == '-')
+                    return value.ToString();
+                else
+                    return string.Concat(signNegative, value.ToString().Substring(1));
+            }
+            else
+            {
+                char signPositive = sign[0];
+                return string.Concat(signPositive, value.ToString());
+            }
         }
 
         /// <summary>
@@ -664,6 +711,11 @@ namespace Energy.Base
             return 0;
         }
 
+        public static long StringToLongSmart(string value)
+        {
+            return StringToLong(RemoveNumericalDifferences(value));
+        }
+        
         /// <summary>
         /// Check if value is long number with or without negative minus sign.
         /// </summary>
@@ -684,19 +736,66 @@ namespace Energy.Base
             }
         }
 
-        public static long StringToLongSmart(string value)
-        {
-            return StringToLong(RemoveNumericalDifferences(value));
-        }
-
         /// <summary>
-        /// Convert long to string.
+        /// Represent long number as text.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static string LongToString(long value)
         {
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string LongToStringSign(long value)
+        {
+            return DecimalToStringSign((decimal)value, null);
+        }
+
+        /// <summary>
+        /// Represent long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string LongToStringSign(long value, string sign)
+        {
+            return DecimalToStringSign((decimal)value, sign);
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToString(ulong value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToStringSign(ulong value)
+        {
+            return DecimalToStringSign((decimal)value, null);
+        }
+
+        /// <summary>
+        /// Represent unsigned long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToStringSign(ulong value, string sign)
+        {
+            return DecimalToStringSign((decimal)value, sign);
         }
 
         #endregion
@@ -733,6 +832,58 @@ namespace Energy.Base
         public static decimal StringToDecimalSmart(string value)
         {
             return StringToDecimal(RemoveNumericalDifferences(value));
+        }
+
+        /// <summary>
+        /// Represent decimal number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DecimalToString(decimal value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent decimal number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DecimalToStringSign(decimal value)
+        {
+            return DecimalToStringSign(value, null);
+        }
+
+        /// <summary>
+        /// Represent decimal number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string DecimalToStringSign(decimal value, string sign)
+        {
+            if (string.IsNullOrEmpty(sign))
+                sign = "+";
+            if (value == 0)
+            {
+                char signZero = sign.Length <= 2 ? '\0' : sign[2];
+                if (signZero == '\0')
+                    signZero = ' ';
+                return string.Concat(signZero, '0');
+            }
+            else if (value < 0)
+            {
+                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
+                if (signNegative == '\0' || signNegative == '-')
+                    return value.ToString();
+                else
+                    return string.Concat(signNegative, value.ToString().Substring(1));
+            }
+            else
+            {
+                char signPositive = sign[0];
+                return string.Concat(signPositive, value.ToString());
+            }
         }
 
         #endregion
@@ -1074,6 +1225,68 @@ namespace Energy.Base
                 }
             }
             return StringToByte(value);
+        }
+
+        /// <summary>
+        /// Represent byte as decimal text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ByteToString(byte value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ByteToStringSign(byte value)
+        {
+            return IntegerToStringSign((int)value, null);
+        }
+
+        /// <summary>
+        /// Represent byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string ByteToStringSign(byte value, string sign)
+        {
+            return IntegerToStringSign((int)value, sign);
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string SignedByteToString(sbyte value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string SignedByteToStringSign(sbyte value)
+        {
+            return IntegerToStringSign((int)value, null);
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string SignedByteToStringSign(sbyte value, string sign)
+        {
+            return IntegerToStringSign((int)value, sign);
         }
 
         #endregion
