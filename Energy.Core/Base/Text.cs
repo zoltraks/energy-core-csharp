@@ -620,7 +620,15 @@ namespace Energy.Base
 
         #endregion
 
-        private static char GetMiddleStringPatternChar(string pattern)
+        #region MiddleString
+
+        /// <summary>
+        /// Get middle character from a pattern string.
+        /// If the length of pattern text is even or empty, function will return an empty character.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static char GetMiddleStringPatternChar(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return '\0';
@@ -639,7 +647,12 @@ namespace Energy.Base
             }
         }
 
-        private static string GetMiddleStringPrefix(string pattern)
+        /// <summary>
+        /// Get left part from a pattern string.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public static string GetMiddleStringPrefix(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return pattern;
@@ -659,11 +672,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return character or two characters string from the middle of text.
+        /// Get right part from a pattern string.
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
-        private static string GetMiddleStringSuffix(string pattern)
+        public static string GetMiddleStringSuffix(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
                 return pattern;
@@ -682,6 +695,8 @@ namespace Energy.Base
                 return pattern.Substring(half + 1, length);
             }
         }
+
+        #endregion
 
         #region RemoveWhiteSpace
 
@@ -914,6 +929,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region RemoveEmptyLines
+
         /// <summary>
         /// Remove empty lines from string.
         /// </summary>
@@ -931,6 +948,10 @@ namespace Energy.Base
                 result += Energy.Base.Text.NL;
             return result;
         }
+
+        #endregion
+
+        #region EscapeExpression
 
         private static string[] _EscapeExpressionStringArray;
 
@@ -1001,6 +1022,8 @@ namespace Energy.Base
             }
             return s == null ? text : s.ToString();
         }
+
+        #endregion
 
         #region Random
 
@@ -1219,7 +1242,7 @@ namespace Energy.Base
             words[0] = words[0].ToLowerInvariant();
             for (int i = 1; i < words.Length; i++)
             {
-                    words[i] = UpperFirst(words[i]);
+                words[i] = UpperFirst(words[i]);
             }
             return string.Join("", words);
         }
@@ -1953,6 +1976,58 @@ namespace Energy.Base
             }
             string cut = text.Substring(a, b);
             return cut.Replace(escape + with, with);
+        }
+
+        #endregion
+
+        #region InArray
+
+        /// <summary>
+        /// Check if string element is a part of string array.
+        /// If array is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="element"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string element, bool ignoreCase)
+        {
+            if (array == null || array.Length == 0)
+                return false;
+            if (element == null)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (array[i] == null)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    if (0 == string.Compare(array[i], element, ignoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Check if string element is a part of string array.
+        /// If array is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string element)
+        {
+            return InArray(array, element, false);
         }
 
         #endregion
