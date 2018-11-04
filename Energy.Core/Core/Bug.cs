@@ -311,6 +311,16 @@ namespace Energy.Core
             return message;
         }
 
+        public static string GetExceptionMessage(Exception exception, bool trace, bool includeClassName)
+        {
+            if (exception == null)
+                return "";
+            string name = null;
+            if (includeClassName)
+                name = exception.GetType().Name;
+            return GetExceptionMessage(exception, trace, name);
+        }
+
         #endregion
 
         #region ThreadIdHex
@@ -422,7 +432,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
-            string message = ExceptionMessage(exception, true);
+            string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)TraceLogging)
             {
@@ -527,7 +537,7 @@ namespace Energy.Core
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)TraceLogging)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                //Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
             Last = new Entry(code, message);
         }
@@ -538,7 +548,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Exception exception)
         {
-            Write(GetExceptionMessage(exception, false, exception.GetType().Name));
+            Write(GetExceptionMessage(exception, (bool)TraceLogging, exception.GetType().Name));
         }
 
         /// <summary>
@@ -548,7 +558,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Code code, Exception exception)
         {
-            Write(code, ExceptionMessage(exception));
+            Write(code, GetExceptionMessage(exception, (bool)TraceLogging));
         }
 
         #endregion

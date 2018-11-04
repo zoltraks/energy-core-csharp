@@ -6,20 +6,29 @@ namespace LogFileThreadStress
 {
     public class App : Energy.Interface.ICommandProgram
     {
+        private Energy.Core.Log.Logger Logger;
+
         public bool Initialize(string[] args)
         {
+            Energy.Core.Bug.TraceLogging = true;
+
             throw new NotImplementedException();
         }
 
         public bool Run(string[] args)
         {
+            this.Logger.Write("RUN");
+
             Energy.Core.Tilde.Pause();
+
             return true;
         }
 
         public bool Setup(string[] args)
         {
             Energy.Core.Bug.Log = Energy.Core.Log.Default;
+
+            Energy.Core.Bug.TraceLogging = false;
 
             Energy.Core.Log.Logger logger = new Energy.Core.Log.Logger();
 
@@ -41,6 +50,8 @@ namespace LogFileThreadStress
             });
 
             logger.Write("SETUP");
+
+            this.Logger = logger;
 
             return true;
         }

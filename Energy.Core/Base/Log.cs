@@ -146,7 +146,7 @@ namespace Energy.Base
                 if (format.Contains("{{MESSAGE}}"))
                     sb.Replace("{{MESSAGE}}", Message);
                 if (format.Contains("{{EXCEPTION}}"))
-                    sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.ExceptionMessage(Exception, true));
+                    sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.GetExceptionMessage(Exception, true, true));
                 return sb.ToString();
             }
 

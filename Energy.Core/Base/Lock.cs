@@ -21,9 +21,12 @@ namespace Energy.Base
         {
             Energy.Core.Bug.Write("C002", () =>
             {
+                string callingMethod = Energy.Core.Bug.CallingMethod(4);
+                if (string.IsNullOrEmpty(callingMethod))
+                    callingMethod = Energy.Core.Bug.CallingMethod(3);
                 return string.Format("Lock created {0} {1}"
                     , Energy.Base.Hex.IntegerToHex(this.GetHashCode())
-                    , Energy.Core.Bug.CallingMethod(3)
+                    , callingMethod
                     );
             });
         }
