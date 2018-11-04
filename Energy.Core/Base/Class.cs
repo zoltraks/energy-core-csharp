@@ -59,6 +59,27 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        public static Type GetClassInterface(Type classType, Type interfaceType)
+        {
+            if (classType == interfaceType)
+                return interfaceType;
+            Type[] interfaceTypes = classType.GetInterfaces();
+            for (int i = 0; i < interfaceTypes.Length; i++)
+            {
+                if (interfaceTypes[i] == interfaceType)
+                    return interfaceTypes[i];
+            }
+            return null;
+        }
+
+        public static Type GetClassInterface(Type classType, string interfaceName)
+        {
+            if (classType.Name == interfaceName)
+                return classType;
+            Type type = classType.GetInterface(interfaceName);
+            return type;
+        }
+
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
         /// </summary>

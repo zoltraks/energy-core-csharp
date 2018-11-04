@@ -131,12 +131,12 @@ namespace Energy.Source
         /// </summary>
         public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
 
-        private Energy.Core.Log _Log;
+        private Energy.Core.Log.Logger _Logger;
 
         /// <summary>
         /// Log
         /// </summary>
-        public Energy.Core.Log Log { get { lock (_Lock) return _Log; } set { lock (_Lock) _Log = value; } }
+        public Energy.Core.Log.Logger Logger { get { lock (_Lock) return _Logger; } set { lock (_Lock) _Logger = value; } }
 
         private Energy.Interface.IDialect _Dialect;
 
@@ -466,7 +466,7 @@ namespace Energy.Source
             catch (Exception x)
             {
                 SetError(x);
-                (Log ?? Energy.Core.Log.Default).Write(x);
+                (Logger ?? Energy.Core.Log.Default).Write(x);
             }
             finally
             {
@@ -596,7 +596,7 @@ namespace Energy.Source
                 catch (Exception x)
                 {
                     SetError(x);
-                    (Log ?? Energy.Core.Log.Default).Write(x);
+                    (Logger ?? Energy.Core.Log.Default).Write(x);
                 }
                 try
                 {
@@ -710,7 +710,7 @@ namespace Energy.Source
 
             string message = exception.Message;
 
-            (Log ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
+            (Logger ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
 
             // Reaction
 
@@ -1249,7 +1249,7 @@ namespace Energy.Source
                 copy.Timeout = this._Timeout;
                 copy.Repeat = this._Repeat;
                 copy.Persistent = this._Persistent;
-                copy.Log = this._Log;
+                copy.Logger = this._Logger;
                 copy.Dialect = this._Dialect;
                 if (this._ThreadOpen != null)
                     copy.ThreadOpen = (bool)this._ThreadOpen;

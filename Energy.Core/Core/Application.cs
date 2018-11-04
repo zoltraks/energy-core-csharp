@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -49,6 +51,10 @@ namespace Energy.Core
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
+        private ICommandProgram _CommandProgram { get; set; }
+
+        public string[] Arguments { get; private set; }
+
         #region Constructor
 
         /// <summary>
@@ -57,6 +63,23 @@ namespace Energy.Core
         public Application()
         {
             // create //
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Application(System.Type type)
+            : base()
+        {
+            // create //
+            if (type == null)
+                return;
+            if (null != Energy.Base.Class.GetClassInterface(type, typeof(Energy.Interface.ICommandProgram)))
+            {
+                Energy.Interface.ICommandProgram app = Activator.CreateInstance(type)
+                    as Energy.Interface.ICommandProgram;
+                this._CommandProgram = app;
+            }
         }
 
         /// <summary>
@@ -99,28 +122,88 @@ namespace Energy.Core
         /// <summary>
         /// Run
         /// </summary>
-        public void Run()
+        public bool Run()
         {
-            throw new NotImplementedException();
+            try
+            {
+                string[] args = this.Arguments;
+                if (_CommandProgram != null)
+                {
+                    return Run(_CommandProgram, args);
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write(exception);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Run
+        /// </summary>
+        public bool Run(ICommandProgram commandProgram, string[] args)
+        {
+            try
+            {
+                if (commandProgram != null)
+                {
+                    if (!commandProgram.Setup(args))
+                        return false;
+                    if (!commandProgram.Initialize(args))
+                        return false;
+                    if (!commandProgram.Run(args))
+                        return false;
+                }
+            }
+            catch (Exception fallBackException)
+            {
+                Energy.Core.Log.Default.Write(fallBackException);
+                throw;
+            }
+
+            return true;
         }
 
         #endregion
 
         #region Static
 
-        public static void SetLanguage(string culture)
+        public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
             try
             {
-                System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+                System.Globalization.CultureInfo cultureInfo;
+                cultureInfo = new System.Globalization.CultureInfo(culture);
+                System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+                return cultureInfo;
             }
-            catch
-            { }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write(exception);
+                throw;
+            }
         }
 
-        public static void SetDefaultLanguage()
+        public static System.Globalization.CultureInfo SetDefaultLanguage()
         {
-            SetLanguage("en-US");
+            return SetLanguage("en-US");
+        }
+
+        public static System.Globalization.CultureInfo GetDefaultCultureInfo()
+        {
+            System.Globalization.CultureInfo cultureInfo;
+            try
+            {
+                cultureInfo = new System.Globalization.CultureInfo("en-US");
+                return cultureInfo;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write("E015", exception);
+                throw;
+            }
         }
 
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
@@ -146,6 +229,21 @@ namespace Energy.Core
         public static void SetConsoleEncoding()
         {
             SetConsoleEncoding(System.Text.Encoding.UTF8);
+        }
+
+        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        {
+            return System.IO.Path.GetDirectoryName(assembly.Location);
+        }
+
+        public static string GetExecutionPath()
+        {
+            return GetExecutionPath(System.Reflection.Assembly.GetExecutingAssembly());
+        }
+
+        internal static CultureInfo GetCurrentUICulture()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
