@@ -560,8 +560,16 @@ namespace Energy.Base
             List<Type> list = new List<Type>();
             for (int i = 0; i < assemblies.Length; i++)
             {
-                Assembly a = assemblies[i];
-                Type[] typeList = a.GetTypes();
+                Assembly assembly = assemblies[i];
+                Type[] typeList;
+                try
+                {
+                    typeList = assembly.GetTypes();
+                }
+                catch (System.Reflection.ReflectionTypeLoadException)
+                {
+                    continue;
+                }
                 if (filter == null)
                 {
                     list.AddRange(typeList);
@@ -583,6 +591,16 @@ namespace Energy.Base
         public static Type[] GetTypes(Assembly[] assemblies)
         {
             return GetTypes(assemblies, null);
+        }
+
+        public static Type[] GetTypes(Assembly assembly)
+        {
+            return GetTypes(new Assembly[] { assembly }, null);
+        }
+
+        public static Type[] GetTypes(Assembly assembly, TypeFilter filter)
+        {
+            return GetTypes(new Assembly[] { assembly }, filter);
         }
 
         #endregion
