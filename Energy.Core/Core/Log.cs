@@ -290,6 +290,8 @@ namespace Energy.Core
                 for (int i = 0; i < Destination.Count; i++)
                 {
                     Energy.Base.Log.Target target = Destination[i];
+                    if (!target.Enable)
+                        continue;
                     if (!target.Immediate)
                         continue;
                     if (entry.Store.Contains(target))
@@ -415,12 +417,135 @@ namespace Energy.Core
 
             public class File : Energy.Base.Log.Target
             {
+                private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
+                private ManualResetEvent _ActivateResetEvent = new ManualResetEvent(false);
+
+                private const double SLEEP_DELAY = 0.5;
+
+                private TimeSpan _SleepDelay = TimeSpan.FromSeconds(SLEEP_DELAY);
+
+                private const double INACTIVITY_LIMIT = 30.0;
+
+                private TimeSpan _InactivityLimit = TimeSpan.FromSeconds(INACTIVITY_LIMIT);
+
+                private List<Energy.Base.Log.Entry> _Buffer = new List<Energy.Base.Log.Entry>();
+
+                private Thread _Thread;
+
+                private DateTime _LastWriteStamp;
+
+                public DateTime LastWriteStamp { get { return GetLastWriteStamp(); } }
+
                 /// <summary>
                 /// File path
                 /// </summary>
                 public string Path { get; set; }
 
                 public override bool Write(Energy.Base.Log.Entry[] log)
+                {
+                    if (!Background)
+                    {
+                        return WriteUnsafe(log);
+                    }
+                    else
+                    {
+                        lock (_Lock)
+                        {
+                            _Buffer.AddRange(log);
+                        }
+                        EnsureWriteThreadRunning();
+                        return true;
+                    }
+                }
+
+                private void EnsureWriteThreadRunning()
+                {
+                    bool activate = true;
+
+                    if (_Thread == null)
+                    {
+                        lock (_Lock)
+                        {
+                            if (_Thread == null)
+                            {
+                                Thread thread = new Thread(() => { WriteThread(); })
+                                {
+                                    IsBackground = true,
+                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                };
+                                _Thread = thread;
+                                _ActivateResetEvent.Reset();
+                                activate = false;
+                                thread.Start();
+                            }
+                        }
+                    }
+                    if (activate)
+                    {
+                        _ActivateResetEvent.Set();
+                    }
+                }
+
+                public DateTime GetLastWriteStamp()
+                {
+                    lock (_Lock)
+                    {
+                        return _LastWriteStamp;
+                    }
+                }
+
+                private void WriteThread()
+                {
+                    try
+                    {
+                        while (true)
+                        {
+                            Energy.Base.Log.Entry[] entries = null;
+                            lock (_Lock)
+                            {
+                                entries = _Buffer.ToArray();
+                                if (entries.Length > 0)
+                                {
+                                    _Buffer.RemoveRange(0, entries.Length);
+                                }
+                            }
+                            if (entries == null)
+                            {
+                                if (DateTime.Now - GetLastWriteStamp() > _InactivityLimit)
+                                {
+                                    Energy.Core.Bug.Write("E8005", "File Log Inactivity");
+                                    break;
+                                }
+                            }
+                            if (WriteUnsafe(entries))
+                            {
+                                lock (_Lock)
+                                {
+                                    _LastWriteStamp = DateTime.Now;
+                                }
+                                continue;
+                            }
+                            else
+                            {
+                                lock (_Lock)
+                                {
+                                    _Buffer.InsertRange(0, entries);
+                                }
+                            }
+                            if (_ActivateResetEvent.WaitOne(_SleepDelay))
+                                continue;
+                            else
+                                continue;
+                        }
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Energy.Core.Bug.Write("E8007", "File Log Abort");
+                    }
+                }
+
+                private bool WriteUnsafe(Energy.Base.Log.Entry[] log)
                 {
                     if (log == null)
                         return false;
@@ -437,8 +562,9 @@ namespace Energy.Core
                         {
                             System.IO.File.AppendAllText(file, content);
                         }
-                        catch
+                        catch (Exception exception)
                         {
+                            Energy.Core.Bug.Write("E6006", exception);
                             return false;
                         }
                     }
@@ -457,6 +583,26 @@ namespace Energy.Core
 
             public class Console : Energy.Base.Log.Target
             {
+                private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+
+                private ManualResetEvent _ActivateResetEvent = new ManualResetEvent(false);
+
+                private const double SLEEP_DELAY = 0.5;
+
+                private TimeSpan _SleepDelay = TimeSpan.FromSeconds(SLEEP_DELAY);
+
+                private const double INACTIVITY_LIMIT = 30.0;
+
+                private TimeSpan _InactivityLimit = TimeSpan.FromSeconds(INACTIVITY_LIMIT);
+
+                private List<Energy.Base.Log.Entry> _Buffer = new List<Energy.Base.Log.Entry>();
+
+                private Thread _Thread;
+
+                private DateTime _LastWriteStamp;
+
+                public DateTime LastWriteStamp { get { return GetLastWriteStamp(); } }
+
                 public Console()
                 {
                     Immediate = true;
@@ -506,29 +652,138 @@ namespace Energy.Core
                 /// </summary>
                 public bool Color { get; set; }
 
+                public DateTime GetLastWriteStamp()
+                {
+                    lock (_Lock)
+                    {
+                        return _LastWriteStamp;
+                    }
+                }
+
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
-                    Energy.Core.Syntax syntax = new Energy.Core.Syntax(Format);
-                    syntax["Date"] = "2017-07-00";
-                    if (!Color)
+                    if (!Background)
                     {
-                        for (int i = 0; i < log.Length; i++)
-                        {
-                            System.Console.WriteLine(log[i].ToString(Format));
-                        }
+                        return WriteUnsafe(log);
                     }
                     else
                     {
-                        syntax["Date"] = "2017-07-01";
-                        syntax["DATE"] = "2017-07-02";
-                        System.Console.WriteLine(string.Join("\n", syntax.Dictionary.ToArray(": ")));
+                        lock (_Lock)
+                        {
+                            _Buffer.AddRange(log);
+                        }
+                        EnsureWriteThreadRunning();
+                        return true;
                     }
+                }
 
+                private void EnsureWriteThreadRunning()
+                {
+                    bool activate = true;
+
+                    if (_Thread == null)
+                    {
+                        lock (_Lock)
+                        {
+                            if (_Thread == null)
+                            {
+                                Thread thread = new Thread(() => { WriteThread(); })
+                                {
+                                    IsBackground = true,
+                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                };
+                                _Thread = thread;
+                                _ActivateResetEvent.Reset();
+                                activate = false;
+                                thread.Start();
+                            }
+                        }
+                    }
+                    if (activate)
+                    {
+                        _ActivateResetEvent.Set();
+                    }
+                }
+
+                public bool WriteUnsafe(Energy.Base.Log.Entry[] log)
+                {
+                    for (int i = 0; i < log.Length; i++)
+                    {
+                        System.Console.WriteLine(log[i].ToString(Format));
+                    }
                     for (int i = 0; i < log.Length; i++)
                     {
                         log[i].Store.Add(this);
                     }
                     return true;
+                }
+
+                private Energy.Core.Syntax _Syntax;
+
+                private Energy.Core.Syntax GetSyntaxReset()
+                {
+                    lock (_Lock)
+                    {
+                        if (_Syntax == null)
+                        {
+                            _Syntax = new Energy.Core.Syntax();
+                        }
+                        else
+                        {
+                            _Syntax.Reset();
+                        }
+                        return _Syntax;
+                    }
+                }
+
+                private void WriteThread()
+                {
+                    try
+                    {
+                        while (true)
+                        {
+                            Energy.Base.Log.Entry[] entries = null;
+                            lock (_Lock)
+                            {
+                                entries = _Buffer.ToArray();
+                                if (entries.Length > 0)
+                                {
+                                    _Buffer.RemoveRange(0, entries.Length);
+                                }
+                            }
+                            if (entries == null)
+                            {
+                                if (DateTime.Now - GetLastWriteStamp() > _InactivityLimit)
+                                {
+                                    Energy.Core.Bug.Write("E8003", "Console Log Inactivity");
+                                    break;
+                                }
+                            }
+                            if (WriteUnsafe(entries))
+                            {
+                                lock (_Lock)
+                                {
+                                    _LastWriteStamp = DateTime.Now;
+                                }
+                                continue;
+                            }
+                            else
+                            {
+                                lock (_Lock)
+                                {
+                                    _Buffer.InsertRange(0, entries);
+                                }
+                            }
+                            if (_ActivateResetEvent.WaitOne(_SleepDelay))
+                                continue;
+                            else
+                                continue;
+                        }
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Energy.Core.Bug.Write("E8002", "Console Log Abort");
+                    }
                 }
             }
 

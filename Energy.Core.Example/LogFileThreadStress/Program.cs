@@ -10,7 +10,6 @@ namespace LogFileThreadStress
         {
             Energy.Core.Application app = new Energy.Core.Application(typeof(App));
             app.Run();
-            Console.ReadLine();
         }
     }
 }

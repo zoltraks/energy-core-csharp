@@ -179,12 +179,12 @@ namespace Energy.Base
             /// <summary>
             /// Immediately call write on new entry
             /// </summary>
-            public bool Immediate { get; set; }
+            public bool Immediate;
 
             /// <summary>
             /// Work in background
             /// </summary>
-            public bool Background { get; set; }
+            public bool Background;
 
             /// <summary>
             /// Minimum entry log level for being accepted
@@ -202,6 +202,11 @@ namespace Energy.Base
             /// <param name="log">List&lt;Entry&gt; - log</param>
             /// <returns></returns>
             public abstract bool Write(Energy.Base.Log.Entry[] log);
+
+            /// <summary>
+            /// Enable target for accepting log entries
+            /// </summary>
+            public bool Enable = true;
 
             /// <summary>
             /// Write single entry
