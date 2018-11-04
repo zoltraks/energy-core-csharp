@@ -26,7 +26,7 @@ namespace LogFileThreadStress
 
         public bool Setup(string[] args)
         {
-            Energy.Core.Bug.Log = Energy.Core.Log.Default;
+            Energy.Core.Bug.Logger = Energy.Core.Log.Default;
 
             Energy.Core.Bug.TraceLogging = false;
 

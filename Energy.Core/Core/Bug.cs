@@ -27,24 +27,13 @@ namespace Energy.Core
         /// </summary>
         public static Energy.Base.Switch DebugOutputCode;
 
-        private static Energy.Core.Log _Log;
+        private static Energy.Core.Log.Logger _Logger;
         /// <summary>Log</summary>
-        public static Energy.Core.Log Log
+        public static Energy.Core.Log.Logger Logger
         {
-            get
-            {
-                if (_Log == null)
-                {
-                    return Core.Log.Default;
-                }
-                else
-                {
-                    return _Log;
-                }
-            }
             set
             {
-                _Log = value;
+                _Logger = value;
             }
         }
 
@@ -436,7 +425,10 @@ namespace Energy.Core
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
             if ((bool)TraceLogging)
             {
-                Log.Write(message, Enumeration.LogLevel.Bug);
+                if (_Logger != null)
+                {
+                    _Logger.Write(message, Enumeration.LogLevel.Bug);
+                }
             }
         }
 
