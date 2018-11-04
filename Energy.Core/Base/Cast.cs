@@ -30,6 +30,10 @@ namespace Energy.Base
 
         private readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
 
+        private const string DOUBLE_STRING_FORMAT = "G17";
+
+        private const string SINGLE_STRING_FORMAT = "G9";
+
         #endregion
 
         #region As
@@ -1105,16 +1109,25 @@ namespace Energy.Base
             {
                 return value.ToString(culture);
             }
-            else if (precision == 0)
-            {
-                return value.ToString("N0", culture);
-            }
             else
             {
-                string format = "R";
-                string result = value.ToString(format, culture);
+                string result = value.ToString(DOUBLE_STRING_FORMAT, culture);
                 string decimalPoint = culture.NumberFormat.NumberDecimalSeparator;
+                int exponent = result.IndexOfAny(new char[] { 'E', 'e' });
+                string exponentString = null;
+                if (exponent > 0)
+                {
+                    exponentString = result.Substring(exponent);
+                    result = result.Substring(0, exponent);
+                    if (result.Length == 0 || result == "-")
+                        result = result + "0.0";
+                }
                 int point = result.IndexOf(decimalPoint);
+                if (point < 0)
+                {
+                    result += ".0";
+                    point = result.IndexOf(decimalPoint);
+                }
                 int length = 1 + point + precision;
                 if (trim)
                 {
@@ -1122,8 +1135,6 @@ namespace Energy.Base
                     {
                         int original = result.Length;
                         result = result.TrimEnd('0');
-                        if (result.Length != original && result.EndsWith(decimalPoint))
-                            result = result.Substring(0, result.Length - decimalPoint.Length);
                     }
                 }
                 else
@@ -1133,6 +1144,10 @@ namespace Energy.Base
                 }
                 if (result.Length > length)
                     result = result.Substring(0, length);
+                if (result.EndsWith(decimalPoint))
+                    result = result.Substring(0, result.Length - decimalPoint.Length);
+                if (exponentString != null)
+                    result = result + exponentString;
                 return result;
             }
         }
@@ -1144,7 +1159,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            return value.ToString("R", CultureInfo.InvariantCulture);
+            return value.ToString(DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
         }
 
         /// <summary>

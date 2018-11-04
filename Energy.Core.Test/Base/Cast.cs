@@ -309,13 +309,22 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void CastDoubleToString()
         {
-            double _double = -1234567890.0987654321;
+            double _double;
+            _double = -1234567890.0987654321;
             Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double));
             Assert.AreEqual("-1234567890.0987654000", Energy.Base.Cast.DoubleToString(_double, 10, false));
             Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double, 10, true));
             Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double, 11, true));
             Assert.AreEqual("-1234567890.09876540000", Energy.Base.Cast.DoubleToString(_double, 11, false));
             Assert.AreEqual("-1234567890.0987", Energy.Base.Cast.DoubleToString(_double, 4));
+            _double = -1E+20;
+            Assert.AreEqual("-1E+20", Energy.Base.Cast.DoubleToString(_double));
+            Assert.AreEqual("-1E+20", Energy.Base.Cast.DoubleToString(_double, 0));
+            Assert.AreEqual("-1.0E+20", Energy.Base.Cast.DoubleToString(_double, 1));
+            _double = double.MinValue;
+            Assert.AreEqual("-1.7976931348623157E+308", Energy.Base.Cast.DoubleToString(_double));
+            Assert.AreEqual("-1.79769E+308", Energy.Base.Cast.DoubleToString(_double, 5, false));
+            Assert.AreEqual("-1.7976E+308", Energy.Base.Cast.DoubleToString(_double, 4, false));
         }
     }
 }
