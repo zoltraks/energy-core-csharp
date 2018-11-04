@@ -121,12 +121,32 @@ namespace Energy.Base
             return Energy.Base.Cast.ObjectToInteger(value);
         }
 
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static uint AsUnsignedInteger(string value)
+        {
+            return Energy.Base.Cast.StringToUnsignedInteger(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static uint AsUnsignedInteger(object value)
+        {
+            return Energy.Base.Cast.ObjectToUnsignedInteger(value);
+        }
+
         #endregion
 
         #region AsLong
 
         /// <summary>
-        /// Convert string to long integer (Int64) value without exception.
+        /// Convert string to long integer value without exception.
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Long number</returns>
@@ -143,6 +163,26 @@ namespace Energy.Base
         public static long AsLong(object value)
         {
             return Energy.Base.Cast.ObjectToLong(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static ulong AsUnsignedLong(object value)
+        {
+            return Energy.Base.Cast.ObjectToUnsignedLong(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>Long number</returns>
+        public static ulong AsUnsignedLong(string value)
+        {
+            return Energy.Base.Cast.StringToUnsignedLong(value, INTEGER_ALLOW_DECIMAL);
         }
 
         #endregion
