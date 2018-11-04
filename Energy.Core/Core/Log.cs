@@ -285,6 +285,14 @@ namespace Energy.Core
         {
             return Write(Add(exception));
         }
+
+        public class Logger: Log
+        {
+            public Logger()
+                : base()
+            {
+            }
+        }
     }
 
     #endregion
