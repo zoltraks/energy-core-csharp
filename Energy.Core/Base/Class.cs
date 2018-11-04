@@ -848,23 +848,34 @@ namespace Energy.Base
         /// <summary>
         /// Get list of assemblies of current application domain filtered...
         /// </summary>
+        /// <param name="matchMode"></param>
         /// <param name="filters"></param>
         /// <returns></returns>
-        public static System.Reflection.Assembly[] GetAssemblies(params string[] filters)
+        public static System.Reflection.Assembly[] GetAssemblies(Energy.Enumeration.MatchMode matchMode, params string[] filters)
         {
             List<System.Reflection.Assembly> list = new List<System.Reflection.Assembly>();
             bool ignoreCase = true;
             foreach (System.Reflection.Assembly assembly in GetAssemblies())
             {
                 string input = assembly.FullName;
-                bool check = Energy.Base.Text.Check(input
-                    , Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, ignoreCase
-                    , filters);
+                bool check = Energy.Base.Text.Check(input, Energy.Enumeration.MatchStyle.Any
+                    , matchMode, ignoreCase, filters);
                 if (!check)
                     continue;
                 list.Add(assembly);
             }
             return list.ToArray();
+        }
+
+
+        /// <summary>
+        /// Get list of assemblies of current application domain filtered...
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public static System.Reflection.Assembly[] GetAssemblies(params string[] filters)
+        {
+            return GetAssemblies(Energy.Enumeration.MatchMode.Simple, filters);
         }
 
         /// <summary>
