@@ -129,6 +129,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerPersistentBenchmar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLitePCLCore", "Example\SQLitePCLCore\SQLitePCLCore.csproj", "{3571E14B-FFDE-463F-98A4-CE95C2501A5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogFileThreadStress", "Energy.Core.Example\LogFileThreadStress\LogFileThreadStress.csproj", "{E9BD18DC-9816-4F26-837C-392E2DC59891}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -679,6 +681,18 @@ Global
 		{3571E14B-FFDE-463F-98A4-CE95C2501A5C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3571E14B-FFDE-463F-98A4-CE95C2501A5C}.Release|x86.ActiveCfg = Release|Any CPU
 		{3571E14B-FFDE-463F-98A4-CE95C2501A5C}.Release|x86.Build.0 = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9BD18DC-9816-4F26-837C-392E2DC59891}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -731,6 +745,7 @@ Global
 		{59A43E24-6979-444A-B8E3-A2A6E6BA6157} = {3A859191-82AC-47CD-BD35-95F0C2722EC8}
 		{739065A7-0B7D-4B12-B34F-A9040C177D1A} = {F9446512-A7A6-4B1D-995A-9EEF1D41DB30}
 		{3571E14B-FFDE-463F-98A4-CE95C2501A5C} = {F9446512-A7A6-4B1D-995A-9EEF1D41DB30}
+		{E9BD18DC-9816-4F26-837C-392E2DC59891} = {E9726BBF-A312-485B-80E8-625CB26265B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

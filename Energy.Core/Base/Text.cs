@@ -2031,5 +2031,74 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region
+
+        public class Editor
+        {
+            public string InsertBeforeFirstLine(string message, string line)
+            {
+                return string.Concat(line, message);
+            }
+
+            public string AppendAfterFirstLine(string text, string line)
+            {
+                if (string.IsNullOrEmpty(line))
+                    return text;
+                if (string.IsNullOrEmpty(text))
+                {
+                    if (text == null && line == null)
+                        return null;
+                }
+                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
+                if (p < 0)
+                {
+                    return string.Concat(text ?? "", line ?? "");
+                }
+                else
+                {
+                    string result = ""
+                        + text.Substring(0, p) + line + text.Substring(p)
+                        ;
+                    return result;
+                }
+            }
+
+            public string InsertBeforeSecondLine(string message, string line)
+            {
+                return string.Concat(line, message);
+            }
+
+            public string InsertBeforeLastLine(string message, string line)
+            {
+                return string.Concat(line, message);
+            }
+
+            public string AppendAfterLastLine(string message, string line)
+            {
+                return string.Concat(line, message);
+            }
+        }
+
+        #endregion
+
+        #region IndexOfAny
+
+        public static int IndexOfAny(string text, string[] any)
+        {
+            int m = -1;
+            for (int i = 0; i < any.Length; i++)
+            {
+                int p = text.IndexOf(any[i]);
+                if (p < 0)
+                    continue;
+                if (p > m)
+                    continue;
+                m = p;
+            }
+            return m;
+        }
+
+        #endregion
     }
 }

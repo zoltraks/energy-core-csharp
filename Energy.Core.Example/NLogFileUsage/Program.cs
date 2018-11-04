@@ -10,7 +10,7 @@ namespace NLogFileUsage
         static void Main(string[] args)
         {
             Energy.Core.Tilde.WriteLine("Welcome ~ ~.~~~~ to ~lr~Energy.Core.Log ~0~and ~lg~NLog ~0~example.");
-            Energy.Core.Log l = new Energy.Core.Log();
+            Energy.Core.Log.Logger l = new Energy.Core.Log.Logger();
             //l.Write()
             l.Write((Energy.Base.Log.Entry)"Custom message 1");
             Energy.Core.Log.Target.Console.Default.Immediate = false;

@@ -13,9 +13,9 @@ namespace Energy.Core
         #region Property
 
         /// <summary>
-        /// Trace switch
+        /// Exception trace switch
         /// </summary>
-        public static Energy.Base.Switch TraceLogging;
+        public static Energy.Base.Switch ExceptionTrace;
 
         /// <summary>
         /// Use time when writing to System.Diagnostics.Debug
@@ -27,25 +27,38 @@ namespace Energy.Core
         /// </summary>
         public static Energy.Base.Switch DebugOutputCode;
 
-        private static Energy.Core.Log _Log;
+        private static Energy.Core.Log.Logger _Logger;
         /// <summary>Log</summary>
-        public static Energy.Core.Log Log
+        public static Energy.Core.Log.Logger Logger
+        {
+            set
+            {
+                _Logger = value;
+            }
+        }
+
+        private static string _ExceptionMessageAppendNameFormat = " ( {0} )";
+
+        private static string ExceptionMessageAppendNameFormat
         {
             get
             {
-                if (_Log == null)
-                {
-                    return Core.Log.Default;
-                }
-                else
-                {
-                    return _Log;
-                }
+                return GetExceptionMessageAppendNameFormat();
             }
             set
             {
-                _Log = value;
+                SetExceptionMessageAppendNameFormat(value);
             }
+        }
+
+        private static string GetExceptionMessageAppendNameFormat()
+        {
+            return _ExceptionMessageAppendNameFormat;
+        }
+
+        public static void SetExceptionMessageAppendNameFormat(string value)
+        {
+            _ExceptionMessageAppendNameFormat = value;
         }
 
         #endregion
@@ -58,7 +71,7 @@ namespace Energy.Core
         static Bug()
         {
             //System.Diagnostics.Debug.WriteLine("BUG");
-            TraceLogging = false;
+            ExceptionTrace = false;
             DebugOutputTime = true;
             DebugOutputCode = false;
         }
@@ -219,6 +232,27 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string ExceptionMessage(Exception exception, bool trace)
         {
+            return GetExceptionMessage(exception, trace);
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>string</returns>
+        public static string ExceptionMessage(Exception exception)
+        {
+            return GetExceptionMessage(exception, (bool)ExceptionTrace);
+        }
+
+        /// <summary>
+        /// Return exception message
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <param name="trace">Include stack trace</param>
+        /// <returns>string</returns>
+        public static string GetExceptionMessage(Exception exception, bool trace)
+        {
             if (exception == null)
             {
                 return "";
@@ -255,14 +289,25 @@ namespace Energy.Core
             return string.Join(Energy.Base.Text.NL, message.ToArray()).Trim();
         }
 
-        /// <summary>
-        /// Return exception message
-        /// </summary>
-        /// <param name="exception">Exception object</param>
-        /// <returns>string</returns>
-        public static string ExceptionMessage(Exception exception)
+        public static string GetExceptionMessage(Exception exception, bool trace, string name)
         {
-            return ExceptionMessage(exception, (bool)TraceLogging);
+            string message = GetExceptionMessage(exception, trace);
+            if (!string.IsNullOrEmpty(name))
+            {
+                string textSuffix = string.Format(ExceptionMessageAppendNameFormat, name);
+                message = new Energy.Base.Text.Editor().AppendAfterFirstLine(message, textSuffix);
+            }
+            return message;
+        }
+
+        public static string GetExceptionMessage(Exception exception, bool trace, bool includeClassName)
+        {
+            if (exception == null)
+                return "";
+            string name = null;
+            if (includeClassName)
+                name = exception.GetType().Name;
+            return GetExceptionMessage(exception, trace, name);
         }
 
         #endregion
@@ -376,11 +421,14 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
-            string message = ExceptionMessage(exception, true);
+            string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
+            if ((bool)ExceptionTrace)
             {
-                Log.Write(message, Enumeration.LogLevel.Bug);
+                if (_Logger != null)
+                {
+                    _Logger.Write(message, Enumeration.LogLevel.Bug);
+                }
             }
         }
 
@@ -424,7 +472,7 @@ namespace Energy.Core
         public static void Write(string message)
         {
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
+            if ((bool)ExceptionTrace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
@@ -449,7 +497,7 @@ namespace Energy.Core
             }
             debugMessage = FormatDebugOutput(debugMessage);
             System.Diagnostics.Debug.WriteLine(debugMessage);
-            if ((bool)TraceLogging)
+            if ((bool)ExceptionTrace)
             {
                 Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
@@ -479,9 +527,9 @@ namespace Energy.Core
                 return;
             }
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
-            if ((bool)TraceLogging)
+            if ((bool)ExceptionTrace)
             {
-                Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                //Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
             }
             Last = new Entry(code, message);
         }
@@ -492,7 +540,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Exception exception)
         {
-            Write(ExceptionMessage(exception));
+            Write(GetExceptionMessage(exception, (bool)ExceptionTrace, exception.GetType().Name));
         }
 
         /// <summary>
@@ -502,7 +550,7 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Code code, Exception exception)
         {
-            Write(code, ExceptionMessage(exception));
+            Write(code, GetExceptionMessage(exception, (bool)ExceptionTrace));
         }
 
         #endregion

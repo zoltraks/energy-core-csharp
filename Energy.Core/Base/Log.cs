@@ -146,7 +146,7 @@ namespace Energy.Base
                 if (format.Contains("{{MESSAGE}}"))
                     sb.Replace("{{MESSAGE}}", Message);
                 if (format.Contains("{{EXCEPTION}}"))
-                    sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.ExceptionMessage(Exception, true));
+                    sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.GetExceptionMessage(Exception, true, true));
                 return sb.ToString();
             }
 
@@ -179,12 +179,12 @@ namespace Energy.Base
             /// <summary>
             /// Immediately call write on new entry
             /// </summary>
-            public bool Immediate { get; set; }
+            public bool Immediate;
 
             /// <summary>
             /// Work in background
             /// </summary>
-            public bool Background { get; set; }
+            public bool Background;
 
             /// <summary>
             /// Minimum entry log level for being accepted
@@ -202,6 +202,11 @@ namespace Energy.Base
             /// <param name="log">List&lt;Entry&gt; - log</param>
             /// <returns></returns>
             public abstract bool Write(Energy.Base.Log.Entry[] log);
+
+            /// <summary>
+            /// Enable target for accepting log entries
+            /// </summary>
+            public bool Enable = true;
 
             /// <summary>
             /// Write single entry
@@ -235,11 +240,56 @@ namespace Energy.Base
         /// <summary>
         /// Log destination targets list
         /// </summary>
-        public class Destination : Energy.Base.Collection.Array<Target>
+        public class Destination : Energy.Base.Collection.Array<Energy.Base.Log.Target>
         {
             #region Constructor
 
             public Destination() { }
+
+            #endregion
+
+            #region Accessor
+
+            public Energy.Base.Log.Target this[Type target]
+            {
+                get
+                {
+                    return GetFirstByType(target);
+                }
+                private set
+                {
+                    SetFirstByType(target, value);
+                }
+            }
+
+            private Target GetFirstByType(Type type)
+            {
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (this[i].GetType() == type)
+                        return this[i];
+                }
+                object a = Activator.CreateInstance(type);
+                Energy.Base.Log.Target target = a as Energy.Base.Log.Target;
+                if (target == null)
+                    return null;
+                else
+                    this.Add(target);
+                return target;
+            }
+
+            private void SetFirstByType(Type type, Target target)
+            {
+                for (int i = 0; i < this.Count; i++)
+                {
+                    if (this[i].GetType() == type)
+                    {
+                        this[i] = target;
+                        return;
+                    }
+                }
+                this.Add(target);
+            }
 
             #endregion
 
