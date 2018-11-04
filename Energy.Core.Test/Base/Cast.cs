@@ -204,6 +204,35 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(test));
                 Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(test));
                 Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(test));
+
+                // int + uint
+
+                string _int;
+                _int = int.MinValue.ToString();
+                Assert.AreEqual(int.MinValue, Energy.Base.Cast.As<int>(_int));
+                Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
+                _int = ((decimal)int.MinValue - 1).ToString();
+                Assert.AreEqual((int)0, Energy.Base.Cast.As<int>(_int));
+                Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
+                _int = int.MaxValue.ToString();
+                Assert.AreEqual(int.MaxValue, Energy.Base.Cast.As<int>(_int));
+                Assert.AreEqual((uint)int.MaxValue, Energy.Base.Cast.As<uint>(_int));
+                _int = ((uint)int.MaxValue + 1).ToString();
+                Assert.AreEqual(0, Energy.Base.Cast.As<int>(_int));
+                Assert.AreEqual((uint)int.MaxValue + 1, Energy.Base.Cast.As<uint>(_int));
+
+                // long + ulong
+
+                string _long;
+                _long = long.MinValue.ToString();
+                Assert.AreEqual(long.MinValue, Energy.Base.Cast.As<long>(_long));
+                Assert.AreEqual((ulong)0, Energy.Base.Cast.As<ulong>(_long));
+                _long = long.MaxValue.ToString();
+                Assert.AreEqual(long.MaxValue, Energy.Base.Cast.As<long>(_long));
+                Assert.AreEqual((ulong)long.MaxValue, Energy.Base.Cast.As<ulong>(_long));
+                _long = ((ulong)long.MaxValue + 1).ToString();
+                Assert.AreEqual(0, Energy.Base.Cast.As<long>(_long));
+                Assert.AreEqual((ulong)long.MaxValue + 1, Energy.Base.Cast.As<ulong>(_long));
             }
         }
     }

@@ -26,7 +26,6 @@ namespace Energy.Base
                 return default(T);
 
             Type type = typeof(T);
-
             return (T)As(type, value);
         }
 
@@ -61,6 +60,14 @@ namespace Energy.Base
                 return ObjectToDouble(value);
             if (r == typeof(decimal))
                 return ObjectToDecimal(value);
+            if (r == typeof(Int32))
+                return ObjectToInteger(value);
+            if (r == typeof(UInt32))
+                return ObjectToUnsignedInteger(value);
+            if (r == typeof(Int64))
+                return ObjectToLong(value);
+            if (r == typeof(UInt64))
+                return ObjectToUnsignedLong(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
@@ -526,6 +533,21 @@ namespace Energy.Base
             return StringToInteger(RemoveNumericalDifferences(value));
         }
 
+
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static uint StringToUnsignedInteger(string value)
+        {
+            long x = StringToLong(value);
+            if (x < uint.MinValue || x > uint.MaxValue)
+                return 0;
+            else
+                return (uint)x;
+        }
+
         public static string IntegerToString(int value)
         {
             return value.ToString();
@@ -601,24 +623,17 @@ namespace Energy.Base
             if (long.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (long.TryParse(value, out result))
-                return result;
+            if (trim.Length != value.Length)
+                if (long.TryParse(value, out result))
+                    return result;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
-                try
-                {
-                    return (long)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < long.MinValue || number > long.MaxValue)
                     return 0;
-                }
-            }
+                else
+                    return (long)number;
             return 0;
         }
 
@@ -627,7 +642,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Long number</returns>
-        public static UInt64 StringToUnsignedLong(string value)
+        public static ulong StringToUnsignedLong(string value)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -635,32 +650,17 @@ namespace Energy.Base
             if (ulong.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
-                return 0;
-            if (ulong.TryParse(value, out result))
-            {
-                return result;
-            }
-            else
-            {
-                long signed;
-                if (long.TryParse(value, out signed))
-                    return (ulong)(signed);
-            }
+            if (trim.Length != value.Length)
+                if (ulong.TryParse(value, out result))
+                    return result;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
-                try
-                {
-                    return (ulong)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < 0 || number > ulong.MaxValue)
                     return 0;
-                }
-            }
+                else
+                    return (ulong)number;
             return 0;
         }
 
@@ -1748,23 +1748,16 @@ namespace Energy.Base
             return value.ToString();
         }
 
-        /// <summary>
-        /// Convert string to integer value without exception.
-        /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.     
-        /// Returns zero on overflow.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public static int ObjectToInteger(object value)
         {
             if (value == null)
                 return 0;
 
-            if (value is Int16)
-                return (int)(Int16)value;
             if (value is Int32)
                 return (int)(Int32)value;
+
+            if (value is Int16)
+                return (int)(Int16)value;
             if (value is Int64)
                 return (int)(Int64)value;
             if (value is UInt16)
@@ -1798,6 +1791,59 @@ namespace Energy.Base
             string s = value is string ? (string)value : value.ToString();
 
             return StringToInteger(s);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static uint ObjectToUnsignedInteger(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is UInt32)
+                return (uint)(UInt32)value;
+
+            if (value is Int16)
+                return (uint)(Int16)value;
+            if (value is Int32)
+                return (uint)(Int32)value;
+            if (value is UInt16)
+                return (uint)(UInt16)value;
+
+            try
+            {
+                if (value is Int64)
+                    return (uint)(Int64)value;
+                if (value is UInt64)
+                    return (uint)(UInt64)value;
+                if (value is double)
+                    return (uint)(double)value;
+                if (value is float)
+                    return (uint)(float)value;
+                if (value is decimal)
+                    return (uint)(decimal)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is byte)
+                return (uint)(byte)value;
+            if (value is sbyte)
+                return (uint)(sbyte)value;
+            if (value is char)
+                return (uint)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToUnsignedInteger(s);
         }
 
         /// <summary>
@@ -1936,12 +1982,13 @@ namespace Energy.Base
                     return (char)(UInt32)value;
                 if (value is UInt64)
                     return (char)(UInt64)value;
+
                 if (value is double)
                     return (char)(double)value;
-                if (value is float)
-                    return (char)(float)value;
                 if (value is decimal)
                     return (char)(decimal)value;
+                if (value is float)
+                    return (char)(float)value;
             }
             catch (OverflowException)
             {
@@ -1952,6 +1999,7 @@ namespace Energy.Base
 
             return StringToChar(s);
         }
+
         /// <summary>
         /// Convert object to long integer number.
         /// </summary>
@@ -1962,38 +2010,94 @@ namespace Energy.Base
             if (value == null)
                 return 0;
 
-            if (value is long || value is long?)
+            if (value is Int64)
                 return (long)(long)value;
-            if (value is ulong || value is ulong?)
-                return (long)(ulong)value;
-            if (value is int || value is int?)
+
+            try
+            {
+                if (value is UInt64)
+                    return (long)(ulong)value;
+
+                if (value is double)
+                    return (long)(double)value;
+                if (value is decimal)
+                    return (long)(decimal)value;
+                if (value is float)
+                    return (long)(float)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is Int32)
                 return (long)(int)value;
-            if (value is uint || value is uint?)
+            if (value is UInt32)
                 return (long)(uint)value;
-            if (value is double || value is double?)
-                return (long)(double)value;
-            if (value is float || value is float?)
-                return (long)(float)value;
-            if (value is decimal || value is decimal?)
-                return (long)(decimal)value;
-            if (value is short || value is short?)
-                return (long)(short)value;
-            if (value is ushort || value is ushort?)
-                return (long)(ushort)value;
-            if (value is byte || value is byte?)
+            if (value is Int16)
+                return (long)(Int16)value;
+            if (value is UInt16)
+                return (long)(UInt16)value;
+            if (value is byte)
                 return (long)(byte)value;
-            if (value is sbyte || value is sbyte?)
+            if (value is sbyte)
                 return (long)(sbyte)value;
-            if (value is char || value is char?)
+            if (value is char)
                 return (long)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
+            string s = value is string ? (string)value : value.ToString();
 
             return StringToLong(s);
+        }
+
+        /// <summary>
+        /// Convert object to long integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ulong ObjectToUnsignedLong(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is UInt64)
+                return (ulong)(ulong)value;
+
+            try
+            {
+                if (value is Int64)
+                    return (ulong)(long)value;
+                if (value is Int32)
+                    return (ulong)(int)value;
+                if (value is Int16)
+                    return (ulong)(Int16)value;
+                if (value is sbyte)
+                    return (ulong)(sbyte)value;
+
+                if (value is double)
+                    return (double)value < 0 ? 0 : (ulong)(double)value;
+                if (value is decimal)
+                    return (decimal)value < 0 ? 0 : (ulong)(decimal)value;
+                if (value is float)
+                    return (float)value < 0 ? 0 : (ulong)(float)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is UInt32)
+                return (ulong)(uint)value;
+            if (value is UInt16)
+                return (ulong)(UInt16)value;
+            if (value is byte)
+                return (ulong)(byte)value;
+            if (value is char)
+                return (ulong)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToUnsignedLong(s);
         }
 
         public static bool ObjectToBool(object value)
