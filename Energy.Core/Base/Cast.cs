@@ -1032,7 +1032,6 @@ namespace Energy.Base
 
         #region Double
 
-
         /// <summary>
         /// Convert string to double value without exception.
         /// Treat comma "," the same as dot "." as decimal point.
@@ -1096,23 +1095,44 @@ namespace Energy.Base
         /// <param name="trim">Trim trailing zeros from fractional part</param>
         /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
         /// <returns>String</returns>
-        public static string DoubleToString(double value, int precision, bool trim, System.Globalization.CultureInfo culture)
+        public static string DoubleToString(double value, int precision, bool trim
+            , System.Globalization.CultureInfo culture)
         {
             // HACK: Missing "??=" operator :-)
             //culture ??= System.Globalization.CultureInfo.InvariantCulture;
             culture = culture ?? System.Globalization.CultureInfo.InvariantCulture;
-            if (precision < 1)
+            if (precision < 0)
             {
                 return value.ToString(culture);
             }
+            else if (precision == 0)
+            {
+                return value.ToString("N0", culture);
+            }
             else
             {
-                string result = value.ToString("0." + new String('0', precision), culture);
+                string format = "R";
+                string result = value.ToString(format, culture);
+                string decimalPoint = culture.NumberFormat.NumberDecimalSeparator;
+                int point = result.IndexOf(decimalPoint);
+                int length = 1 + point + precision;
                 if (trim)
                 {
-                    char point = Energy.Base.Cast.StringToChar(culture.NumberFormat.NumberDecimalSeparator);
-                    result = result.TrimEnd('0').TrimEnd(point);
+                    if (result.EndsWith("0"))
+                    {
+                        int original = result.Length;
+                        result = result.TrimEnd('0');
+                        if (result.Length != original && result.EndsWith(decimalPoint))
+                            result = result.Substring(0, result.Length - decimalPoint.Length);
+                    }
                 }
+                else
+                {
+                    if (result.Length < length)
+                        result = result.PadRight(length, '0');
+                }
+                if (result.Length > length)
+                    result = result.Substring(0, length);
                 return result;
             }
         }
@@ -1124,7 +1144,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            return value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return value.ToString("R", CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1134,7 +1154,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(string value)
         {
-            return StringToDouble(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return DoubleToString(StringToDouble(value));
         }
 
         /// <summary>

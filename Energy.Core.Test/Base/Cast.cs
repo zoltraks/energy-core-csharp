@@ -305,5 +305,17 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("-2147483648", Energy.Base.Cast.IntegerToString(_int));
             Assert.AreEqual("$2147483648", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
         }
+
+        [TestMethod]
+        public void CastDoubleToString()
+        {
+            double _double = -1234567890.0987654321;
+            Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double));
+            Assert.AreEqual("-1234567890.0987654000", Energy.Base.Cast.DoubleToString(_double, 10, false));
+            Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double, 10, true));
+            Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double, 11, true));
+            Assert.AreEqual("-1234567890.09876540000", Energy.Base.Cast.DoubleToString(_double, 11, false));
+            Assert.AreEqual("-1234567890.0987", Energy.Base.Cast.DoubleToString(_double, 4));
+        }
     }
 }
