@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -48,6 +49,8 @@ namespace Energy.Core
         /// Application locale
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
+        public ICommandProgram _CommandProgram { get; private set; }
+        public string[] Arguments { get; private set; }
 
         #region Constructor
 
@@ -57,6 +60,23 @@ namespace Energy.Core
         public Application()
         {
             // create //
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Application(System.Type type)
+            : base()
+        {
+            // create //
+            if (type == null)
+                return;
+            if (null != Energy.Base.Class.GetClassInterface(type, typeof(Energy.Interface.ICommandProgram)))
+            {
+                Energy.Interface.ICommandProgram app = Activator.CreateInstance(type)
+                    as Energy.Interface.ICommandProgram;
+                this._CommandProgram = app;
+            }
         }
 
         /// <summary>
@@ -99,9 +119,37 @@ namespace Energy.Core
         /// <summary>
         /// Run
         /// </summary>
-        public void Run()
+        public bool Run()
         {
-            throw new NotImplementedException();
+            string[] args = this.Arguments;
+            if (_CommandProgram != null)
+                return Run(_CommandProgram, args);
+            return true;
+        }
+
+        /// <summary>
+        /// Run
+        /// </summary>
+        public bool Run(ICommandProgram commandProgram, string[] args)
+        {
+            try
+            {
+                if (commandProgram != null)
+                {
+                    if (!commandProgram.Setup(args))
+                        return false;
+                    if (!commandProgram.Initialize(args))
+                        return false;
+                    if (!commandProgram.Run(args))
+                        return false;
+                }
+            }
+            catch (Exception fallBackException)
+            {
+                Energy.Core.Log.Default.Write(fallBackException);
+            }
+
+            return true;
         }
 
         #endregion
@@ -146,6 +194,16 @@ namespace Energy.Core
         public static void SetConsoleEncoding()
         {
             SetConsoleEncoding(System.Text.Encoding.UTF8);
+        }
+
+        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        {
+            return System.IO.Path.GetDirectoryName(assembly.Location);
+        }
+
+        public static string GetExecutionPath()
+        {
+            return GetExecutionPath(System.Reflection.Assembly.GetExecutingAssembly());
         }
 
         #endregion
