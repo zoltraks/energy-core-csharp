@@ -304,13 +304,13 @@ namespace Energy.Base
         /// Escape JSON characters and include string in double quotes.
         /// Null strings will be represented as "null".
         /// 
-        /// Backspace is replaced with \b
-        /// Form feed is replaced with \f
-        /// Newline is replaced with \n
-        /// Carriage return is replaced with \r
-        /// Tab is replaced with \t
-        /// Double quote is replaced with \"
-        /// Backslash is replaced with \\
+        /// Backspace is replaced with '\b'.
+        /// Form feed is replaced with '\f'.
+        /// Newline is replaced with '\n'.
+        /// Carriage return is replaced with '\r'.
+        /// Tab is replaced with '\t'.
+        /// Double quote is replaced with '\"'.
+        /// Backslash is replaced with '\\'.
         /// 
         /// </summary>
         /// <param name="text">Text to be escaped for JSON string</param>

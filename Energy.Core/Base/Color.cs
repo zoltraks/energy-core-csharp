@@ -142,7 +142,7 @@ namespace Energy.Base
         /// <summary>
         /// Convert hexadecimal string or HTML color to System.Drawing.Color
         /// </summary>
-        /// <param name="hex">333, #ebebeb, etc.</param>
+        /// <param name="hex">"333", "#ebebeb", etc.</param>
         /// <returns>System.Drawing.Color equivalent</returns>
         public static Energy.Base.Color HexToColor(string hex)
         {

@@ -88,8 +88,8 @@ namespace Energy.Query
 
             /// <summary>
             /// Parameter names must be explicit.
-            /// If set to false, parameters with single at sign (@var)
-            /// can be defined in shorter form ("var").
+            /// If set to false, parameters can be defined in shorter form 
+            /// without at sign.
             /// </summary>
             public bool Explicit
             {
