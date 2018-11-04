@@ -8,6 +8,9 @@ using System.Threading;
 
 namespace Energy.Core
 {
+    /// <summary>
+    /// Bug
+    /// </summary>
     public class Bug
     {
         #region Property
