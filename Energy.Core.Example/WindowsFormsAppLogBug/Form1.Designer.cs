@@ -35,40 +35,45 @@
             // 
             // buttonAddMessage
             // 
-            this.buttonAddMessage.Location = new System.Drawing.Point(12, 12);
+            this.buttonAddMessage.Location = new System.Drawing.Point(16, 15);
+            this.buttonAddMessage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonAddMessage.Name = "buttonAddMessage";
-            this.buttonAddMessage.Size = new System.Drawing.Size(110, 23);
+            this.buttonAddMessage.Size = new System.Drawing.Size(147, 28);
             this.buttonAddMessage.TabIndex = 0;
             this.buttonAddMessage.Text = "Add message";
             this.buttonAddMessage.UseVisualStyleBackColor = true;
+            this.buttonAddMessage.Click += new System.EventHandler(this.buttonAddMessage_Click);
             // 
             // textBoxMessage
             // 
             this.textBoxMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxMessage.Location = new System.Drawing.Point(128, 14);
+            this.textBoxMessage.Location = new System.Drawing.Point(171, 17);
+            this.textBoxMessage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxMessage.Name = "textBoxMessage";
-            this.textBoxMessage.Size = new System.Drawing.Size(144, 20);
+            this.textBoxMessage.Size = new System.Drawing.Size(191, 22);
             this.textBoxMessage.TabIndex = 1;
             this.textBoxMessage.Text = "Example message";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 41);
+            this.button1.Location = new System.Drawing.Point(16, 50);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(110, 23);
+            this.button1.Size = new System.Drawing.Size(147, 28);
             this.button1.TabIndex = 2;
             this.button1.Text = "Add message";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(379, 321);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBoxMessage);
             this.Controls.Add(this.buttonAddMessage);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);

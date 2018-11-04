@@ -86,5 +86,57 @@ namespace Energy.Base
             }
             return q;
         }
+
+        public static long Increment(long value)
+        {
+            return Increment(value, 0);
+        }
+
+        public static long Increment(long value, long zeroValue)
+        {
+            if (value == long.MaxValue)
+                return zeroValue;
+            else
+                return value + 1;
+        }
+
+        public static long Decrement(long value)
+        {
+            return Decrement(value, 0);
+        }
+
+        public static long Decrement(long value, long zeroValue)
+        {
+            if (value == long.MinValue)
+                return zeroValue;
+            else
+                return value - 1;
+        }
+
+        public static int Increment(int value)
+        {
+            return Increment(value, 0);
+        }
+
+        public static int Increment(int value, int zeroValue)
+        {
+            if (value == int.MaxValue)
+                return zeroValue;
+            else
+                return value + 1;
+        }
+
+        public static int Decrement(int value)
+        {
+            return Decrement(value, 0);
+        }
+
+        public static int Decrement(int value, int zeroValue)
+        {
+            if (value == int.MinValue)
+                return zeroValue;
+            else
+                return value - 1;
+        }
     }
 }

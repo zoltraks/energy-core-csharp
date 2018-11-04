@@ -21,8 +21,14 @@ namespace WindowsFormsAppLogBug
             Energy.Core.Bug.Write("Form Load");
 
             //Energy.Core.Log.Default.Destination += new Energy.Log.Target.Event();
-            Energy.Core.Log logger = new Energy.Core.Log();
+            Energy.Core.Log.Logger logger = new Energy.Core.Log.Logger();
             logger.Maximum = 10;     
+        }
+
+        private void buttonAddMessage_Click(object sender, EventArgs e)
+        {
+            //Energy.Core.Log.Default.Destination.Add(new Energy.Core.Log.Target.Event())
+            Energy.Core.Log.Default.Write(textBoxMessage.Text, Energy.Enumeration.LogLevel.Message);
         }
     }
 }

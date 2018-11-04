@@ -1,21 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
+    <AssemblyName>Energy.Core</AssemblyName>
+    <Version>18.11.0</Version>
+    <FileVersion>18.11.0</FileVersion>
+    <AssemblyVersion>2018.11.04</AssemblyVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
-    <AssemblyName>Energy.Core</AssemblyName>
-    <Version>17.09.4</Version>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
-    <Description></Description>
+    <Description>Library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. Designed for all purposes as a set of libraries compiled into one include file. No external dependencies, avaliable for most .NET platform versions.</Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
-    <AssemblyVersion>2017.09.26</AssemblyVersion>
-    <FileVersion>17.9.4</FileVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-  </PropertyGroup>
+    <PackageProjectUrl>http://energy.alyx.pl/</PackageProjectUrl>
+    <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
+    <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+ </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>bin\</OutputPath>
@@ -31,12 +35,27 @@
     <DefineConstants>TRACE;DEBUG;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Energy.Core.NET20.suo" />
+    <None Remove="Energy.Core.NET40.suo" />
+    <None Remove="Energy.Core.suo" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Query\Standard\" />
   </ItemGroup>
 
 </Project>
