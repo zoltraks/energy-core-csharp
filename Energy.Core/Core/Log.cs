@@ -843,7 +843,7 @@ namespace Energy.Core
                         Thread thread = new Thread(() => { WriteUnsafe(log); })
                         {
                             IsBackground = true,
-                            CurrentUICulture = Energy.Core.Application.GetCurrentUICulture(),
+                            CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
                         };
                         thread.Start();
                         return true;
