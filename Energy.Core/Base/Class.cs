@@ -428,6 +428,16 @@ namespace Energy.Base
             return null;
         }
 
+        /// <summary>
+        /// Get desired attribute for a class or null if not found.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static T GetClassAttribute<T>(Type type)
+        {
+            return (T)GetClassAttribute(type, typeof(T));
+        }
+
         #endregion
 
         #region GetValueWithAttribute / GetValuesWithAttribute
@@ -1050,6 +1060,46 @@ namespace Energy.Base
                 dictionary[name] = version;
             }
             return dictionary;
+        }
+
+        /// <summary>
+        /// Returns the major/minor version number for an assembly formatted as a string.
+        /// </summary>
+        public static string GetAssemblySoftwareVersion(System.Reflection.Assembly assembly)
+        {
+#if NETSTANDARD
+            AssemblyInformationalVersionAttribute attributeAssemblyInformationalVersion
+                = Energy.Base.Class.GetClassAttribute<AssemblyInformationalVersionAttribute>(assembly.GetType());
+            return attributeAssemblyInformationalVersion.InformationalVersion;
+#else
+            return null;
+#endif
+        }
+
+        /// <summary>
+        /// Returns the build/revision number for an assembly formatted as a string.
+        /// </summary>
+        public static string GetAssemblyBuildNumber(System.Reflection.Assembly assembly)
+        {
+#if NETSTANDARD
+            return assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+#else
+            return assembly.ImageRuntimeVersion;
+#endif
+        }
+
+        /// <summary>
+        /// Returns the linker timestamp for an assembly. 
+        /// </summary>
+        public static DateTime GetAssemblyTimestamp(System.Reflection.Assembly assembly)
+        {
+            try
+            {
+                return System.IO.File.GetLastWriteTimeUtc(assembly.Location);
+            }
+            catch
+            { }
+            return DateTime.MinValue;
         }
 
         #endregion
