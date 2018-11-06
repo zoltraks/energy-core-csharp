@@ -39,7 +39,7 @@ namespace Energy.Base
 
         public delegate void ReceiveDelegate(object self, byte[] data);
 
-        public delegate void TimeoutDelegate(object self);
+        public delegate void ErrorDelegate(object self, Exception exception);
 
         #endregion
 
