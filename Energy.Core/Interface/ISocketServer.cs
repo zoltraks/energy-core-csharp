@@ -6,10 +6,16 @@ namespace Energy.Interface
 {
     public interface ISocketServer: ISocketConnection
     {
-        int Port { get; set; }
+        event Energy.Base.Network.CloseDelegate OnClose;
 
-        bool Listen();
+        event Energy.Base.Network.ListenDelegate OnListen;
 
-        bool Send(byte[] data);
+        event Energy.Base.Network.AcceptDelegate OnAccept;
+
+        event Energy.Base.Network.ReceiveDelegate OnReceive;
+
+        event Energy.Base.Network.SendDelegate OnSend;
+
+        event Energy.Base.Network.ErrorDelegate OnError;
     }
 }
