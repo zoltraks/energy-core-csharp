@@ -32,6 +32,36 @@ namespace Energy.Query
 
         #endregion
 
+        #region Private
+
+        private Dictionary<string, Format> _DialectFormatDictionary;
+
+        #endregion
+
+        #region Accessor
+
+        public Format this[string dialect]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(dialect))
+                    return null;
+                string search = dialect.ToUpperInvariant();
+                if (_DialectFormatDictionary == null)
+                {
+                    _DialectFormatDictionary = new Dictionary<string, Format>();
+                }
+                else
+                {
+                    if (_DialectFormatDictionary.ContainsKey(search))
+                        return _DialectFormatDictionary[search];
+                }
+                ///Energy.Base.Class.GetClassesWithAttribute(typeof(Energy.Attribute.Database.Dialect));
+            }
+        }
+
+        #endregion
+
         #region Property
 
         /// <summary>
