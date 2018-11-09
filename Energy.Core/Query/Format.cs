@@ -46,17 +46,34 @@ namespace Energy.Query
             {
                 if (string.IsNullOrEmpty(dialect))
                     return null;
-                string search = dialect.ToUpperInvariant();
+                Energy.Query.Format findFormat = null;
                 if (_DialectFormatDictionary == null)
                 {
                     _DialectFormatDictionary = new Dictionary<string, Format>();
                 }
                 else
                 {
-                    if (_DialectFormatDictionary.ContainsKey(search))
-                        return _DialectFormatDictionary[search];
+                    findFormat = Energy.Base.Collection.GetStringDictionaryValue<Energy.Query.Format>(_DialectFormatDictionary, dialect, true);
                 }
-                ///Energy.Base.Class.GetClassesWithAttribute(typeof(Energy.Attribute.Database.Dialect));
+                if (findFormat == null)
+                {
+                    System.Type classFormat = null;
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetAssembly(typeof(Energy.Query.Format));
+                    System.Type[] types;
+                    types = assembly.GetTypes();
+                    System.Type[] class1Array = Energy.Base.Class.GetTypesWithAttribute(types, typeof(Energy.Attribute.Code.TemporaryAttribute));
+                    System.Type[] class2Array = Energy.Base.Class.GetTypesWithInterface(types, typeof(Energy.Interface.IDialect));
+
+                    classFormat = Energy.Base.Collection.GetFirstOrDefault<System.Type>(class1Array, class2Array);
+
+                    if (classFormat != null)
+                    {
+                        findFormat = (Energy.Query.Format)Activator.CreateInstance(classFormat);
+                        _DialectFormatDictionary[dialect] = findFormat;
+                    }
+                }
+                return findFormat;
+
             }
         }
 
