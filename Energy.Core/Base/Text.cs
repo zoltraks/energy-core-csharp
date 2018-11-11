@@ -1927,6 +1927,30 @@ namespace Energy.Base
             return Quote(text, with, escape);
         }
 
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string Quote(object value)
+        {
+            string text = Energy.Base.Cast.AsString(value);
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(object value, string with)
+        {
+            string text = Energy.Base.Cast.AsString(value);
+            return Quote(text, with, with);
+        }
+
         #endregion
 
         #region Strip
