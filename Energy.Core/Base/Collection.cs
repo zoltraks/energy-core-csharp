@@ -509,6 +509,51 @@ namespace Energy.Base
                 }
                 return false;
             }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right)
+            {
+                return Compare(left, right, false);
+            }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right, bool ignoreCase)
+            {
+                if (left == null || right == null)
+                {
+                    if (left == null && right == null)
+                        return 0;
+                    if (left == null)
+                        return -1;
+                    else
+                        return 1;
+                }
+                if (left.Length < right.Length)
+                    return -1;
+                else if (left.Length > right.Length)
+                    return 1;
+                else
+                {
+                    for (int i = 0; i < left.Length; i++)
+                    {
+                        int result = string.Compare(left[i], right[i], ignoreCase);
+                        if (result != 0)
+                            return result;
+                    }
+                }
+                return 0;
+            }
         }
 
         #endregion
