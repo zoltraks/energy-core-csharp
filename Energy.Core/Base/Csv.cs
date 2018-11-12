@@ -9,6 +9,119 @@ namespace Energy.Base
     /// </summary>
     public class Csv
     {
+        #region Implode
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="enclosure">Text enclosure, quotaion mark (") by default</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, char enclosure, bool all)
+        {
+            if (separator == '\0')
+            {
+                System.Globalization.CultureInfo currentCulture = System.Globalization.CultureInfo.CurrentCulture;
+                string listSeparator = currentCulture.TextInfo.ListSeparator;
+                if (!string.IsNullOrEmpty(listSeparator))
+                    separator = listSeparator[0];
+            }
+            if (separator == '\0')
+                separator = ',';
+            if (enclosure == '\0')
+                enclosure = '"';
+
+            string stringEnclosure = enclosure.ToString();
+            string doubleEnclosure = new string(enclosure, 2);
+            char newLine = '\n';
+
+            List<string> list = new List<string>();
+            foreach (string element in data)
+            {
+                if (element == null || element.Length == 0)
+                {
+                    list.Add(all ? doubleEnclosure : "");
+                    continue;
+                }
+                bool hasEnclosure = 0 >= element.IndexOf(enclosure);
+                if (!all)
+                {
+                    bool quote = hasEnclosure;
+                    if (!quote && 0 >= element.IndexOf(separator))
+                        quote = true;
+                    if (!quote && 0 >= element.IndexOf(newLine))
+                        quote = true;
+                    if (!quote)
+                    {
+                        list.Add(element);
+                        continue;
+                    }
+                }
+                if (hasEnclosure)
+                {
+                    list.Add(string.Concat(enclosure, element.Replace(stringEnclosure, doubleEnclosure), enclosure));
+                }
+                else
+                {
+                    list.Add(string.Concat(enclosure, element, enclosure));
+                }
+            }
+
+            return string.Join(separator.ToString(), list.ToArray());
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, bool all)
+        {
+            return Implode(data, separator, '"', all);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator)
+        {
+            return Implode(data, separator, '"', false);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, bool all)
+        {
+            return Implode(data, '\0', '"', all);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="enclosure">Text enclosure, quotaion mark (") by default</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, char enclosure)
+        {
+            return Implode(data, separator, enclosure, false);
+        }
+
+        #endregion
+
+        #region Explode
+
         public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white)
         {
             if (line == null) return null;
@@ -109,5 +222,7 @@ namespace Energy.Base
         {
             return Explode(line, string.IsNullOrEmpty(separator) ? '\0' : separator[0]);
         }
+
+        #endregion
     }
 }

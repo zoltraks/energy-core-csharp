@@ -15,8 +15,8 @@
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageProjectUrl>http://energy.alyx.pl/</PackageProjectUrl>
-    <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
+    <PackageProjectUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/</PackageProjectUrl>
+    <PackageIconUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/media/icon/nuget.png</PackageIconUrl>
     <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
     <NoPackageAnalysis>true</NoPackageAnalysis>
  </PropertyGroup>
