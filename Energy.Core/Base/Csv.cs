@@ -124,6 +124,12 @@ namespace Energy.Base
 
         public static string[] Explode(string line, char[] separator, char[] enclosure, bool trim, bool glue, bool strip)
         {
+            if (line == null)
+                return null;
+            int l = line.Length;
+            if (l == 0)
+                return new string[] { };
+
             return null;
         }
 

@@ -13,6 +13,10 @@ namespace Energy.Core.Test.Base
             string[] result;
             string line;
 
+            line = null;
+            result = Energy.Base.Csv.Explode(line, ",");
+            Assert.IsNull(result);
+
             line = "a,b,c";
             result = Energy.Base.Csv.Explode(line, ",");
             expect = new string[] { "a", "b", "c" };
