@@ -538,7 +538,6 @@ namespace Energy.Core
             public SocketConnection()
             {
                 this.Encoding = System.Text.Encoding.UTF8;
-                this.Background = false;
             }
 
             #endregion
@@ -563,7 +562,7 @@ namespace Energy.Core
 
             public Encoding Encoding { get; set; }
             public int Retry { get; set; }
-            public bool Background { get; set; }
+
             public DateTime ConnectStamp { get; private set; }
 
             #endregion
@@ -592,13 +591,9 @@ namespace Energy.Core
 
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
 
-                    if (OnListen != null)
+                    if (this.OnListen != null)
                     {
-                        Energy.Core.Worker.Fire(() =>
-                        {
-                            if (this.OnListen != null)
-                                this.OnListen(this);
-                        });
+                        this.OnListen(this);
                     }
                 }
                 catch (Exception e)
@@ -681,12 +676,9 @@ namespace Energy.Core
                     clientConnection.State = new StateObject();
                     clientConnection.State.Socket = clientSocket;
 
-                    if (OnAccept != null)
+                    if (this.OnAccept != null)
                     {
-                        if (this.Background)
-                            Energy.Core.Worker.Fire(() => { OnAccept(this); });
-                        else
-                            OnAccept(this);
+                        this.OnAccept(this);
                     }
 
                     AcceptDone.Set();
@@ -754,10 +746,7 @@ namespace Energy.Core
 
                     if (this.OnConnect != null)
                     {
-                        if (this.Background)
-                            Energy.Core.Worker.Fire(() => { this.OnConnect(this); });
-                        else
-                            this.OnConnect(this);
+                        this.OnConnect(this);
                     }
                 }
                 catch (SocketException exceptionSocket)
@@ -819,7 +808,7 @@ namespace Energy.Core
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Sending is currently waiting for callback");
+                    System.Diagnostics.Debug.WriteLine("Send operation already waiting for callback");
                 }
 
                 return true;
@@ -873,10 +862,7 @@ namespace Energy.Core
 
                     if (this.OnSend != null)
                     {
-                        if (this.Background)
-                            Energy.Core.Worker.Fire(() => { this.OnSend(this, data); });
-                        else
-                            this.OnSend(this, data);
+                        this.OnSend(this, data);
                     }
 
                     int length = 0;
@@ -911,6 +897,10 @@ namespace Energy.Core
                 if (ReceiveDone.WaitOne(0))
                 {
                     return ReceiveBegin();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Receive operation already waiting for callback");
                 }
 
                 return true;
@@ -986,21 +976,15 @@ namespace Energy.Core
 
                 try
                 {
+                    byte[] data = null;
+
                     if (flush)
                     {
                         if (stateObject.Stream.Length > 0)
                         {
-                            byte[] data = stateObject.Stream.ToArray();
+                            data = stateObject.Stream.ToArray();
                             stateObject.Stream.SetLength(0);
                             stateObject.ReceiveBuffer.Add(data);
-
-                            if (this.OnReceive != null)
-                            {
-                                if (this.Background)
-                                    Energy.Core.Worker.Fire(() => { this.OnReceive(this, data); });
-                                else
-                                    this.OnReceive(this, data);
-                            }
                         }
                     }
 
@@ -1011,6 +995,14 @@ namespace Energy.Core
                     else
                     {
                         ReceiveDone.Set();
+                    }
+
+                    if (data != null)
+                    {
+                        if (this.OnReceive != null)
+                        {
+                            this.OnReceive(this, data);
+                        }
                     }
                 }
                 catch (Exception e)
