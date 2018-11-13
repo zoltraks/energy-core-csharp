@@ -398,6 +398,12 @@ namespace Energy.Core
 
         #endregion
 
+        #region SocketClient
+
+        public class SocketClient : SocketConnection { }
+
+        #endregion
+
         #region SocketConnection
 
         public class SocketConnection : Energy.Interface.ISocketConnection
@@ -588,7 +594,7 @@ namespace Energy.Core
 
                     if (OnListen != null)
                     {
-                        Energy.Core.Worker.Fire(() => 
+                        Energy.Core.Worker.Fire(() =>
                         {
                             if (this.OnListen != null)
                                 this.OnListen(this);
