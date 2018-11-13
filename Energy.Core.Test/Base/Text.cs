@@ -166,6 +166,15 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Text.Quote(value, "'", "'", true);
             expect = "\"";
             Assert.AreEqual(expect, result);
+            object o;
+            o = 12;
+            result = Energy.Base.Text.Quote(o);
+            expect = "\"12\"";
+            Assert.AreEqual(expect, result);
+            o = 12.34;
+            result = Energy.Base.Text.Quote(o);
+            expect = "\"12.34\"";
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]

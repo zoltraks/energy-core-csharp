@@ -541,7 +541,8 @@ namespace Energy.Base
         #region Char
 
         /// <summary>
-        /// Get first character from a string without exception
+        /// Get first character from a string without exception.
+        /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -551,7 +552,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get character from a string without exception
+        /// Get character at specified position from a string without exception.
+        /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
         /// <param name="position"></param>
