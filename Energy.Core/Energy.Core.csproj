@@ -5,7 +5,7 @@
     <Version>18.11.1</Version>
     <FileVersion>18.11.0</FileVersion>
     <AssemblyVersion>2018.11.11</AssemblyVersion>
-    <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
@@ -53,6 +53,15 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net20'">
     <DefineConstants>RELEASE;NET20</DefineConstants>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net35'">
+    <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net35'">
+    <DefineConstants>RELEASE;NET35</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net40'">
