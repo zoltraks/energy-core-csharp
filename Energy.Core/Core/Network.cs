@@ -413,143 +413,125 @@ namespace Energy.Core
 
         #endregion
 
+        #region SocketServer
+
+        public class SocketServer : SocketConnection
+        {
+        }
+
+        #endregion
+
         #region SocketConnection
 
         public class SocketConnection : Energy.Interface.ISocketConnection
         {
-            public bool AlwaysReceive { get; set; }
-
-            #region StateObject
-
-                private volatile Socket _Socket;
-                /// <summary>
-                /// Working socket
-                /// </summary>
-                public Socket Socket { get { return _Socket; } set { _Socket = value; } }
-
-                private volatile int _Capacity = 8192;
-
-                /// <summary>
-                /// Buffer capacity
-                /// </summary>
-                public int Capacity { get { return _Capacity; } set { _Capacity = value; } }
-
-                private volatile byte[] _Buffer;
-
-                public byte[] Buffer { get { return _Buffer; } set { _Buffer = value; } }
-
-                private volatile MemoryStream _Stream;
-
-                public MemoryStream Stream { get { return GetStream(); } private set { _Stream = value; } }
-
-            private byte[] GetBuffer()
-            {
-                if (Buffer == null)
-                {
-                    Buffer = new byte[Capacity];
-                }
-                return _Buffer;
-            }
-
-            private MemoryStream GetStream()
-            {
-                if (_Stream == null)
-                {
-                    Stream = new MemoryStream(Capacity);
-                }
-                return _Stream;
-            }
-
-            private volatile bool _Active;
-
-                /// <summary>
-                /// Is connection active? Set to 0 if should be closed immediately
-                /// </summary>
-                public bool Active { get { return _Active; } set { _Active = value; } }
-
-            private volatile bool _Connected;
-
-            /// <summary>
-            /// Is connection active? Set to 0 if should be closed immediately
-            /// </summary>
-            public bool Connected { get { return _Connected; } set { _Connected = value; } }
-
-
-            private volatile int _Repeat = 0;
-
-                /// <summary>
-                /// Repeat operation if possible, 0 means no repeat
-                /// </summary>
-                public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
-
-            private List<byte[]> _ReceiveBuffer;
-
-                public List<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
-
-            private List<byte[]> GetReceiveBuffer()
-            {
-                if (_ReceiveBuffer == null)
-                {
-                    _ReceiveBuffer = new List<byte[]>();
-                }
-                return _ReceiveBuffer;
-            }
-
-            private List<byte[]> _SendBuffer;
-
-            public List<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
-
-            private List<byte[]> GetSendBuffer()
-            {
-                if (_SendBuffer == null)
-                {
-                    _SendBuffer = new List<byte[]>();
-                }
-                return _SendBuffer;
-            }
-
-            public int SendBufferPosition { get; set; }
-
-            #endregion
-
-            #region Lock
-
-            private readonly object _PropertyLock = new object();
-
-            #endregion
-
             #region Property
-
-            //private bool _Active = false;
-            //[DefaultValue(false)]
-            //public bool Active { get { lock (_PropertyLock) return _Active; } set { lock (_PropertyLock) _Active = value; } }
 
             private string _Host = "";
             [DefaultValue(null)]
-            public string Host { get { lock (_PropertyLock) return _Host; } set { lock (_PropertyLock) _Host = value; } }
+            public string Host { get { return _Host; } set { _Host = value; } }
 
             private int _Port = 0;
             [DefaultValue(0)]
-            public int Port { get { lock (_PropertyLock) return _Port; } set { lock (_PropertyLock) _Port = value; } }
+            public int Port { get { return _Port; } set { _Port = value; } }
 
             private AddressFamily _Family = AddressFamily.InterNetwork;
             [DefaultValue(default(AddressFamily))]
-            public AddressFamily Family { get { lock (_PropertyLock) return _Family; } set { lock (_PropertyLock) _Family = value; } }
+            public AddressFamily Family { get { return _Family; } set { _Family = value; } }
 
             private ProtocolType _Protocol = ProtocolType.Tcp;
             [DefaultValue(default(ProtocolType))]
-            public ProtocolType Protocol { get { lock (_PropertyLock) return _Protocol; } set { lock (_PropertyLock) _Protocol = value; } }
-
-            private int _Backlog = 100;
-            [DefaultValue(100)]
-            public int Backlog { get { lock (_PropertyLock) return _Backlog; } set { lock (_PropertyLock) _Backlog = value; } }
+            public ProtocolType Protocol { get { return _Protocol; } set { _Protocol = value; } }
 
             private int _Timeout = 3000;
             /// <summary>
             /// Timeout in milliseconds
             /// </summary>
             [DefaultValue(0)]
-            public int Timeout { get { lock (_PropertyLock) return _Timeout; } set { lock (_PropertyLock) _Timeout = value; } }
+            public int Timeout { get { return _Timeout; } set { _Timeout = value; } }
+
+            private int _Capacity = 8192;
+            /// <summary>
+            /// Buffer capacity
+            /// </summary>
+            public int Capacity { get { return _Capacity; } set { _Capacity = value; } }
+
+            private int _Repeat = 0;
+            /// <summary>
+            /// Repeat operation if possible, 0 means no repeat
+            /// </summary>
+            public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
+
+            private bool _AlwaysReceive = false;
+            /// <summary>
+            /// Start receiving automatically after connection is established
+            /// and keep receiving until connection is deactivated.
+            /// </summary>
+            public bool AlwaysReceive { get { return _AlwaysReceive; } set { _AlwaysReceive = value; } }
+
+            private Encoding _Encoding;
+            /// <summary>
+            /// Text encoding for strings. UTF-8 will be used if not set.
+            /// </summary>
+            public Encoding Encoding { get { return GetEncoding(); } set { _Encoding = value; } }
+
+            public int Retry { get; set; }
+
+            private int _Backlog = 100;
+            [DefaultValue(100)]
+            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
+
+            #endregion
+
+            #region State
+
+            private bool _Active;
+            /// <summary>
+            /// Is connection active? Set to 0 if should be closed immediately
+            /// </summary>
+            public bool Active { get { return _Active; } set { _Active = value; } }
+
+            private bool _Connected;
+            /// <summary>
+            /// Is connection active? Set to 0 if should be closed immediately
+            /// </summary>
+            public bool Connected { get { return _Connected; } set { _Connected = value; } }
+
+            private Socket _Socket;
+            /// <summary>
+            /// Working socket
+            /// </summary>
+            public Socket Socket { get { return _Socket; } set { _Socket = value; } }
+
+            public DateTime ActivityStamp { get; private set; }
+
+            public DateTime ConnectStamp { get; private set; }
+
+            public DateTime SendStamp { get; private set; }
+
+            public DateTime ReceiveStamp { get; private set; }
+
+            #endregion
+
+            #region Private
+
+            private byte[] _Buffer;
+
+            public byte[] Buffer { get { return GetBuffer(); } set { _Buffer = value; } }
+
+            private MemoryStream _Stream;
+
+            public MemoryStream Stream { get { return GetStream(); } private set { _Stream = value; } }
+
+            private List<byte[]> _ReceiveBuffer;
+
+            public List<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
+
+            private List<byte[]> _SendBuffer;
+
+            public List<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
+
+            public int SendBufferPosition { get; set; }
 
             #endregion
 
@@ -594,13 +576,52 @@ namespace Energy.Core
 
             #endregion
 
-            #region Other
+            #region Get
 
-            public Encoding Encoding { get; set; }
+            private Encoding GetEncoding()
+            {
+                if (_Encoding == null)
+                {
+                    _Encoding = Encoding.UTF8;
+                }
+                return _Encoding;
+            }
 
-            public int Retry { get; set; }
+            private byte[] GetBuffer()
+            {
+                if (_Buffer == null)
+                {
+                    _Buffer = new byte[Capacity];
+                }
+                return _Buffer;
+            }
 
-            public DateTime ConnectStamp { get; private set; }
+            private MemoryStream GetStream()
+            {
+                if (_Stream == null)
+                {
+                    _Stream = new MemoryStream(Capacity);
+                }
+                return _Stream;
+            }
+
+            private List<byte[]> GetReceiveBuffer()
+            {
+                if (_ReceiveBuffer == null)
+                {
+                    _ReceiveBuffer = new List<byte[]>();
+                }
+                return _ReceiveBuffer;
+            }
+
+            private List<byte[]> GetSendBuffer()
+            {
+                if (_SendBuffer == null)
+                {
+                    _SendBuffer = new List<byte[]>();
+                }
+                return _SendBuffer;
+            }
 
             #endregion
 
@@ -787,7 +808,9 @@ namespace Energy.Core
 
                     remoteSocket.EndConnect(ar);
 
-                    connection.ConnectStamp = DateTime.Now;
+                    DateTime now = DateTime.Now;
+                    connection.ActivityStamp = now;
+                    connection.ConnectStamp = now;
 
                     connection.Connected = true;
 
@@ -836,6 +859,10 @@ namespace Energy.Core
                     }
                 }
             }
+
+            #endregion
+
+            #region Send
 
             private readonly object SendLock = new object();
 
@@ -903,7 +930,11 @@ namespace Energy.Core
                     Socket clientSocket = connection.Socket;
 
                     int count = clientSocket.EndSend(ar);
-        
+
+                    DateTime now = DateTime.Now;
+                    connection.ActivityStamp = now;
+                    connection.SendStamp = now;
+
                     lock (SendLock)
                     {
                         data = connection.SendBuffer[connection.SendBufferPosition];
@@ -952,6 +983,16 @@ namespace Energy.Core
                     }
                 }
             }
+
+            public bool Send(string content)
+            {
+                byte[] data = ((System.Text.Encoding)this.Encoding).GetBytes(content);
+                return Send(data);
+            }
+
+            #endregion
+
+            #region Receive
 
             public bool Receive()
             {
@@ -1004,6 +1045,10 @@ namespace Energy.Core
 
                     // Read data from the client socket.   
                     int dataLength = clientSocket.EndReceive(ar);
+
+                    DateTime now = DateTime.Now;
+                    connection.ActivityStamp = now;
+                    connection.ReceiveStamp = now;
 
                     if (dataLength == 0)
                     {
@@ -1075,10 +1120,21 @@ namespace Energy.Core
                 }
             }
 
+            #endregion
+       
+            #region Clear
+
             public void Clear()
             {
-                
+                this.ActivityStamp = DateTime.MinValue;
+                this.ConnectStamp = DateTime.MinValue;
+                this.ReceiveStamp = DateTime.MinValue;
+                this.SendStamp = DateTime.MinValue;
             }
+
+            #endregion
+
+            #region Clone
 
             public object Clone()
             {
@@ -1095,6 +1151,10 @@ namespace Energy.Core
 
                 return clone;
             }
+
+            #endregion
+
+            #region Mirror
 
             private void Mirror(SocketConnection clone)
             {
@@ -1158,12 +1218,6 @@ namespace Energy.Core
                         }
                     });
                 }
-            }
-
-            public bool Send(string content)
-            {
-                byte[] data = ((System.Text.Encoding)this.Encoding).GetBytes(content);
-                return Send(data);
             }
 
             #endregion
