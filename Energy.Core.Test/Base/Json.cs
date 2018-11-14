@@ -45,5 +45,23 @@ namespace Energy.Core.Test.Base
             string expectedString2 = "[null,true]";
             Assert.AreEqual(expectedString2, jsonString2);
         }
+
+        [TestMethod]
+        public void JsonSerialize()
+        {
+            Energy.Base.Json.JsonLayout layout = new Energy.Base.Json.JsonLayout();
+            Energy.Base.Json.Document doc;
+            doc = new Energy.Base.Json.Document();
+            doc.Root = new Energy.Base.Json.JsonObject();
+            ((Energy.Base.Json.JsonObject)doc.Root).Dictionary.Add("Name"
+                , new Energy.Base.Json.JsonString() { Value = "Hello \"Henry\"." });
+            string result;
+            layout.Compact = true;
+            layout.Indent = false;
+            result = doc.Serialize(layout);
+            string expect;
+            expect = "{\"Name\":\"Hello \\\"Henry\\\".\"}";
+            Assert.AreEqual(expect, result);
+        }
     }
 }

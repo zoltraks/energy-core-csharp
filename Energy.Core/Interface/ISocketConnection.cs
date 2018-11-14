@@ -18,6 +18,6 @@ namespace Energy.Interface
 
         event Energy.Base.Network.SendDelegate OnSend;
 
-        event Energy.Base.Network.TimeoutDelegate OnTimeout;
+        event Energy.Base.Network.ExceptionDelegate OnException;
     }
 }
