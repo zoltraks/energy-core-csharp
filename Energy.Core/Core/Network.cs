@@ -400,7 +400,9 @@ namespace Energy.Core
 
         #region SocketClient
 
-        public class SocketClient : SocketConnection { }
+        public class SocketClient : SocketConnection
+        {
+        }
 
         #endregion
 
@@ -408,6 +410,8 @@ namespace Energy.Core
 
         public class SocketConnection : Energy.Interface.ISocketConnection
         {
+            public bool AlwaysReceive { get; set; }
+
             #region StateObject
 
             public class StateObject
@@ -748,6 +752,11 @@ namespace Energy.Core
                     {
                         this.OnConnect(this);
                     }
+
+                    if (AlwaysReceive)
+                    {
+                        Receive();
+                    }
                 }
                 catch (SocketException exceptionSocket)
                 {
@@ -1010,6 +1019,11 @@ namespace Energy.Core
                     Energy.Core.Bug.Write(e);
                     throw;
                 }
+            }
+
+            public void Reset()
+            {
+                
             }
 
             public object Clone()
