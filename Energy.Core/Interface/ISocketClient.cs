@@ -10,7 +10,7 @@ namespace Energy.Interface
     /// </summary>
     public interface ISocketClient
     {
-        event Energy.Base.Network.ErrorDelegate OnError;
+        event Energy.Base.Network.ExceptionDelegate OnError;
 
         event Energy.Base.Network.ConnectDelegate OnConnect;
 

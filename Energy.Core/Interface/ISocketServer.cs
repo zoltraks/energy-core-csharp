@@ -6,7 +6,7 @@ namespace Energy.Interface
 {
     public interface ISocketServer
     {
-        event Energy.Base.Network.ErrorDelegate OnError;
+        event Energy.Base.Network.ExceptionDelegate OnError;
 
         event Energy.Base.Network.ListenDelegate OnListen;
 

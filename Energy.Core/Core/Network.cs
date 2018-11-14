@@ -16,10 +16,17 @@ namespace Energy.Core
 
         public static string GetHostAddress(string host)
         {
-            if (host == "localhost")
+            if (host == null)
+                return null;
+
+            if (host == "")
+                return "";
+
+            if (host == "localhost" || host == ".")
             {
                 return IPAddress.Parse("127.0.0.1").ToString();
             }
+
             IPAddress ipAddress;
             if (!IPAddress.TryParse(host, out ipAddress))
             {
@@ -414,8 +421,6 @@ namespace Energy.Core
 
             #region StateObject
 
-            public class StateObject
-            {
                 private volatile Socket _Socket;
                 /// <summary>
                 /// Working socket
@@ -435,46 +440,75 @@ namespace Energy.Core
 
                 private volatile MemoryStream _Stream;
 
-                public MemoryStream Stream { get { return _Stream; } set { _Stream = value; } }
+                public MemoryStream Stream { get { return GetStream(); } private set { _Stream = value; } }
 
-                private volatile bool _Active;
+            private byte[] GetBuffer()
+            {
+                if (Buffer == null)
+                {
+                    Buffer = new byte[Capacity];
+                }
+                return _Buffer;
+            }
+
+            private MemoryStream GetStream()
+            {
+                if (_Stream == null)
+                {
+                    Stream = new MemoryStream(Capacity);
+                }
+                return _Stream;
+            }
+
+            private volatile bool _Active;
 
                 /// <summary>
                 /// Is connection active? Set to 0 if should be closed immediately
                 /// </summary>
                 public bool Active { get { return _Active; } set { _Active = value; } }
 
-                private volatile int _Repeat = 0;
+            private volatile bool _Connected;
+
+            /// <summary>
+            /// Is connection active? Set to 0 if should be closed immediately
+            /// </summary>
+            public bool Connected { get { return _Connected; } set { _Connected = value; } }
+
+
+            private volatile int _Repeat = 0;
 
                 /// <summary>
                 /// Repeat operation if possible, 0 means no repeat
                 /// </summary>
                 public int Repeat { get { return _Repeat; } set { _Repeat = value; } }
 
-                public List<byte[]> ReceiveBuffer { get; private set; }
+            private List<byte[]> _ReceiveBuffer;
 
-                public List<byte[]> SendBuffer { get; private set; }
+                public List<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
 
-                public int SendBufferPosition { get; set; }
-
-                #region Constructor
-
-                public StateObject()
+            private List<byte[]> GetReceiveBuffer()
+            {
+                if (_ReceiveBuffer == null)
                 {
-                    Buffer = new byte[Capacity];
-                    Stream = new MemoryStream(Capacity);
-
-                    ReceiveBuffer = new List<byte[]>();
-                    SendBuffer = new List<byte[]>();
+                    _ReceiveBuffer = new List<byte[]>();
                 }
-
-                public StateObject(int repeat) : this()
-                {
-                    Repeat = repeat;
-                }
-
-                #endregion
+                return _ReceiveBuffer;
             }
+
+            private List<byte[]> _SendBuffer;
+
+            public List<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
+
+            private List<byte[]> GetSendBuffer()
+            {
+                if (_SendBuffer == null)
+                {
+                    _SendBuffer = new List<byte[]>();
+                }
+                return _SendBuffer;
+            }
+
+            public int SendBufferPosition { get; set; }
 
             #endregion
 
@@ -486,9 +520,9 @@ namespace Energy.Core
 
             #region Property
 
-            private bool _Active = false;
-            [DefaultValue(false)]
-            public bool Active { get { lock (_PropertyLock) return _Active; } set { lock (_PropertyLock) _Active = value; } }
+            //private bool _Active = false;
+            //[DefaultValue(false)]
+            //public bool Active { get { lock (_PropertyLock) return _Active; } set { lock (_PropertyLock) _Active = value; } }
 
             private string _Host = "";
             [DefaultValue(null)]
@@ -533,7 +567,7 @@ namespace Energy.Core
 
             public event Energy.Base.Network.SendDelegate OnSend;
 
-            public event Energy.Base.Network.ErrorDelegate OnError;
+            public event Energy.Base.Network.ExceptionDelegate OnException;
 
             #endregion
 
@@ -562,9 +596,8 @@ namespace Energy.Core
 
             #region Other
 
-            private StateObject State { get; set; }
-
             public Encoding Encoding { get; set; }
+
             public int Retry { get; set; }
 
             public DateTime ConnectStamp { get; private set; }
@@ -584,14 +617,11 @@ namespace Energy.Core
                     socket.Bind(endPoint);
                     socket.Listen(Backlog);
 
-                    StateObject stateObject = new StateObject();
+                    Clear();
 
                     AcceptDone.Reset();
 
-                    this.State = stateObject;
-
-                    this.State = new StateObject();
-                    this.State.Socket = socket;
+                    this.Socket = socket;
 
                     socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
 
@@ -656,16 +686,17 @@ namespace Energy.Core
             private void AcceptCallback(IAsyncResult ar)
             {
                 SocketConnection socketConnection = ar.AsyncState as SocketConnection;
-                StateObject stateObject = socketConnection.State;
 
                 //socketConnection = (SocketConnection)socketConnection.Clone();
 
                 try
                 {
-                    Socket serverSocket = stateObject.Socket;
+                    Socket serverSocket = this.Socket;
 
                     // Get the socket that handles the client request.
                     Socket clientSocket = serverSocket.EndAccept(ar);
+
+                    AcceptDone.Set();
 
                     SocketConnection clientConnection = new SocketConnection();
                     IPEndPoint remoteEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
@@ -677,17 +708,17 @@ namespace Energy.Core
 
                     this.Mirror(clientConnection);
 
-                    clientConnection.State = new StateObject();
-                    clientConnection.State.Socket = clientSocket;
+                    clientConnection.Socket = clientSocket;
 
                     if (this.OnAccept != null)
                     {
                         this.OnAccept(this);
                     }
 
-                    AcceptDone.Set();
-
-                    clientConnection.Receive();
+                    if (this.AlwaysReceive)
+                    {
+                        clientConnection.Receive();
+                    }
                 }
                 catch
                 {
@@ -700,62 +731,76 @@ namespace Energy.Core
 
             public bool Connect()
             {
-                Socket connectSocket = this.CreateSocket();
-
-                StateObject stateObject = new StateObject();
-                stateObject.Socket = connectSocket;
-                stateObject.Active = true;
-
                 ConnectDone.Reset();
 
-                this.State = stateObject;
-
-                IPEndPoint endPoint = GetEndPoint();
-
-                connectSocket.BeginConnect(endPoint, new AsyncCallback(ConnectCallback), stateObject);
-
-                int timeout = this.Timeout;
-                bool timeoutEnable = timeout > 0;
-                if (timeoutEnable)
+                try
                 {
-                    Energy.Core.Worker.Fire(() =>
+                    Socket connectSocket = this.CreateSocket();
+
+                    this.Socket = connectSocket;
+                    this.Active = true;
+                    this.Connected = false;
+
+                    IPEndPoint endPoint = this.GetEndPoint();
+
+                    connectSocket.BeginConnect(endPoint, new AsyncCallback(ConnectCallback), this);
+
+                    int timeout = this.Timeout;
+                    bool timeoutEnable = timeout > 0;
+                    if (timeoutEnable)
                     {
-                        if (!ConnectDone.WaitOne(timeout))
+                        Energy.Core.Worker.Fire(() =>
                         {
-                            this.State.Active = false;
-                        }
-                    });
+                            if (!this.ConnectDone.WaitOne(timeout))
+                            {
+                                this.Active = false;
+                            }
+                        });
+                    }
+
+                    return true;
+                }
+                catch (Exception exception)
+                {
+                    if (this.OnException != null)
+                    {
+                        this.OnException(this, exception);
+                    }
+                    return false;
+                    throw;
                 }
 
-                return true;
             }
 
             private void ConnectCallback(IAsyncResult ar)
             {
-                StateObject stateObject = ar.AsyncState as StateObject;
-                if (stateObject == null)
+                SocketConnection connection = ar.AsyncState as SocketConnection;
+
+                if (connection == null)
                 {
                     throw new ArgumentNullException("Asynchronous State Object");
                 }
 
                 try
                 {
-                    Socket clientSocket = stateObject.Socket;
+                    Socket remoteSocket = connection.Socket;
 
-                    clientSocket.EndConnect(ar);
+                    remoteSocket.EndConnect(ar);
 
-                    ConnectStamp = DateTime.Now;
+                    connection.ConnectStamp = DateTime.Now;
 
-                    ConnectDone.Set();
+                    connection.Connected = true;
 
-                    if (this.OnConnect != null)
+                    connection.ConnectDone.Set();
+
+                    if (connection.OnConnect != null)
                     {
-                        this.OnConnect(this);
+                        connection.OnConnect(this);
                     }
 
-                    if (AlwaysReceive)
+                    if (connection.AlwaysReceive)
                     {
-                        Receive();
+                        connection.Receive();
                     }
                 }
                 catch (SocketException exceptionSocket)
@@ -763,29 +808,32 @@ namespace Energy.Core
                     switch (exceptionSocket.SocketErrorCode)
                     {
                         default:
-                            stateObject.Active = false;
+                            connection.Active = false;
                             break;
 
                         case SocketError.TimedOut:
-                            stateObject.Active = false;
+                            connection.Active = false;
                             break;
                     }
 
-                    if (this.OnError != null)
+                    if (this.OnException != null)
                     {
-                        Energy.Core.Worker.Fire(() => { this.OnError(this, (Exception)exceptionSocket); });
+                        this.OnException(this, (Exception)exceptionSocket);
                     }
                 }
                 catch (Exception exception)
                 {
                     Energy.Core.Bug.Write(exception);
 
-                    if (this.OnError != null)
+                    if (this.OnException != null)
                     {
-                        Energy.Core.Worker.Fire(() => { this.OnError(this, exception); });
+                        this.OnException(this, (Exception)exception);
                     }
 
-                    throw;
+                    if (this.OnException == null)
+                    {
+                        throw;
+                    }
                 }
             }
 
@@ -793,10 +841,9 @@ namespace Energy.Core
 
             public bool Send(byte[] data)
             {
-                if (this.State == null)
+                if (!this.Active)
                     return false;
-                StateObject stateObject = this.State;
-                if (!stateObject.Active)
+                if (!this.Connected)
                     return false;
 
                 int count = data.Length;
@@ -805,7 +852,7 @@ namespace Energy.Core
 
                 lock (SendLock)
                 {
-                    stateObject.SendBuffer.Add(copy);
+                    this.SendBuffer.Add(copy);
                 }
 
                 if (SendDone.WaitOne(0))
@@ -825,43 +872,41 @@ namespace Energy.Core
 
             private bool SendBegin()
             {
-                if (this.State == null)
-                    return false;
-                StateObject stateObject = this.State;
-                if (!stateObject.Active)
-                    return false;
-
-                byte[] copy = stateObject.SendBuffer[stateObject.SendBufferPosition];
-
                 SendDone.Reset();
 
-                Socket clientSocket = stateObject.Socket;
+                if (!this.Active)
+                    return false;
+                if (!this.Connected)
+                    return false;
 
-                clientSocket.BeginSend(copy, 0, copy.Length, (SocketFlags)0, SendCallback, stateObject);
+                byte[] copy = this.SendBuffer[this.SendBufferPosition];
+
+                Socket clientSocket = this.Socket;
+
+                clientSocket.BeginSend(copy, 0, copy.Length, (SocketFlags)0, SendCallback, this);
 
                 return true;
-
             }
 
             private void SendCallback(IAsyncResult ar)
             {
                 bool signal = true;
+                bool more = false;
+                byte[] data = null;
                 try
                 {
-                    StateObject stateObject = ar.AsyncState as StateObject;
-                    if (stateObject == null)
+                    SocketConnection connection = ar.AsyncState as SocketConnection;
+                    if (connection == null)
                     {
                         throw new ArgumentNullException("Asynchronous State Object");
                     }
-                    Socket clientSocket = stateObject.Socket;
+                    Socket clientSocket = connection.Socket;
 
                     int count = clientSocket.EndSend(ar);
-
-                    byte[] data = null;
-
+        
                     lock (SendLock)
                     {
-                        data = stateObject.SendBuffer[stateObject.SendBufferPosition];
+                        data = connection.SendBuffer[connection.SendBufferPosition];
                     }
 
                     if (count != data.Length)
@@ -869,24 +914,34 @@ namespace Energy.Core
                         Energy.Core.Bug.Write("E8401", "Different size of buffer and send count");
                     }
 
-                    if (this.OnSend != null)
-                    {
-                        this.OnSend(this, data);
-                    }
-
                     int length = 0;
                     int position = 0;
 
                     lock (SendLock)
                     {
-                        length = stateObject.SendBuffer.Count;
-                        position = ++stateObject.SendBufferPosition;
+                        length = this.SendBuffer.Count;
+                        position = ++this.SendBufferPosition;
                     }
 
                     if (position < length)
                     {
-                        SendBegin();
+                        more = true;
                         signal = false;
+                    }
+
+                    if (signal)
+                    {
+                        SendDone.Set();
+                    }
+
+                    if (connection.OnSend != null)
+                    {
+                        connection.OnSend(this, data);
+                    }
+
+                    if (more)
+                    {
+                        SendBegin();
                     }
                 }
                 finally
@@ -900,36 +955,32 @@ namespace Energy.Core
 
             public bool Receive()
             {
-                if (this.State == null)
-                    return false;
-
-                if (ReceiveDone.WaitOne(0))
+                if (this.ReceiveDone.WaitOne(0))
                 {
                     return ReceiveBegin();
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("Receive operation already waiting for callback");
+                    return true;
                 }
-
-                return true;
             }
 
             private bool ReceiveBegin()
             {
-                StateObject stateObject = this.State;
-
-                if (false == stateObject.Active)
-                    return false;
-
                 ReceiveDone.Reset();
 
-                Socket clientSocket = stateObject.Socket;
+                if (!this.Active)
+                    return false;
+                if (!this.Connected)
+                    return false;
+
+                Socket clientSocket = this.Socket;
 
                 // Begin receiving the data from the remote  
-                clientSocket.BeginReceive(stateObject.Buffer, 0, stateObject.Buffer.Length
+                clientSocket.BeginReceive(this.Buffer, 0, this.Buffer.Length
                     , (SocketFlags)0, new AsyncCallback(ReceiveCallback)
-                    , stateObject
+                    , this
                     );
 
                 return true;
@@ -937,8 +988,9 @@ namespace Energy.Core
 
             private void ReceiveCallback(IAsyncResult ar)
             {
-                StateObject stateObject = ar.AsyncState as StateObject;
-                if (stateObject == null)
+                SocketConnection connection = ar.AsyncState as SocketConnection;
+
+                if (connection == null)
                 {
                     throw new ArgumentNullException("Asynchronous State Object");
                 }
@@ -948,7 +1000,7 @@ namespace Energy.Core
 
                 try
                 {
-                    Socket clientSocket = stateObject.Socket;
+                    Socket clientSocket = connection.Socket;
 
                     // Read data from the client socket.   
                     int dataLength = clientSocket.EndReceive(ar);
@@ -962,11 +1014,11 @@ namespace Energy.Core
                     else if (dataLength > 0)
                     {
                         more = true;
-                        if (dataLength < stateObject.Capacity)
+                        if (dataLength < connection.Capacity)
                             flush = true;
                         else
                             flush = false;
-                        stateObject.Stream.Write(stateObject.Buffer, 0, dataLength);
+                        connection.Stream.Write(connection.Buffer, 0, dataLength);
                     }
                 }
                 catch (SocketException exceptionSocket)
@@ -989,22 +1041,17 @@ namespace Energy.Core
 
                     if (flush)
                     {
-                        if (stateObject.Stream.Length > 0)
+                        if (connection.Stream.Length > 0)
                         {
-                            data = stateObject.Stream.ToArray();
-                            stateObject.Stream.SetLength(0);
-                            stateObject.ReceiveBuffer.Add(data);
+                            data = connection.Stream.ToArray();
+                            connection.Stream.SetLength(0);
+                            connection.ReceiveBuffer.Add(data);
                         }
                     }
 
-                    if (more)
-                    {
-                        ReceiveBegin();
-                    }
-                    else
-                    {
-                        ReceiveDone.Set();
-                    }
+                    ReceiveDone.Set();
+
+                    // fire event
 
                     if (data != null)
                     {
@@ -1012,6 +1059,13 @@ namespace Energy.Core
                         {
                             this.OnReceive(this, data);
                         }
+                    }
+
+                    // start receiving
+
+                    if (more || connection.AlwaysReceive)
+                    {
+                        connection.Receive();
                     }
                 }
                 catch (Exception e)
@@ -1021,7 +1075,7 @@ namespace Energy.Core
                 }
             }
 
-            public void Reset()
+            public void Clear()
             {
                 
             }
