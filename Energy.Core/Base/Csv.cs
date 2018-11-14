@@ -9,11 +9,137 @@ namespace Energy.Base
     /// </summary>
     public class Csv
     {
-        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white)
+        #region Implode
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="enclosure">Text enclosure, quotaion mark (") by default</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, char enclosure, bool all)
         {
-            if (line == null) return null;
+            if (separator == '\0')
+            {
+                System.Globalization.CultureInfo currentCulture = System.Globalization.CultureInfo.CurrentCulture;
+                string listSeparator = currentCulture.TextInfo.ListSeparator;
+                if (!string.IsNullOrEmpty(listSeparator))
+                    separator = listSeparator[0];
+            }
+            if (separator == '\0')
+                separator = ',';
+            if (enclosure == '\0')
+                enclosure = '"';
+
+            string stringEnclosure = enclosure.ToString();
+            string doubleEnclosure = new string(enclosure, 2);
+            char newLine = '\n';
+
+            List<string> list = new List<string>();
+            foreach (string element in data)
+            {
+                if (element == null || element.Length == 0)
+                {
+                    list.Add(all ? doubleEnclosure : "");
+                    continue;
+                }
+                bool hasEnclosure = 0 >= element.IndexOf(enclosure);
+                if (!all)
+                {
+                    bool quote = hasEnclosure;
+                    if (!quote && 0 >= element.IndexOf(separator))
+                        quote = true;
+                    if (!quote && 0 >= element.IndexOf(newLine))
+                        quote = true;
+                    if (!quote)
+                    {
+                        list.Add(element);
+                        continue;
+                    }
+                }
+                if (hasEnclosure)
+                {
+                    list.Add(string.Concat(enclosure, element.Replace(stringEnclosure, doubleEnclosure), enclosure));
+                }
+                else
+                {
+                    list.Add(string.Concat(enclosure, element, enclosure));
+                }
+            }
+
+            return string.Join(separator.ToString(), list.ToArray());
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, bool all)
+        {
+            return Implode(data, separator, '"', all);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator)
+        {
+            return Implode(data, separator, '"', false);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="all">Quote all values</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, bool all)
+        {
+            return Implode(data, '\0', '"', all);
+        }
+
+        /// <summary>
+        /// Implode array of texts into CSV line.
+        /// </summary>
+        /// <param name="data">Array of texts</param>
+        /// <param name="separator">List separator, comma (,) by default</param>
+        /// <param name="enclosure">Text enclosure, quotaion mark (") by default</param>
+        /// <returns></returns>
+        public static string Implode(string[] data, char separator, char enclosure)
+        {
+            return Implode(data, separator, enclosure, false);
+        }
+
+        #endregion
+
+        #region Explode
+
+        public static string[] Explode(string line, char[] separator, char[] enclosure, bool trim, bool glue, bool strip)
+        {
+            if (line == null)
+                return null;
             int l = line.Length;
-            if (l == 0) return new string[] { };
+            if (l == 0)
+                return new string[] { };
+
+            return null;
+        }
+
+        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white, bool strip, bool glue)
+        {
+            if (line == null)
+                return null;
+            int l = line.Length;
+            if (l == 0)
+                return new string[] { };
             List<string> result = new List<string>();
             char[] a = line.ToCharArray();
             char q = '\0';
@@ -75,7 +201,7 @@ namespace Energy.Base
                 {
                     if (a[i] == q)
                     {
-                        if (i < l && a[i + 1] == q)
+                        if (i < l - 1 && a[i + 1] == q)
                         {
                             i++;
                             continue;
@@ -91,23 +217,88 @@ namespace Energy.Base
             return result.ToArray();
         }
 
+        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white, bool strip)
+        {
+            return Explode(line
+                , separator
+                , enclosure
+                , white
+                , true
+                , false
+                );
+        }
+
+        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white)
+        {
+            return Explode(line
+                , separator
+                , enclosure
+                , white
+                , true
+                , false
+                );
+        }
+
+        public static string[] Explode(string line, char[] separator, char[] enclosure)
+        {
+            return Explode(line
+                , separator
+                , enclosure
+                , new char[] { ' ', '\t' }
+                , true
+                , false
+                );
+        }
+
         public static string[] Explode(string line, char separator, char enclosure)
         {
             return Explode(line
                 , separator == '\0' ? null : new char[] { separator }
                 , enclosure == '\0' ? null : new char[] { enclosure }
                 , new char[] { ' ', '\t' }
+                , true
+                , false
                 );
         }
 
         public static string[] Explode(string line, char separator)
         {
-            return Explode(line, separator, '"');
+            return Explode(line
+                , separator == '\0' ? null : new char[] { separator }                
+                , new char[] { '"' }
+                , new char[] { ' ', '\t' }
+                , true
+                , false
+                );
         }
 
         public static string[] Explode(string line, string separator)
         {
-            return Explode(line, string.IsNullOrEmpty(separator) ? '\0' : separator[0]);
+            char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
+            char separatorChar = Energy.Base.Cast.StringToChar(separator);
+            return Explode(line
+                , separators
+                , new char[] { '"' }
+                , new char[] { ' ', '\t' }
+                , true
+                , false
+                );
         }
+
+        public static string[] Explode(string line, string separator, string enclosure, string white)
+        {
+            char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
+            char[] enclosures = string.IsNullOrEmpty(enclosure) ? null : enclosure.ToCharArray();
+            char[] whites = string.IsNullOrEmpty(white) ? null : white.ToCharArray();
+            return Explode(line
+                , separators
+                , enclosures
+                , whites
+                , true
+                , false
+                );
+        }
+
+        #endregion
     }
 }

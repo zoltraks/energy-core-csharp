@@ -1909,7 +1909,17 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Quote(string text, string with, string escape)
         {
-            return string.Concat(with, text.Replace(with, escape + with), with);
+            if (text == null || text.Length == 0)
+                return string.Concat(with, with);
+
+            if (text.Contains(with))
+            {
+                return string.Concat(with, text.Replace(with, escape + with), with);
+            }
+            else
+            {
+                return string.Concat(with, text, with);
+            }
         }
 
         /// <summary>
@@ -1925,6 +1935,30 @@ namespace Energy.Base
             if (optional && !text.Contains(with))
                 return text;
             return Quote(text, with, escape);
+        }
+
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string Quote(object value)
+        {
+            string text = Energy.Base.Cast.AsString(value);
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with quotation characters.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="with"></param>
+        /// <returns></returns>
+        public static string Quote(object value, string with)
+        {
+            string text = Energy.Base.Cast.AsString(value);
+            return Quote(text, with, with);
         }
 
         #endregion

@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Energy.Enumeration;
+using Energy.Query;
 
 namespace Energy.Base
 {
@@ -271,6 +272,66 @@ namespace Energy.Base
 
         #endregion
 
+        #region GetFirstOrDefault
+
+        public static T GetFirstOrDefault<T>(params T[][] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            for (int i = 0; i < array.Length; i++)
+            {
+                T[] sub = array[i];
+                if (sub == null || sub.Length == 0)
+                    continue;
+                return sub[0];
+            }
+            return default(T);
+        }
+
+        #endregion
+
+        #region Static utility functions
+
+        public static TValue GetDictionaryValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (dictionary.ContainsKey(key))
+                return dictionary[key];
+            else
+                return default(TValue);
+        }
+
+        public static TValue GetStringDictionaryValue<TValue>(Dictionary<string, TValue> dictionary, string key, bool ignoreCase)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (ignoreCase)
+            {
+                string[] keys = new string[dictionary.Count];
+                dictionary.Keys.CopyTo(keys, 0);
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    if (0 == string.Compare(keys[i], key, true))
+                        return dictionary[keys[i]];
+                }
+                return default(TValue);
+            }
+            else
+            {
+                if (dictionary.ContainsKey(key))
+                    return dictionary[key];
+                else
+                    return default(TValue);
+            }
+        }
+
+        #endregion
+
         #region Associative
 
         /// <summary>
@@ -447,6 +508,51 @@ namespace Energy.Base
                     check.Add(array[i]);
                 }
                 return false;
+            }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right)
+            {
+                return Compare(left, right, false);
+            }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right, bool ignoreCase)
+            {
+                if (left == null || right == null)
+                {
+                    if (left == null && right == null)
+                        return 0;
+                    if (left == null)
+                        return -1;
+                    else
+                        return 1;
+                }
+                if (left.Length < right.Length)
+                    return -1;
+                else if (left.Length > right.Length)
+                    return 1;
+                else
+                {
+                    for (int i = 0; i < left.Length; i++)
+                    {
+                        int result = string.Compare(left[i], right[i], ignoreCase);
+                        if (result != 0)
+                            return result;
+                    }
+                }
+                return 0;
             }
         }
 

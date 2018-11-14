@@ -158,16 +158,16 @@ namespace Energy.Core
         /// </summary>
         public struct Code
         {
-            public string Number;
+            public string Text;
 
             public Code(string text)
             {
-                Number = text;
+                Text = text;
             }
 
             public Code(long number)
             {
-                Number = number.ToString();
+                Text = number.ToString();
             }
 
             public static implicit operator Code(long number)
@@ -187,7 +187,7 @@ namespace Energy.Core
 
             public bool Match(Code code, bool ignoreCase)
             {
-                if (0 == string.Compare(this.Number, code.Number))
+                if (0 == string.Compare(this.Text, code.Text))
                 {
                     return true;
                 }
@@ -195,6 +195,11 @@ namespace Energy.Core
                 {
                     return false;
                 }
+            }
+
+            public override string ToString()
+            {
+                return Text;
             }
         }
 
@@ -208,6 +213,7 @@ namespace Energy.Core
         public struct Entry
         {
             public Code Code;
+
             public string Message;
 
             public Entry(string message)
@@ -220,6 +226,16 @@ namespace Energy.Core
             {
                 this.Code = code;
                 this.Message = message;
+            }
+
+            public override string ToString()
+            {
+                List<string> list = new List<string>();
+                if (!string.IsNullOrEmpty(this.Code.Text))
+                    list.Add(this.Code.Text);
+                if (!string.IsNullOrEmpty(this.Message))
+                    list.Add(this.Message);
+                return string.Join(" ", list.ToArray());
             }
         }
 
@@ -496,7 +512,7 @@ namespace Energy.Core
             string debugMessage = message;
             if ((bool)DebugOutputCode)
             {
-                debugMessage = (code.Number + " " + debugMessage).Trim();
+                debugMessage = (code.Text + " " + debugMessage).Trim();
             }
             debugMessage = FormatDebugOutput(debugMessage);
             System.Diagnostics.Debug.WriteLine(debugMessage);
@@ -630,6 +646,10 @@ namespace Energy.Core
                 };
                 SuppressCodeList.Add(item);
             }
+            else
+            {
+                item.Suppress = true;
+            }
         }
 
         /// <summary>
@@ -659,6 +679,15 @@ namespace Energy.Core
         public static bool IsSuppressed(Code code)
         {
             return SuppressCodeList.IsSuppressed(code);
+        }
+
+        #endregion
+
+        #region Clear
+
+        public static void Clear()
+        {
+            Last = default(Entry);
         }
 
         #endregion

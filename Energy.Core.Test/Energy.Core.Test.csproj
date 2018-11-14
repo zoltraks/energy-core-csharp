@@ -64,6 +64,7 @@
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Syntax.cs" />
     <Compile Include="Base\Queue.cs" />
+    <Compile Include="Base\Csv.cs" />
     <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Cast.cs" />
