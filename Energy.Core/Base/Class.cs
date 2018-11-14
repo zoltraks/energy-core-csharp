@@ -12,7 +12,7 @@ namespace Energy.Base
 
         #region GetDefault
 
-        public static object GetDefault(Type type)
+        public static object GetDefault(System.Type type)
         {
             object o = Activator.CreateInstance(type);
             return o;
@@ -68,7 +68,6 @@ namespace Energy.Base
         {
             return GetFieldsAndProperties(type, true, true);
         }
-
         /// <summary>
         /// Get list of names of all fields and propeties for specified class type.
         /// </summary>
@@ -547,21 +546,69 @@ namespace Energy.Base
 
         #endregion
 
+        #region GetTypesWithInterface
+
+        public static System.Type[] GetTypesWithInterface(System.Type[] types, System.Type interfaceType)
+        {
+            if (types == null || types.Length == 0)
+                return types;
+            if (interfaceType == null)
+                return null;
+            List<System.Type> typeList = new List<System.Type>();
+            foreach (System.Type type in types)
+            {
+                System.Type[] interfaces = type.GetInterfaces();
+                foreach (System.Type needle in interfaces)
+                {
+                    if (needle == interfaceType)
+                    {
+                        typeList.Add(type);
+                        break; // foreach
+                    }
+                }
+            }
+            return typeList.ToArray();
+        }
+
+        #endregion
+
+        #region GetTypesWithAttribute
+
+        public static System.Type[] GetTypesWithAttribute(System.Type[] types, System.Type attributeType)
+        {
+            if (types == null || types.Length == 0)
+                return types;
+            if (attributeType == null)
+                return null;
+            List<System.Type> typeList = new List<System.Type>();
+            foreach (System.Type type in types)
+            {
+                object[] look = type.GetCustomAttributes(attributeType, true);
+                if (look.Length > 0)
+                {
+                    typeList.Add(type);
+                }
+            }
+            return typeList.ToArray();
+        }
+
+        #endregion
+
         #region GetTypes
 
-        public delegate bool TypeFilter(Type type);
+        public delegate bool TypeFilter(System.Type type);
 
-        public static Type[] GetTypes(Assembly[] assemblies, TypeFilter filter)
+        public static System.Type[] GetTypes(Assembly[] assemblies, TypeFilter filter)
         {
             if (assemblies == null)
                 return null;
             if (assemblies.Length == 0)
-                return new Type[] { };
-            List<Type> list = new List<Type>();
+                return new System.Type[] { };
+            List<System.Type> list = new List<System.Type>();
             for (int i = 0; i < assemblies.Length; i++)
             {
                 Assembly assembly = assemblies[i];
-                Type[] typeList;
+                System.Type[] typeList;
                 try
                 {
                     typeList = assembly.GetTypes();
