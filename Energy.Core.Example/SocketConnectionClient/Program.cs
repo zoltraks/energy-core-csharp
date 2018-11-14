@@ -16,9 +16,8 @@ namespace SocketConnectionClient
             connection.OnReceive += Connection_OnReceive;
             connection.OnSend += Connection_OnSend;
             connection.OnConnect += Connection_OnConnect;
-            connection.OnError += Connection_OnError;
+            connection.OnException += Connection_OnException;
 
-            connection.Background = true;
             connection.Timeout = 5000;
             connection.Retry = 1;
 
@@ -27,10 +26,11 @@ namespace SocketConnectionClient
             Energy.Core.Tilde.Pause();
         }
 
-        private static void Connection_OnError(object self, Exception exception)
+        private static void Connection_OnException(object self, Exception exception)
         {
             Energy.Core.Tilde.WriteLine(string.Format("~y~{0} ~r~Error ~w~{1}"
                 , Energy.Base.Clock.CurrentTimeSeconds, exception.Message));
+            Energy.Core.Tilde.WriteException(exception, true);
         }
 
         private static void Connection_OnConnect(object self)
