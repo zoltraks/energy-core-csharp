@@ -115,6 +115,11 @@ namespace Energy.Base
             return Energy.Base.Cast.StringToInteger(value);
         }
 
+        public static string TimeSpanToStringMicroseconds(object p)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Convert string to integer value without exception.
         /// </summary>
