@@ -531,8 +531,6 @@ namespace Energy.Core
 
             public Energy.Base.Collection.Circular<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
 
-            public int SendBufferPosition { get; set; }
-
             #endregion
 
             #region Event
@@ -888,13 +886,9 @@ namespace Energy.Core
                 if (!this.Connected)
                     return false;
 
-                int count = data.Length;
-                byte[] copy = new byte[count];
-                Array.Copy(data, copy, count);
-
                 lock (SendLock)
                 {
-                    this.SendBuffer.Add(copy);
+                    SendBuffer.Push(data);
                 }
 
                 if (SendDone.WaitOne(0))
@@ -921,11 +915,22 @@ namespace Energy.Core
                 if (!this.Connected)
                     return false;
 
-                byte[] copy = this.SendBuffer[this.SendBufferPosition];
+                byte[] data = null;
+
+                lock (SendLock)
+                {
+                    data = SendBuffer.First;
+                }
+
+                if (data == null)
+                {
+                    SendDone.Set();
+                    return true;
+                }
 
                 Socket clientSocket = this.Socket;
 
-                clientSocket.BeginSend(copy, 0, copy.Length, (SocketFlags)0, SendCallback, this);
+                clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, this);
 
                 return true;
             }
@@ -944,15 +949,21 @@ namespace Energy.Core
                     }
                     Socket clientSocket = connection.Socket;
 
-                    int count = clientSocket.EndSend(ar);
+                    int count = 0;
 
-                    DateTime now = DateTime.Now;
-                    connection.ActivityStamp = now;
-                    connection.SendStamp = now;
+                    try
+                    {
+                        count = clientSocket.EndSend(ar);
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     lock (SendLock)
                     {
-                        data = connection.SendBuffer[connection.SendBufferPosition];
+                        data = SendBuffer.Pull();
                     }
 
                     if (count != data.Length)
@@ -960,22 +971,21 @@ namespace Energy.Core
                         Energy.Core.Bug.Write("E8401", "Different size of buffer and send count");
                     }
 
-                    int length = 0;
-                    int position = 0;
+                    DateTime now = DateTime.Now;
+                    connection.ActivityStamp = now;
+                    connection.SendStamp = now;
 
                     lock (SendLock)
                     {
-                        length = this.SendBuffer.Count;
-                        position = ++this.SendBufferPosition;
+                        if (SendBuffer.Count > 0)
+                            more = true;
                     }
 
-                    if (position < length)
+                    if (more)
                     {
-                        more = true;
-                        signal = false;
+                        SendBegin();
                     }
-
-                    if (signal)
+                    else
                     {
                         SendDone.Set();
                     }
@@ -984,17 +994,18 @@ namespace Energy.Core
                     {
                         connection.OnSend(this, data);
                     }
-
-                    if (more)
-                    {
-                        SendBegin();
-                    }
                 }
-                finally
+                catch (Exception e)
                 {
-                    if (signal)
+                    Energy.Core.Bug.Write(e);
+                    bool ignore = false;
+                    if (OnException != null)
                     {
-                        SendDone.Set();
+                        ignore = OnException(this, e);
+                    }
+                    if (!ignore)
+                    {
+                        throw;
                     }
                 }
             }

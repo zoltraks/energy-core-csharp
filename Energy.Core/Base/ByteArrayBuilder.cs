@@ -1119,5 +1119,43 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Concat
+
+        /// <summary>
+        /// Concatenate arrays of byte.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static byte[] Concat(params byte[][] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return new byte[] { };
+            int c = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null)
+                    continue;
+                else
+                    c += array[i].Length;
+            }
+            if (c == 0)
+                return new byte[] { };
+            int p = 0;
+            byte[] b = new byte[c];
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null || array.Length == 0)
+                    continue;
+                int l = array.Length;
+                Array.Copy(array, 0, b, p, l);
+                p += l;
+            }
+            return b;
+        }
+
+        #endregion
     }
 }

@@ -1201,7 +1201,7 @@ namespace Energy.Base
 
         #region Circular
 
-        public class Circular<T> : IList<T>, Energy.Interface.IArray<T>
+        public class Circular<T> : IList<T>, Energy.Interface.IArray<T>, Energy.Interface.IStack<T>
         {
             private List<T> _List = new List<T>();
 
@@ -1348,6 +1348,26 @@ namespace Energy.Base
                 {
                     _List.RemoveRange(0, _List.Count - Limit);
                 }
+            }
+
+            public T[] ToArray()
+            {
+                return _List.ToArray();
+            }
+
+            public void Push(T item)
+            {
+                Add(item);
+            }
+
+            public T Pull()
+            {
+                if (_List.Count == 0)
+                    return default(T);
+
+                T item = _List[0];
+                _List.RemoveAt(0);
+                return item;
             }
         }
 
