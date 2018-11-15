@@ -2066,7 +2066,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Editor
 
         public class Editor
         {
@@ -2112,6 +2112,38 @@ namespace Energy.Base
             {
                 return string.Concat(line, message);
             }
+
+            public string GetFirstLine(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return text;
+
+                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
+                if (p < 0)
+                {
+                    return text;
+                }
+                else
+                {
+                    return text.Substring(0, p);
+                }
+            }
+
+            public string GetLastLine(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return text;
+
+                int p = Energy.Base.Text.AfterOfAny(text, _NewLine);
+                if (p < 0)
+                {
+                    return text;
+                }
+                else
+                {
+                    return text.Substring(p);
+                }
+            }
         }
 
         #endregion
@@ -2128,7 +2160,49 @@ namespace Energy.Base
                     continue;
                 if (p > m)
                     continue;
-                m = p;
+                else
+                    m = p;
+            }
+            return m;
+        }
+
+        #endregion
+
+        #region LastOfAny
+
+        public static int LastOfAny(string text, string[] any)
+        {
+            int m = -1;
+            for (int i = 0; i < any.Length; i++)
+            {
+                int p = text.LastIndexOf(any[i]);
+                if (p < 0)
+                    continue;
+                if (p < m)
+                    continue;
+                else
+                    m = p;
+            }
+            return m;
+        }
+
+        #endregion
+
+        #region AfterOfAny
+
+        public static int AfterOfAny(string text, string[] any)
+        {
+            int m = -1;
+            for (int i = 0; i < any.Length; i++)
+            {
+                int p = text.LastIndexOf(any[i]);
+                if (p < 0)
+                    continue;
+                p += any[i].Length;
+                if (p < m)
+                    continue;
+                else
+                    m = p;
             }
             return m;
         }
