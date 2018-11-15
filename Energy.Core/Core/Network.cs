@@ -716,8 +716,6 @@ namespace Energy.Core
 
             #region Synchronisation
 
-            public ManualResetEvent ConnectResetEvent = new ManualResetEvent(true);
-
             public ManualResetEvent ConnectDone = new ManualResetEvent(true);
 
             public ManualResetEvent ReceiveDone = new ManualResetEvent(true);
@@ -949,7 +947,7 @@ namespace Energy.Core
 
             private readonly object SendLock = new object();
 
-            public bool Send(byte[] data)
+            public virtual bool Send(byte[] data)
             {
                 if (!this.Active)
                     return false;
@@ -958,8 +956,8 @@ namespace Energy.Core
 
                 lock (SendLock)
                 {
-                    Energy.Core.Bug.Write("X");
                     SendBuffer.Push(data);
+                    Energy.Core.Bug.Write("X " + SendBuffer.Count);
                 }
 
                 if (SendDone.WaitOne(0))
@@ -1008,7 +1006,6 @@ namespace Energy.Core
 
             private void SendCallback(IAsyncResult ar)
             {
-                bool signal = true;
                 bool more = false;
                 byte[] data = null;
                 try
@@ -1046,19 +1043,21 @@ namespace Energy.Core
                     connection.ActivityStamp = now;
                     connection.SendStamp = now;
 
+                    SendDone.Set();
+
                     lock (SendLock)
                     {
+                        System.Diagnostics.Debug.WriteLine("Y " + SendBuffer.Count);
                         if (SendBuffer.Count > 0)
                             more = true;
                     }
 
                     if (more)
                     {
-                        SendBegin();
-                    }
-                    else
-                    {
-                        SendDone.Set();
+                        if (SendDone.WaitOne(0))
+                        {
+                            SendBegin();
+                        }
                     }
 
                     if (connection.OnSend != null)
