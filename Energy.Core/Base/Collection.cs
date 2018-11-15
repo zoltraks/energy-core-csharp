@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Energy.Enumeration;
+using Energy.Interface;
 using Energy.Query;
 
 namespace Energy.Base
@@ -114,6 +116,16 @@ namespace Energy.Base
                         return base.Count == 0 ? default(T) : base[0];
                     }
                 }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (base.Count == 0)
+                            base.Add(value);
+                        else
+                            base[0] = value;
+                    }
+                }
             }
 
             /// <summary>
@@ -126,6 +138,16 @@ namespace Energy.Base
                     lock (_Lock)
                     {
                         return base.Count == 0 ? default(T) : base[base.Count - 1];
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (base.Count == 0)
+                            base.Add(value);
+                        else
+                            this[base.Count - 1] = value;
                     }
                 }
             }
@@ -340,7 +362,7 @@ namespace Energy.Base
         /// <typeparam name="T">Value type</typeparam>
         [XmlRoot]
         [Serializable]
-        public class Associative<T> : Dictionary<string, T>, IXmlSerializable
+        public class Associative<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
         {
             #region IXmlSerializable Members
 
@@ -560,7 +582,7 @@ namespace Energy.Base
 
         #region StringDictionary
 
-        public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
+        public class StringDictionary<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
         {
             #region Contructor
 
@@ -1116,7 +1138,7 @@ namespace Energy.Base
 
         #region SerializableDictionary
 
-        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, Energy.Interface.IXmlSerializable
         {
             public System.Xml.Schema.XmlSchema GetSchema()
             {
@@ -1171,6 +1193,160 @@ namespace Energy.Base
                     writer.WriteEndElement();
 
                     writer.WriteEndElement();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Circular
+
+        public class Circular<T> : IList<T>, Energy.Interface.IArray<T>
+        {
+            private List<T> _List = new List<T>();
+
+            public T this[int index]
+            {
+                get
+                {
+                    return _List[index];
+                }
+                set
+                {
+                    _List[index] = value;
+                }
+            }
+
+            public int Count { get { return _List.Count; } set { SetCount(value); } }
+
+            private void SetCount(int value)
+            {
+                if (value <= 0)
+                {
+                    _List.Clear();
+                }
+                else if (value < _List.Count)
+                {
+                    _List.RemoveRange(value, _List.Count - value);
+                }
+                else
+                {
+                    while (_List.Count < value)
+                    {
+                        _List.Add(default(T));
+                    }
+                }
+            }
+
+            public bool IsReadOnly { get { return false; } }
+
+            public T First
+            {
+                get
+                {
+                    return _List.Count > 0 ? _List[0] : default(T);
+                }
+                set
+                {
+                    if (_List.Count == 0)
+                        _List.Add(value);
+                    else
+                        _List[0] = value;
+                }
+            }
+
+            public T Last
+            {
+                get
+                {
+                    return _List.Count > 0 ? _List[_List.Count - 1] : default(T);
+                }
+                set
+                {
+                    if (_List.Count == 0)
+                        _List.Add(value);
+                    else
+                        _List[_List.Count - 1] = value;
+                }
+            }
+
+            private int _Limit = 0;
+
+            public int Limit { get { return GetLimit(); } set { SetLimit(value); } }
+
+            private int GetLimit()
+            {
+                return _Limit;
+            }
+
+            private void SetLimit(int value)
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("Limit must be a positive number");
+                _Limit = value;
+            }
+
+            public void Add(T item)
+            {
+                _List.Add(item);
+                Scroll();
+            }
+
+            public void Clear()
+            {
+                _List.Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                return _List.Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                _List.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return _List.GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return _List.IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                _List.Insert(index, item);
+                Scroll();
+            }
+
+            public bool Remove(T item)
+            {
+                return _List.Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                _List.RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _List.GetEnumerator();
+            }
+
+            private void Scroll()
+            {
+                if (_Limit == 0)
+                {
+                    return;
+                }
+                if (_List.Count > _Limit)
+                {
+                    _List.RemoveRange(0, _List.Count - Limit);
                 }
             }
         }
