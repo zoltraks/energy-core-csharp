@@ -2158,7 +2158,7 @@ namespace Energy.Base
                 int p = text.IndexOf(any[i]);
                 if (p < 0)
                     continue;
-                if (p > m)
+                if (m >= 0 && p > m)
                     continue;
                 else
                     m = p;
