@@ -922,12 +922,12 @@ namespace Energy.Core
                     connection.ActivityStamp = now;
                     connection.ConnectStamp = now;
 
-                    connection.Connected = true;
-
                     connection.ConnectDone.Set();
 
                     if (!this.Active)
                         return;
+
+                    connection.Connected = true;
 
                     if (connection.OnConnect != null)
                     {
