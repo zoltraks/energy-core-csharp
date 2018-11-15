@@ -818,13 +818,31 @@ namespace Energy.Core
 
             public bool Connect()
             {
-                if (Connected)
+                if (this.Active || this.Connected)
                 {
                     Close();
                 }
 
                 Clear();
 
+                if (ConnectDone.WaitOne(0))
+                {
+                    if (!ConnectBegin())
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Connect operation already waiting for callback");
+                }
+
+                return true;
+
+            }
+
+            public bool ConnectBegin()
+            {
                 ConnectDone.Reset();
 
                 try
@@ -879,9 +897,20 @@ namespace Energy.Core
                 {
                     Socket remoteSocket = connection.Socket;
 
+                    if (remoteSocket == null)
+                        return;
+
                     try
                     {
                         remoteSocket.EndConnect(ar);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
                     }
                     catch (Exception x)
                     {
@@ -896,6 +925,9 @@ namespace Energy.Core
                     connection.Connected = true;
 
                     connection.ConnectDone.Set();
+
+                    if (!this.Active)
+                        return;
 
                     if (connection.OnConnect != null)
                     {
@@ -1023,6 +1055,14 @@ namespace Energy.Core
                     {
                         count = clientSocket.EndSend(ar);
                     }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
+                    }
                     catch (Exception x)
                     {
                         if (!connection.Catch(x))
@@ -1044,6 +1084,9 @@ namespace Energy.Core
                     connection.SendStamp = now;
 
                     SendDone.Set();
+
+                    if (!this.Active)
+                        return;
 
                     lock (SendLock)
                     {
@@ -1146,6 +1189,14 @@ namespace Energy.Core
                         // Read data from the client socket.   
                         length = clientSocket.EndReceive(ar);
                     }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
+                    }
                     catch (Exception x)
                     {
                         if (!connection.Catch(x))
@@ -1192,6 +1243,9 @@ namespace Energy.Core
                     }
 
                     ReceiveDone.Set();
+
+                    if (!this.Active)
+                        return;
 
                     // fire event
 
@@ -1274,6 +1328,8 @@ namespace Energy.Core
             {
                 this.Active = false;
                 this.Connected = false;
+
+                this.Socket = null;
 
                 this.ReceiveDone.Set();
                 this.SendDone.Set();
