@@ -888,6 +888,7 @@ namespace Energy.Core
 
                 lock (SendLock)
                 {
+                    Energy.Core.Bug.Write("X");
                     SendBuffer.Push(data);
                 }
 
