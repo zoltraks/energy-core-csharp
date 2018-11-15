@@ -136,7 +136,7 @@ namespace Energy.Core
         #region IsConnected
 
         /// <summary>
-        /// Check if socket is connected
+        /// Check if socket is connected.
         /// </summary>
         /// <param name="socket"></param>
         /// <returns></returns>
@@ -523,13 +523,13 @@ namespace Energy.Core
 
             public MemoryStream Stream { get { return GetStream(); } private set { _Stream = value; } }
 
-            private List<byte[]> _ReceiveBuffer;
+            private Energy.Base.Collection.Circular<byte[]> _ReceiveBuffer;
 
-            public List<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
+            public Energy.Base.Collection.Circular<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
 
-            private List<byte[]> _SendBuffer;
+            private Energy.Base.Collection.Circular<byte[]> _SendBuffer;
 
-            public List<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
+            public Energy.Base.Collection.Circular<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
 
             public int SendBufferPosition { get; set; }
 
@@ -605,20 +605,20 @@ namespace Energy.Core
                 return _Stream;
             }
 
-            private List<byte[]> GetReceiveBuffer()
+            private Energy.Base.Collection.Circular<byte[]> GetReceiveBuffer()
             {
                 if (_ReceiveBuffer == null)
                 {
-                    _ReceiveBuffer = new List<byte[]>();
+                    _ReceiveBuffer = new Energy.Base.Collection.Circular<byte[]>();
                 }
                 return _ReceiveBuffer;
             }
 
-            private List<byte[]> GetSendBuffer()
+            private Energy.Base.Collection.Circular<byte[]> GetSendBuffer()
             {
                 if (_SendBuffer == null)
                 {
-                    _SendBuffer = new List<byte[]>();
+                    _SendBuffer = new Energy.Base.Collection.Circular<byte[]>();
                 }
                 return _SendBuffer;
             }
@@ -1059,11 +1059,18 @@ namespace Energy.Core
                     else if (dataLength > 0)
                     {
                         more = true;
-                        if (dataLength < connection.Capacity)
-                            flush = true;
-                        else
-                            flush = false;
                         connection.Stream.Write(connection.Buffer, 0, dataLength);
+                        if (dataLength < connection.Capacity)
+                        {
+                            flush = true;
+                        }
+                        else
+                        {
+                            if (connection.Socket.Available > 0)
+                            {
+                                flush = false;
+                            }
+                        }
                     }
                 }
                 catch (SocketException exceptionSocket)
