@@ -41,7 +41,7 @@ namespace Energy.Base
 
         public delegate void ErrorDelegate(object self);
 
-        public delegate void ExceptionDelegate(object self, Exception exception);
+        public delegate bool ExceptionDelegate(object self, Exception exception);
 
         #endregion
 

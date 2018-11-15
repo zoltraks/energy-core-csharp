@@ -752,6 +752,13 @@ namespace Energy.Core
 
             public bool Connect()
             {
+                if (Connected)
+                {
+                    Close();
+                }
+
+                Clear();
+
                 ConnectDone.Reset();
 
                 try
@@ -806,7 +813,15 @@ namespace Energy.Core
                 {
                     Socket remoteSocket = connection.Socket;
 
-                    remoteSocket.EndConnect(ar);
+                    try
+                    {
+                        remoteSocket.EndConnect(ar);
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     DateTime now = DateTime.Now;
                     connection.ActivityStamp = now;
@@ -1039,28 +1054,38 @@ namespace Energy.Core
                 bool flush = false;
                 bool more = false;
 
+                int length = 0;
+
                 try
                 {
                     Socket clientSocket = connection.Socket;
 
-                    // Read data from the client socket.   
-                    int dataLength = clientSocket.EndReceive(ar);
+                    try
+                    {
+                        // Read data from the client socket.   
+                        length = clientSocket.EndReceive(ar);
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     DateTime now = DateTime.Now;
                     connection.ActivityStamp = now;
                     connection.ReceiveStamp = now;
 
-                    if (dataLength == 0)
+                    if (length == 0)
                     {
                         // no data to receive
                         more = false;
                         flush = true;
                     }
-                    else if (dataLength > 0)
+                    else if (length > 0)
                     {
                         more = true;
-                        connection.Stream.Write(connection.Buffer, 0, dataLength);
-                        if (dataLength < connection.Capacity)
+                        connection.Stream.Write(connection.Buffer, 0, length);
+                        if (length < connection.Capacity)
                         {
                             flush = true;
                         }
@@ -1072,23 +1097,7 @@ namespace Energy.Core
                             }
                         }
                     }
-                }
-                catch (SocketException exceptionSocket)
-                {
-                    switch (exceptionSocket.SocketErrorCode)
-                    {
-                        case SocketError.ConnectionReset:
-                            break;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Energy.Core.Bug.Write(e);
-                    throw;
-                }
 
-                try
-                {
                     byte[] data = null;
 
                     if (flush)
@@ -1123,16 +1132,73 @@ namespace Energy.Core
                 catch (Exception e)
                 {
                     Energy.Core.Bug.Write(e);
-                    throw;
+                    bool ignore = false;
+                    if (OnException != null)
+                    {
+                        ignore = OnException(this, e);
+                    }
+                    if (!ignore)
+                    {
+                        throw;
+                    }
                 }
             }
 
             #endregion
-       
+
+            #region Catch
+
+            public bool Catch(Exception exception)
+            {
+                if (exception == null)
+                    return false;
+
+                if (exception is SocketException)
+                {
+                    switch (((SocketException)exception).SocketErrorCode)
+                    {
+                        case SocketError.ConnectionRefused:
+                            break;
+
+                        case SocketError.ConnectionReset:
+                            Close();
+                            break;
+                    }
+                }
+
+                return false;
+            }
+
+            #endregion
+
+            #region Close
+
+            public void Close()
+            {
+                this.Active = false;
+                Energy.Core.Network.Shutdown(this.Socket);
+                this.Connected = false;
+
+                if (this.OnClose != null)
+                {
+                    this.OnClose(this);
+                }
+            }
+
+            #endregion
+
             #region Clear
 
             public void Clear()
             {
+                this.Active = false;
+                this.Connected = false;
+
+                this.ReceiveDone.Set();
+                this.SendDone.Set();
+                this.ConnectDone.Set();
+                this.AcceptDone.Set();
+
                 this.ActivityStamp = DateTime.MinValue;
                 this.ConnectStamp = DateTime.MinValue;
                 this.ReceiveStamp = DateTime.MinValue;
