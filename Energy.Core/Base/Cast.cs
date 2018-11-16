@@ -1919,7 +1919,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMilliseconds(seconds, true, true, true);
+            return TimeSpanToStringMilliseconds(seconds, false, false, true);
         }
 
         /// <summary>
@@ -2048,7 +2048,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, false, true, true);
         }
 
         #endregion

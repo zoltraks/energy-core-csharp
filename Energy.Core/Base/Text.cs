@@ -807,6 +807,41 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Limit string to have maximum count characters with optional suffix if it was cut off.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="limit">int</param>
+        /// <param name="end"></param>
+        /// <param name="with">string</param>
+        /// <returns>string</returns>
+        public static string Limit(string text, int limit, int end, string with)
+        {
+            if (limit < 0)
+                return "";
+
+            if (string.IsNullOrEmpty(text) || limit == 0 || text.Length <= limit)
+            {
+                return text;
+            }
+            else
+            {
+                string last = text.Substring(text.Length - end);
+                string first = "";
+                if (string.IsNullOrEmpty(with))
+                {
+                    first = text.Substring(0, limit - last.Length);
+                }
+                else
+                {
+                    limit -= with.Length;
+                    first = string.Concat(text.Substring(0, limit - last.Length), with);
+                }
+                text = string.Concat(first, last);
+                return text;
+            }
+        }
+
+        /// <summary>
         /// Limit string to have maximum count characters with optional prefix or suffix if it was cut off.
         /// </summary>
         /// <param name="text">string</param>
@@ -2143,6 +2178,29 @@ namespace Energy.Base
                 {
                     return text.Substring(p);
                 }
+            }
+
+            public string EnsureNewLineAtEnd(string text)
+            {
+                string[] nll = _NewLine;
+                if (nll == null || nll.Length == 0)
+                {
+                    nll = new string[] { Environment.NewLine };
+                }
+                if (string.IsNullOrEmpty(text))
+                {
+                    text = nll[0];
+                }
+                else
+                {
+                    foreach (string nl in nll)
+                    {
+                        if (text.EndsWith(nl))
+                            return text;
+                    }
+                    text = string.Concat(text, nll[0]);
+                }
+                return text;
             }
         }
 

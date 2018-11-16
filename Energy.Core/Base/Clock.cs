@@ -242,6 +242,42 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringSeconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringMilliseconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss.fff");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringMicroseconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss.ffffff");
+        }
+
+        /// <summary>
         /// Represent TimeSpan as simplified ISO time string with total hours, like "01:07.350", or "123:01:02"
         /// </summary>
         /// <param name="span">TimeSpan?</param>
