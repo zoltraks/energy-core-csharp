@@ -14,7 +14,7 @@ namespace Energy.Core
     {
         #region Utility
 
-        public static string GetHostAddress(string host)
+        public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
             if (host == null)
                 return null;
@@ -34,6 +34,25 @@ namespace Energy.Core
                 {
                     IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
                     ipAddress = ipHostInfo.AddressList[0];
+                    if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                    {
+                        Energy.Core.Bug.Write("C175", () =>
+                        {
+                            List<string> ls = new List<string>();
+                            for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                            {
+                                ls.Add(ipHostInfo.AddressList[i].ToString());
+                            }
+                            string msg = string.Join(" , ", ls.ToArray());
+                            return msg;
+                        });
+                        for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                        {
+                            ipAddress = ipHostInfo.AddressList[i];
+                            if (ipAddress.AddressFamily == addressFamily)
+                                break;
+                        }
+                    }
                 }
                 catch (SocketException socketException)
                 {
@@ -502,26 +521,50 @@ namespace Energy.Core
 
             public bool Listen()
             {
-                Socket socket = this.CreateSocket();
-
                 try
                 {
-                    IPEndPoint endPoint = this.GetEndPoint();
-
-                    socket.Bind(endPoint);
-                    socket.Listen(Backlog);
-
                     Clear();
 
                     AcceptDone.Reset();
 
-                    this.Socket = socket;
+                    Socket socket = this.CreateSocket();
 
-                    socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
+                    IPEndPoint endPoint = this.GetEndPoint();
+
+                    try
+                    {
+                        socket.Bind(endPoint);
+                        socket.Listen(Backlog);
+                        this.Socket = socket;
+                        this.Active = true;
+                    }
+                    catch (System.Security.SecurityException)
+                    {
+                        throw;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (SocketException)
+                    {
+                        throw;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    this.Socket = socket;
 
                     if (this.OnListen != null)
                     {
                         this.OnListen(this);
+                    }
+
+                    if (this.Active)
+                    {
+                        socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
                     }
                 }
                 catch (Exception e)
@@ -547,30 +590,37 @@ namespace Energy.Core
                     Socket serverSocket = this.Socket;
 
                     // Get the socket that handles the client request.
-                    Socket clientSocket = serverSocket.EndAccept(ar);
+                    Socket remoteSocket = serverSocket.EndAccept(ar);
 
                     AcceptDone.Set();
 
-                    SocketConnection clientConnection = new SocketConnection();
-                    IPEndPoint remoteEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
+                    SocketConnection remoteConnection = new SocketConnection();
+                    IPEndPoint remoteEndPoint = remoteSocket.RemoteEndPoint as IPEndPoint;
 
-                    clientConnection.Host = remoteEndPoint.Address.ToString();
-                    clientConnection.Port = remoteEndPoint.Port;
-                    clientConnection.Family = remoteEndPoint.AddressFamily;
-                    clientConnection.Protocol = socketConnection.Protocol;
+                    remoteConnection.Host = remoteEndPoint.Address.ToString();
+                    remoteConnection.Port = remoteEndPoint.Port;
+                    remoteConnection.Family = remoteEndPoint.AddressFamily;
+                    remoteConnection.Protocol = socketConnection.Protocol;
 
-                    this.Mirror(clientConnection);
+                    this.Mirror(remoteConnection);
 
-                    clientConnection.Socket = clientSocket;
+                    remoteConnection.Socket = remoteSocket;
+                    remoteConnection.Active = true;
+                    remoteConnection.Connected = true;
 
                     if (this.OnAccept != null)
                     {
-                        this.OnAccept(this);
+                        this.OnAccept(remoteConnection);
                     }
 
                     if (this.AlwaysReceive)
                     {
-                        clientConnection.Receive();
+                        remoteConnection.Receive();
+                    }
+
+                    if (this.Active)
+                    {
+                        this.Socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
                     }
                 }
                 catch
@@ -793,10 +843,10 @@ namespace Energy.Core
             public string GetHost()
             {
                 string host;
-                host = Energy.Core.Network.GetHostAddress(this.Host);
+                host = Energy.Core.Network.GetHostAddress(this.Host, this.Family);
                 if (string.IsNullOrEmpty(host))
                 {
-                    host = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
+                    host = Energy.Core.Network.GetHostAddress(Dns.GetHostName(), this.Family);
                 }
                 return host;
             }
@@ -865,7 +915,8 @@ namespace Energy.Core
                         {
                             if (!this.ConnectDone.WaitOne(timeout))
                             {
-                                this.Active = false;
+                                //this.Active = false;
+                                this.Close();
                             }
                         });
                     }
@@ -944,6 +995,10 @@ namespace Energy.Core
                     switch (exceptionSocket.SocketErrorCode)
                     {
                         default:
+                            connection.Active = false;
+                            break;
+
+                        case SocketError.ConnectionRefused:
                             connection.Active = false;
                             break;
 
@@ -1313,6 +1368,7 @@ namespace Energy.Core
                 this.Active = false;
                 Energy.Core.Network.Shutdown(this.Socket);
                 this.Connected = false;
+                this.Socket = null;
 
                 if (this.OnClose != null)
                 {
