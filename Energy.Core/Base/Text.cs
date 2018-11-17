@@ -2115,7 +2115,7 @@ namespace Energy.Base
 
         #region Editor
 
-        public class Editor
+        public class Editor: Energy.Base.Pattern.DefaultProperty<Editor>
         {
             public string InsertBeforeFirstLine(string message, string line)
             {
@@ -2213,6 +2213,17 @@ namespace Energy.Base
                     text = string.Concat(text, nll[0]);
                 }
                 return text;
+            }
+
+            public string ConvertNewLine(string text, string newLine)
+            {
+                string pattern = @"\r\n|\r|\n";
+                return Regex.Replace(text, pattern, newLine);
+            }
+
+            public string ConvertNewLine(string text)
+            {
+                return ConvertNewLine(text, "\r\n");
             }
         }
 
