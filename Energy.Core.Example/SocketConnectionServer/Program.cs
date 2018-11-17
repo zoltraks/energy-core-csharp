@@ -10,7 +10,7 @@ namespace SocketConnectionServer
         {
             Energy.Core.Tilde.WriteLine("~g~Network ~m~Server~0~ using ~y~SocketConnection");
 
-            Energy.Core.Network.SocketConnection serverConnection = new Energy.Core.Network.SocketConnection();
+            Energy.Core.Network.SocketServer serverConnection = new Energy.Core.Network.SocketServer();
             serverConnection.Host = "localhost";
             serverConnection.Port = 9000;
             serverConnection.OnReceive += ServerConnection_OnReceive;
