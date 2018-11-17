@@ -122,18 +122,7 @@ namespace Energy.Base
 
         #region Explode
 
-        public static string[] Explode(string line, char[] separator, char[] enclosure, bool trim, bool glue, bool strip)
-        {
-            if (line == null)
-                return null;
-            int l = line.Length;
-            if (l == 0)
-                return new string[] { };
-
-            return null;
-        }
-
-        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white, bool strip, bool glue)
+        public static string[] Explode(string line, char[] separator, char[] enclosure, bool strip, bool white, bool glue)
         {
             if (line == null)
                 return null;
@@ -144,9 +133,11 @@ namespace Energy.Base
             char[] a = line.ToCharArray();
             char q = '\0';
 
+            char[] ws = Energy.Base.Text.WS.ToCharArray();
+
             int _s_ = separator == null ? 0 : separator.Length;
             int _e_ = enclosure == null ? 0 : enclosure.Length;
-            int _w_ = white == null ? 0 : white.Length;
+            int _w_ = ws.Length;
 
             int p = 0;
             bool w = true;
@@ -175,7 +166,7 @@ namespace Energy.Base
                         bool b = true;
                         for (int n = 0; n < _w_; n++)
                         {
-                            if (a[i] == white[n])
+                            if (a[i] == ws[n])
                             {
                                 b = false;
                                 break;
@@ -217,23 +208,12 @@ namespace Energy.Base
             return result.ToArray();
         }
 
-        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white, bool strip)
+        public static string[] Explode(string line, char[] separator, char[] enclosure, bool strip)
         {
             return Explode(line
                 , separator
                 , enclosure
-                , white
-                , true
-                , false
-                );
-        }
-
-        public static string[] Explode(string line, char[] separator, char[] enclosure, char[] white)
-        {
-            return Explode(line
-                , separator
-                , enclosure
-                , white
+                , strip
                 , true
                 , false
                 );
@@ -244,7 +224,7 @@ namespace Energy.Base
             return Explode(line
                 , separator
                 , enclosure
-                , new char[] { ' ', '\t' }
+                , false
                 , true
                 , false
                 );
@@ -255,7 +235,7 @@ namespace Energy.Base
             return Explode(line
                 , separator == '\0' ? null : new char[] { separator }
                 , enclosure == '\0' ? null : new char[] { enclosure }
-                , new char[] { ' ', '\t' }
+                , false
                 , true
                 , false
                 );
@@ -266,7 +246,7 @@ namespace Energy.Base
             return Explode(line
                 , separator == '\0' ? null : new char[] { separator }                
                 , new char[] { '"' }
-                , new char[] { ' ', '\t' }
+                , false
                 , true
                 , false
                 );
@@ -276,24 +256,39 @@ namespace Energy.Base
         {
             char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
             char separatorChar = Energy.Base.Cast.StringToChar(separator);
+
             return Explode(line
                 , separators
                 , new char[] { '"' }
-                , new char[] { ' ', '\t' }
+                , false
                 , true
                 , false
                 );
         }
 
-        public static string[] Explode(string line, string separator, string enclosure, string white)
+        public static string[] Explode(string line, string separator, string enclosure)
         {
             char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
             char[] enclosures = string.IsNullOrEmpty(enclosure) ? null : enclosure.ToCharArray();
-            char[] whites = string.IsNullOrEmpty(white) ? null : white.ToCharArray();
+
             return Explode(line
                 , separators
                 , enclosures
-                , whites
+                , false
+                , true
+                , false
+                );
+        }
+
+        public static string[] Explode(string line, string separator, string enclosure, bool strip)
+        {
+            char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
+            char[] enclosures = string.IsNullOrEmpty(enclosure) ? null : enclosure.ToCharArray();
+
+            return Explode(line
+                , separators
+                , enclosures
+                , strip
                 , true
                 , false
                 );
