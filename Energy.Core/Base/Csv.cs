@@ -122,7 +122,7 @@ namespace Energy.Base
 
         #region Explode
 
-        public static string[] Explode(string line, char[] separator, char[] enclosure, bool strip, bool white, bool glue)
+        public static string[] Explode(string line, char[] separator, char[] enclosure, bool strip, bool white, bool equal, bool glue)
         {
             if (line == null)
                 return null;
@@ -132,6 +132,7 @@ namespace Energy.Base
             List<string> result = new List<string>();
             char[] a = line.ToCharArray();
             char q = '\0';
+            char Q = '\0';
 
             char[] ws = Energy.Base.Text.WS.ToCharArray();
 
@@ -156,7 +157,15 @@ namespace Energy.Base
                     }
                     if (c)
                     {
-                        result.Add(line.Substring(p, i - p));
+                        // add value
+                        string v = line.Substring(p, i - p);
+                        if (strip && Q != '\0')
+                            v = Energy.Base.Text.Strip(v, Q);
+                        else if (!white)
+                            v = v.Trim();
+                        result.Add(v);
+
+                        if (Q != '\0') Q = '\0'; // reset last character used in text enclosure
                         p = i + 1;
                         w = true;
                         continue;
@@ -184,6 +193,7 @@ namespace Energy.Base
                             if (a[i] == enclosure[n])
                             {
                                 q = enclosure[n];
+                                p = i; // store current position (no matter if white parameter was used or not)
                             }
                         }
                     }
@@ -197,13 +207,20 @@ namespace Energy.Base
                             i++;
                             continue;
                         }
+                        Q = q; // remember quote character used in text enclosure
                         q = '\0';
                     }
                 }
             }
             if (p <= l)
             {
-                result.Add(line.Substring(p));
+                // add value
+                string v = line.Substring(p);
+                if (strip && Q != '\0')
+                    v = Energy.Base.Text.Strip(v, Q);
+                else if (!white)
+                    v = v.Trim();
+                result.Add(v);
             }
             return result.ToArray();
         }
@@ -214,6 +231,7 @@ namespace Energy.Base
                 , separator
                 , enclosure
                 , strip
+                , true
                 , true
                 , false
                 );
@@ -226,6 +244,7 @@ namespace Energy.Base
                 , enclosure
                 , false
                 , true
+                , true
                 , false
                 );
         }
@@ -237,6 +256,7 @@ namespace Energy.Base
                 , enclosure == '\0' ? null : new char[] { enclosure }
                 , false
                 , true
+                , true
                 , false
                 );
         }
@@ -247,6 +267,7 @@ namespace Energy.Base
                 , separator == '\0' ? null : new char[] { separator }                
                 , new char[] { '"' }
                 , false
+                , true
                 , true
                 , false
                 );
@@ -262,6 +283,7 @@ namespace Energy.Base
                 , new char[] { '"' }
                 , false
                 , true
+                , true
                 , false
                 );
         }
@@ -276,6 +298,22 @@ namespace Energy.Base
                 , enclosures
                 , false
                 , true
+                , true
+                , false
+                );
+        }
+
+        public static string[] Explode(string line, string separator, string enclosure, bool strip, bool white)
+        {
+            char[] separators = string.IsNullOrEmpty(separator) ? null : separator.ToCharArray();
+            char[] enclosures = string.IsNullOrEmpty(enclosure) ? null : enclosure.ToCharArray();
+
+            return Explode(line
+                , separators
+                , enclosures
+                , strip
+                , white
+                , true
                 , false
                 );
         }
@@ -289,6 +327,7 @@ namespace Energy.Base
                 , separators
                 , enclosures
                 , strip
+                , true
                 , true
                 , false
                 );

@@ -2014,37 +2014,49 @@ namespace Energy.Base
         /// Strip text from quotation characters.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="with"></param>
+        /// <param name="quote"></param>
         /// <returns></returns>
-        public static string Strip(string text, string with)
+        public static string Strip(string text, char quote)
         {
-            return Strip(text, with, with);
+            string s = quote.ToString();
+            return Strip(text, s, s);
         }
 
         /// <summary>
         /// Strip text from quotation characters.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="with"></param>
+        /// <param name="quote"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string quote)
+        {
+            return Strip(text, quote, quote);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
         /// <param name="escape"></param>
         /// <returns></returns>
-        public static string Strip(string text, string with, string escape)
+        public static string Strip(string text, string quote, string escape)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
             int a = 0;
             int b = text.Length;
-            if (text.StartsWith(with))
+            if (text.StartsWith(quote))
             {
-                a = with.Length;
-                b -= with.Length;
+                a = quote.Length;
+                b -= quote.Length;
             }
-            if (text.EndsWith(with))
+            if (text.EndsWith(quote))
             {
-                b -= with.Length;
+                b -= quote.Length;
             }
             string cut = text.Substring(a, b);
-            return cut.Replace(escape + with, with);
+            return cut.Replace(escape + quote, quote);
         }
 
         #endregion
