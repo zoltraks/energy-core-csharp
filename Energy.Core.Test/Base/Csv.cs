@@ -13,12 +13,27 @@ namespace Energy.Core.Test.Base
             string[] result;
             string line;
 
-            line = "=1,='0'";
+            // This line is illegal...
+            // =0123, ="0789",= 0123,= '0456', = '0789'
+            // It will somehow work anyway...
+            // Glue will not work...
+
+            line = ",'";
             result = Energy.Base.Csv.Explode(line, ",", "'");
-            expect = new string[] { "=1", "='0'" };
+            expect = new string[] { "", "'" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
 
-            line = "=1,='0'";
+            line = " ='";
+            result = Energy.Base.Csv.Explode(line, ",", "'");
+            expect = new string[] { " ='" };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            line = ", ='0', ''";
+            result = Energy.Base.Csv.Explode(line, ",", "'");
+            expect = new string[] { "", "='0'", "''" };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            line = "=1, ='0'";
             result = Energy.Base.Csv.Explode(line, ",", "'", true);
             expect = new string[] { "=1", "0" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
@@ -99,6 +114,29 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Csv.Implode(array, ',', false);
             expect = ",,\"\"\"\"\"\",\",\",";
             Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void CsvSplit()
+        {
+            string content;
+            string[] result;
+            string[] expect;
+
+            content = "\n" + "\r\n" + "\r";
+            expect = new string[] { "", "", "\r" };
+            result = Energy.Base.Csv.Split(content);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            content = "\r\n";
+            expect = new string[] { "" };
+            result = Energy.Base.Csv.Split(content);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            content = "A" + "\r" + "B" + "\r\n" + "C" + "\n" + "\r\n";
+            expect = new string[] { "A\rB", "C", "" };
+            result = Energy.Base.Csv.Split(content);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
         }
     }
 }
