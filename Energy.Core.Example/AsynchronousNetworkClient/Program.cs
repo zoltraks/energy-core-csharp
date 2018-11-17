@@ -36,7 +36,7 @@ namespace AsynchronousNetworkClient
             if (0 < (integer = Energy.Base.Cast.StringToInteger(value)))
                 port = integer;
 
-            string address = Energy.Core.Network.GetHostAddress(host);
+            string address = Energy.Core.Network.GetHostAddress(host, AddressFamily.InterNetwork);
             Energy.Core.Tilde.WriteLine($"Trying to connect to ~w~{address}~0~:~y~{port}~0~ and start conversation...");
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
