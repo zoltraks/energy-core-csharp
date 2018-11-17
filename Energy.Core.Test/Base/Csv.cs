@@ -18,6 +18,11 @@ namespace Energy.Core.Test.Base
             // It will somehow work anyway...
             // Glue will not work...
 
+            line = null;
+            result = Energy.Base.Csv.Explode(line, ",");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Length);
+
             line = ",'";
             result = Energy.Base.Csv.Explode(line, ",", "'");
             expect = new string[] { "", "'" };
@@ -38,9 +43,6 @@ namespace Energy.Core.Test.Base
             expect = new string[] { "=1", "0" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
 
-            line = null;
-            result = Energy.Base.Csv.Explode(line, ",");
-            Assert.IsNull(result);
             line = "";
             result = Energy.Base.Csv.Explode(line, ",");
             Assert.IsNotNull(result);
