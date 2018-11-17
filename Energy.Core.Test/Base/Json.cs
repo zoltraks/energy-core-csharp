@@ -20,7 +20,7 @@ namespace Energy.Core.Test.Base
         {
             string text1 = "Hello \"Name\"!\r\nHow are you?";
             string json1 = Energy.Base.Json.Escape(text1);
-            string escaped1 = @"""Hello \""Name\""!\r\nHow are you?""";
+            string escaped1 = @"Hello \""Name\""!\r\nHow are you?";
             Assert.AreEqual(escaped1, json1);
         }
 
