@@ -36,16 +36,43 @@ namespace AsynchronousNetworkClient
             if (0 < (integer = Energy.Base.Cast.StringToInteger(value)))
                 port = integer;
 
-            string address = Energy.Core.Network.GetHostAddress(host);
+            string address = Energy.Core.Network.GetHostAddress(host, AddressFamily.InterNetwork);
             Energy.Core.Tilde.WriteLine($"Trying to connect to ~w~{address}~0~:~y~{port}~0~ and start conversation...");
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-            StateObject state = CreateStateObject(address, port);
+            Energy.Core.Network.SocketConnection socketConnection = new Energy.Core.Network.SocketConnection();
+            socketConnection.Host = host;
+            socketConnection.Port = port;
 
-            Connect(state);
+            socketConnection.OnConnect += SocketConnection_OnConnect;
+            socketConnection.OnReceive += SocketConnection_OnReceive;
+            socketConnection.OnSend += SocketConnection_OnSend;
+
+
+            socketConnection.Connect();
 
             Energy.Core.Tilde.Pause();
+        }
+
+        private static void SocketConnection_OnSend(object self, byte[] data)
+        {
+            Energy.Core.Network.SocketConnection socketConnection = self as Energy.Core.Network.SocketConnection;
+            Console.WriteLine("Socket Send");
+            Console.WriteLine(Energy.Base.Hex.Print(data));
+        }
+
+        private static void SocketConnection_OnReceive(object self, byte[] data)
+        {
+            Energy.Core.Network.SocketConnection socketConnection = self as Energy.Core.Network.SocketConnection;
+            Console.WriteLine("Socket Receive");
+            Console.WriteLine(Energy.Base.Hex.Print(data));
+        }
+
+        private static void SocketConnection_OnConnect(object self)
+        {
+            Energy.Core.Network.SocketConnection socketConnection = self as Energy.Core.Network.SocketConnection;
+            Console.WriteLine("Socket Connect");
         }
 
         private static StateObject CreateStateObject(string host, int port)

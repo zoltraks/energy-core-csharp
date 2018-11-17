@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -146,6 +147,27 @@ namespace Energy.Core
             public System.Threading.Thread Thread;
 
             public bool Result;
+        }
+
+        /// <summary>
+        /// Start new thread with anonymous code.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static Thread Fire(Energy.Base.Anonymous.Function code)
+        {
+            Thread thread = new Thread(() =>
+            {
+                try
+                {
+                    code();
+                }
+                catch (ThreadAbortException)
+                { }
+            })
+            { IsBackground = true };
+            thread.Start();
+            return thread;
         }
     }
 }

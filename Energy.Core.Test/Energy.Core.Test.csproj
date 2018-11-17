@@ -64,12 +64,14 @@
     <Compile Include="Base\Json.cs" />
     <Compile Include="Base\Syntax.cs" />
     <Compile Include="Base\Queue.cs" />
+    <Compile Include="Base\Csv.cs" />
     <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Base\Color.cs" />
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Http.cs" />
+    <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.11.0</Version>
-    <FileVersion>18.11.0</FileVersion>
-    <AssemblyVersion>2018.11.04</AssemblyVersion>
-    <TargetFrameworks>netstandard2.0;net40;net20</TargetFrameworks>
+    <Version>18.11.1</Version>
+    <FileVersion>18.11.1</FileVersion>
+    <AssemblyVersion>2018.11.17</AssemblyVersion>
+    <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
@@ -15,32 +15,61 @@
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageProjectUrl>http://energy.alyx.pl/</PackageProjectUrl>
-    <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
+    <PackageProjectUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/</PackageProjectUrl>
+    <PackageIconUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/media/icon/nuget.png</PackageIconUrl>
     <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
     <NoPackageAnalysis>true</NoPackageAnalysis>
  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;RELEASE;NETSTANDARD</DefineConstants>
+    <DefineConstants>RELEASE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>bin\</OutputPath>
     <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard2.0'">
+    <DefineConstants>RELEASE;NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net20'">
+    <DefineConstants>TRACE;DEBUG;NET20</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net20'">
+    <DefineConstants>RELEASE;NET20</DefineConstants>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net35'">
+    <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net35'">
+    <DefineConstants>RELEASE;NET35</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net40'">
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net40'">
+    <DefineConstants>RELEASE;NET40</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

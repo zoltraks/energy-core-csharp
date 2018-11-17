@@ -15,34 +15,36 @@ namespace Energy.Base
 
         public static readonly TimeSpan Midday = TimeSpan.FromHours(12);
 
+        public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
         #endregion
 
         #region CurrentTime
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.176"
+        /// Return current time in 24h/ms format, i.e. "17:33:15.176"
         /// </summary>
         public static string CurrentTime
         {
             get
             {
-                return DateTime.Now.ToString("HH:mm:ss.fff");
+                return CurrentTimeMilliseconds;
             }
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15"
+        /// Return current time in 24h/ms format, i.e. "17:33"
         /// </summary>
         public static string CurrentTimeShort
         {
             get
             {
-                return DateTime.Now.ToString("HH:mm:ss");
+                return DateTime.Now.ToString("HH:mm");
             }
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.123"
+        /// Return current time in 24h ms format, i.e. "17:33:15.123"
         /// </summary>
         public static string CurrentTimeMilliseconds
         {
@@ -53,7 +55,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.123456"
+        /// Return current time in 24h μs format, i.e. "17:33:15.123456"
         /// </summary>
         public static string CurrentTimeMicroseconds
         {
@@ -64,18 +66,40 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.176"
+        /// Return current time in 24h format, i.e. "17:33:15"
         /// </summary>
-        public static string CurrentTimeUtc
+        public static string CurrentTimeSeconds
         {
             get
             {
-                return DateTime.UtcNow.ToString("HH:mm:ss.fff");
+                return DateTime.Now.ToString("HH:mm:ss");
             }
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15"
+        /// Return current time in 24h format, i.e. "17:33"
+        /// </summary>
+        public static string CurrentTimeMinutes
+        {
+            get
+            {
+                return DateTime.Now.ToString("HH:mm");
+            }
+        }
+
+        /// <summary>
+        /// Return current time in 24h/ms format, i.e. "17:33:15.176"
+        /// </summary>
+        public static string CurrentUtcTime
+        {
+            get
+            {
+                return CurrentUtcTimeMilliseconds;
+            }
+        }
+
+        /// <summary>
+        /// Return current time in short 24h format, i.e. "17:33"
         /// </summary>
         public static string CurrentUtcTimeShort
         {
@@ -86,9 +110,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.123"
+        /// Return current time in 24h ms format, i.e. "17:33:15.123"
         /// </summary>
-        public static string CurrentTimeUtcMilliseconds
+        public static string CurrentUtcTimeMilliseconds
         {
             get
             {
@@ -97,15 +121,16 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "12:33:15.123456"
+        /// Return current time in 24h μs format, i.e. "17:33:15.123456"
         /// </summary>
-        public static string CurrentTimeUtcMicroseconds
+        public static string CurrentUtcTimeMicroseconds
         {
             get
             {
                 return DateTime.UtcNow.ToString("HH:mm:ss.ffffff");
             }
         }
+
         /// <summary>
         /// Return current time in unix time format, i.e. 1461477755.353
         /// </summary>
@@ -140,10 +165,8 @@ namespace Energy.Base
         /// <returns>DateTime</returns>
         public static DateTime GetDateTime(double unix)
         {
-            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            return epoch.AddSeconds(unix).ToLocalTime();
+            return UnixEpoch.AddSeconds(unix).ToLocalTime();
         }
-
 
         /// <summary>
         /// Return time as unix time
@@ -216,6 +239,42 @@ namespace Energy.Base
                 return ((DateTime)stamp).ToString("HH:mm:ss.fff");
             else
                 return ((DateTime)stamp).ToString("HH:mm:ss");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringSeconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringMilliseconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss.fff");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringMicroseconds(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss.ffffff");
         }
 
         /// <summary>
