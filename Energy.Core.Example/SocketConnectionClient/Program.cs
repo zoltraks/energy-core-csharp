@@ -26,11 +26,12 @@ namespace SocketConnectionClient
             Energy.Core.Tilde.Pause();
         }
 
-        private static void Connection_OnException(object self, Exception exception)
+        private static bool Connection_OnException(object self, Exception exception)
         {
             Energy.Core.Tilde.WriteLine(string.Format("~y~{0} ~r~Error ~w~{1}"
                 , Energy.Base.Clock.CurrentTimeSeconds, exception.Message));
             Energy.Core.Tilde.WriteException(exception, true);
+            return true;
         }
 
         private static void Connection_OnConnect(object self)
