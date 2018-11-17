@@ -590,7 +590,7 @@ namespace Energy.Base
             {
             }
 
-            public StringDictionary(string[] keyValuePairArray)
+            public StringDictionary(params string[] keyValuePairArray)
             {
                 for (int i = 0; i < keyValuePairArray.Length - 1; i++)
                 {
@@ -599,6 +599,17 @@ namespace Energy.Base
                     this[key] = Energy.Base.Cast.StringToObject<T>(value);
                 }
             }
+
+            public StringDictionary(params object[] keyValuePairArray)
+            {
+                for (int i = 0; i < keyValuePairArray.Length - 1; i++)
+                {
+                    string key = Energy.Base.Cast.ObjectToString(keyValuePairArray[i++]);
+                    T value = Energy.Base.Cast.As<T>(keyValuePairArray[i]);
+                    this[key] = value;
+                }
+            }
+
 
             #endregion
 

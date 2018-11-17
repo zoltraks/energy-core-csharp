@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -94,6 +95,35 @@ namespace Energy.Core.Test.Base
             Energy.Base.Collection.StringArray stringArray = new Energy.Base.Collection.StringArray(array);
             Assert.IsFalse(stringArray.HasDuplicates(), "String array should not have duplicates");
             Assert.IsTrue(stringArray.HasDuplicates(true), "String array should have duplicates when ignoreCase is true");
+        }
+
+        [TestMethod]
+        public void StringDictionaryConstructor()
+        {
+            Dictionary<string, object> d;
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a");
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(0, d.Count);
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a", "b");
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(1, d.Count);
+            Assert.AreEqual("b", d["a"]);
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a", "b", null);
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(1, d.Count);
+            Assert.AreEqual("b", d["a"]);
+        }
+
+        [TestMethod]
+        public void StringArrayToDictionaryCast()
+        {
+
         }
     }
 }
