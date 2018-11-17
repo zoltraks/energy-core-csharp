@@ -123,7 +123,11 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void StringArrayToDictionaryCast()
         {
-
+            var x = Energy.Base.Cast.StringArrayToDictionary<string, object>("0", null, "a", 1, "b", false, "c", true, null);
+            Assert.IsNotNull(x);
+            Assert.AreEqual(4, x.Count);
+            Assert.AreEqual(false, Energy.Base.Cast.AsBool(x["b"]));
+            Assert.AreEqual(true, Energy.Base.Cast.AsBool(x["c"]));
         }
     }
 }
