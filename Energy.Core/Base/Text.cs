@@ -2189,26 +2189,466 @@ namespace Energy.Base
 
         #region Cell
 
-        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, string prefix, string suffix, out string remains)
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="prefix">
+        /// Optional prefix text that can be added if there is a space in resulting text to match size.
+        /// </param>
+        /// <param name="suffix">
+        /// Optional suffix text that can be added if there is a space in resulting text to match size.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill, string prefix, string suffix, out string remains)
         {
             remains = "";
+
+            if (size == 0)
+                return "";
+
+            if (text == null)
+                text = "";
             if (prefix == null)
                 prefix = "";
             if (suffix == null)
                 suffix = "";
-            if (string.IsNullOrEmpty(text))
+
+            if (start < 0)
             {
-                if (size == 0)
-                    return "";
-                string v = "";
-                if (prefix.Length > 0 && v.Length + prefix.Length <= size)
-                    v = prefix + v;
-                v = v.PadRight(size - suffix.Length, fill);
-                if (suffix.Length > 0 && v.Length + suffix.Length <= size)
-                    v = v + suffix;
-                return v;
+                start = text.Length + start;
+                if (start < 0)
+                {
+                    text = "";
+                    start = 0;
+                }
             }
-            return "";
+
+            if (size < 0)
+            {
+                size = -size;
+                if (text.Length > size)
+                {
+                    text = text.Substring(text.Length - size);
+                    return text;
+                }
+            }
+
+            if (start > 0)
+            {
+                if (start >= text.Length)
+                    text = "";
+                else if (text.Length - start <= size)
+                    text = text.Substring(start);
+                else
+                {
+                    remains = text.Substring(start + size);
+                    text = text.Substring(start, size);
+                    return text;
+                }
+            }
+
+            if (text.Length == size)
+                return text;
+
+            bool leftJustify = 0 < (pad & Energy.Enumeration.TextPad.Left);
+
+            if (size > 0)
+            {
+                if (text.Length > size)
+                {
+                    remains = text.Substring(size);
+                    text = text.Substring(0, size);
+                    return text;
+                }
+            }
+
+            int width = size;
+
+            if (leftJustify)
+            {
+                if (prefix.Length > 0 && width - text.Length >= prefix.Length)
+                    width -= prefix.Length;
+                if (suffix.Length > 0 && width - text.Length >= suffix.Length)
+                    width -= suffix.Length;
+            }
+            else
+            {
+                if (suffix.Length > 0 && width - text.Length >= suffix.Length)
+                    width -= suffix.Length;
+                if (prefix.Length > 0 && width - text.Length >= prefix.Length)
+                    width -= prefix.Length;
+            }
+
+            string result = Energy.Base.Text.Pad(text, width, fill, pad, true);
+
+            if (leftJustify)
+            {
+                if (prefix.Length > 0 && result.Length + prefix.Length <= size)
+                    result = prefix + result;
+                if (suffix.Length > 0 && result.Length + suffix.Length <= size)
+                    result = result + suffix;
+            }
+            else
+            {
+                if (suffix.Length > 0 && result.Length + suffix.Length <= size)
+                    result = result + suffix;
+                if (prefix.Length > 0 && result.Length + prefix.Length <= size)
+                    result = prefix + result;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, out string remains)
+        {
+            remains = "";
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill, out string remains)
+        {
+            remains = "";
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad)
+        {
+            string remains = "";
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill)
+        {
+            string remains = "";
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, out string remains)
+        {
+            remains = "";
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, char fill, out string remains)
+        {
+            remains = "";
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad)
+        {
+            string remains = "";
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, char fill)
+        {
+            string remains = "";
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
         }
 
         #endregion
@@ -2216,7 +2656,8 @@ namespace Energy.Base
         #region
 
         /// <summary>
-        /// 
+        /// Expand the text on the left or right by filling in the specified character.
+        /// Optionally, cut the text to the desired size.
         /// </summary>
         /// <remarks>
         ///
@@ -2234,26 +2675,40 @@ namespace Energy.Base
         ///
         /// </remarks>
         /// <param name="text"></param>
-        /// <param name="size"></param>
-        /// <param name="fill"></param>
-        /// <param name="pad"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters.
+        /// </param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="cut">If true, text will be limited to specified size</param>
         /// <returns></returns>
-        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad)
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad, bool cut)
         {
-            if (string.IsNullOrEmpty(text))
+            if (text == null)
+                text = "";
+
+            if (text == "")
             {
                 if (size == 0)
                     return "";
             }
+
+            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+
             if (text.Length < size)
             {
-                bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
-                bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
                 if (beLeft && beRight)
                 {
                     int d = size - text.Length;
                     int d2 = d / 2;
-                    int d21 = d - d2;
+                    int d21 = d - d2; // may be higher or equal d2
                     text = text.PadLeft(text.Length + d21, fill);
                     if (text.Length < size)
                     {
@@ -2269,7 +2724,61 @@ namespace Energy.Base
                     text = text.PadRight(size, fill);
                 }
             }
+
+            if (cut && text.Length > size)
+            {
+                if (beLeft && beRight)
+                {
+                    int d = text.Length - size;
+                    int d2 = d / 2;
+                    text = text.Substring(d2, size);
+                }
+                else if (beRight)
+                {
+                    text = text.Substring(text.Length - size, size);
+                }
+                else
+                {
+                    text = text.Substring(0, size);
+                }
+            }
+
             return text;
+        }
+
+        /// <summary>
+        /// Expand the text on the left or right by filling in the specified character.
+        /// If text is longer than size, it will remain untouched.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters
+        /// </param>
+        /// <param name="fill"></param>
+        /// <param name="pad">Padding direction</param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad)
+        {
+            return Pad(text, size, fill, pad, false);
+        }
+
+        /// <summary>
+        /// Expand the text on the left or right by filling in the specified character.
+        /// If text is longer than size, it will remain untouched.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters
+        /// </param>
+        /// <param name="fill"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextAlign align)
+        {
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Pad(text, size, fill, pad, false);
         }
 
         #endregion
