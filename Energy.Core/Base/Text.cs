@@ -56,6 +56,13 @@ namespace Energy.Base
             }
         }
 
+        /// <summary>
+        /// An array of empty texts containing end-of-line characters.
+        /// </summary>
+        public static readonly string[] NEWLINE_ARRAY = new string[] { "\r\n", "\n", "\r" };
+
+        public const string NEWLINE_PATTERN = "\r\n|\n|\r";
+
         #endregion
 
         /// <summary>
@@ -461,8 +468,6 @@ namespace Energy.Base
 
         #region Split
 
-        private static readonly string[] _NewLine = new string[] { "\r\n", "\n", "\r" };
-
         /// <summary>
         /// Split string to array by new line characters.
         /// Elements will not include new line itself.
@@ -471,7 +476,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitNewLine(string content)
         {
-            return content.Split(_NewLine, StringSplitOptions.None);
+            return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
         }
 
         /// <summary>
@@ -483,7 +488,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitNewLine(string content, bool removeEmptyEntries)
         {
-            string[] split = content.Split(_NewLine
+            string[] split = content.Split(NEWLINE_ARRAY
                 , removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
                 );
             return split;
@@ -2115,118 +2120,10 @@ namespace Energy.Base
 
         #region Editor
 
-        public class Editor: Energy.Base.Pattern.DefaultProperty<Editor>
-        {
-            public string InsertBeforeFirstLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string AppendAfterFirstLine(string text, string line)
-            {
-                if (string.IsNullOrEmpty(line))
-                    return text;
-                if (string.IsNullOrEmpty(text))
-                {
-                    if (text == null && line == null)
-                        return null;
-                }
-                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return string.Concat(text ?? "", line ?? "");
-                }
-                else
-                {
-                    string result = ""
-                        + text.Substring(0, p) + line + text.Substring(p)
-                        ;
-                    return result;
-                }
-            }
-
-            public string InsertBeforeSecondLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string InsertBeforeLastLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string AppendAfterLastLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string GetFirstLine(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                    return text;
-
-                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return text;
-                }
-                else
-                {
-                    return text.Substring(0, p);
-                }
-            }
-
-            public string GetLastLine(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                    return text;
-
-                int p = Energy.Base.Text.AfterOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return text;
-                }
-                else
-                {
-                    return text.Substring(p);
-                }
-            }
-
-            public string EnsureNewLineAtEnd(string text)
-            {
-                string[] nll = _NewLine;
-                if (nll == null || nll.Length == 0)
-                {
-                    nll = new string[] { Environment.NewLine };
-                }
-                if (string.IsNullOrEmpty(text))
-                {
-                    text = nll[0];
-                }
-                else
-                {
-                    foreach (string nl in nll)
-                    {
-                        if (text.EndsWith(nl))
-                            return text;
-                    }
-                    text = string.Concat(text, nll[0]);
-                }
-                return text;
-            }
-
-            public string ConvertNewLine(string text, string newLine)
-            {
-                string pattern = @"\r\n|\r|\n";
-                return Regex.Replace(text, pattern, newLine);
-            }
-
-            public string ConvertNewLine(string text)
-            {
-                return ConvertNewLine(text, "\r\n");
-            }
-        }
-
+        [Energy.Attribute.Code.Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace")]
+        [Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace", false)]
+        public class Editor : Energy.Core.Text.Editor { }
+        
         #endregion
 
         #region IndexOfAny
