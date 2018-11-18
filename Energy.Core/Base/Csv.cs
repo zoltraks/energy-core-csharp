@@ -123,7 +123,7 @@ namespace Energy.Base
         #region Explode
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -286,7 +286,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -309,7 +309,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -332,7 +332,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -355,7 +355,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -378,7 +378,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -404,7 +404,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -430,7 +430,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -456,7 +456,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
