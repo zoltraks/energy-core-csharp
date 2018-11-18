@@ -2167,6 +2167,50 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringArrayToFirstCharArray(string[] array, bool onlyFirstCharacter)
+        {
+            List<char> charList = new List<char>();
+            foreach (string s in array)
+            {
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                if (onlyFirstCharacter)
+                    charList.Add(s[0]);
+                else
+                {
+                    foreach (char c in s.ToCharArray())
+                    {
+                        if (!charList.Contains(c))
+                            charList.Add(c);
+                    }
+                }
+            }
+            return charList.ToArray();
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringListToFirstCharArray(List<string> list, bool onlyFirstCharacter)
+        {
+            return StringArrayToFirstCharArray(list.ToArray(), onlyFirstCharacter);
+        }
+
+        /// <summary>
         /// Convert dictionary to array of objects of key value pairs.
         /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
         /// </summary>
