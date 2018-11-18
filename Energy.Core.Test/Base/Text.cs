@@ -254,5 +254,44 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(false, Energy.Base.Text.InArray(null, "A"));
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "b", true));
         }
+
+        [TestMethod]
+        public void TextPad()
+        {
+            string text;
+            string expect;
+            string result;
+
+            text = "X";
+            expect = "X";
+            result = Energy.Base.Text.Pad(text, 1, '0', Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 0, '0', Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, -1, '0', Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 1, '0', Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 0, '0', Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, -1, '0', Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+
+            result = Energy.Base.Text.Pad(text, 2, '0', Enumeration.TextPad.Left);
+            expect = "0X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 2, '0', Enumeration.TextPad.Right);
+            expect = "X0";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 2, '0', Enumeration.TextPad.Center);
+            expect = "0X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 4, '0', Enumeration.TextPad.Middle);
+            expect = "00X0";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 5, '0', Enumeration.TextPad.Center);
+            expect = "00X00";
+            Assert.AreEqual(expect, result);
+        }
     }
 }

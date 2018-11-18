@@ -2186,5 +2186,92 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Cell
+
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, string prefix, string suffix, out string remains)
+        {
+            remains = "";
+            if (prefix == null)
+                prefix = "";
+            if (suffix == null)
+                suffix = "";
+            if (string.IsNullOrEmpty(text))
+            {
+                if (size == 0)
+                    return "";
+                string v = "";
+                if (prefix.Length > 0 && v.Length + prefix.Length <= size)
+                    v = prefix + v;
+                v = v.PadRight(size - suffix.Length, fill);
+                if (suffix.Length > 0 && v.Length + suffix.Length <= size)
+                    v = v + suffix;
+                return v;
+            }
+            return "";
+        }
+
+        #endregion
+
+        #region
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        ///
+        /// GOOD
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left)) &amp;&amp; (0 &lt; (pad &amp; Energy.Enumeration.TextPad.Right)))
+        ///
+        /// WORKS
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left)) &amp; (0 &lt; (pad &amp; Energy.Enumeration.TextPad.Right)))
+        ///
+        /// WRONG
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left | Energy.Enumeration.TextPad.Right)))
+        ///
+        /// </remarks>
+        /// <param name="text"></param>
+        /// <param name="size"></param>
+        /// <param name="fill"></param>
+        /// <param name="pad"></param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                if (size == 0)
+                    return "";
+            }
+            if (text.Length < size)
+            {
+                bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+                bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+                if (beLeft && beRight)
+                {
+                    int d = size - text.Length;
+                    int d2 = d / 2;
+                    int d21 = d - d2;
+                    text = text.PadLeft(text.Length + d21, fill);
+                    if (text.Length < size)
+                    {
+                        text = text.PadRight(text.Length + d2, fill);
+                    }
+                }
+                else if (beLeft)
+                {
+                    text = text.PadLeft(size, fill);
+                }
+                else if (beRight)
+                {
+                    text = text.PadRight(size, fill);
+                }
+            }
+            return text;
+        }
+
+        #endregion
     }
 }
