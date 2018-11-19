@@ -19,6 +19,8 @@ namespace Energy.Base
 
         public const int DEFAULT_PING_TIMEOUT = 30000;
 
+        public const AddressFamily DEFAULT_ADDRESS_FAMILY = AddressFamily.Unspecified;
+
         #endregion
 
         #region Delegate
@@ -56,10 +58,13 @@ namespace Energy.Base
 
             public int SocketBufferSize { get; set; }
 
+            public AddressFamily AddressFamily { get; set; }
+
             public Settings()
             {
                 SocketTimeout = DEFAULT_SOCKET_TIMEOUT;
                 SocketBufferSize = DEFAULT_SOCKET_BUFFER_SIZE;
+                AddressFamily = DEFAULT_ADDRESS_FAMILY;
             }
         }
 

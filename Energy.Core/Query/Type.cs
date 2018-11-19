@@ -18,7 +18,7 @@ namespace Energy.Query
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static string Simplify(string type)
+        public static string Simplify(string type)
         {
             string simple = ExtractType(type);
             if (string.IsNullOrEmpty(simple))

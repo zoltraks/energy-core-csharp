@@ -209,6 +209,37 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Append byte array to a stream.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public ByteArrayBuilder Append(byte[] data, int offset, int count)
+        {
+            Tail();
+            if (data == null || data.Length == 0)
+                return this;
+            if (data.Length - offset < count)
+                count = data.Length - offset;
+            if (count <= 0)
+                return this;
+            _Stream.Write(data, offset, count);
+            return this;
+        }
+
+        /// <summary>
+        /// Append byte array to a stream.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public ByteArrayBuilder Append(byte[] data, int count)
+        {
+            return Append(data, 0, count);
+        }
+
+        /// <summary>
         /// Append byte array initialized to value to a stream.
         /// </summary>
         /// <param name="value"></param>
