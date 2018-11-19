@@ -220,7 +220,7 @@ namespace Energy.Base
             Tail();
             if (data == null || data.Length == 0)
                 return this;
-            if (data.Length - offset > count)
+            if (data.Length - offset < count)
                 count = data.Length - offset;
             if (count <= 0)
                 return this;

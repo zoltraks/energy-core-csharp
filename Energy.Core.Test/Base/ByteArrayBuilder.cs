@@ -99,5 +99,42 @@ namespace Energy.Core.Test.Base
             expect = new byte[] { 4, 0 };
             Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(expect, result));
         }
+
+        [TestMethod]
+        public void ByteArrayBuilderAppend()
+        {
+            byte[] source;
+            byte[] expect;
+
+            source = new byte[] { 1, 2, 3 };
+
+            Energy.Base.ByteArrayBuilder bb = new Energy.Base.ByteArrayBuilder();
+            bb.Append(source);
+            Assert.AreEqual(3, bb.Length);
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(source, bb.ToArray()));
+            bb.Clear();
+            Assert.AreEqual(0, bb.Length);
+            bb.Append(source, 1, 1);
+            expect = new byte[] { 2 };
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            bb.Append(source, 2, 2);
+            expect = new byte[] { 2, 3 };
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            bb.Append(source, 0, 2);
+            expect = new byte[] { 2, 3, 1, 2 };
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            bb.Append(source, 3, 3);
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            bb.Append(source, 3, 0);
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            bb.Append(source, 2, 3);
+            expect = new byte[] { 2, 3, 1, 2, 3 };
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+
+            bb.Clear();
+            bb.Append(source, 2);
+            expect = new byte[] { 1, 2 };
+            Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+        }
     }
 }
