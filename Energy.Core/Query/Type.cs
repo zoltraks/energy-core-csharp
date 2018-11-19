@@ -7,6 +7,65 @@ namespace Energy.Query
 {
     public class Type
     {
+        #region Private
+
+        private bool _TreatBitAsBool = false;
+
+        private Dictionary<string, Energy.Enumeration.BasicType> _BasicTypeMap;
+
+        #endregion
+
+        #region Property
+
+        /// <summary>
+        /// Treat BIT type the same as BOOL.
+        /// </summary>
+        public bool TreatBitAsBool
+        {
+            get
+            {
+                return _TreatBitAsBool;
+            }
+            set
+            {
+                _TreatBitAsBool = value;
+            }
+        }
+
+        public Dictionary<string, Energy.Enumeration.BasicType> BasicTypeMap
+        {
+            get
+            {
+                if (_BasicTypeMap == null)
+                    _BasicTypeMap = CreateBasicTypeMap();
+                return _BasicTypeMap;
+            }
+        }
+
+        #endregion
+
+        #region Private
+
+        private Dictionary<string, Energy.Enumeration.BasicType> CreateBasicTypeMap()
+        {
+            Dictionary<string, Energy.Enumeration.BasicType> d = new Dictionary<string, Energy.Enumeration.BasicType>();
+            d["TEXT"] = Enumeration.BasicType.Text;
+            d["BOOL"] = Enumeration.BasicType.Bool;
+            d["NUMBER"] = Enumeration.BasicType.Number;
+            d["INTEGER"] = Enumeration.BasicType.Integer;
+            d["TIME"] = Enumeration.BasicType.Time;
+            d["DATE"] = Enumeration.BasicType.Date;
+            d["DATETIME"] = Enumeration.BasicType.Stamp;
+            return d;
+        }
+
+        #endregion
+        
+        /// <summary>
+        /// Check if SQL type is numeric.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static bool IsNumeric(string type)
         {
             type = Simplify(type);
@@ -14,7 +73,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Simplify type
+        /// Simplify type.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -42,7 +101,7 @@ namespace Energy.Query
                 case "MEDIUMINT":
                     return "INTEGER";
                 case "VARCHAR":
-                case "NVACHAR":
+                case "NVARCHAR":
                 case "CHARACTER VARYING":
                     return "TEXT";
                 case "TEXT":
@@ -67,6 +126,7 @@ namespace Energy.Query
                 case "DECIMAL":
                     return "NUMBER";
                 case "CHAR":
+                case "NCHAR":
                     return "TEXT";
                 case "XML":
                     return "TEXT";
@@ -77,13 +137,19 @@ namespace Energy.Query
             return simple;
         }
 
-        private static string ExtractType(string type)
+        /// <summary>
+        /// Extract type name from type declaration.
+        /// For "VARCHAR(50) NOT NULL" function will return "VARCHAR" only.
+        /// </summary>
+        /// <param name="declaration"></param>
+        /// <returns></returns>
+        public static string ExtractType(string declaration)
         {
-            if (string.IsNullOrEmpty(type))
-                return type;
-            Match match = Regex.Match(type, Energy.Base.Expression.SqlColumnTypeSimple);
+            if (string.IsNullOrEmpty(declaration))
+                return declaration;
+            Match match = Regex.Match(declaration, Energy.Base.Expression.SqlTypeDeclaration);
             if (!match.Success)
-                return type;
+                return declaration;
             string simple = match.Groups["type"].Value;
             return simple;
         }
