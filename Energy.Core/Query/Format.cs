@@ -390,18 +390,13 @@ namespace Energy.Query
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             string s = value is string ? (string)value : value.ToString();
-            string v = s.Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
-            long l;
-            if (long.TryParse(v, out l))
-                return Number(l);
-            double d;
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture, out d))
-                return Number(d);
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.CurrentCulture, out d))
-                return Number(d);
-            return nullify ? "NULL" : "0";
+            s = Energy.Base.Text.Trim(s);
+            if (Energy.Base.Cast.IsLong(s, true))
+                return Number((long)Energy.Base.Cast.StringToLong(s));
+            else
+                return Number((double)Energy.Base.Cast.StringToDouble(s));
+
+            //return nullify ? "NULL" : "0";
         }
 
         #endregion
