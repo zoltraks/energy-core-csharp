@@ -135,6 +135,7 @@ namespace Energy.Core.Test.Base
             bb.Append(source, 2);
             expect = new byte[] { 1, 2 };
             Assert.AreEqual(0, Energy.Base.ByteArrayBuilder.Compare(expect, bb.ToArray()));
+            Assert.AreEqual(2, bb.Length);
         }
     }
 }
