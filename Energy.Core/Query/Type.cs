@@ -60,7 +60,9 @@ namespace Energy.Query
         }
 
         #endregion
-        
+
+        #region IsNumeric
+
         /// <summary>
         /// Check if SQL type is numeric.
         /// </summary>
@@ -72,6 +74,23 @@ namespace Energy.Query
             return type == "NUMBER" || type == "INTEGER";
         }
 
+        #endregion
+
+        #region IsNullable
+
+        /// <summary>
+        /// Check if SQL type is numeric.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsNullable(string type)
+        {
+            string nullable = ExtractTypeNull(type);
+            return nullable != "NOT NULL";
+        }
+
+        #endregion
+
         /// <summary>
         /// Simplify type.
         /// </summary>
@@ -79,7 +98,7 @@ namespace Energy.Query
         /// <returns></returns>
         public static string Simplify(string type)
         {
-            string simple = ExtractType(type);
+            string simple = ExtractTypeName(type);
             if (string.IsNullOrEmpty(simple))
                 return type;
             switch (simple.ToUpper())
@@ -137,13 +156,15 @@ namespace Energy.Query
             return simple;
         }
 
+        #region Extract
+
         /// <summary>
         /// Extract type name from type declaration.
         /// For "VARCHAR(50) NOT NULL" function will return "VARCHAR" only.
         /// </summary>
         /// <param name="declaration"></param>
         /// <returns></returns>
-        public static string ExtractType(string declaration)
+        public static string ExtractTypeName(string declaration)
         {
             if (string.IsNullOrEmpty(declaration))
                 return declaration;
@@ -153,5 +174,26 @@ namespace Energy.Query
             string simple = match.Groups["type"].Value;
             return simple;
         }
+
+        /// <summary>
+        /// Extract nullability from type declaration.
+        /// For "VARCHAR(50) not null" function will return "NOT NULL".
+        /// For empty declaration function results empty value.
+        /// </summary>
+        /// <param name="declaration"></param>
+        /// <returns></returns>
+        public static string ExtractTypeNull(string declaration)
+        {
+            if (string.IsNullOrEmpty(declaration))
+                return "";
+            Match match = Regex.Match(declaration, Energy.Base.Expression.SqlTypeDeclaration);
+            if (!match.Success)
+                return "";
+            string value = match.Groups["null"].Value;
+            value = value.ToUpper().StartsWith("NOT") ? "NOT NULL" : "NULL";
+            return value;
+        }
+
+        #endregion
     }
 }
