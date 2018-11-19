@@ -807,6 +807,41 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Limit string to have maximum count characters with optional suffix if it was cut off.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="limit">int</param>
+        /// <param name="end"></param>
+        /// <param name="with">string</param>
+        /// <returns>string</returns>
+        public static string Limit(string text, int limit, int end, string with)
+        {
+            if (limit < 0)
+                return "";
+
+            if (string.IsNullOrEmpty(text) || limit == 0 || text.Length <= limit)
+            {
+                return text;
+            }
+            else
+            {
+                string last = text.Substring(text.Length - end);
+                string first = "";
+                if (string.IsNullOrEmpty(with))
+                {
+                    first = text.Substring(0, limit - last.Length);
+                }
+                else
+                {
+                    limit -= with.Length;
+                    first = string.Concat(text.Substring(0, limit - last.Length), with);
+                }
+                text = string.Concat(first, last);
+                return text;
+            }
+        }
+
+        /// <summary>
         /// Limit string to have maximum count characters with optional prefix or suffix if it was cut off.
         /// </summary>
         /// <param name="text">string</param>
@@ -1979,37 +2014,49 @@ namespace Energy.Base
         /// Strip text from quotation characters.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="with"></param>
+        /// <param name="quote"></param>
         /// <returns></returns>
-        public static string Strip(string text, string with)
+        public static string Strip(string text, char quote)
         {
-            return Strip(text, with, with);
+            string s = quote.ToString();
+            return Strip(text, s, s);
         }
 
         /// <summary>
         /// Strip text from quotation characters.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="with"></param>
+        /// <param name="quote"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string quote)
+        {
+            return Strip(text, quote, quote);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
         /// <param name="escape"></param>
         /// <returns></returns>
-        public static string Strip(string text, string with, string escape)
+        public static string Strip(string text, string quote, string escape)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
             int a = 0;
             int b = text.Length;
-            if (text.StartsWith(with))
+            if (text.StartsWith(quote))
             {
-                a = with.Length;
-                b -= with.Length;
+                a = quote.Length;
+                b -= quote.Length;
             }
-            if (text.EndsWith(with))
+            if (text.EndsWith(quote))
             {
-                b -= with.Length;
+                b -= quote.Length;
             }
             string cut = text.Substring(a, b);
-            return cut.Replace(escape + with, with);
+            return cut.Replace(escape + quote, quote);
         }
 
         #endregion
@@ -2066,9 +2113,9 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Editor
 
-        public class Editor
+        public class Editor: Energy.Base.Pattern.DefaultProperty<Editor>
         {
             public string InsertBeforeFirstLine(string message, string line)
             {
@@ -2112,6 +2159,72 @@ namespace Energy.Base
             {
                 return string.Concat(line, message);
             }
+
+            public string GetFirstLine(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return text;
+
+                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
+                if (p < 0)
+                {
+                    return text;
+                }
+                else
+                {
+                    return text.Substring(0, p);
+                }
+            }
+
+            public string GetLastLine(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return text;
+
+                int p = Energy.Base.Text.AfterOfAny(text, _NewLine);
+                if (p < 0)
+                {
+                    return text;
+                }
+                else
+                {
+                    return text.Substring(p);
+                }
+            }
+
+            public string EnsureNewLineAtEnd(string text)
+            {
+                string[] nll = _NewLine;
+                if (nll == null || nll.Length == 0)
+                {
+                    nll = new string[] { Environment.NewLine };
+                }
+                if (string.IsNullOrEmpty(text))
+                {
+                    text = nll[0];
+                }
+                else
+                {
+                    foreach (string nl in nll)
+                    {
+                        if (text.EndsWith(nl))
+                            return text;
+                    }
+                    text = string.Concat(text, nll[0]);
+                }
+                return text;
+            }
+
+            public string ConvertNewLine(string text, string newLine)
+            {
+                string pattern = @"\r\n|\r|\n";
+                return Regex.Replace(text, pattern, newLine);
+            }
+
+            public string ConvertNewLine(string text)
+            {
+                return ConvertNewLine(text, "\r\n");
+            }
         }
 
         #endregion
@@ -2126,9 +2239,51 @@ namespace Energy.Base
                 int p = text.IndexOf(any[i]);
                 if (p < 0)
                     continue;
-                if (p > m)
+                if (m >= 0 && p > m)
                     continue;
-                m = p;
+                else
+                    m = p;
+            }
+            return m;
+        }
+
+        #endregion
+
+        #region LastOfAny
+
+        public static int LastOfAny(string text, string[] any)
+        {
+            int m = -1;
+            for (int i = 0; i < any.Length; i++)
+            {
+                int p = text.LastIndexOf(any[i]);
+                if (p < 0)
+                    continue;
+                if (p < m)
+                    continue;
+                else
+                    m = p;
+            }
+            return m;
+        }
+
+        #endregion
+
+        #region AfterOfAny
+
+        public static int AfterOfAny(string text, string[] any)
+        {
+            int m = -1;
+            for (int i = 0; i < any.Length; i++)
+            {
+                int p = text.LastIndexOf(any[i]);
+                if (p < 0)
+                    continue;
+                p += any[i].Length;
+                if (p < m)
+                    continue;
+                else
+                    m = p;
             }
             return m;
         }

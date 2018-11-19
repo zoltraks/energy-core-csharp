@@ -10,20 +10,6 @@ namespace Energy.Interface
     /// </summary>
     public interface ISocketClient
     {
-        event Energy.Base.Network.ExceptionDelegate OnError;
-
         event Energy.Base.Network.ConnectDelegate OnConnect;
-
-        event Energy.Base.Network.CloseDelegate OnClose;
-
-        event Energy.Base.Network.ReceiveDelegate OnReceive;
-
-        event Energy.Base.Network.SendDelegate OnSend;
-
-        /// <summary>
-        /// Connect to remote.
-        /// </summary>
-        /// <returns></returns>
-        bool Connect();
     }
 }

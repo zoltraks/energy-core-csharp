@@ -71,6 +71,9 @@ namespace Energy.Base
             if (t == r)
                 return value;
 
+            if (r == typeof(object))
+                return (object)value;
+
             if (r == typeof(string))
                 return ObjectToString(value);
             if (r == typeof(byte))
@@ -1919,7 +1922,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMilliseconds(seconds, true, true, true);
+            return TimeSpanToStringMilliseconds(seconds, false, false, true);
         }
 
         /// <summary>
@@ -2048,7 +2051,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, false, true, true);
         }
 
         #endregion
@@ -2114,6 +2117,100 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<string, object> StringArrayToObjectDictionary(params object[] array)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                string key = Energy.Base.Cast.ObjectToString(array[i]);
+                if (key == null)
+                    continue;
+                object value = array[i + 1];
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                string key = Energy.Base.Cast.ObjectToString(array[array.Length - 1]);
+                if (key != null)
+                    dictionary[key] = null;
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> StringArrayToDictionary<TKey, TValue>(params object[] array)
+        {
+            Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                TKey key = Energy.Base.Cast.As<TKey>(array[i]);
+                if (key == null)
+                    continue;
+                TValue value = Energy.Base.Cast.As<TValue>(array[1 + i]);
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                TKey key = Energy.Base.Cast.As<TKey>(array[array.Length - 1]);
+                if (key != null)
+                    dictionary[key] = default(TValue);
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringArrayToFirstCharArray(string[] array, bool onlyFirstCharacter)
+        {
+            List<char> charList = new List<char>();
+            foreach (string s in array)
+            {
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                if (onlyFirstCharacter)
+                    charList.Add(s[0]);
+                else
+                {
+                    foreach (char c in s.ToCharArray())
+                    {
+                        if (!charList.Contains(c))
+                            charList.Add(c);
+                    }
+                }
+            }
+            return charList.ToArray();
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringListToFirstCharArray(List<string> list, bool onlyFirstCharacter)
+        {
+            return StringArrayToFirstCharArray(list.ToArray(), onlyFirstCharacter);
+        }
+
+        /// <summary>
         /// Convert dictionary to array of objects of key value pairs.
         /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
         /// </summary>
@@ -2135,7 +2232,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="dictionary">Dictionary</param>
         /// <returns></returns>
-        public static object[] DictionaryToObjectArrayKeyValuePAir<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
+        public static object[] DictionaryToObjectArrayKeyValuePair<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
         {
             List<object> list = new List<object>();
             foreach (KeyValuePair<TKey, TValue> _ in dictionary)

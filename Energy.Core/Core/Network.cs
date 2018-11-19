@@ -14,7 +14,7 @@ namespace Energy.Core
     {
         #region Utility
 
-        public static string GetHostAddress(string host)
+        public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
             if (host == null)
                 return null;
@@ -34,6 +34,25 @@ namespace Energy.Core
                 {
                     IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
                     ipAddress = ipHostInfo.AddressList[0];
+                    if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                    {
+                        Energy.Core.Bug.Write("C175", () =>
+                        {
+                            List<string> ls = new List<string>();
+                            for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                            {
+                                ls.Add(ipHostInfo.AddressList[i].ToString());
+                            }
+                            string msg = string.Join(" , ", ls.ToArray());
+                            return msg;
+                        });
+                        for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                        {
+                            ipAddress = ipHostInfo.AddressList[i];
+                            if (ipAddress.AddressFamily == addressFamily)
+                                break;
+                        }
+                    }
                 }
                 catch (SocketException socketException)
                 {
@@ -136,7 +155,7 @@ namespace Energy.Core
         #region IsConnected
 
         /// <summary>
-        /// Check if socket is connected
+        /// Check if socket is connected.
         /// </summary>
         /// <param name="socket"></param>
         /// <returns></returns>
@@ -407,7 +426,7 @@ namespace Energy.Core
 
         #region SocketClient
 
-        public class SocketClient : SocketConnection
+        public class SocketClient : SocketConnection, Energy.Interface.ISocketClient
         {
         }
 
@@ -415,8 +434,201 @@ namespace Energy.Core
 
         #region SocketServer
 
-        public class SocketServer : SocketConnection
+        public class SocketServer : SocketConnection, Energy.Interface.ISocketServer
         {
+            #region Property
+
+            private int _Backlog = 100;
+            [DefaultValue(100)]
+            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
+
+            #endregion
+
+            #region State
+
+            public DateTime ListenStamp { get; private set; }
+
+            public DateTime AcceptStamp { get; private set; }
+
+            #endregion
+
+            #region Event
+
+            public event Energy.Base.Network.ListenDelegate OnListen;
+
+            public event Energy.Base.Network.AcceptDelegate OnAccept;
+
+            #endregion
+
+            #region Synchronisation
+
+            public ManualResetEvent ListenDone = new ManualResetEvent(true);
+
+            public ManualResetEvent AcceptDone = new ManualResetEvent(true);
+
+            #endregion
+
+            #region Constructor
+
+            public SocketServer()
+                : base()
+            { }
+
+            #endregion
+
+            #region Clear
+
+            public override void Clear()
+            {
+                base.Clear();
+
+                ListenDone.Set();
+                AcceptDone.Set();
+            }
+
+            #endregion
+
+            #region Mirror
+
+            public virtual void Mirror(SocketServer clone)
+            {
+                base.Mirror(clone as SocketConnection);
+                if (this.OnAccept != null)
+                {
+                    clone.OnAccept += new Energy.Base.Network.AcceptDelegate((object o) =>
+                    {
+                        if (this.OnAccept != null)
+                        {
+                            this.OnAccept(clone);
+                        }
+                    });
+                }
+                if (this.OnListen != null)
+                {
+                    clone.OnListen += new Energy.Base.Network.ListenDelegate((object o) =>
+                    {
+                        if (this.OnListen != null)
+                        {
+                            this.OnListen(clone);
+                        }
+                    });
+                }
+            }
+
+            #endregion
+
+            #region Listen
+
+            public bool Listen()
+            {
+                try
+                {
+                    Clear();
+
+                    AcceptDone.Reset();
+
+                    Socket socket = this.CreateSocket();
+
+                    IPEndPoint endPoint = this.GetEndPoint();
+
+                    try
+                    {
+                        socket.Bind(endPoint);
+                        socket.Listen(Backlog);
+                        this.Socket = socket;
+                        this.Active = true;
+                    }
+                    catch (System.Security.SecurityException)
+                    {
+                        throw;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                    catch (SocketException)
+                    {
+                        throw;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    this.Socket = socket;
+
+                    if (this.OnListen != null)
+                    {
+                        this.OnListen(this);
+                    }
+
+                    if (this.Active)
+                    {
+                        socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Energy.Core.Bug.Catch(e);
+                    return false;
+                }
+                return true;
+            }
+
+            #endregion
+
+            #region Accept
+
+            private void AcceptCallback(IAsyncResult ar)
+            {
+                SocketConnection socketConnection = ar.AsyncState as SocketConnection;
+
+                //socketConnection = (SocketConnection)socketConnection.Clone();
+
+                try
+                {
+                    Socket serverSocket = this.Socket;
+
+                    // Get the socket that handles the client request.
+                    Socket remoteSocket = serverSocket.EndAccept(ar);
+
+                    AcceptDone.Set();
+
+                    SocketConnection remoteConnection = new SocketConnection();
+                    IPEndPoint remoteEndPoint = remoteSocket.RemoteEndPoint as IPEndPoint;
+
+                    remoteConnection.Host = remoteEndPoint.Address.ToString();
+                    remoteConnection.Port = remoteEndPoint.Port;
+                    remoteConnection.Family = remoteEndPoint.AddressFamily;
+                    remoteConnection.Protocol = socketConnection.Protocol;
+
+                    this.Mirror(remoteConnection);
+
+                    remoteConnection.Socket = remoteSocket;
+                    remoteConnection.Active = true;
+                    remoteConnection.Connected = true;
+
+                    if (this.OnAccept != null)
+                    {
+                        this.OnAccept(remoteConnection);
+                    }
+
+                    if (this.AlwaysReceive)
+                    {
+                        remoteConnection.Receive();
+                    }
+
+                    if (this.Active)
+                    {
+                        this.Socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            #endregion
         }
 
         #endregion
@@ -477,10 +689,6 @@ namespace Energy.Core
 
             public int Retry { get; set; }
 
-            private int _Backlog = 100;
-            [DefaultValue(100)]
-            public int Backlog { get { return _Backlog; } set { _Backlog = value; } }
-
             #endregion
 
             #region State
@@ -523,15 +731,13 @@ namespace Energy.Core
 
             public MemoryStream Stream { get { return GetStream(); } private set { _Stream = value; } }
 
-            private List<byte[]> _ReceiveBuffer;
+            private Energy.Base.Collection.Circular<byte[]> _ReceiveBuffer;
 
-            public List<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
+            public Energy.Base.Collection.Circular<byte[]> ReceiveBuffer { get { return GetReceiveBuffer(); } private set { _ReceiveBuffer = value; } }
 
-            private List<byte[]> _SendBuffer;
+            private Energy.Base.Collection.Circular<byte[]> _SendBuffer;
 
-            public List<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
-
-            public int SendBufferPosition { get; set; }
+            public Energy.Base.Collection.Circular<byte[]> SendBuffer { get { return GetSendBuffer(); } private set { _SendBuffer = value; } }
 
             #endregion
 
@@ -540,10 +746,6 @@ namespace Energy.Core
             public event Energy.Base.Network.ConnectDelegate OnConnect;
 
             public event Energy.Base.Network.CloseDelegate OnClose;
-
-            public event Energy.Base.Network.ListenDelegate OnListen;
-
-            public event Energy.Base.Network.AcceptDelegate OnAccept;
 
             public event Energy.Base.Network.ReceiveDelegate OnReceive;
 
@@ -563,10 +765,6 @@ namespace Energy.Core
             #endregion
 
             #region Synchronisation
-
-            public ManualResetEvent ConnectResetEvent = new ManualResetEvent(true);
-
-            public ManualResetEvent AcceptDone = new ManualResetEvent(true);
 
             public ManualResetEvent ConnectDone = new ManualResetEvent(true);
 
@@ -605,61 +803,25 @@ namespace Energy.Core
                 return _Stream;
             }
 
-            private List<byte[]> GetReceiveBuffer()
+            private Energy.Base.Collection.Circular<byte[]> GetReceiveBuffer()
             {
                 if (_ReceiveBuffer == null)
                 {
-                    _ReceiveBuffer = new List<byte[]>();
+                    _ReceiveBuffer = new Energy.Base.Collection.Circular<byte[]>();
                 }
                 return _ReceiveBuffer;
             }
 
-            private List<byte[]> GetSendBuffer()
+            private Energy.Base.Collection.Circular<byte[]> GetSendBuffer()
             {
                 if (_SendBuffer == null)
                 {
-                    _SendBuffer = new List<byte[]>();
+                    _SendBuffer = new Energy.Base.Collection.Circular<byte[]>();
                 }
                 return _SendBuffer;
             }
 
-            #endregion
-
-            #region Listen
-
-            public bool Listen()
-            {
-                Socket socket = CreateSocket();
-
-                try
-                {
-                    IPEndPoint endPoint = this.GetEndPoint();
-
-                    socket.Bind(endPoint);
-                    socket.Listen(Backlog);
-
-                    Clear();
-
-                    AcceptDone.Reset();
-
-                    this.Socket = socket;
-
-                    socket.BeginAccept(new AsyncCallback(AcceptCallback), this);
-
-                    if (this.OnListen != null)
-                    {
-                        this.OnListen(this);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Energy.Core.Bug.Catch(e);
-                    return false;
-                }
-                return true;
-            }
-
-            private Socket CreateSocket()
+            public Socket CreateSocket()
             {
                 string host = this.GetHost();
                 AddressFamily family = this.GetAddressFamily(this.Family, host);
@@ -669,7 +831,7 @@ namespace Energy.Core
                 return socket;
             }
 
-            private AddressFamily GetAddressFamily(AddressFamily family, string host)
+            public AddressFamily GetAddressFamily(AddressFamily family, string host)
             {
                 if (family == default(AddressFamily))
                 {
@@ -678,18 +840,18 @@ namespace Energy.Core
                 return family;
             }
 
-            private string GetHost()
+            public string GetHost()
             {
                 string host;
-                host = Energy.Core.Network.GetHostAddress(this.Host);
+                host = Energy.Core.Network.GetHostAddress(this.Host, this.Family);
                 if (string.IsNullOrEmpty(host))
                 {
-                    host = Energy.Core.Network.GetHostAddress(Dns.GetHostName());
+                    host = Energy.Core.Network.GetHostAddress(Dns.GetHostName(), this.Family);
                 }
                 return host;
             }
 
-            private IPEndPoint GetEndPoint()
+            public IPEndPoint GetEndPoint()
             {
                 string host = GetHost();
                 AddressFamily family = this.GetAddressFamily(this.Family, host);
@@ -702,55 +864,34 @@ namespace Energy.Core
 
             #endregion
 
-            #region Accept
-
-            private void AcceptCallback(IAsyncResult ar)
-            {
-                SocketConnection socketConnection = ar.AsyncState as SocketConnection;
-
-                //socketConnection = (SocketConnection)socketConnection.Clone();
-
-                try
-                {
-                    Socket serverSocket = this.Socket;
-
-                    // Get the socket that handles the client request.
-                    Socket clientSocket = serverSocket.EndAccept(ar);
-
-                    AcceptDone.Set();
-
-                    SocketConnection clientConnection = new SocketConnection();
-                    IPEndPoint remoteEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-
-                    clientConnection.Host = remoteEndPoint.Address.ToString();
-                    clientConnection.Port = remoteEndPoint.Port;
-                    clientConnection.Family = remoteEndPoint.AddressFamily;
-                    clientConnection.Protocol = socketConnection.Protocol;
-
-                    this.Mirror(clientConnection);
-
-                    clientConnection.Socket = clientSocket;
-
-                    if (this.OnAccept != null)
-                    {
-                        this.OnAccept(this);
-                    }
-
-                    if (this.AlwaysReceive)
-                    {
-                        clientConnection.Receive();
-                    }
-                }
-                catch
-                {
-                }
-            }
-
-            #endregion
-
             #region Connect
 
             public bool Connect()
+            {
+                if (this.Active || this.Connected)
+                {
+                    Close();
+                }
+
+                Clear();
+
+                if (ConnectDone.WaitOne(0))
+                {
+                    if (!ConnectBegin())
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Connect operation already waiting for callback");
+                }
+
+                return true;
+
+            }
+
+            public bool ConnectBegin()
             {
                 ConnectDone.Reset();
 
@@ -774,7 +915,8 @@ namespace Energy.Core
                         {
                             if (!this.ConnectDone.WaitOne(timeout))
                             {
-                                this.Active = false;
+                                //this.Active = false;
+                                this.Close();
                             }
                         });
                     }
@@ -806,15 +948,37 @@ namespace Energy.Core
                 {
                     Socket remoteSocket = connection.Socket;
 
-                    remoteSocket.EndConnect(ar);
+                    if (remoteSocket == null)
+                        return;
+
+                    try
+                    {
+                        remoteSocket.EndConnect(ar);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     DateTime now = DateTime.Now;
                     connection.ActivityStamp = now;
                     connection.ConnectStamp = now;
 
-                    connection.Connected = true;
-
                     connection.ConnectDone.Set();
+
+                    if (!this.Active)
+                        return;
+
+                    connection.Connected = true;
 
                     if (connection.OnConnect != null)
                     {
@@ -831,6 +995,10 @@ namespace Energy.Core
                     switch (exceptionSocket.SocketErrorCode)
                     {
                         default:
+                            connection.Active = false;
+                            break;
+
+                        case SocketError.ConnectionRefused:
                             connection.Active = false;
                             break;
 
@@ -866,20 +1034,17 @@ namespace Energy.Core
 
             private readonly object SendLock = new object();
 
-            public bool Send(byte[] data)
+            public virtual bool Send(byte[] data)
             {
                 if (!this.Active)
                     return false;
                 if (!this.Connected)
                     return false;
 
-                int count = data.Length;
-                byte[] copy = new byte[count];
-                Array.Copy(data, copy, count);
-
                 lock (SendLock)
                 {
-                    this.SendBuffer.Add(copy);
+                    SendBuffer.Push(data);
+                    Energy.Core.Bug.Write("X " + SendBuffer.Count);
                 }
 
                 if (SendDone.WaitOne(0))
@@ -906,18 +1071,28 @@ namespace Energy.Core
                 if (!this.Connected)
                     return false;
 
-                byte[] copy = this.SendBuffer[this.SendBufferPosition];
+                byte[] data = null;
+
+                lock (SendLock)
+                {
+                    data = SendBuffer.First;
+                }
+
+                if (data == null)
+                {
+                    SendDone.Set();
+                    return true;
+                }
 
                 Socket clientSocket = this.Socket;
 
-                clientSocket.BeginSend(copy, 0, copy.Length, (SocketFlags)0, SendCallback, this);
+                clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, this);
 
                 return true;
             }
 
             private void SendCallback(IAsyncResult ar)
             {
-                bool signal = true;
                 bool more = false;
                 byte[] data = null;
                 try
@@ -929,15 +1104,29 @@ namespace Energy.Core
                     }
                     Socket clientSocket = connection.Socket;
 
-                    int count = clientSocket.EndSend(ar);
+                    int count = 0;
 
-                    DateTime now = DateTime.Now;
-                    connection.ActivityStamp = now;
-                    connection.SendStamp = now;
+                    try
+                    {
+                        count = clientSocket.EndSend(ar);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     lock (SendLock)
                     {
-                        data = connection.SendBuffer[connection.SendBufferPosition];
+                        data = SendBuffer.Pull();
                     }
 
                     if (count != data.Length)
@@ -945,41 +1134,46 @@ namespace Energy.Core
                         Energy.Core.Bug.Write("E8401", "Different size of buffer and send count");
                     }
 
-                    int length = 0;
-                    int position = 0;
+                    DateTime now = DateTime.Now;
+                    connection.ActivityStamp = now;
+                    connection.SendStamp = now;
+
+                    SendDone.Set();
+
+                    if (!this.Active)
+                        return;
 
                     lock (SendLock)
                     {
-                        length = this.SendBuffer.Count;
-                        position = ++this.SendBufferPosition;
+                        System.Diagnostics.Debug.WriteLine("Y " + SendBuffer.Count);
+                        if (SendBuffer.Count > 0)
+                            more = true;
                     }
 
-                    if (position < length)
+                    if (more)
                     {
-                        more = true;
-                        signal = false;
-                    }
-
-                    if (signal)
-                    {
-                        SendDone.Set();
+                        if (SendDone.WaitOne(0))
+                        {
+                            SendBegin();
+                        }
                     }
 
                     if (connection.OnSend != null)
                     {
                         connection.OnSend(this, data);
                     }
-
-                    if (more)
-                    {
-                        SendBegin();
-                    }
                 }
-                finally
+                catch (Exception e)
                 {
-                    if (signal)
+                    Energy.Core.Bug.Write(e);
+                    bool ignore = false;
+                    if (OnException != null)
                     {
-                        SendDone.Set();
+                        ignore = OnException(this, e);
+                    }
+                    if (!ignore)
+                    {
+                        throw;
                     }
                 }
             }
@@ -1039,49 +1233,58 @@ namespace Energy.Core
                 bool flush = false;
                 bool more = false;
 
+                int length = 0;
+
                 try
                 {
                     Socket clientSocket = connection.Socket;
 
-                    // Read data from the client socket.   
-                    int dataLength = clientSocket.EndReceive(ar);
+                    try
+                    {
+                        // Read data from the client socket.   
+                        length = clientSocket.EndReceive(ar);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        return;
+                    }
+                    catch (ArgumentException)
+                    {
+                        return;
+                    }
+                    catch (Exception x)
+                    {
+                        if (!connection.Catch(x))
+                            throw;
+                    }
 
                     DateTime now = DateTime.Now;
                     connection.ActivityStamp = now;
                     connection.ReceiveStamp = now;
 
-                    if (dataLength == 0)
+                    if (length == 0)
                     {
                         // no data to receive
                         more = false;
                         flush = true;
                     }
-                    else if (dataLength > 0)
+                    else if (length > 0)
                     {
                         more = true;
-                        if (dataLength < connection.Capacity)
+                        connection.Stream.Write(connection.Buffer, 0, length);
+                        if (length < connection.Capacity)
+                        {
                             flush = true;
+                        }
                         else
-                            flush = false;
-                        connection.Stream.Write(connection.Buffer, 0, dataLength);
+                        {
+                            if (connection.Socket.Available > 0)
+                            {
+                                flush = false;
+                            }
+                        }
                     }
-                }
-                catch (SocketException exceptionSocket)
-                {
-                    switch (exceptionSocket.SocketErrorCode)
-                    {
-                        case SocketError.ConnectionReset:
-                            break;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Energy.Core.Bug.Write(e);
-                    throw;
-                }
 
-                try
-                {
                     byte[] data = null;
 
                     if (flush)
@@ -1095,6 +1298,9 @@ namespace Energy.Core
                     }
 
                     ReceiveDone.Set();
+
+                    if (!this.Active)
+                        return;
 
                     // fire event
 
@@ -1116,16 +1322,75 @@ namespace Energy.Core
                 catch (Exception e)
                 {
                     Energy.Core.Bug.Write(e);
-                    throw;
+                    bool ignore = false;
+                    if (OnException != null)
+                    {
+                        ignore = OnException(this, e);
+                    }
+                    if (!ignore)
+                    {
+                        throw;
+                    }
                 }
             }
 
             #endregion
-       
+
+            #region Catch
+
+            public bool Catch(Exception exception)
+            {
+                if (exception == null)
+                    return false;
+
+                if (exception is SocketException)
+                {
+                    switch (((SocketException)exception).SocketErrorCode)
+                    {
+                        case SocketError.ConnectionRefused:
+                            break;
+
+                        case SocketError.ConnectionReset:
+                            Close();
+                            break;
+                    }
+                }
+
+                return false;
+            }
+
+            #endregion
+
+            #region Close
+
+            public void Close()
+            {
+                this.Active = false;
+                Energy.Core.Network.Shutdown(this.Socket);
+                this.Connected = false;
+                this.Socket = null;
+
+                if (this.OnClose != null)
+                {
+                    this.OnClose(this);
+                }
+            }
+
+            #endregion
+
             #region Clear
 
-            public void Clear()
+            public virtual void Clear()
             {
+                this.Active = false;
+                this.Connected = false;
+
+                this.Socket = null;
+
+                this.ReceiveDone.Set();
+                this.SendDone.Set();
+                this.ConnectDone.Set();
+
                 this.ActivityStamp = DateTime.MinValue;
                 this.ConnectStamp = DateTime.MinValue;
                 this.ReceiveStamp = DateTime.MinValue;
@@ -1136,7 +1401,7 @@ namespace Energy.Core
 
             #region Clone
 
-            public object Clone()
+            public virtual object Clone()
             {
                 SocketConnection clone = new SocketConnection();
 
@@ -1144,7 +1409,6 @@ namespace Energy.Core
                 clone.Protocol = this.Protocol;
                 clone.Port = this.Port;
                 clone.Family = this.Family;
-                clone.Backlog = this.Backlog;
                 clone.Timeout = this.Timeout;
 
                 this.Mirror(clone);
@@ -1156,7 +1420,7 @@ namespace Energy.Core
 
             #region Mirror
 
-            private void Mirror(SocketConnection clone)
+            public virtual void Mirror(SocketConnection clone)
             {
                 if (this.OnConnect != null)
                 {
@@ -1165,26 +1429,6 @@ namespace Energy.Core
                         if (this.OnConnect != null)
                         {
                             this.OnConnect(clone);
-                        }
-                    });
-                }
-                if (this.OnAccept != null)
-                {
-                    clone.OnAccept += new Energy.Base.Network.AcceptDelegate((object o) =>
-                    {
-                        if (this.OnAccept != null)
-                        {
-                            this.OnAccept(clone);
-                        }
-                    });
-                }
-                if (this.OnListen != null)
-                {
-                    clone.OnListen += new Energy.Base.Network.ListenDelegate((object o) =>
-                    {
-                        if (this.OnListen != null)
-                        {
-                            this.OnListen(clone);
                         }
                     });
                 }
