@@ -63,6 +63,14 @@ namespace Energy.Core
             return ipAddress.ToString();
         }
 
+        public static string GetHostAddress(string host)
+        {
+            AddressFamily addressFamily = Settings.AddressFamily;
+            if (addressFamily == AddressFamily.Unspecified)
+                addressFamily = GetAddressFamily(host);
+            return GetHostAddress(host, addressFamily);
+        }
+
         public static AddressFamily GetAddressFamily(string address)
         {
             if (address == "localhost" || address == "127.0.0.1")
