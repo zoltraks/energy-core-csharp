@@ -32,6 +32,53 @@ namespace Energy.Query
 
         #endregion
 
+        #region Private
+
+        private Dictionary<string, Format> _DialectFormatDictionary;
+
+        #endregion
+
+        #region Accessor
+
+        public Format this[string dialect]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(dialect))
+                    return null;
+                Energy.Query.Format findFormat = null;
+                if (_DialectFormatDictionary == null)
+                {
+                    _DialectFormatDictionary = new Dictionary<string, Format>();
+                }
+                else
+                {
+                    findFormat = Energy.Base.Collection.GetStringDictionaryValue<Energy.Query.Format>(_DialectFormatDictionary, dialect, true);
+                }
+                if (findFormat == null)
+                {
+                    System.Type classFormat = null;
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetAssembly(typeof(Energy.Query.Format));
+                    System.Type[] types;
+                    types = assembly.GetTypes();
+                    System.Type[] class1Array = Energy.Base.Class.GetTypesWithAttribute(types, typeof(Energy.Attribute.Code.TemporaryAttribute));
+                    System.Type[] class2Array = Energy.Base.Class.GetTypesWithInterface(types, typeof(Energy.Interface.IDialect));
+
+                    classFormat = Energy.Base.Collection.GetFirstOrDefault<System.Type>(class1Array, class2Array);
+
+                    if (classFormat != null)
+                    {
+                        findFormat = (Energy.Query.Format)Activator.CreateInstance(classFormat);
+                        _DialectFormatDictionary[dialect] = findFormat;
+                    }
+                }
+                return findFormat;
+
+            }
+        }
+
+        #endregion
+
         #region Property
 
         /// <summary>
@@ -343,18 +390,13 @@ namespace Energy.Query
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             string s = value is string ? (string)value : value.ToString();
-            string v = s.Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
-            long l;
-            if (long.TryParse(v, out l))
-                return Number(l);
-            double d;
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture, out d))
-                return Number(d);
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.CurrentCulture, out d))
-                return Number(d);
-            return nullify ? "NULL" : "0";
+            s = Energy.Base.Text.Trim(s);
+            if (Energy.Base.Cast.IsLong(s, true))
+                return Number((long)Energy.Base.Cast.StringToLong(s));
+            else
+                return Number((double)Energy.Base.Cast.StringToDouble(s));
+
+            //return nullify ? "NULL" : "0";
         }
 
         #endregion
