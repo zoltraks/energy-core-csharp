@@ -3202,5 +3202,41 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Enumeration
+
+        public static Energy.Enumeration.TextPad EnumerationTextAlignToTextPad(Energy.Enumeration.TextAlign align)
+        {
+            switch (align)
+            {
+                default:
+                    return Enumeration.TextPad.None;
+
+                case Enumeration.TextAlign.Center:
+                    return Enumeration.TextPad.Center;
+
+                case Enumeration.TextAlign.Left:
+                    return Enumeration.TextPad.Right;
+
+                case Enumeration.TextAlign.Right:
+                    return Enumeration.TextPad.Left;
+            }
+        }
+
+        public static Energy.Enumeration.TextAlign EnumerationTextPadToTextAlign(Energy.Enumeration.TextPad pad)
+        {
+            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+            if (beLeft && beRight)
+                return Enumeration.TextAlign.Center;
+            else if (beLeft)
+                return Enumeration.TextAlign.Right;
+            else if (beRight)
+                return Enumeration.TextAlign.Left;
+            else
+                return Enumeration.TextAlign.None;
+        }
+
+        #endregion
     }
 }
