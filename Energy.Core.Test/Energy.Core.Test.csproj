@@ -75,6 +75,8 @@
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\Format.cs" />
+    <Compile Include="Query\Type.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Energy.Core\Energy.Core.csproj">
