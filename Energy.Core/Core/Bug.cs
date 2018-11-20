@@ -409,8 +409,12 @@ namespace Energy.Core
 
         #region FormatDebugOutput
 
-        public static string FormatDebugOutput(string message)
+        public static string FormatDebugOutput(string code, string message)
         {
+            if ((bool)DebugOutputCode && !string.IsNullOrEmpty(code))
+            {
+                message = string.Concat(code.PadRight(6, ' '), message);
+            }
             if ((bool)DebugOutputTime)
             {
                 message = string.Format("{0} {1}", DateTime.Now.ToString("HH:mm:ss.fff"), message);
@@ -418,9 +422,14 @@ namespace Energy.Core
             return message;
         }
 
+        public static string FormatDebugOutput(string message)
+        {
+            return FormatDebugOutput(null, message);
+        }
+
         #endregion
 
-        #region Static
+            #region Static
 
         private static Class.SuppressCodeList SuppressCodeList
         {
@@ -441,7 +450,7 @@ namespace Energy.Core
         public static void Catch(Exception exception)
         {
             string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(exception.GetType().Name, message));
             if ((bool)ExceptionTrace)
             {
                 if (_Logger != null)
@@ -514,7 +523,7 @@ namespace Energy.Core
             {
                 debugMessage = (code.Text + " " + debugMessage).Trim();
             }
-            debugMessage = FormatDebugOutput(debugMessage);
+            debugMessage = FormatDebugOutput(code.Text, debugMessage);
             System.Diagnostics.Debug.WriteLine(debugMessage);
             if ((bool)ExceptionTrace)
             {
