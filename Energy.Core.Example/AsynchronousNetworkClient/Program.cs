@@ -41,7 +41,7 @@ namespace AsynchronousNetworkClient
             IPAddress ipAddress = IPAddress.Parse(address);
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
-            Energy.Core.Network.SocketConnection socketConnection = new Energy.Core.Network.SocketConnection();
+            Energy.Core.Network.SocketClient socketConnection = new Energy.Core.Network.SocketClient();
             socketConnection.Host = host;
             socketConnection.Port = port;
 

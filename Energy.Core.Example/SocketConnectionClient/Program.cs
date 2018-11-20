@@ -10,7 +10,7 @@ namespace SocketConnectionClient
         {
             Energy.Core.Tilde.WriteLine("Welcome to ~lm~Network ~lc~Client~0~ using ~y~Energy.Core.Network.~lc~SocketClient");
 
-            Energy.Core.Network.SocketConnection connection = new Energy.Core.Network.SocketConnection();
+            Energy.Core.Network.SocketClient connection = new Energy.Core.Network.SocketClient();
             connection.Host = "localhost";
             connection.Port = 9000;
             connection.OnReceive += Connection_OnReceive;
@@ -36,7 +36,7 @@ namespace SocketConnectionClient
 
         private static void Connection_OnConnect(object self)
         {
-            Energy.Core.Network.SocketConnection connection = self as Energy.Core.Network.SocketConnection;
+            Energy.Core.Network.SocketClient connection = self as Energy.Core.Network.SocketClient;
             if (connection == null)
             {
                 string tilde = "~r~ERROR~0~ ~lm~Object is null in ~y~Connection_OnConnect";
@@ -60,7 +60,6 @@ namespace SocketConnectionClient
             {
                 Energy.Core.Tilde.WriteLine("~r~ERROR~0~ ~lm~Send error in ~y~Connection_OnConnect");
             }
-            connection.WaitUntilSendDone();
             if (!connection.Receive())
             {
                 Energy.Core.Tilde.WriteLine("~r~ERROR~0~ ~lm~Receive error in ~y~Connection_OnConnect");
@@ -89,7 +88,7 @@ namespace SocketConnectionClient
 
         private static void Connection_OnSend(object self, byte[] data)
         {
-            var connection = self as Energy.Core.Network.SocketConnection;
+            var connection = self as Energy.Core.Network.SocketClient;
             string message = Energy.Base.Text.Limit(connection.Encoding.GetString(data).Trim(), 13, "...");
             string time = Energy.Base.Cast.TimeSpanToStringMicroseconds(DateTime.Now - connection.ConnectStamp);
             Energy.Core.Tilde.WriteLine($"~y~{time} ~g~SEND~0~ ~w~{message}");
@@ -97,7 +96,7 @@ namespace SocketConnectionClient
 
         private static void Connection_OnReceive(object self, byte[] data)
         {
-            var connection = self as Energy.Core.Network.SocketConnection;
+            var connection = self as Energy.Core.Network.SocketClient;
             string message = Energy.Base.Text.Limit(connection.Encoding.GetString(data).Trim(), 13, "...");
             string time = Energy.Base.Cast.TimeSpanToStringMicroseconds(DateTime.Now - connection.ConnectStamp);
             Energy.Core.Tilde.WriteLine($"~y~{time} ~g~RECEIVE~0~ ~w~{message}");

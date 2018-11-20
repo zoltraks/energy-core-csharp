@@ -23,13 +23,13 @@ namespace SocketConnectionServer
 
         private static void ServerConnection_OnListen(object self)
         {
-            Energy.Core.Network.SocketConnection serverConnection = self as Energy.Core.Network.SocketConnection;
+            Energy.Core.Network.SocketServer serverConnection = self as Energy.Core.Network.SocketServer;
             Console.WriteLine("Server is listening at " + serverConnection.ToString());
         }
 
         private static void ServerConnection_OnReceive(object self, byte[] data)
         {
-            Energy.Core.Network.SocketConnection clientConnection = self as Energy.Core.Network.SocketConnection;
+            Energy.Core.Network.SocketClient clientConnection = self as Energy.Core.Network.SocketClient;
             string text = Encoding.UTF8.GetString(data);
             Console.WriteLine("Client message from " + clientConnection.ToString() + ": " + text);
             clientConnection.Send(System.Text.Encoding.UTF8.GetBytes(text));
@@ -37,7 +37,7 @@ namespace SocketConnectionServer
 
         private static void ServerConnection_OnAccept(object self)
         {
-            Energy.Core.Network.SocketConnection clientConnection = self as Energy.Core.Network.SocketConnection;
+            Energy.Core.Network.SocketClient clientConnection = self as Energy.Core.Network.SocketClient;
             string text = string.Format(Global.HelloText, Global.ClientCounter.Increment());
             clientConnection.Send(System.Text.Encoding.UTF8.GetBytes(text));
         }
