@@ -112,27 +112,27 @@ namespace Energy.Core
 
                 public class Item
                 {
-                    public Code Code;
+                    public string Code;
 
                     public bool Suppress;
                 }
 
-                public Item Find(Code code, bool ignoreCase)
+                public Item Find(string code, bool ignoreCase)
                 {
                     for (int i = 0; i < this.Count; i++)
                     {
-                        if (code.Match(this[i].Code, ignoreCase))
+                        if (0 == string.Compare(this[i].Code, code, ignoreCase))
                             return this[i];
                     }
                     return null;
                 }
 
-                public Item Find(Code code)
+                public Item Find(string code)
                 {
                     return Find(code, true);
                 }
 
-                public bool IsSuppressed(Code code)
+                public bool IsSuppressed(string code)
                 {
                     Item item = Find(code, true);
                     if (item == null)
@@ -151,59 +151,73 @@ namespace Energy.Core
 
         #endregion
 
-        #region Code
+        //#region Code
 
-        /// <summary>
-        /// Bug message code. May be numbered, litereal or both.
-        /// </summary>
-        public struct Code
-        {
-            public string Text;
+        ///// <summary>
+        ///// Bug message code. May be numbered, litereal or both.
+        ///// </summary>
+        //public struct Code
+        //{
+        //    public string Text;
 
-            public Code(string text)
-            {
-                Text = text;
-            }
+        //    public Code(string text)
+        //    {
+        //        Text = text;
+        //    }
 
-            public Code(long number)
-            {
-                Text = number.ToString();
-            }
+        //    public Code(long number)
+        //    {
+        //        Text = number.ToString();
+        //    }
 
-            public static implicit operator Code(long number)
-            {
-                return new Code(number);
-            }
+        //    public static implicit operator Code(long number)
+        //    {
+        //        return new Code(number);
+        //    }
 
-            public static implicit operator Code(string number)
-            {
-                return new Code(number);
-            }
+        //    public static implicit operator Code(string number)
+        //    {
+        //        return new Code(number);
+        //    }
 
-            public bool Match(Code code)
-            {
-                return Match(code, true);
-            }
+        //    public bool Match(Code code)
+        //    {
+        //        return Match(code, true);
+        //    }
 
-            public bool Match(Code code, bool ignoreCase)
-            {
-                if (0 == string.Compare(this.Text, code.Text))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+        //    public bool Match(Code code, bool ignoreCase)
+        //    {
+        //        if (0 == string.Compare(this.Text, code.Text))
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
 
-            public override string ToString()
-            {
-                return Text;
-            }
-        }
+        //    public override string ToString()
+        //    {
+        //        return Text;
+        //    }
 
-        #endregion
+        //    public static Code FromTypeName(Exception exception)
+        //    {
+        //        if (exception == null)
+        //            return default(Code);
+        //        return new Code { Text = exception.GetType().Name };
+        //    }
+
+        //    public static Code FromTypeFullName(Exception exception)
+        //    {
+        //        if (exception == null)
+        //            return default(Code);
+        //        return new Code { Text = exception.GetType().FullName };
+        //    }
+        //}
+
+        //#endregion
 
         #region Entry
 
@@ -212,27 +226,39 @@ namespace Energy.Core
         /// </summary>
         public struct Entry
         {
-            public Code Code;
+            public string Code;
 
             public string Message;
 
             public Entry(string message)
             {
-                this.Code = default(Code);
-                this.Message = message;
+                this.Code = "";
+                this.Message = message ?? "";
             }
 
-            public Entry(Code code, string message)
+            public Entry(string code, string message)
             {
-                this.Code = code;
-                this.Message = message;
+                this.Code = code ?? "";
+                this.Message = message ?? "";
             }
 
+            private static Entry _Empty = default(Entry);
+
+            public static Entry Empty
+            {
+                get
+                {
+                    if (_Empty.Code == null || _Empty.Message == null)
+                        _Empty = new Entry("", "");
+                    return _Empty;
+                }
+            }
+            
             public override string ToString()
             {
                 List<string> list = new List<string>();
-                if (!string.IsNullOrEmpty(this.Code.Text))
-                    list.Add(this.Code.Text);
+                if (!string.IsNullOrEmpty(this.Code))
+                    list.Add(this.Code);
                 if (!string.IsNullOrEmpty(this.Message))
                     list.Add(this.Message);
                 return string.Join(" ", list.ToArray());
@@ -449,6 +475,11 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
+            if (exception == null)
+            {
+                Energy.Core.Bug.Write("C601", "Can't catch null exception");
+                return;
+            }
             string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
             System.Diagnostics.Debug.WriteLine(FormatDebugOutput(exception.GetType().Name, message));
             if ((bool)ExceptionTrace)
@@ -512,7 +543,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <param name="message"></param>
-        public static void Write(Code code, string message)
+        public static void Write(string code, string message)
         {
             if (IsSuppressed(code))
             {
@@ -521,9 +552,9 @@ namespace Energy.Core
             string debugMessage = message;
             if ((bool)DebugOutputCode)
             {
-                debugMessage = (code.Text + " " + debugMessage).Trim();
+                debugMessage = (code + " " + debugMessage).Trim();
             }
-            debugMessage = FormatDebugOutput(code.Text, debugMessage);
+            debugMessage = FormatDebugOutput(code, debugMessage);
             System.Diagnostics.Debug.WriteLine(debugMessage);
             if ((bool)ExceptionTrace)
             {
@@ -538,7 +569,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <param name="action"></param>
-        public static void Write(Code code, Energy.Base.Anonymous.String action)
+        public static void Write(string code, Energy.Base.Anonymous.String action)
         {
             if (IsSuppressed(code))
             {
@@ -554,7 +585,7 @@ namespace Energy.Core
             {
                 return;
             }
-            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(code, message));
             if ((bool)ExceptionTrace)
             {
                 //Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
@@ -568,7 +599,10 @@ namespace Energy.Core
         /// <param name="exception"></param>
         public static void Write(Exception exception)
         {
-            Write(GetExceptionMessage(exception, (bool)ExceptionTrace, exception.GetType().Name));
+            if (exception == null)
+                return;
+            Write(exception.GetType().Name
+                , GetExceptionMessage(exception, (bool)ExceptionTrace, exception.GetType().Name));
         }
 
         /// <summary>
@@ -576,7 +610,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <param name="exception"></param>
-        public static void Write(Code code, Exception exception)
+        public static void Write(string code, Exception exception)
         {
             Write(code, GetExceptionMessage(exception, (bool)ExceptionTrace));
         }
@@ -643,7 +677,7 @@ namespace Energy.Core
         /// Suppress message identified by code.
         /// </summary>
         /// <param name="code"></param>
-        public static void Suppress(Code code)
+        public static void Suppress(string code)
         {
             Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
             if (item == null)
@@ -667,7 +701,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <param name="suppress"></param>
-        public static void Suppress(Code code, bool suppress)
+        public static void Suppress(string code, bool suppress)
         {
             Class.SuppressCodeList.Item item = SuppressCodeList.Find(code);
             if (item == null)
@@ -685,7 +719,7 @@ namespace Energy.Core
             }
         }
 
-        public static bool IsSuppressed(Code code)
+        public static bool IsSuppressed(string code)
         {
             return SuppressCodeList.IsSuppressed(code);
         }
@@ -696,7 +730,7 @@ namespace Energy.Core
 
         public static void Clear()
         {
-            Last = default(Entry);
+            Last = Entry.Empty;
         }
 
         #endregion
