@@ -1157,9 +1157,20 @@ namespace Energy.Core
                     }
                     catch (Exception exception)
                     {
+                        if (serverConnection.OnException != null)
+                        {
+                            if (!serverConnection.OnException(serverConnection, exception))
+                            {
+                                return;
+                            }
+                        }
+                        if (!serverConnection.Active)
+                        {
+                            return;
+                        }
                         if (!this.Catch(exception))
                         {
-                            throw;
+                            return;
                         }
                     }
                     finally

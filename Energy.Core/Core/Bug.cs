@@ -314,7 +314,7 @@ namespace Energy.Core
             if (!string.IsNullOrEmpty(name))
             {
                 string textSuffix = string.Format(ExceptionMessageAppendNameFormat, name);
-                message = new Energy.Base.Text.Editor().AppendAfterFirstLine(message, textSuffix);
+                message = Energy.Core.Text.Editor.Default.AppendAfterFirstLine(message, textSuffix);
             }
             return message;
         }
