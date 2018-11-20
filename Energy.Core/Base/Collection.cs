@@ -1383,5 +1383,30 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region KeyValuePairList
+
+        public class KeyValuePairList<TKey, TValue> : List<KeyValuePair<TKey, TValue>>
+        {
+            public bool Empty { get { return IsEmpty(); } }
+
+            private bool IsEmpty()
+            {
+                return this.Count == 0;
+            }
+
+            public KeyValuePair<TKey, TValue> Take()
+            {
+                if (this.Count == 0)
+                {
+                    return default(KeyValuePair<TKey, TValue>);
+                }
+                KeyValuePair<TKey, TValue> result = this[0];
+                this.RemoveAt(0);
+                return result;
+            }
+        }
+
+        #endregion
     }
 }
