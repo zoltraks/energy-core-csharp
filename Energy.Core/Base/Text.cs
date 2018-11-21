@@ -65,8 +65,10 @@ namespace Energy.Base
 
         #endregion
 
+        #region
+
         /// <summary>
-        /// Exchange texts between each other
+        /// Exchange texts between each other.
         /// </summary>
         /// <param name="first"></param>
         /// <param name="second"></param>
@@ -78,7 +80,23 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Select first non empty string element
+        /// Exchange characters between each other.
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        public static void Exchange(ref char first, ref char second)
+        {
+            char remember = first;
+            first = second;
+            second = remember;
+        }
+
+        #endregion
+
+        #region Select
+
+        /// <summary>
+        /// Select first non empty string element.
         /// </summary>
         /// <param name="list">string[]</param>
         /// <returns>string</returns>
@@ -90,6 +108,8 @@ namespace Energy.Base
             }
             return null;
         }
+
+        #endregion
 
         #region Surround
 
