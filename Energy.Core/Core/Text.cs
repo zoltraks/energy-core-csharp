@@ -8,13 +8,28 @@ namespace Energy.Core
     {
         #region Editor
 
+        /// <summary>
+        /// Text editor class.
+        /// </summary>
         public class Editor : Energy.Base.Pattern.DefaultProperty<Editor>
         {
-            public string InsertBeforeFirstLine(string message, string line)
+            /// <summary>
+            /// Insert text before first line.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public string InsertBeforeFirstLine(string text, string line)
             {
-                return string.Concat(line, message);
+                return string.Concat(line, text);
             }
 
+            /// <summary>
+            /// Append text after first line.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
             public string AppendAfterFirstLine(string text, string line)
             {
                 if (string.IsNullOrEmpty(line))
@@ -38,19 +53,37 @@ namespace Energy.Core
                 }
             }
 
-            public string InsertBeforeSecondLine(string message, string line)
+            /// <summary>
+            /// Insert text before second line.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public string InsertBeforeSecondLine(string text, string line)
             {
-                return string.Concat(line, message);
+                return string.Concat(line, text);
             }
 
-            public string InsertBeforeLastLine(string message, string line)
+            /// <summary>
+            /// Insert text before last line.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public string InsertBeforeLastLine(string text, string line)
             {
-                return string.Concat(line, message);
+                return string.Concat(line, text);
             }
 
-            public string AppendAfterLastLine(string message, string line)
+            /// <summary>
+            /// Append text after last line.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public string AppendAfterLastLine(string text, string line)
             {
-                return string.Concat(line, message);
+                return string.Concat(line, text);
             }
 
             public string GetFirstLine(string text)
@@ -69,6 +102,11 @@ namespace Energy.Core
                 }
             }
 
+            /// <summary>
+            /// Get last line of text.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
             public string GetLastLine(string text)
             {
                 if (string.IsNullOrEmpty(text))
@@ -85,6 +123,13 @@ namespace Energy.Core
                 }
             }
 
+            /// <summary>
+            /// Ensure text ends with newline.
+            /// Add newline string to the end if not included even if empty.
+            /// Works with multiple newline strings.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
             public string EnsureNewLineAtEnd(string text)
             {
                 string[] nll = Energy.Base.Text.NEWLINE_ARRAY;
@@ -108,15 +153,25 @@ namespace Energy.Core
                 return text;
             }
 
+            /// <summary>
+            /// Convert new line delimiter to specified one.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <param name="newLine"></param>
+            /// <returns></returns>
             public string ConvertNewLine(string text, string newLine)
             {
-                string pattern = @"\r\n|\r|\n";
-                return System.Text.RegularExpressions.Regex.Replace(text, pattern, newLine);
+                return Energy.Base.Text.ConvertNewLine(text, newLine);
             }
 
+            /// <summary>
+            /// Convert newline delimiter to environment default.
+            /// Value of constant **Energy.Base.Text.NL** is used.
+            /// <param name="text"></param>
+            /// <returns></returns>
             public string ConvertNewLine(string text)
             {
-                return ConvertNewLine(text, "\r\n");
+                return Energy.Base.Text.ConvertNewLine(text);
             }
         }
 

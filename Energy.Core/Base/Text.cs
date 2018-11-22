@@ -61,6 +61,9 @@ namespace Energy.Base
         /// </summary>
         public static readonly string[] NEWLINE_ARRAY = new string[] { "\r\n", "\n", "\r" };
 
+        /// <summary>
+        /// Regular expressions pattern for new line.
+        /// </summary>
         public const string NEWLINE_PATTERN = "\r\n|\n|\r";
 
         #endregion
@@ -1460,7 +1463,7 @@ namespace Energy.Base
         #region Newline endings
 
         /// <summary>
-        /// Convert newline delimiter to specified one
+        /// Convert new line delimiter to specified one.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="newLine"></param>
@@ -1473,7 +1476,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert newline delimiter to environment default
+        /// Convert newline delimiter to environment default.
+        /// Value of constant **Energy.Base.Text.NL** is used.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>string[]</returns>
