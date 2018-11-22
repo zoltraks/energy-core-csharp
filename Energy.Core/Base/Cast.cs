@@ -485,7 +485,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert bool to string
+        /// Convert boolean value to its string representation.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="style"></param>
@@ -2683,6 +2683,11 @@ namespace Energy.Base
             return StringToUnsignedLong(s);
         }
 
+        /// <summary>
+        /// Convert object to boolean value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool ObjectToBool(object value)
         {
             if (value == null)
@@ -2731,7 +2736,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert object to double value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2772,7 +2778,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert object to float value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2788,7 +2795,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to double number.
+        /// Convert object to decimal number.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2926,7 +2935,7 @@ namespace Energy.Base
         #region Enum
 
         /// <summary>
-        /// Convert string to enum
+        /// Convert string to enumeration value.
         /// </summary>
         /// <param name="value">string</param>
         /// <param name="type">Type</param>
@@ -3108,6 +3117,11 @@ namespace Energy.Base
             return Energy.Base.Json.Escape(value);
         }
 
+        /// <summary>
+        /// Convert object to formal JSON value string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string ObjectToJsonValue(object value)
         {
             // treat DBNull as empty string //
@@ -3132,6 +3146,11 @@ namespace Energy.Base
             return StringToJsonString(value.ToString());
         }
 
+        /// <summary>
+        /// Convert JSON value string to an object.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static object JsonValueToObject(string text)
         {
             if (text == "null")
@@ -3166,6 +3185,14 @@ namespace Energy.Base
 
         private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
+        /// <summary>
+        /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
+        /// </summary>
+        /// <param name="sizeInBytes"></param>
+        /// <param name="decimalPlaces"></param>
+        /// <param name="numberCeiling"></param>
+        /// <returns></returns>
         public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
         {
             if (sizeInBytes <= 0)

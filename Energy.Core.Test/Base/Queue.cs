@@ -15,7 +15,7 @@ namespace Energy.Core.Test.Base
             q.Push("ABC");
             q.Push("DEF");
             Assert.IsFalse(q.Push("GHI"), "Queue should not allow to push element when exceeds limit");
-            q.Circular = true;
+            q.Ring = true;
             Assert.IsTrue(q.Push("GHI"), "Queue should allow to push element when circular mode is on");
             Assert.AreEqual("DEF", q.Pull());
             Assert.AreEqual("GHI", q.Pull());
@@ -50,7 +50,7 @@ namespace Energy.Core.Test.Base
         public void QueueCircular()
         {
             Energy.Base.Queue<string> queue = new Energy.Base.Queue<string>();
-            queue.Circular = true;
+            queue.Ring = true;
             queue.Limit = 2;
             queue.Push("A");
             queue.Push("B");
@@ -67,7 +67,7 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, queue.Count);
 
             queue.Limit = 1;
-            queue.Circular = false;
+            queue.Ring = false;
             queue.Push("A");
             bool success;
             success = queue.Push("B");

@@ -48,13 +48,15 @@ namespace Energy.Base
         /// </summary>
         public int Limit { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
 
-        private bool _Circular;
+        private bool _Ring;
 
         /// <summary>
-        /// Circular mode. When this option is set, 
-        /// the oldest items are removed from the list when limit has been exceeded.
+        /// Ring mode. 
+        /// Makes internal buffer work like circular buffer.
+        /// When this option is set, the oldest items are
+        /// removed from the list when limit has been exceeded.
         /// </summary>
-        public bool Circular { get { lock (_List) return _Circular; } set { lock (_List) _Circular = value; } }
+        public bool Ring { get { lock (_List) return _Ring; } set { lock (_List) _Ring = value; } }
 
         /// <summary>
         /// Number of elements in queue.
@@ -137,7 +139,7 @@ namespace Energy.Base
         /// <summary>
         /// Put element at the end of queue.
         /// If limit is reached, function will return false and element will not be put
-        /// at the end of the queue unless Circular option is set.
+        /// at the end of the queue unless Ring option is set.
         /// </summary>
         /// <param name="item">Element</param>
         /// <returns></returns>
@@ -150,7 +152,7 @@ namespace Energy.Base
                 {
                     if (Limit > 0 && _List.Count >= Limit)
                     {
-                        if (Circular)
+                        if (Ring)
                         {
                             int count = 1 + Limit - _List.Count;
                             _List.RemoveRange(0, count);
@@ -197,7 +199,7 @@ namespace Energy.Base
                 {
                     if (Limit > 0 && _List.Count + array.Length > Limit)
                     {
-                        if (Circular)
+                        if (Ring)
                         {
                             int count = 1 + Limit - _List.Count - array.Length;
                             _List.RemoveRange(0, count);
