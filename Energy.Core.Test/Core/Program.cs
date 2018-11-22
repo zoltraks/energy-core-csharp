@@ -11,8 +11,8 @@ namespace Energy.Core.Test.Core
         {
             Energy.Base.Lock lock1 = new Energy.Base.Lock();
             Assert.IsTrue(Energy.Core.Bug.Last.Code.Equals("C002"));
-            Energy.Core.Bug.Entry defaultEntry = default(Energy.Core.Bug.Entry);
-            Energy.Core.Bug.Last = defaultEntry;
+            Energy.Core.Bug.Entry emptyEntry = Energy.Core.Bug.Entry.Empty;
+            Energy.Core.Bug.Last = emptyEntry;
             Energy.Core.Bug.Suppress("C002");
             Energy.Base.Lock lock2 = new Energy.Base.Lock();
             Assert.IsFalse(Energy.Core.Bug.Last.Code.Equals("C002"));
