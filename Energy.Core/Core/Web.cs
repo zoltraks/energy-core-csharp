@@ -398,7 +398,7 @@ namespace Energy.Core
         #region GET
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from HTTP request.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -409,7 +409,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="acceptType"></param>
@@ -427,7 +427,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -440,6 +440,11 @@ namespace Energy.Core
 
         #region POST
 
+        /// <summary>
+        /// Perform POST and return response from HTTP request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public static Energy.Base.Http.Response Post(Energy.Base.Http.Request request)
         {
             request.Method = "POST";
@@ -447,7 +452,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return response from URL
+        /// Perform POST and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -473,7 +478,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return response from URL
+        /// Perform POST and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>

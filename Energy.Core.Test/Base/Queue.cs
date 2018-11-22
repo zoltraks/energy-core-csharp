@@ -45,5 +45,34 @@ namespace Energy.Core.Test.Base
             q.Clear();
             Assert.AreEqual(0, q.Count);
         }
-   }
+
+        [TestMethod]
+        public void QueueCircular()
+        {
+            Energy.Base.Queue<string> queue = new Energy.Base.Queue<string>();
+            queue.Circular = true;
+            queue.Limit = 2;
+            queue.Push("A");
+            queue.Push("B");
+            queue.Push("C");
+            Assert.AreEqual(2, queue.Count);
+            string value;
+            value = queue.Pull();
+            System.Diagnostics.Debug.WriteLine(value);
+            Assert.AreEqual("B", value);
+            value = queue.Pull();
+            Assert.AreEqual("C", value);
+            value = queue.Pull();
+            Assert.IsNull(value);
+            Assert.AreEqual(0, queue.Count);
+
+            queue.Limit = 1;
+            queue.Circular = false;
+            queue.Push("A");
+            bool success;
+            success = queue.Push("B");
+            Assert.IsFalse(success);
+            Assert.AreEqual(1, queue.Count);
+        }
+    }
 }

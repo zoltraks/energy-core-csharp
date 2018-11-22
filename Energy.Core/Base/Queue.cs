@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Queue<T>: IDisposable, Energy.Interface.IQueue<T>
     {
-        private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
+        #region Constructor
 
         public Queue()
         {
@@ -20,15 +23,13 @@ namespace Energy.Base
             _List.AddRange(list);
         }
 
-        public void Dispose()
-        {
-            lock (_List)
-            {
-                _List.Clear();
-                _List = null;
-            }
-        }
+        #endregion
 
+        #region Property
+
+        /// <summary>
+        /// Check if queue is empty.
+        /// </summary>
         public bool IsEmpty
         {
             get
@@ -42,24 +43,21 @@ namespace Energy.Base
 
         private int _Limit;
 
-        public int Name { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
+        /// <summary>
+        /// Limit number of items in queue.
+        /// </summary>
+        public int Limit { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
 
         private bool _Circular;
 
+        /// <summary>
+        /// Circular mode. When this option is set, 
+        /// the oldest items are removed from the list when limit has been exceeded.
+        /// </summary>
         public bool Circular { get { lock (_List) return _Circular; } set { lock (_List) _Circular = value; } }
 
-        private ManualResetEvent _PushResetEvent;
-
-        public void Clear()
-        {
-            lock (_List)
-            {
-                _List.Clear();
-            }
-        }
-
         /// <summary>
-        /// Return number of elements in queue
+        /// Number of elements in queue.
         /// </summary>
         public int Count
         {
@@ -72,10 +70,50 @@ namespace Energy.Base
             }
         }
 
-        public int Limit { get; set; }
+        #endregion
+
+        #region Private
+
+        private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
+
+        private ManualResetEvent _PushResetEvent;
+
+        #endregion
+
+        #region Dispose
+
+        public void Dispose()
+        {
+            lock (_List)
+            {
+                _List.Clear();
+                _List = null;
+            }
+        }
+
+        #endregion
+
+        #region Clear
 
         /// <summary>
-        /// Put element at the end of queue
+        /// Clear list.
+        /// </summary>
+        public void Clear()
+        {
+            lock (_List)
+            {
+                _List.Clear();
+            }
+        }
+
+        #endregion
+
+        #region Push
+
+        /// <summary>
+        /// Put element at the end of queue.
+        /// If limit is reached, function will return false and element will not be put
+        /// at the end of the queue unless Circular option is set.
         /// </summary>
         /// <param name="item">Element</param>
         /// <returns></returns>
@@ -108,9 +146,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Put array of elements at the end of queue
+        /// Put array of elements at the end of queue.
         /// </summary>
-        /// <remarks>Using one element instead of array may be more efficient.</remarks>
+        /// <remarks>
+        /// Using one element instead of array may be more efficient.
+        /// </remarks>
         /// <param name="array">Array of elements</param>
         /// <returns></returns>
         public bool Push(T[] array)
@@ -143,8 +183,13 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region Pull
+
         /// <summary>
         /// Take first element from queue, remove it from queue, and finally return.
+        /// If queue is empty, function will return null.
         /// </summary>
         /// <returns>Element</returns>
         public T Pull()
@@ -246,11 +291,16 @@ namespace Energy.Base
             }
         }
 
-            /// <summary>
-            /// Put element back to queue, at begining. This element will be taken first.
-            /// </summary>
-            /// <param name="item">Element</param>
-            public void Back(T item)
+        #endregion
+
+        #region Back
+
+        /// <summary>
+        /// Put element back to queue, at begining. 
+        /// This element will be taken first.
+        /// </summary>
+        /// <param name="item">Element</param>
+        public void Back(T item)
         {
             try
             {
@@ -267,7 +317,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Put array of elements back to queue, at begining. These elements will be taken first.
+        /// Put array of elements back to queue, at begining.
+        /// These elements will be taken first.
         /// </summary>
         /// <param name="list">Array of elements</param>
         public void Back(T[] list)
@@ -287,6 +338,10 @@ namespace Energy.Base
                // _PushResetEvent.Set();
             }
         }
+
+        #endregion
+
+        #region Chop
 
         /// <summary>
         /// Delete last element from queue and return it.
@@ -324,10 +379,12 @@ namespace Energy.Base
                 return list.ToArray();
             }
         }
+
+        #endregion
     }
 
     /// <summary>
-    /// Queue
+    /// Non generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
     /// </summary>
     public class Queue: Queue<object>
     {
