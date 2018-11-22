@@ -91,6 +91,8 @@ namespace Energy.Query
 
         #endregion
 
+        #region Simplify
+
         /// <summary>
         /// Simplify type.
         /// </summary>
@@ -174,6 +176,8 @@ namespace Energy.Query
             string simple = match.Groups["type"].Value;
             return simple;
         }
+
+        #endregion
 
         /// <summary>
         /// Extract nullability from type declaration.

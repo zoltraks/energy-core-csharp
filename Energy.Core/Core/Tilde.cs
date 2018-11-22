@@ -761,6 +761,9 @@ namespace Energy.Core
 
         #region Color
 
+        /// <summary>
+        /// Tilde coloring engine console color string table.
+        /// </summary>
         public class Color
         {
             public static string DarkBlue = "~1~";
@@ -895,7 +898,7 @@ namespace Energy.Core
         #region Escape
 
         /// <summary>
-        /// Escape string which may contain tilde character
+        /// Escape string which may contain tilde characters.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -913,7 +916,7 @@ namespace Energy.Core
         #region Strip
 
         /// <summary>
-        /// Strip tildes from text
+        /// Strip tildes from text.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -979,7 +982,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write out exception message
+        /// Write out exception message with optional stack trace.
         /// </summary>
         /// <param name="exception"></param>
         /// <param name="trace">Write also stack trace</param>
@@ -1110,7 +1113,11 @@ namespace Energy.Core
         #region Input
 
         /// <summary>
-        /// Write out prompt message and wait for input string. If user did not provide
+        /// Write out prompt message and wait for input string. 
+        /// If empty string is read from console, function will return 
+        /// defaultValue parameter value.
+        /// If message contains placeholder {0}, it will be
+        /// replaced with defaultValue parameter value.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="defaultValue"></param>
@@ -1144,7 +1151,8 @@ namespace Energy.Core
         #region Length
 
         /// <summary>
-        /// Return total length of tilde string
+        /// Return total length of tilde string.
+        /// Doesn't count tilde control strings.
         /// </summary>
         /// <param name="example"></param>
         /// <returns></returns>

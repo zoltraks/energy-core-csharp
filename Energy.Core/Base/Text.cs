@@ -196,6 +196,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region Texture
+
         /// <summary>
         /// Repeat string pattern to specified amount of characters length.
         /// </summary>
@@ -220,6 +222,10 @@ namespace Energy.Base
             return s.ToString().Substring(0, size);
         }
 
+        #endregion
+
+        #region
+
         /// <summary>
         /// Remove leading and trailing whitespace.
         /// Includes space, tabulation (horizontal and vertical), new line and null characters.
@@ -239,10 +245,12 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
         #region Is
 
         /// <summary>
-        /// Check if string contains one of wild characters ("*" or "?")
+        /// Check if string contains one of wild characters ("*" or "?").
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>bool</returns>
@@ -252,7 +260,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Check if string contains one of characters used in LIKE ("%" or "_")
+        /// Check if string contains one of characters used in LIKE ("%" or "_").
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>bool</returns>
@@ -1089,6 +1097,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random text.
+        /// Resulting string will contain upper and lower latin letters and numbers only.
+        /// You may expect length from 3 to 10 characters.
         /// </summary>
         /// <returns></returns>
         public static string Random()

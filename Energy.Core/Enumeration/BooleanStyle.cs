@@ -4,6 +4,7 @@ namespace Energy.Enumeration
 {
     /// <summary>
     /// Style of representing boolean values.
+    /// Used by Energy.Cast.BoolToString().
     /// </summary>
     public enum BooleanStyle
     {

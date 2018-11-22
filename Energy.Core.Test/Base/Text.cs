@@ -427,6 +427,7 @@ namespace Energy.Core.Test.Base
             expect = "<div>---Ana's Song</div>";
             Assert.AreEqual(expect, result);
 
+            expect = "Ana";
             result = Energy.Base.Text.Cell(text, 0, 3, Energy.Enumeration.TextPad.Left, '\0', null, null, out remains);
             expect = "Ana";
             Assert.AreEqual(expect, result);
@@ -434,6 +435,8 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, remains);
             result = Energy.Base.Text.Cell(text, -4, 4, Energy.Enumeration.TextPad.Left, '\0', null, null, out remains);
             expect = "Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, -4, 4, Energy.Enumeration.TextPad.Left);
             Assert.AreEqual(expect, result);
             expect = "";
             Assert.AreEqual(expect, remains);
