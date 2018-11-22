@@ -72,6 +72,30 @@ namespace Energy.Base
 
         #endregion
 
+        #region Event
+
+        /// <summary>
+        /// Event fired when Push() is called and element was added to the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnPush;
+
+        /// <summary>
+        /// Event fired when Pull() is called and element was taken from the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnPull;
+
+        /// <summary>
+        /// Event fired when Back() is called and element was put back to the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnBack;
+
+        /// <summary>
+        /// Event fired when Chop() is called and element was deleted from the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnChop;
+
+        #endregion
+
         #region Private
 
         private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
@@ -119,6 +143,7 @@ namespace Energy.Base
         /// <returns></returns>
         public bool Push(T item)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -136,12 +161,20 @@ namespace Energy.Base
                         }
                     }
                     _List.Add(item);
+                    signal = true;
                     return true;
                 }
             }
             finally
             {
                 _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnPush != null)
+                    {
+                        OnPush(this);
+                    }
+                }
             }
         }
 
@@ -157,6 +190,7 @@ namespace Energy.Base
         {
             if (array == null || array.Length == 0)
                 return false;
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -174,12 +208,20 @@ namespace Energy.Base
                         }
                     }
                     _List.AddRange(array);
-                    return false;
+                    signal = true;
+                    return true;
                 }
             }
             finally
             {
                 _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnPush != null)
+                    {
+                        OnPush(this);
+                    }
+                }
             }
         }
 
@@ -194,6 +236,7 @@ namespace Energy.Base
         /// <returns>Element</returns>
         public T Pull()
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -202,12 +245,20 @@ namespace Energy.Base
                         return default(T);
                     T item = _List[0];
                     _List.RemoveAt(0);
+                    signal = true;
                     return item;
                 }
             }
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
@@ -219,6 +270,7 @@ namespace Energy.Base
         /// <returns>Array of elements</returns>
         public T[] Pull(int count)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -227,6 +279,8 @@ namespace Energy.Base
                     if (count == 0 || count > max)
                         count = max;
                     System.Collections.Generic.List<T> list = new System.Collections.Generic.List<T>();
+                    if (count > 0)
+                        signal = true;
                     while (count-- > 0)
                     {
                         list.Add(_List[0]);
@@ -238,6 +292,13 @@ namespace Energy.Base
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
@@ -250,6 +311,7 @@ namespace Energy.Base
         /// <returns>Element or default (null) if no elements in queue</returns>
         public T Pull(double timeout)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -258,6 +320,7 @@ namespace Energy.Base
                     {
                         T item = _List[0];
                         _List.RemoveAt(0);
+                        signal = true;
                         return item;
                     }
                 }
@@ -280,6 +343,7 @@ namespace Energy.Base
                         {
                             T item = _List[0];
                             _List.RemoveAt(0);
+                            signal = true;
                             return item;
                         }
                     }
@@ -288,6 +352,13 @@ namespace Energy.Base
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
@@ -302,17 +373,25 @@ namespace Energy.Base
         /// <param name="item">Element</param>
         public void Back(T item)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
                 {
                     _List.Insert(0, item);
-
+                    signal = true;
                 }
             }
             finally
             {
                 //_PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnBack != null)
+                    {
+                        OnBack(this);
+                    }
+                }
             }
         }
 
@@ -323,6 +402,7 @@ namespace Energy.Base
         /// <param name="list">Array of elements</param>
         public void Back(T[] list)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -331,11 +411,19 @@ namespace Energy.Base
                     {
                         _List.Insert(i, list[i]);
                     }
+                    signal = true;
                 }
             }
             finally
             {
-               // _PushResetEvent.Set();
+                // _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnBack != null)
+                    {
+                        OnBack(this);
+                    }
+                }
             }
         }
 
@@ -349,14 +437,29 @@ namespace Energy.Base
         /// <returns>Element or default if queue was empty</returns>
         public T Chop()
         {
-            lock (_List)
+            bool signal = false;
+            try
             {
-                if (_List.Count == 0)
-                    return default(T);
-                int n = _List.Count - 1;
-                T last = _List[n];
-                _List.RemoveAt(n);
-                return last;
+                lock (_List)
+                {
+                    if (_List.Count == 0)
+                        return default(T);
+                    signal = true;
+                    int n = _List.Count - 1;
+                    T last = _List[n];
+                    _List.RemoveAt(n);
+                    return last;
+                }
+            }
+            finally
+            {
+                if (signal)
+                {
+                    if (OnChop != null)
+                    {
+                        OnChop(this);
+                    }
+                }
             }
         }
 
@@ -367,16 +470,31 @@ namespace Energy.Base
         /// <returns>Array of elements</returns>
         public T[] Chop(int count)
         {
-            lock (_List)
+            bool signal = false;
+            try
             {
-                if (count > _List.Count)
-                    count = _List.Count;
-                if (count == 0)
-                    return new T[] { };
-                int first = _List.Count - count;
-                List<T> list = _List.GetRange(first, count);
-                _List.RemoveRange(first, count);
-                return list.ToArray();
+                lock (_List)
+                {
+                    if (count > _List.Count)
+                        count = _List.Count;
+                    if (count == 0)
+                        return new T[] { };
+                    signal = true;
+                    int first = _List.Count - count;
+                    List<T> list = _List.GetRange(first, count);
+                    _List.RemoveRange(first, count);
+                    return list.ToArray();
+                }
+            }
+            finally
+            {
+                if (signal)
+                {
+                    if (OnChop != null)
+                    {
+                        OnChop(this);
+                    }
+                }
             }
         }
 

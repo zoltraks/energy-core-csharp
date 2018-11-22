@@ -44,7 +44,7 @@ namespace Energy.Base
         /// <summary>
         /// Event function delegate.
         /// </summary>
-        public delegate void Event();
+        public delegate void Event(object self);
 
         /// <summary>
         /// Event function delegate.
