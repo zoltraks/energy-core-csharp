@@ -18,6 +18,13 @@ namespace Energy.Core.Test.Query
 
             value = "abc nchar not    NULL  ";
 
+            Energy.Query.Type.Definition def;
+            def = Energy.Query.Type.ExtractTypeDefinition(value);
+
+            result = def.Type;
+            expect = "NCHAR";
+            Assert.AreEqual(expect, result);
+
             result = Energy.Query.Type.ExtractTypeNull(value);
             expect = "NOT NULL";
             Assert.AreEqual(expect, result);

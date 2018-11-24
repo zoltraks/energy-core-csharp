@@ -442,36 +442,45 @@ namespace Energy.Base
         #region Join
 
         /// <summary>
-        /// Join non empty strings into one list with separator
+        /// Join non empty and optionally empty strings into one list with separator.
+        /// For example Energy.Base.Text.Join(" : ", false, "A", "B", "", "C") will return "A : B : C".
         /// </summary>
-        /// <param name="with">Separator string</param>
+        /// <param name="glue">Separator string</param>
+        /// <param name="empty">Include empty values</param>
         /// <param name="array">Parts to join</param>
-        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string Join(string with, params string[] array)
+        /// <returns></returns>
+        public static string Join(string glue, bool empty, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             for (int i = 0; i < array.Length; i++)
             {
-                if (String.IsNullOrEmpty(array[i]))
+                if (string.IsNullOrEmpty(array[i]))
+                {
+                    if (empty)
+                    {
+                        list.Add("");
+                    }
                     continue;
+                }
                 string trim = array[i].Trim();
-                if (trim.Length == 0)
+                if (trim.Length == 0 && !empty)
                     continue;
                 list.Add(trim);
             }
-            return string.Join(with, list.ToArray());
+            return string.Join(glue, list.ToArray());
         }
 
+
         /// <summary>
-        /// Join non empty strings into one list with separator
+        /// Join strings into one list with separator.
+        /// For example Energy.Base.Text.Join(" : ", "A", "B", "", "C") will return "A : B : : C".
         /// </summary>
-        /// <param name="with">Separator string</param>
+        /// <param name="glue">Separator string</param>
         /// <param name="array">Parts to join</param>
-        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        [Energy.Attribute.Code.Obsolete("Use shorter version Join()")]
-        public static string JoinWith(string with, params string[] array)
+        /// <returns></returns>
+        public static string Join(string glue, params string[] array)
         {
-            return Join(with, array);
+            return Energy.Base.Text.Join(glue, true, array);
         }
 
         #endregion

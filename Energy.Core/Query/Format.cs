@@ -265,7 +265,7 @@ namespace Energy.Query
         #region Text
 
         /// <summary>
-        /// Format as TEXT.
+        /// Format object value as TEXT.
         /// Null values will be represented as "NULL".
         /// </summary>
         /// <param name="value"></param>
@@ -278,7 +278,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT. 
+        /// Format object value as TEXT.
         /// When nullify parameter is set to true, null values
         /// will be represented as "NULL" instead of "''".
         /// </summary>
@@ -293,7 +293,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT with limited length.
+        /// Format object value as TEXT with limited length.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="limit"></param>
@@ -304,7 +304,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT.
+        /// Format object value as TEXT.
         /// </summary>
         /// <param name="value">object</param>
         /// <returns>static</returns>
@@ -321,25 +321,56 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as Unicode TEXT.
+        /// Null values will be represented as "NULL".
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="value"></param>
         /// <returns>string</returns>
-        public string Unicode(string name)
+        public string Unicode(object value)
         {
-            return "N" + Text(name);
+            if (value == null)
+                return "NULL";
+            return "N" + Text(Energy.Base.Cast.ObjectToString(value)));
         }
 
         /// <summary>
         /// Format as Unicode TEXT.
+        /// Null values will be represented as "NULL".
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns>string</returns>
+        public string Unicode(string value)
+        {
+            if (value == null)
+                return "NULL";
+            return "N" + Text(value);
+        }
+
+        /// <summary>
+        /// Format as Unicode TEXT.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns>string</returns>
-        public string Unicode(string name, bool nullify)
+        public string Unicode(string value, bool nullify)
         {
-            if (nullify && name == null)
+            if (nullify && value == null)
                 return "NULL";
-            return "N" + Text(name);
+            return "N" + Text(value);
+        }
+
+        /// <summary>
+        /// Format as Unicode TEXT.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="nullify"></param>
+        /// <returns>string</returns>
+        public string Unicode(object value, bool nullify)
+        {
+            return Unicode(Energy.Base.Cast.ObjectToString(value), nullify);
         }
 
         #endregion
@@ -348,6 +379,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as NUMBER.
+        /// Real numbers are represented with dot "." as decimal point separator.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -358,6 +390,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as NUMBER.
+        /// Real numbers are represented with dot "." as decimal point separator.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="nullify"></param>
@@ -416,7 +449,7 @@ namespace Energy.Query
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="number">double</param>
         /// <returns>string</returns>
         public string Integer(double number)
         {
@@ -426,9 +459,70 @@ namespace Energy.Query
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
+        /// <param name="number">float</param>
+        /// <returns>string</returns>
+        public string Integer(float number)
+        {
+            return Number(Math.Floor(number));
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// Returns "1" for true and "0" for false.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(bool number)
+        {
+            return number ? "1" : "0";
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(char number)
+        {
+            return ((int)number).ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
         /// <param name="number"></param>
         /// <returns>string</returns>
         public string Integer(int number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(uint number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(long number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(ulong number)
         {
             return number.ToString();
         }
@@ -454,6 +548,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATE.
+        /// Represents date as quoted date string using "YYYY-MM-DD" format.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -464,6 +559,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATE.
+        /// Represents date as quoted date string using "YYYY-MM-DD" format.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -478,6 +574,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as TIME.
+        /// Uses 24h "hh:mm:ss" format.
+        /// Milliseconds will be used if present.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -492,6 +590,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as TIME.
+        /// Uses 24h "hh:mm:ss" format.
+        /// Milliseconds will be used if present.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -506,6 +606,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATETIME.
+        /// Uses by default "YYYY-MM-DD hh:mm:ss" format or "YYYY-MM-DD**T**hh:mm:ss"
+        /// depending on settings.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -527,6 +629,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATETIME.
+        /// Uses by default "YYYY-MM-DD hh:mm:ss" format or "YYYY-MM-DD**T**hh:mm:ss"
+        /// depending on settings.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -549,6 +653,5 @@ namespace Energy.Query
         }
 
         #endregion
-
     }
 }

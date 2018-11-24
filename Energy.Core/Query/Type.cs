@@ -32,6 +32,9 @@ namespace Energy.Query
             }
         }
 
+        /// <summary>
+        /// Dictionary of basic data types.
+        /// </summary>
         public Dictionary<string, Energy.Enumeration.BasicType> BasicTypeMap
         {
             get
@@ -57,6 +60,48 @@ namespace Energy.Query
             d["DATE"] = Enumeration.BasicType.Date;
             d["DATETIME"] = Enumeration.BasicType.Stamp;
             return d;
+        }
+
+        #endregion
+
+        #region Definition
+
+        /// <summary>
+        /// Represents SQL database type definition from a string like "NVARCHAR(20) NOT NULL".
+        /// </summary>
+        public class Definition
+        {
+            /// <summary>
+            /// Represents type name.
+            /// Example "VARCHAR".
+            /// </summary>
+            public string Type;
+
+            /// <summary>
+            /// Represents type parameter string. 
+            /// Example: "(9,2)".
+            /// </summary>
+            public string Parameter;
+
+            /// <summary>
+            /// Represents default option.
+            /// Example: "DEFAULT ''"
+            /// </summary>
+            public string Default;
+
+            /// <summary>
+            /// Represents nullable.
+            /// Example "NOT NULL", "NULL".
+            /// </summary>
+            public string Null;
+
+            public override string ToString()
+            {
+                return Energy.Base.Text.Join(" ", new string[]
+                {
+                    Type, Parameter, Default, Null
+                });
+            }
         }
 
         #endregion
@@ -106,7 +151,7 @@ namespace Energy.Query
             switch (simple.ToUpper())
             {
                 case "BIT":
-                    return "INTEGER";
+                    return "BOOL";
                 case "BOOL":
                     return "BOOL";
                 case "BINARY":
@@ -131,7 +176,9 @@ namespace Energy.Query
                     return "TEXT";
                 case "DATETIME":
                 case "DATETIME2":
-                    return "DATETIME";
+                case "DATETIMEOFFSET":
+                case "SMALLDATETIME":
+                    return "STAMP";
                 case "DATE":
                     return "DATE";
                 case "TIME":
@@ -148,15 +195,21 @@ namespace Energy.Query
                     return "NUMBER";
                 case "CHAR":
                 case "NCHAR":
+                case "UNIQUEIDENTIFIER":
                     return "TEXT";
                 case "XML":
                     return "TEXT";
+                case "MONEY":
+                case "SMALLMONEY":
+                    return "NUMBER";
                 case "SET":
                 case "ENUM":
                     return "SET";
             }
             return simple;
         }
+
+        #endregion
 
         #region Extract
 
@@ -177,8 +230,6 @@ namespace Energy.Query
             return simple;
         }
 
-        #endregion
-
         /// <summary>
         /// Extract nullability from type declaration.
         /// For "VARCHAR(50) not null" function will return "NOT NULL".
@@ -196,6 +247,11 @@ namespace Energy.Query
             string value = match.Groups["null"].Value;
             value = value.ToUpper().StartsWith("NOT") ? "NOT NULL" : "NULL";
             return value;
+        }
+
+        public static Definition ExtractTypeDefinition(string declaration)
+        {
+            string pattern = Energy.Base.Expression.SqlDeclarationToken;
         }
 
         #endregion
