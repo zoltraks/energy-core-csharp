@@ -11,7 +11,7 @@ namespace Energy.Core
         /// <summary>
         /// Text editor class.
         /// </summary>
-        public class Editor : Energy.Base.Pattern.DefaultProperty<Editor>
+        public class Editor : Energy.Base.Pattern.GlobalProperty<Editor>
         {
             /// <summary>
             /// Insert text before first line.
