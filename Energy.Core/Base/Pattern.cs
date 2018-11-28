@@ -10,6 +10,49 @@ namespace Energy.Base
     public class Pattern
     {
         /// <summary>
+        /// Global property / Singleton instance pattern
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public class GlobalProperty<T>
+        {
+            private static T _Global;
+
+            private readonly static object _GlobalLock = new object();
+
+            /// <summary>
+            /// Static instance of class (default)
+            /// </summary>
+            public static T Global
+            {
+                get
+                {
+                    if (_Global == null)
+                    {
+                        lock (_GlobalLock)
+                        {
+                            if (_Global == null)
+                            {
+                                try
+                                {
+                                    _Global = Activator.CreateInstance<T>();
+                                    Energy.Core.Bug.Write("Energy.Base.Pattern.Global", () =>
+                                    {
+                                        return string.Format("Global instance of {0} created", typeof(T).FullName);
+                                    });
+                                }
+                                catch (Exception exception)
+                                {
+                                    Energy.Core.Bug.Catch(exception);
+                                }
+                            }
+                        }
+                    }
+                    return _Global;
+                }
+            }
+        }
+
+        /// <summary>
         /// Default property / Static instance pattern
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -35,7 +78,7 @@ namespace Energy.Base
                                 try
                                 {
                                     _Default = Activator.CreateInstance<T>();
-                                    Energy.Core.Bug.Write("C011", () =>
+                                    Energy.Core.Bug.Write("Energy.Base.Pattern.Default", () =>
                                     {
                                         return string.Format("Default instance of {0} created", typeof(T).FullName);
                                     });
