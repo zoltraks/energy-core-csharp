@@ -160,6 +160,33 @@ namespace Energy.Core
 
         #endregion
 
+        #region GetHostName
+
+        /// <summary>
+        /// Get host name of the machine process is running on.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetHostName()
+        {
+            string name = Environment.MachineName;
+            if (!string.IsNullOrEmpty(name))
+                return name;
+                try
+                {
+                    name = System.Net.Dns.GetHostName();
+                }
+                catch (SocketException exceptionSocket)
+                {
+                    Energy.Core.Bug.Catch(exceptionSocket);
+                }
+            if (!string.IsNullOrEmpty(name))
+                return name;
+            name = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+            return name;
+        }
+
+        #endregion
+
         #region IsConnected
 
         /// <summary>
