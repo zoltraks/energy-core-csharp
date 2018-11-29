@@ -618,6 +618,18 @@ namespace Energy.Base
             /// </summary>
             public Dictionary<string, string> Index = null;
 
+            private Energy.Enumeration.SelectionOfDuplicates _SelectionOfDuplicates = SelectionOfDuplicates.Last;
+
+            /// <summary>
+            /// Specifies behaviour for selecting one element from multiple duplicates
+            /// when case sensitive option is set to false.
+            /// </summary>
+            public Energy.Enumeration.SelectionOfDuplicates SelectionOfDuplicates
+            {
+                get { lock (_Lock) return _SelectionOfDuplicates; }
+                set { lock (_Lock) _SelectionOfDuplicates = value; }
+            }
+
             private bool _CaseSensitive = true;
 
             /// <summary>
@@ -668,7 +680,9 @@ namespace Energy.Base
                 foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
-                    if (!Index.ContainsKey(map))
+                    if (_SelectionOfDuplicates == SelectionOfDuplicates.Last)
+                        Index[map] = key;
+                    else if (!Index.ContainsKey(map))
                         Index.Add(map, key);
                 }
             }

@@ -12,6 +12,8 @@ namespace Energy.Core.Test.Base
         {
             var dictionary = new Energy.Base.Collection.StringDictionary<object>();
 
+            dictionary.SelectionOfDuplicates = Energy.Enumeration.SelectionOfDuplicates.First;
+
             dictionary["One"] = 1;
             dictionary["TWO"] = 2;
             dictionary["ONE"] = 1 + (int)(dictionary["two"] ?? 1);
@@ -21,6 +23,40 @@ namespace Energy.Core.Test.Base
             dictionary.CaseSensitive = false;
 
             Assert.AreEqual("ONE=1 one=1", string.Concat("", "ONE=", dictionary["ONE"], " one=", dictionary["one"]));
+
+            string result;
+            string expect;
+            Energy.Base.Collection.StringDictionary sd;
+
+            sd = new Energy.Base.Collection.StringDictionary();
+            sd.CaseSensitive = false;
+            sd.Set("Product", "123");
+            sd.Set("product", "123456789");
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
+            sd.CaseSensitive = true;
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
+
+            sd = new Energy.Base.Collection.StringDictionary();
+            sd.Set("Product", "123");
+            sd.Set("product", "123456789");
+            sd.Set("zzz1", "abc");
+
+            result = sd.Get("Product");
+            expect = "123";
+            Assert.AreEqual(expect, result);
+
+            result = sd.Get("zzz1");
+            expect = "abc";
+            Assert.AreEqual(expect, result);
+
+            sd.CaseSensitive = false;
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
         }
 
         private class StringDictionaryToObjectArrayTestClass1
