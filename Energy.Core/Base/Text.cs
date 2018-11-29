@@ -68,7 +68,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Exchange
 
         /// <summary>
         /// Exchange texts between each other.
@@ -2696,7 +2696,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Pad
 
         /// <summary>
         /// Expand the text on the left or right by filling in the specified character.
@@ -2822,6 +2822,69 @@ namespace Energy.Base
         {
             Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
             return Pad(text, size, fill, pad, false);
+        }
+
+        #endregion
+
+        #region Interpolate
+
+        /// <summary>
+        /// Interpolate text content by changing specified texts known also as placeholders
+        /// with specified values.
+        /// This version uses regular expression match, so might be slower.
+        /// It is not recursive so with ":a:" = ":b:" and ":b:" = ":a:" interpolating
+        /// text containing ":a:" will result in ":b:". 
+        /// Be careful about using it in recursion.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="ignoreCase"></param>
+        /// <param name="array">Key value pairs dictionary for interpolation</param>
+        /// <returns></returns>
+        public static string Interpolate(string text, bool ignoreCase, params string[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return text;
+            }
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            for (int i = 0; i < array.Length / 2; i++)
+            {
+                string key = array[i * 2] ?? "";
+                if (ignoreCase)
+                    key = key.ToUpperInvariant();
+                dictionary[key] = array[1 + i * 2] ?? "";
+            }
+            if (dictionary.Count == 0)
+            {
+                return text;
+            }
+            List<string> suspect = new List<string>();
+            foreach (string key in dictionary.Keys)
+            {
+                suspect.Add(Energy.Base.Text.EscapeExpression(key));
+            }
+            suspect.Sort((string s1, string s2) => { return (s2 ?? "").Length - (s1 ?? "").Length; });
+            string pattern = string.Join("|", suspect.ToArray());
+            int Δ = 0;
+            string result = text;
+            RegexOptions option = RegexOptions.None;
+            if (ignoreCase)
+                option |= RegexOptions.IgnoreCase;
+            Match match = Regex.Match(text, pattern, option);
+            while (match.Success)
+            {
+                int position = match.Index;
+                int length = match.Length;
+                position += Δ;
+                string value = match.Value;
+                if (ignoreCase)
+                    value = value.ToUpperInvariant();
+                string replacement = dictionary[value];
+                result = string.Concat(result.Substring(0, position), replacement, result.Substring(position + length));
+                Δ += replacement.Length - length;
+                match = match.NextMatch();
+            }
+            return result;
         }
 
         #endregion

@@ -167,6 +167,7 @@ namespace Energy.Core
             /// <summary>
             /// Convert newline delimiter to environment default.
             /// Value of constant **Energy.Base.Text.NL** is used.
+            /// </summary>
             /// <param name="text"></param>
             /// <returns></returns>
             public string ConvertNewLine(string text)
