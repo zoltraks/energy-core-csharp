@@ -329,7 +329,17 @@ namespace Energy.Query
         {
             if (value == null)
                 return "NULL";
-            return "N" + Text(Energy.Base.Cast.ObjectToString(value)));
+            DateTime dateTime = Energy.Base.Cast.ObjectToDateTime(value);
+            if (dateTime != DateTime.MinValue)
+            {
+                bool optionRecogniseDateTime;
+                optionRecogniseDateTime = false;
+                if (optionRecogniseDateTime)
+                {
+                    return Stamp(dateTime);
+                }
+            }
+            return "N" + Text(Energy.Base.Cast.ObjectToString(value));
         }
 
         /// <summary>

@@ -340,7 +340,7 @@ namespace Energy.Core
             if (!string.IsNullOrEmpty(name))
             {
                 string textSuffix = string.Format(ExceptionMessageAppendNameFormat, name);
-                message = Energy.Core.Text.Editor.Default.AppendAfterFirstLine(message, textSuffix);
+                message = Energy.Core.Text.Editor.Global.AppendAfterFirstLine(message, textSuffix);
             }
             return message;
         }

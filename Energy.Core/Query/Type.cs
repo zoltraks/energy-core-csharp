@@ -252,6 +252,7 @@ namespace Energy.Query
         public static Definition ExtractTypeDefinition(string declaration)
         {
             string pattern = Energy.Base.Expression.SqlDeclarationToken;
+            return default(Definition);
         }
 
         #endregion
