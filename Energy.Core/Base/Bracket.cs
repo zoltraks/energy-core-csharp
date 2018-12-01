@@ -174,7 +174,7 @@ namespace Energy.Base
 
         private string _Include;
         /// <summary>
-        /// Optionally include special sequence to include suffix
+        /// Optionally specify special sequence to include suffix
         /// instead of treating as end of quoted value.
         /// Set to empty string if you don't want to
         /// escape anything inside text in brackets.
@@ -184,12 +184,6 @@ namespace Energy.Base
         {
             get
             {
-                if (_Include == null)
-                {
-                    if (string.IsNullOrEmpty(_Suffix))
-                        return null;
-                    return string.Concat(_Suffix, _Suffix);
-                }
                 return _Include;
             }
             set
@@ -396,10 +390,13 @@ namespace Energy.Base
         /// <returns></returns>
         private string GetIncludeText()
         {
-            if (_Include != null)
-                return _Include;
-            else
-                return "";
+            if (_Include == null)
+            {
+                if (string.IsNullOrEmpty(_Suffix))
+                    return "";
+                return string.Concat(_Suffix, _Suffix);
+            }
+            return _Include;
         }
 
         #endregion
