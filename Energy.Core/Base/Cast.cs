@@ -770,11 +770,28 @@ namespace Energy.Base
             return (byte)value;
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have always 8 digits or letters (A-F).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value)
         {
             return Energy.Base.Hex.IntegerToHex(value);
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have count specified by size of digits or letters (A-F).
+        /// If number representation will be larger than size, it will be truncated to the last characters.
+        /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, int size)
         {
             return Energy.Base.Hex.IntegerToHex(value, size);
@@ -790,18 +807,34 @@ namespace Energy.Base
             return Energy.Base.Hex.IntegerToHex(value, upperCase);
         }
 
-        public static bool IsInteger(string value, bool negative)
+        /// <summary>
+        /// Convert hexadecimal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static int HexToInteger(string hex)
         {
-            if (negative)
+            return Energy.Base.Hex.HexToInteger(hex);
+        }
+
+        /// <summary>
+        /// Convert octal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="oct"></param>
+        /// <returns></returns>
+        public static int OctToInteger(string oct)
+        {
+            if (!Energy.Base.Text.HasDigitsOnly(oct))
+                return 0;
+            try
             {
-                int useless;
-                return int.TryParse(value, out useless);
+                return Convert.ToInt32(oct, 8);
             }
-            else
+            catch (Exception exception)
             {
-                uint useless;
-                return uint.TryParse(value, out useless);
+                Energy.Core.Bug.Catch(exception);
             }
+            return 0;
         }
 
         #endregion

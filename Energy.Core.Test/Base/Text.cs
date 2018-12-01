@@ -446,5 +446,53 @@ namespace Energy.Core.Test.Base
             expect = "g";
             Assert.AreEqual(expect, remains);
         }
+
+        [TestMethod]
+        public void TextDecodeControlString()
+        {
+            string text;
+            string result;
+            string expect;
+            text = "'Adam''s line' #13 #$0a 'Betty''s line'";
+            expect = "Adam's line" + "\r\n" + "Betty's line";
+            result = Energy.Base.Text.DecodeControlString(text, '\'', '\'', "#", "#$", "#0", "#%"
+                , System.Text.Encoding.ASCII, true, true, true);
+            Assert.AreEqual(expect, result);
+
+            text = " \\0101 ";
+            expect = "A";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = "\u0003\u0002";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = "\u0003ą\u0002";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+                IncludeUnknown = true,
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = " \u0003 ą \u0002 ";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+                IncludeUnknown = true,
+                IncludeWhite = true,
+            });
+            Assert.AreEqual(expect, result);
+        }
     }
 }

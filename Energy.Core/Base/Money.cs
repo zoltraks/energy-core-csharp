@@ -17,9 +17,9 @@ namespace Energy.Base
         /// <summary>
         /// Currency
         /// </summary>
-        public Currency Currency { get; private set; }
+        public Monetary Currency { get; private set; }
 
-        public Money(decimal amount, Currency currency)
+        public Money(decimal amount, Monetary currency)
             : this()
         {
             if (currency == null)
@@ -32,7 +32,7 @@ namespace Energy.Base
             Currency = currency;
         }
 
-        public Money(double amount, Currency currency)
+        public Money(double amount, Monetary currency)
             : this((decimal)amount, currency)
         { }
 

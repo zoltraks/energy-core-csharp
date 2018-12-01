@@ -9,6 +9,8 @@ namespace Energy.Base
     /// </summary>
     public static partial class Expression
     {
+        #region Constant
+
         /// <summary>
         /// Connection string pattern
         /// </summary>
@@ -110,5 +112,42 @@ namespace Energy.Base
         /// Expression for matching tilde color text
         /// </summary>
         public static readonly string TildeText = @"~`(?:``|[^`])*`~|~\d+~|~[\w\d]+~|~+?|[^~]+";
+
+        #endregion
+
+        #region Utility
+
+        public static string EscapeJoin(string glue, char[] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return "";
+            List<string> list = new List<string>();
+            foreach (char character in array)
+            {
+                string e = Energy.Base.Text.EscapeExpression((char)character);
+                list.Add(e);
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        public static string EscapeSurround(string prefix, string suffix, char[] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return "";
+            StringBuilder s = new StringBuilder();
+            foreach (char character in array)
+            {
+                s.Append(prefix);
+                s.Append(Energy.Base.Text.EscapeExpression((char)character));
+                s.Append(suffix);
+            }
+            return s.ToString();
+        }
+
+        #endregion
     }
 }

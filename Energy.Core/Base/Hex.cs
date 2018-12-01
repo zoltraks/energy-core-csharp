@@ -300,6 +300,17 @@ namespace Energy.Base
 
         #region IntegerToHex
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have count specified by size of digits or letters (A-F).
+        /// If number representation will be larger than size, it will be truncated to the last characters.
+        /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <param name="uppperCase"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, int size, bool uppperCase)
         {
             string hex = value.ToString(uppperCase ? "X" : "x");
@@ -310,19 +321,64 @@ namespace Energy.Base
             return hex;
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have always 8 digits or letters (A-F).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value)
         {
             return IntegerToHex(value, 8, true);
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have always 8 digits or letters (A-F).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="uppperCase"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, bool uppperCase)
         {
             return IntegerToHex(value, 8, uppperCase);
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have count specified by size of digits or letters (A-F).
+        /// If number representation will be larger than size, it will be truncated to the last characters.
+        /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, int size)
         {
             return IntegerToHex(value, size, true);
+        }
+
+        #endregion
+
+        #region HexToInteger
+
+        /// <summary>
+        /// Convert hexadecimal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static int HexToInteger(string hex)
+        {
+            int value;
+            if (Int32.TryParse(hex, System.Globalization.NumberStyles.HexNumber
+                , System.Globalization.CultureInfo.InvariantCulture, out value))
+            {
+                return value;
+            }
+            return value;
         }
 
         #endregion
