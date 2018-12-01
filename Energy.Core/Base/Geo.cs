@@ -13,7 +13,7 @@ namespace Energy.Base
     public class Geo
     {
         /// <summary>
-        /// Location point
+        /// Location point.
         /// </summary>
         public class Point
         {
@@ -131,35 +131,38 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert degrees to radians
-        /// </summary>
-        /// <param name="value">Degrees</param>
-        /// <returns>Radians</returns>
-        public static double Deg2Rad(double value)
-        {
-            return value * Math.PI / 180;
-        }
-
-        /// <summary>
         /// Earth radius
         /// </summary>
         public const double R = 6371;
 
         /// <summary>
-        /// Get distance between two locations in kilometers
+        /// Get earth distance between two locations in kilometers.
         /// </summary>
         /// <param name="location1">First location</param>
         /// <param name="location2">Second location</param>
         /// <returns>Distance</returns>
         public static double GetDistance(Point location1, Point location2)
         {
-            var longitudeDifference = Deg2Rad(location2.Longitude - location1.Longitude);
-            var latitudeDifference = Deg2Rad(location2.Latitude - location1.Latitude);
+            return GetDistance(location1, location2, Energy.Base.Geo.R);
+        }
+
+        /// <summary>
+        /// Get distance between two locations using globe radius value.
+        /// </summary>
+        /// <param name="location1">First location</param>
+        /// <param name="location2">Second location</param>
+        /// <param name="R">Radius</param>
+        /// <returns>Distance</returns>
+        public static double GetDistance(Point location1, Point location2, double R)
+        {
+            var longitudeDifference = Energy.Base.Number.Deg2Rad(location2.Longitude - location1.Longitude);
+            var latitudeDifference = Energy.Base.Number.Deg2Rad(location2.Latitude - location1.Latitude);
 
             var a = Math.Sin(latitudeDifference / 2) * Math.Sin(latitudeDifference / 2)
-              + Math.Cos(Deg2Rad(location1.Latitude)) * Math.Cos(Deg2Rad(location2.Latitude))
-              * Math.Sin(longitudeDifference / 2) * Math.Sin(longitudeDifference / 2)
-              ;
+                + Math.Cos(Energy.Base.Number.Deg2Rad(location1.Latitude)) 
+                * Math.Cos(Energy.Base.Number.Deg2Rad(location2.Latitude))
+                * Math.Sin(longitudeDifference / 2) * Math.Sin(longitudeDifference / 2)
+                ;
 
             return R * 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         }

@@ -32,6 +32,53 @@ namespace Energy.Query
 
         #endregion
 
+        #region Private
+
+        private Dictionary<string, Format> _DialectFormatDictionary;
+
+        #endregion
+
+        #region Accessor
+
+        public Format this[string dialect]
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(dialect))
+                    return null;
+                Energy.Query.Format findFormat = null;
+                if (_DialectFormatDictionary == null)
+                {
+                    _DialectFormatDictionary = new Dictionary<string, Format>();
+                }
+                else
+                {
+                    findFormat = Energy.Base.Collection.GetStringDictionaryValue<Energy.Query.Format>(_DialectFormatDictionary, dialect, true);
+                }
+                if (findFormat == null)
+                {
+                    System.Type classFormat = null;
+                    System.Reflection.Assembly assembly = System.Reflection.Assembly.GetAssembly(typeof(Energy.Query.Format));
+                    System.Type[] types;
+                    types = assembly.GetTypes();
+                    System.Type[] class1Array = Energy.Base.Class.GetTypesWithAttribute(types, typeof(Energy.Attribute.Code.TemporaryAttribute));
+                    System.Type[] class2Array = Energy.Base.Class.GetTypesWithInterface(types, typeof(Energy.Interface.IDialect));
+
+                    classFormat = Energy.Base.Collection.GetFirstOrDefault<System.Type>(class1Array, class2Array);
+
+                    if (classFormat != null)
+                    {
+                        findFormat = (Energy.Query.Format)Activator.CreateInstance(classFormat);
+                        _DialectFormatDictionary[dialect] = findFormat;
+                    }
+                }
+                return findFormat;
+
+            }
+        }
+
+        #endregion
+
         #region Property
 
         /// <summary>
@@ -218,7 +265,7 @@ namespace Energy.Query
         #region Text
 
         /// <summary>
-        /// Format as TEXT.
+        /// Format object value as TEXT.
         /// Null values will be represented as "NULL".
         /// </summary>
         /// <param name="value"></param>
@@ -231,7 +278,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT. 
+        /// Format object value as TEXT.
         /// When nullify parameter is set to true, null values
         /// will be represented as "NULL" instead of "''".
         /// </summary>
@@ -246,7 +293,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT with limited length.
+        /// Format object value as TEXT with limited length.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="limit"></param>
@@ -257,7 +304,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format as TEXT.
+        /// Format object value as TEXT.
         /// </summary>
         /// <param name="value">object</param>
         /// <returns>static</returns>
@@ -274,25 +321,66 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as Unicode TEXT.
+        /// Null values will be represented as "NULL".
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="value"></param>
         /// <returns>string</returns>
-        public string Unicode(string name)
+        public string Unicode(object value)
         {
-            return "N" + Text(name);
+            if (value == null)
+                return "NULL";
+            DateTime dateTime = Energy.Base.Cast.ObjectToDateTime(value);
+            if (dateTime != DateTime.MinValue)
+            {
+                bool optionRecogniseDateTime;
+                optionRecogniseDateTime = false;
+                if (optionRecogniseDateTime)
+                {
+                    return Stamp(dateTime);
+                }
+            }
+            return "N" + Text(Energy.Base.Cast.ObjectToString(value));
         }
 
         /// <summary>
         /// Format as Unicode TEXT.
+        /// Null values will be represented as "NULL".
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns>string</returns>
+        public string Unicode(string value)
+        {
+            if (value == null)
+                return "NULL";
+            return "N" + Text(value);
+        }
+
+        /// <summary>
+        /// Format as Unicode TEXT.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="value"></param>
         /// <param name="nullify"></param>
         /// <returns>string</returns>
-        public string Unicode(string name, bool nullify)
+        public string Unicode(string value, bool nullify)
         {
-            if (nullify && name == null)
+            if (nullify && value == null)
                 return "NULL";
-            return "N" + Text(name);
+            return "N" + Text(value);
+        }
+
+        /// <summary>
+        /// Format as Unicode TEXT.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="nullify"></param>
+        /// <returns>string</returns>
+        public string Unicode(object value, bool nullify)
+        {
+            return Unicode(Energy.Base.Cast.ObjectToString(value), nullify);
         }
 
         #endregion
@@ -301,6 +389,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as NUMBER.
+        /// Real numbers are represented with dot "." as decimal point separator.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -311,6 +400,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as NUMBER.
+        /// Real numbers are represented with dot "." as decimal point separator.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="nullify"></param>
@@ -343,18 +433,13 @@ namespace Energy.Query
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             string s = value is string ? (string)value : value.ToString();
-            string v = s.Trim(' ', '\t', '\r', '\n', '\v', '\0').Replace(" ", null);
-            long l;
-            if (long.TryParse(v, out l))
-                return Number(l);
-            double d;
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture, out d))
-                return Number(d);
-            if (double.TryParse(v, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.CurrentCulture, out d))
-                return Number(d);
-            return nullify ? "NULL" : "0";
+            s = Energy.Base.Text.Trim(s);
+            if (Energy.Base.Cast.IsLong(s, true))
+                return Number((long)Energy.Base.Cast.StringToLong(s));
+            else
+                return Number((double)Energy.Base.Cast.StringToDouble(s));
+
+            //return nullify ? "NULL" : "0";
         }
 
         #endregion
@@ -374,7 +459,7 @@ namespace Energy.Query
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="number">double</param>
         /// <returns>string</returns>
         public string Integer(double number)
         {
@@ -384,9 +469,70 @@ namespace Energy.Query
         /// <summary>
         /// Format as INTEGER.
         /// </summary>
+        /// <param name="number">float</param>
+        /// <returns>string</returns>
+        public string Integer(float number)
+        {
+            return Number(Math.Floor(number));
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// Returns "1" for true and "0" for false.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(bool number)
+        {
+            return number ? "1" : "0";
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(char number)
+        {
+            return ((int)number).ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
         /// <param name="number"></param>
         /// <returns>string</returns>
         public string Integer(int number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(uint number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(long number)
+        {
+            return number.ToString();
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(ulong number)
         {
             return number.ToString();
         }
@@ -412,6 +558,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATE.
+        /// Represents date as quoted date string using "YYYY-MM-DD" format.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -422,6 +569,7 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATE.
+        /// Represents date as quoted date string using "YYYY-MM-DD" format.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -436,6 +584,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as TIME.
+        /// Uses 24h "hh:mm:ss" format.
+        /// Milliseconds will be used if present.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -450,6 +600,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as TIME.
+        /// Uses 24h "hh:mm:ss" format.
+        /// Milliseconds will be used if present.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -464,6 +616,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATETIME.
+        /// Uses by default "YYYY-MM-DD hh:mm:ss" format or "YYYY-MM-DD**T**hh:mm:ss"
+        /// depending on settings.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -485,6 +639,8 @@ namespace Energy.Query
 
         /// <summary>
         /// Format as DATETIME.
+        /// Uses by default "YYYY-MM-DD hh:mm:ss" format or "YYYY-MM-DD**T**hh:mm:ss"
+        /// depending on settings.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -507,6 +663,5 @@ namespace Energy.Query
         }
 
         #endregion
-
     }
 }

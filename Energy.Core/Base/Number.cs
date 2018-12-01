@@ -378,5 +378,19 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Deg2Rad
+
+        /// <summary>
+        /// Convert degrees to radians.
+        /// </summary>
+        /// <param name="value">Degrees</param>
+        /// <returns>Radians</returns>
+        public static double Deg2Rad(double value)
+        {
+            return value * Math.PI / 180.0;
+        }
+
+        #endregion
     }
 }

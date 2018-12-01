@@ -123,7 +123,7 @@ namespace Energy.Base
         #region Explode
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
@@ -286,15 +286,12 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
         /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, char[] separator, char[] enclosure, bool strip)
         {
@@ -309,15 +306,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
-        /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, char[] separator, char[] enclosure)
         {
@@ -332,15 +325,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
-        /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, char separator, char enclosure)
         {
@@ -355,15 +344,10 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
-        /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
-        /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, char separator)
         {
@@ -378,15 +362,10 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
-        /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
-        /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, string separator)
         {
@@ -404,15 +383,11 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
-        /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, string separator, string enclosure)
         {
@@ -430,15 +405,13 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
         /// <param name="strip">Strip field value if it was quoted</param>
         /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, string separator, string enclosure, bool strip, bool white)
         {
@@ -456,15 +429,12 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Explore CSV line into array of values.
+        /// Explode CSV line into array of values.
         /// </summary>
         /// <param name="line">CSV line</param>
         /// <param name="separator">Field separator characters (comma, semicolon, etc.)</param>
         /// <param name="enclosure">Text enclosure characters (quotation marks, apostrophes, etc.)</param>
         /// <param name="strip">Strip field value if it was quoted</param>
-        /// <param name="white">Allow whitespace before value if not quoted</param>
-        /// <param name="equals">Allow usage of equals sign (="01")</param>
-        /// <param name="glue">Glue separators together (not supported)</param>
         /// <returns>Empty array if line was empty or null</returns>
         public static string[] Explode(string line, string separator, string enclosure, bool strip)
         {

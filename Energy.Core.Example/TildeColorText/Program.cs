@@ -27,7 +27,19 @@ namespace TildeColorText
             Console.WriteLine("Example text length = {0} (raw), length = {1} (tilde)"
                 , example.Length, (int)Energy.Core.Tilde.Length(example));
             Energy.Core.Tilde.WriteLine(ConsoleColor.Yellow, example);
-            Console.ReadLine();
+
+            try
+            {
+                throw new NotSupportedException();
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Tilde.WriteException(exception, true);
+            }
+
+            Energy.Core.Tilde.Break(2);
+
+            Energy.Core.Tilde.Pause();
         }
     }
 }

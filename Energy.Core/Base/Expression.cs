@@ -9,6 +9,8 @@ namespace Energy.Base
     /// </summary>
     public static partial class Expression
     {
+        #region Constant
+
         /// <summary>
         /// Connection string pattern
         /// </summary>
@@ -71,7 +73,12 @@ namespace Energy.Base
         /// <summary>
         /// Matching for "VARCHAR(50) NOT NULL" or "DECIMAL(20, 3) NULL DEFAULT = '';"
         /// </summary>
-        public static readonly string SqlColumnTypeSimple = @"(?<type>[\w_][\w\d_]*)\s*(?<parameter>\(\s*(?<length>[0-9][^\)]*)\))?(?:\s(?<null>(?:NOT\s+)?NULL))?";
+        public static readonly string SqlTypeDeclaration = @"(?<type>[\w_][\w\d_]*)\s*(?<parameter>\(\s*(?<length>[0-9][^\)]*)\))?(?:\s(?<null>(?:NOT\s+)?NULL))?";
+
+        /// <summary>
+        /// Matchin for token in declarations like "CHARACTER VARYING NOT NULL".
+        /// </summary>
+        public static readonly string SqlDeclarationToken = @"[a-zA-Z][a-zA-Z0-9]*|\([^)]*\)|\[(?:\[]]|[^]])*]|[0-9]+(?:.[0-9]+)?|""(?:""""|[^""])*""|'(?:''|[^'])*'";
 
         /// <summary>
         /// Matching for elements of list "10 20 30" or "1,2, 3|4|5" or with description like "flower (Rose), fruit (Banana)"
@@ -105,5 +112,42 @@ namespace Energy.Base
         /// Expression for matching tilde color text
         /// </summary>
         public static readonly string TildeText = @"~`(?:``|[^`])*`~|~\d+~|~[\w\d]+~|~+?|[^~]+";
+
+        #endregion
+
+        #region Utility
+
+        public static string EscapeJoin(string glue, char[] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return "";
+            List<string> list = new List<string>();
+            foreach (char character in array)
+            {
+                string e = Energy.Base.Text.EscapeExpression((char)character);
+                list.Add(e);
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        public static string EscapeSurround(string prefix, string suffix, char[] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return "";
+            StringBuilder s = new StringBuilder();
+            foreach (char character in array)
+            {
+                s.Append(prefix);
+                s.Append(Energy.Base.Text.EscapeExpression((char)character));
+                s.Append(suffix);
+            }
+            return s.ToString();
+        }
+
+        #endregion
     }
 }

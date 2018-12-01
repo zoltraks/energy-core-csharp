@@ -254,5 +254,245 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(false, Energy.Base.Text.InArray(null, "A"));
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "b", true));
         }
+
+        [TestMethod]
+        public void TextPad()
+        {
+            string text;
+            string expect;
+            string result;
+
+            text = "X";
+            expect = "X";
+            result = Energy.Base.Text.Pad(text, 1, '0', Energy.Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 0, '0', Energy.Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, -1, '0', Energy.Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 1, '0', Energy.Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 0, '0', Energy.Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, -1, '0', Energy.Enumeration.TextPad.Center);
+            Assert.AreEqual(expect, result);
+
+            result = Energy.Base.Text.Pad(text, 2, '0', Energy.Enumeration.TextPad.Left);
+            expect = "0X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 2, '0', Energy.Enumeration.TextPad.Right);
+            expect = "X0";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 2, '0', Energy.Enumeration.TextPad.Center);
+            expect = "0X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 4, '0', Energy.Enumeration.TextPad.Middle);
+            expect = "00X0";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Pad(text, 5, '0', Energy.Enumeration.TextPad.Center);
+            expect = "00X00";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextCell()
+        {
+            string text;
+            string expect;
+            string result;
+            string remains;
+
+            text = null;
+            expect = "";
+            result = Energy.Base.Text.Cell(text, 0, 0, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            Assert.AreEqual(expect, result);
+            expect = ".";
+            result = Energy.Base.Text.Cell(text, 0, 1, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 2, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            expect = "..";
+            Assert.AreEqual(expect, result);
+
+            text = "X";
+            expect = "X";
+            result = Energy.Base.Text.Cell(text, 0, 1, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 0, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 1, 1, Energy.Enumeration.TextPad.Left, '.', "", "", out remains);
+            expect = ".";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 0, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 1, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 1, 1, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "[";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 2, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "[X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 2, Energy.Enumeration.TextPad.Right, '.', "[", "]", out remains);
+            expect = "X]";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 2, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "[X";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 2, Energy.Enumeration.TextPad.Right, '.', "[", "]", out remains);
+            expect = "X]";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 1, 2, Energy.Enumeration.TextPad.Left, '.', "[", "]", out remains);
+            expect = "[]";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 1, 2, Energy.Enumeration.TextPad.Right, '.', "[", "]", out remains);
+            expect = "[]";
+            Assert.AreEqual(expect, result);
+
+            text = "Ana's Song";
+            result = Energy.Base.Text.Cell(text, 2, 13 + 5 + 6, Energy.Enumeration.TextPad.Center, '-', "<div>", "</div>", out remains);
+            expect = "<div>---a's Song--</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 0 + 5 + 6, Energy.Enumeration.TextPad.Center, '-', "<div>", "</div>", out remains);
+            expect = "-Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 0 + 5 + 6, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song-";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 3, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song---";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 4, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song----";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 5, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 6, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 7, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song-</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 9, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song---</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 10, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song----</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 11, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 12, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song-</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 13, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song--</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 4, Energy.Enumeration.TextPad.Right, '-', "<div>", "</div>", out remains);
+            expect = "Ana's Song----";
+            Assert.AreEqual(expect, result);
+
+            result = Energy.Base.Text.Cell(text, 0, 10 + 5, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 6, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>-Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 7, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>--Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 9, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>----Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 10, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>-----Ana's Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 11, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 12, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>-Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 13, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>--Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+
+            result = Energy.Base.Text.Cell(text, 0, 10 + 14, Energy.Enumeration.TextPad.Center, '-', "<div>", "</div>", out remains);
+            expect = "<div>--Ana's Song-</div>";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 0, 10 + 14, Energy.Enumeration.TextPad.Left, '-', "<div>", "</div>", out remains);
+            expect = "<div>---Ana's Song</div>";
+            Assert.AreEqual(expect, result);
+
+            expect = "Ana";
+            result = Energy.Base.Text.Cell(text, 0, 3, Energy.Enumeration.TextPad.Left, '\0', null, null, out remains);
+            expect = "Ana";
+            Assert.AreEqual(expect, result);
+            expect = "'s Song";
+            Assert.AreEqual(expect, remains);
+            result = Energy.Base.Text.Cell(text, -4, 4, Energy.Enumeration.TextPad.Left, '\0', null, null, out remains);
+            expect = "Song";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, -4, 4, Energy.Enumeration.TextPad.Left);
+            Assert.AreEqual(expect, result);
+            expect = "";
+            Assert.AreEqual(expect, remains);
+            result = Energy.Base.Text.Cell(text, -4, 3, Energy.Enumeration.TextPad.Left, '\0', null, null, out remains);
+            expect = "Son";
+            Assert.AreEqual(expect, result);
+            expect = "g";
+            Assert.AreEqual(expect, remains);
+        }
+
+        [TestMethod]
+        public void TextDecodeControlString()
+        {
+            string text;
+            string result;
+            string expect;
+            text = "'Adam''s line' #13 #$0a 'Betty''s line'";
+            expect = "Adam's line" + "\r\n" + "Betty's line";
+            result = Energy.Base.Text.DecodeControlString(text, '\'', '\'', "#", "#$", "#0", "#%"
+                , System.Text.Encoding.ASCII, true, true, true);
+            Assert.AreEqual(expect, result);
+
+            text = " \\0101 ";
+            expect = "A";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = "\u0003\u0002";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = "\u0003ą\u0002";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+                IncludeUnknown = true,
+            });
+            Assert.AreEqual(expect, result);
+
+            text = " \\003 ą \\002 ";
+            expect = " \u0003 ą \u0002 ";
+            result = Energy.Base.Text.DecodeControlString(text, new Energy.Base.Text.Class.ControlStringOptions()
+            {
+                OctalPrefix = new string[] { "\\0", },
+                IncludeUnknown = true,
+                IncludeWhite = true,
+            });
+            Assert.AreEqual(expect, result);
+        }
     }
 }

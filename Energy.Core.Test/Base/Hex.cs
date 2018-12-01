@@ -47,5 +47,19 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Hex.HexToByteArray(value);
             Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
         }
+
+        [TestMethod]
+        public void HexToNumberType()
+        {
+            object expect;
+            object result;
+
+            string hex;
+
+            hex = "ffffffff";
+            expect = -1;
+            result = Energy.Base.Hex.HexToInteger(hex);
+            Assert.AreEqual(expect, result);
+        }
     }
 }

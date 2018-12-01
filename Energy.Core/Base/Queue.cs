@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Queue<T>: IDisposable, Energy.Interface.IQueue<T>
     {
-        private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
+        #region Constructor
 
         public Queue()
         {
@@ -20,15 +23,13 @@ namespace Energy.Base
             _List.AddRange(list);
         }
 
-        public void Dispose()
-        {
-            lock (_List)
-            {
-                _List.Clear();
-                _List = null;
-            }
-        }
+        #endregion
 
+        #region Property
+
+        /// <summary>
+        /// Check if queue is empty.
+        /// </summary>
         public bool IsEmpty
         {
             get
@@ -42,24 +43,23 @@ namespace Energy.Base
 
         private int _Limit;
 
-        public int Name { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
+        /// <summary>
+        /// Limit number of items in queue.
+        /// </summary>
+        public int Limit { get { lock (_List) return _Limit; } set { lock (_List) _Limit = value; } }
 
-        private bool _Circular;
-
-        public bool Circular { get { lock (_List) return _Circular; } set { lock (_List) _Circular = value; } }
-
-        private ManualResetEvent _PushResetEvent;
-
-        public void Clear()
-        {
-            lock (_List)
-            {
-                _List.Clear();
-            }
-        }
+        private bool _Ring;
 
         /// <summary>
-        /// Return number of elements in queue
+        /// Ring mode. 
+        /// Makes internal buffer work like circular buffer.
+        /// When this option is set, the oldest items are
+        /// removed from the list when limit has been exceeded.
+        /// </summary>
+        public bool Ring { get { lock (_List) return _Ring; } set { lock (_List) _Ring = value; } }
+
+        /// <summary>
+        /// Number of elements in queue.
         /// </summary>
         public int Count
         {
@@ -72,22 +72,87 @@ namespace Energy.Base
             }
         }
 
-        public int Limit { get; set; }
+        #endregion
+
+        #region Event
 
         /// <summary>
-        /// Put element at the end of queue
+        /// Event fired when Push() is called and element was added to the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnPush;
+
+        /// <summary>
+        /// Event fired when Pull() is called and element was taken from the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnPull;
+
+        /// <summary>
+        /// Event fired when Back() is called and element was put back to the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnBack;
+
+        /// <summary>
+        /// Event fired when Chop() is called and element was deleted from the queue.
+        /// </summary>
+        public event Energy.Base.Anonymous.Event OnChop;
+
+        #endregion
+
+        #region Private
+
+        private System.Collections.Generic.List<T> _List = new System.Collections.Generic.List<T>();
+
+        private ManualResetEvent _PushResetEvent;
+
+        #endregion
+
+        #region Dispose
+
+        public void Dispose()
+        {
+            lock (_List)
+            {
+                _List.Clear();
+                _List = null;
+            }
+        }
+
+        #endregion
+
+        #region Clear
+
+        /// <summary>
+        /// Clear list.
+        /// </summary>
+        public void Clear()
+        {
+            lock (_List)
+            {
+                _List.Clear();
+            }
+        }
+
+        #endregion
+
+        #region Push
+
+        /// <summary>
+        /// Put element at the end of queue.
+        /// If limit is reached, function will return false and element will not be put
+        /// at the end of the queue unless Ring option is set.
         /// </summary>
         /// <param name="item">Element</param>
         /// <returns></returns>
         public bool Push(T item)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
                 {
                     if (Limit > 0 && _List.Count >= Limit)
                     {
-                        if (Circular)
+                        if (Ring)
                         {
                             int count = 1 + Limit - _List.Count;
                             _List.RemoveRange(0, count);
@@ -98,32 +163,43 @@ namespace Energy.Base
                         }
                     }
                     _List.Add(item);
+                    signal = true;
                     return true;
                 }
             }
             finally
             {
                 _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnPush != null)
+                    {
+                        OnPush(this);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Put array of elements at the end of queue
+        /// Put array of elements at the end of queue.
         /// </summary>
-        /// <remarks>Using one element instead of array may be more efficient.</remarks>
+        /// <remarks>
+        /// Using one element instead of array may be more efficient.
+        /// </remarks>
         /// <param name="array">Array of elements</param>
         /// <returns></returns>
         public bool Push(T[] array)
         {
             if (array == null || array.Length == 0)
                 return false;
+            bool signal = false;
             try
             {
                 lock (_List)
                 {
                     if (Limit > 0 && _List.Count + array.Length > Limit)
                     {
-                        if (Circular)
+                        if (Ring)
                         {
                             int count = 1 + Limit - _List.Count - array.Length;
                             _List.RemoveRange(0, count);
@@ -134,21 +210,35 @@ namespace Energy.Base
                         }
                     }
                     _List.AddRange(array);
-                    return false;
+                    signal = true;
+                    return true;
                 }
             }
             finally
             {
                 _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnPush != null)
+                    {
+                        OnPush(this);
+                    }
+                }
             }
         }
 
+        #endregion
+
+        #region Pull
+
         /// <summary>
         /// Take first element from queue, remove it from queue, and finally return.
+        /// If queue is empty, function will return null.
         /// </summary>
         /// <returns>Element</returns>
         public T Pull()
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -157,12 +247,20 @@ namespace Energy.Base
                         return default(T);
                     T item = _List[0];
                     _List.RemoveAt(0);
+                    signal = true;
                     return item;
                 }
             }
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
@@ -174,6 +272,7 @@ namespace Energy.Base
         /// <returns>Array of elements</returns>
         public T[] Pull(int count)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -182,6 +281,8 @@ namespace Energy.Base
                     if (count == 0 || count > max)
                         count = max;
                     System.Collections.Generic.List<T> list = new System.Collections.Generic.List<T>();
+                    if (count > 0)
+                        signal = true;
                     while (count-- > 0)
                     {
                         list.Add(_List[0]);
@@ -193,6 +294,13 @@ namespace Energy.Base
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
@@ -205,6 +313,7 @@ namespace Energy.Base
         /// <returns>Element or default (null) if no elements in queue</returns>
         public T Pull(double timeout)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -213,6 +322,7 @@ namespace Energy.Base
                     {
                         T item = _List[0];
                         _List.RemoveAt(0);
+                        signal = true;
                         return item;
                     }
                 }
@@ -235,6 +345,7 @@ namespace Energy.Base
                         {
                             T item = _List[0];
                             _List.RemoveAt(0);
+                            signal = true;
                             return item;
                         }
                     }
@@ -243,35 +354,57 @@ namespace Energy.Base
             finally
             {
                 //_PushResetEvent.Reset();
+                if (signal)
+                {
+                    if (OnPull != null)
+                    {
+                        OnPull(this);
+                    }
+                }
             }
         }
 
-            /// <summary>
-            /// Put element back to queue, at begining. This element will be taken first.
-            /// </summary>
-            /// <param name="item">Element</param>
-            public void Back(T item)
+        #endregion
+
+        #region Back
+
+        /// <summary>
+        /// Put element back to queue, at begining. 
+        /// This element will be taken first.
+        /// </summary>
+        /// <param name="item">Element</param>
+        public void Back(T item)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
                 {
                     _List.Insert(0, item);
-
+                    signal = true;
                 }
             }
             finally
             {
                 //_PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnBack != null)
+                    {
+                        OnBack(this);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Put array of elements back to queue, at begining. These elements will be taken first.
+        /// Put array of elements back to queue, at begining.
+        /// These elements will be taken first.
         /// </summary>
         /// <param name="list">Array of elements</param>
         public void Back(T[] list)
         {
+            bool signal = false;
             try
             {
                 lock (_List)
@@ -280,13 +413,25 @@ namespace Energy.Base
                     {
                         _List.Insert(i, list[i]);
                     }
+                    signal = true;
                 }
             }
             finally
             {
-               // _PushResetEvent.Set();
+                // _PushResetEvent.Set();
+                if (signal)
+                {
+                    if (OnBack != null)
+                    {
+                        OnBack(this);
+                    }
+                }
             }
         }
+
+        #endregion
+
+        #region Chop
 
         /// <summary>
         /// Delete last element from queue and return it.
@@ -294,14 +439,29 @@ namespace Energy.Base
         /// <returns>Element or default if queue was empty</returns>
         public T Chop()
         {
-            lock (_List)
+            bool signal = false;
+            try
             {
-                if (_List.Count == 0)
-                    return default(T);
-                int n = _List.Count - 1;
-                T last = _List[n];
-                _List.RemoveAt(n);
-                return last;
+                lock (_List)
+                {
+                    if (_List.Count == 0)
+                        return default(T);
+                    signal = true;
+                    int n = _List.Count - 1;
+                    T last = _List[n];
+                    _List.RemoveAt(n);
+                    return last;
+                }
+            }
+            finally
+            {
+                if (signal)
+                {
+                    if (OnChop != null)
+                    {
+                        OnChop(this);
+                    }
+                }
             }
         }
 
@@ -312,22 +472,39 @@ namespace Energy.Base
         /// <returns>Array of elements</returns>
         public T[] Chop(int count)
         {
-            lock (_List)
+            bool signal = false;
+            try
             {
-                if (count > _List.Count)
-                    count = _List.Count;
-                if (count == 0)
-                    return new T[] { };
-                int first = _List.Count - count;
-                List<T> list = _List.GetRange(first, count);
-                _List.RemoveRange(first, count);
-                return list.ToArray();
+                lock (_List)
+                {
+                    if (count > _List.Count)
+                        count = _List.Count;
+                    if (count == 0)
+                        return new T[] { };
+                    signal = true;
+                    int first = _List.Count - count;
+                    List<T> list = _List.GetRange(first, count);
+                    _List.RemoveRange(first, count);
+                    return list.ToArray();
+                }
+            }
+            finally
+            {
+                if (signal)
+                {
+                    if (OnChop != null)
+                    {
+                        OnChop(this);
+                    }
+                }
             }
         }
+
+        #endregion
     }
 
     /// <summary>
-    /// Queue
+    /// Non generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
     /// </summary>
     public class Queue: Queue<object>
     {

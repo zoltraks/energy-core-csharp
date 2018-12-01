@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -11,6 +12,8 @@ namespace Energy.Core.Test.Base
         {
             var dictionary = new Energy.Base.Collection.StringDictionary<object>();
 
+            dictionary.SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.First;
+
             dictionary["One"] = 1;
             dictionary["TWO"] = 2;
             dictionary["ONE"] = 1 + (int)(dictionary["two"] ?? 1);
@@ -20,6 +23,40 @@ namespace Energy.Core.Test.Base
             dictionary.CaseSensitive = false;
 
             Assert.AreEqual("ONE=1 one=1", string.Concat("", "ONE=", dictionary["ONE"], " one=", dictionary["one"]));
+
+            string result;
+            string expect;
+            Energy.Base.Collection.StringDictionary sd;
+
+            sd = new Energy.Base.Collection.StringDictionary();
+            sd.CaseSensitive = false;
+            sd.Set("Product", "123");
+            sd.Set("product", "123456789");
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
+            sd.CaseSensitive = true;
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
+
+            sd = new Energy.Base.Collection.StringDictionary();
+            sd.Set("Product", "123");
+            sd.Set("product", "123456789");
+            sd.Set("zzz1", "abc");
+
+            result = sd.Get("Product");
+            expect = "123";
+            Assert.AreEqual(expect, result);
+
+            result = sd.Get("zzz1");
+            expect = "abc";
+            Assert.AreEqual(expect, result);
+
+            sd.CaseSensitive = false;
+            result = sd.Get("Product");
+            expect = "123456789";
+            Assert.AreEqual(expect, result);
         }
 
         private class StringDictionaryToObjectArrayTestClass1
@@ -94,6 +131,39 @@ namespace Energy.Core.Test.Base
             Energy.Base.Collection.StringArray stringArray = new Energy.Base.Collection.StringArray(array);
             Assert.IsFalse(stringArray.HasDuplicates(), "String array should not have duplicates");
             Assert.IsTrue(stringArray.HasDuplicates(true), "String array should have duplicates when ignoreCase is true");
+        }
+
+        [TestMethod]
+        public void StringDictionaryConstructor()
+        {
+            Dictionary<string, object> d;
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a");
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(0, d.Count);
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a", "b");
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(1, d.Count);
+            Assert.AreEqual("b", d["a"]);
+
+            d = new Energy.Base.Collection.StringDictionary<object>("a", "b", null);
+
+            Assert.IsNotNull(d);
+            Assert.AreEqual(1, d.Count);
+            Assert.AreEqual("b", d["a"]);
+        }
+
+        [TestMethod]
+        public void StringArrayToDictionaryCast()
+        {
+            var x = Energy.Base.Cast.StringArrayToDictionary<string, object>("0", null, "a", 1, "b", false, "c", true, null);
+            Assert.IsNotNull(x);
+            Assert.AreEqual(4, x.Count);
+            Assert.AreEqual(false, Energy.Base.Cast.AsBool(x["b"]));
+            Assert.AreEqual(true, Energy.Base.Cast.AsBool(x["c"]));
         }
     }
 }

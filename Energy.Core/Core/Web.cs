@@ -289,7 +289,7 @@ namespace Energy.Core
         #region Execute
 
         /// <summary>
-        /// Perform HTTP request
+        /// Perform HTTP request.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="httpWebRequest">Custom HttpWebRequest object to use</param>
@@ -398,7 +398,7 @@ namespace Energy.Core
         #region GET
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from HTTP request.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -409,7 +409,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="acceptType"></param>
@@ -427,7 +427,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform GET and return response from URL
+        /// Perform GET and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -440,6 +440,11 @@ namespace Energy.Core
 
         #region POST
 
+        /// <summary>
+        /// Perform POST and return response from HTTP request.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public static Energy.Base.Http.Response Post(Energy.Base.Http.Request request)
         {
             request.Method = "POST";
@@ -447,7 +452,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return response from URL
+        /// Perform POST and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -473,7 +478,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform POST and return response from URL
+        /// Perform POST and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -523,7 +528,7 @@ namespace Energy.Core
         #region PUT
 
         /// <summary>
-        /// Perform PUT and return response from URL
+        /// Perform PUT and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -548,7 +553,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return response from URL
+        /// Perform PUT and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -570,7 +575,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PUT and return response from URL
+        /// Perform PUT and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -585,7 +590,7 @@ namespace Energy.Core
         #region PATCH
 
         /// <summary>
-        /// Perform PATCH and return response from URL
+        /// Perform PATCH and return response from URL.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -596,7 +601,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PATCH and return response from URL
+        /// Perform PATCH and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -622,7 +627,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PATCH and return response from URL
+        /// Perform PATCH and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -647,7 +652,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PATCH and return response from URL
+        /// Perform PATCH and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="body"></param>
@@ -658,7 +663,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform PATCH and return response from URL
+        /// Perform PATCH and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -672,7 +677,7 @@ namespace Energy.Core
         #region HEAD
 
         /// <summary>
-        /// Perform HEAD and return response from URL
+        /// Perform HEAD and return response from URL.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -683,7 +688,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform HEAD and return response from URL
+        /// Perform HEAD and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -698,7 +703,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform HEAD and return response from URL
+        /// Perform HEAD and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="responseHeaders"></param>
@@ -728,7 +733,7 @@ namespace Energy.Core
         #region DELETE
 
         /// <summary>
-        /// Perform DELETE and return response from URL
+        /// Perform DELETE and return response from URL.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -739,7 +744,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform DELETE and return response from URL
+        /// Perform DELETE and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -758,7 +763,7 @@ namespace Energy.Core
         #region OPTIONS
 
         /// <summary>
-        /// Perform OPTIONS and return response from URL
+        /// Perform OPTIONS and return response from URL.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -769,7 +774,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Perform OPTIONS and return response from URL
+        /// Perform OPTIONS and return response from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>

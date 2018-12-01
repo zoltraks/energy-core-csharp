@@ -485,7 +485,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert bool to string
+        /// Convert boolean value to its string representation.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="style"></param>
@@ -770,11 +770,28 @@ namespace Energy.Base
             return (byte)value;
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have always 8 digits or letters (A-F).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value)
         {
             return Energy.Base.Hex.IntegerToHex(value);
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have count specified by size of digits or letters (A-F).
+        /// If number representation will be larger than size, it will be truncated to the last characters.
+        /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, int size)
         {
             return Energy.Base.Hex.IntegerToHex(value, size);
@@ -790,18 +807,34 @@ namespace Energy.Base
             return Energy.Base.Hex.IntegerToHex(value, upperCase);
         }
 
-        public static bool IsInteger(string value, bool negative)
+        /// <summary>
+        /// Convert hexadecimal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static int HexToInteger(string hex)
         {
-            if (negative)
+            return Energy.Base.Hex.HexToInteger(hex);
+        }
+
+        /// <summary>
+        /// Convert octal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="oct"></param>
+        /// <returns></returns>
+        public static int OctToInteger(string oct)
+        {
+            if (!Energy.Base.Text.HasDigitsOnly(oct))
+                return 0;
+            try
             {
-                int useless;
-                return int.TryParse(value, out useless);
+                return Convert.ToInt32(oct, 8);
             }
-            else
+            catch (Exception exception)
             {
-                uint useless;
-                return uint.TryParse(value, out useless);
+                Energy.Core.Bug.Catch(exception);
             }
+            return 0;
         }
 
         #endregion
@@ -2167,6 +2200,50 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringArrayToFirstCharArray(string[] array, bool onlyFirstCharacter)
+        {
+            List<char> charList = new List<char>();
+            foreach (string s in array)
+            {
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                if (onlyFirstCharacter)
+                    charList.Add(s[0]);
+                else
+                {
+                    foreach (char c in s.ToCharArray())
+                    {
+                        if (!charList.Contains(c))
+                            charList.Add(c);
+                    }
+                }
+            }
+            return charList.ToArray();
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringListToFirstCharArray(List<string> list, bool onlyFirstCharacter)
+        {
+            return StringArrayToFirstCharArray(list.ToArray(), onlyFirstCharacter);
+        }
+
+        /// <summary>
         /// Convert dictionary to array of objects of key value pairs.
         /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
         /// </summary>
@@ -2639,6 +2716,11 @@ namespace Energy.Base
             return StringToUnsignedLong(s);
         }
 
+        /// <summary>
+        /// Convert object to boolean value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool ObjectToBool(object value)
         {
             if (value == null)
@@ -2687,7 +2769,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert object to double value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2728,7 +2811,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert object to float value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2744,7 +2828,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to double number.
+        /// Convert object to decimal number.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2882,7 +2968,7 @@ namespace Energy.Base
         #region Enum
 
         /// <summary>
-        /// Convert string to enum
+        /// Convert string to enumeration value.
         /// </summary>
         /// <param name="value">string</param>
         /// <param name="type">Type</param>
@@ -3064,6 +3150,11 @@ namespace Energy.Base
             return Energy.Base.Json.Escape(value);
         }
 
+        /// <summary>
+        /// Convert object to formal JSON value string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string ObjectToJsonValue(object value)
         {
             // treat DBNull as empty string //
@@ -3088,6 +3179,11 @@ namespace Energy.Base
             return StringToJsonString(value.ToString());
         }
 
+        /// <summary>
+        /// Convert JSON value string to an object.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static object JsonValueToObject(string text)
         {
             if (text == "null")
@@ -3122,6 +3218,14 @@ namespace Energy.Base
 
         private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
+        /// <summary>
+        /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
+        /// </summary>
+        /// <param name="sizeInBytes"></param>
+        /// <param name="decimalPlaces"></param>
+        /// <param name="numberCeiling"></param>
+        /// <returns></returns>
         public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
         {
             if (sizeInBytes <= 0)
@@ -3155,6 +3259,42 @@ namespace Energy.Base
             int count = data.Length;
             string result = Energy.Base.Text.Encoding(null).GetString(data, index, count);
             return result;
+        }
+
+        #endregion
+
+        #region Enumeration
+
+        public static Energy.Enumeration.TextPad EnumerationTextAlignToTextPad(Energy.Enumeration.TextAlign align)
+        {
+            switch (align)
+            {
+                default:
+                    return Enumeration.TextPad.None;
+
+                case Enumeration.TextAlign.Center:
+                    return Enumeration.TextPad.Center;
+
+                case Enumeration.TextAlign.Left:
+                    return Enumeration.TextPad.Right;
+
+                case Enumeration.TextAlign.Right:
+                    return Enumeration.TextPad.Left;
+            }
+        }
+
+        public static Energy.Enumeration.TextAlign EnumerationTextPadToTextAlign(Energy.Enumeration.TextPad pad)
+        {
+            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+            if (beLeft && beRight)
+                return Enumeration.TextAlign.Center;
+            else if (beLeft)
+                return Enumeration.TextAlign.Right;
+            else if (beRight)
+                return Enumeration.TextAlign.Left;
+            else
+                return Enumeration.TextAlign.None;
         }
 
         #endregion

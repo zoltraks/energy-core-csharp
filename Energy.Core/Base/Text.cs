@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using Energy.Enumeration;
 
 namespace Energy.Base
 {
     /// <summary>
-    /// Text related functions
+    /// Text related functions.
     /// </summary>
-    // TODO This class probably should be renamed to avoid conflicts and allow to add using Energy.Base
+    /// <remarks>
+    /// There was a small question whether the class name should be renamed from **Energy.Base.Text** to something else to avoid possible conflicts with **System.Text** 
+    /// when anyone wants to add **Energy.Base** namespace to *using* list.
+    /// It was decided to keep it as it is while recommending using full class names 
+    /// in *using* list and synonyms as well.
+    /// </remarks>
     public class Text
     {
         #region Constants
@@ -56,10 +62,61 @@ namespace Energy.Base
             }
         }
 
-        #endregion
+        /// <summary>
+        /// An array of empty texts containing end-of-line characters.
+        /// </summary>
+        public static readonly string[] NEWLINE_ARRAY = new string[] { "\r\n", "\n", "\r" };
 
         /// <summary>
-        /// Exchange texts between each other
+        /// Regular expressions pattern for new line.
+        /// </summary>
+        public const string NEWLINE_PATTERN = "\r\n|\n|\r";
+
+        #endregion
+
+        #region Class
+
+        public class Class
+        {
+            public struct ControlStringOptions
+            {
+                public char Quote;
+
+                public char Escape;
+
+                public string[] DecimalPrefix;
+
+                public string[] HexadecimalPrefix;
+
+                public string[] OctalPrefix;
+
+                public string[] BinaryPrefix;
+
+                public bool Wide;
+
+                /// <summary>
+                /// Allow whitespace between text and character codes
+                /// </summary>
+                public bool White;
+
+                /// <summary>
+                /// Include whitespace into resulting text (not likely useful).
+                /// </summary>
+                public bool IncludeWhite;
+
+                /// <summary>
+                /// Include not recognised sequences in resulting text (not likely useful).
+                /// </summary>
+                public bool IncludeUnknown;
+            }
+        }
+
+        #endregion
+
+        #region Exchange
+
+        /// <summary>
+        /// Exchange texts between each other.
         /// </summary>
         /// <param name="first"></param>
         /// <param name="second"></param>
@@ -71,7 +128,23 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Select first non empty string element
+        /// Exchange characters between each other.
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        public static void Exchange(ref char first, ref char second)
+        {
+            char remember = first;
+            first = second;
+            second = remember;
+        }
+
+        #endregion
+
+        #region Select
+
+        /// <summary>
+        /// Select first non empty string element.
         /// </summary>
         /// <param name="list">string[]</param>
         /// <returns>string</returns>
@@ -83,6 +156,8 @@ namespace Energy.Base
             }
             return null;
         }
+
+        #endregion
 
         #region Surround
 
@@ -169,6 +244,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region Texture
+
         /// <summary>
         /// Repeat string pattern to specified amount of characters length.
         /// </summary>
@@ -193,6 +270,10 @@ namespace Energy.Base
             return s.ToString().Substring(0, size);
         }
 
+        #endregion
+
+        #region
+
         /// <summary>
         /// Remove leading and trailing whitespace.
         /// Includes space, tabulation (horizontal and vertical), new line and null characters.
@@ -212,10 +293,12 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
         #region Is
 
         /// <summary>
-        /// Check if string contains one of wild characters ("*" or "?")
+        /// Check if string contains one of wild characters ("*" or "?").
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>bool</returns>
@@ -225,7 +308,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Check if string contains one of characters used in LIKE ("%" or "_")
+        /// Check if string contains one of characters used in LIKE ("%" or "_").
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>bool</returns>
@@ -404,36 +487,45 @@ namespace Energy.Base
         #region Join
 
         /// <summary>
-        /// Join non empty strings into one list with separator
+        /// Join non empty and optionally empty strings into one list with separator.
+        /// For example Energy.Base.Text.Join(" : ", false, "A", "B", "", "C") will return "A : B : C".
         /// </summary>
-        /// <param name="with">Separator string</param>
+        /// <param name="glue">Separator string</param>
+        /// <param name="empty">Include empty values</param>
         /// <param name="array">Parts to join</param>
-        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        public static string Join(string with, params string[] array)
+        /// <returns></returns>
+        public static string Join(string glue, bool empty, params string[] array)
         {
             System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>();
             for (int i = 0; i < array.Length; i++)
             {
-                if (String.IsNullOrEmpty(array[i]))
+                if (string.IsNullOrEmpty(array[i]))
+                {
+                    if (empty)
+                    {
+                        list.Add("");
+                    }
                     continue;
+                }
                 string trim = array[i].Trim();
-                if (trim.Length == 0)
+                if (trim.Length == 0 && !empty)
                     continue;
                 list.Add(trim);
             }
-            return string.Join(with, list.ToArray());
+            return string.Join(glue, list.ToArray());
         }
 
+
         /// <summary>
-        /// Join non empty strings into one list with separator
+        /// Join strings into one list with separator.
+        /// For example Energy.Base.Text.Join(" : ", "A", "B", "", "C") will return "A : B : : C".
         /// </summary>
-        /// <param name="with">Separator string</param>
+        /// <param name="glue">Separator string</param>
         /// <param name="array">Parts to join</param>
-        /// <returns>Example: JoinWith(" : ", "A", "B", "", "C") = "A : B : C".</returns>
-        [Energy.Attribute.Code.Obsolete("Use shorter version Join()")]
-        public static string JoinWith(string with, params string[] array)
+        /// <returns></returns>
+        public static string Join(string glue, params string[] array)
         {
-            return Join(with, array);
+            return Energy.Base.Text.Join(glue, true, array);
         }
 
         #endregion
@@ -461,8 +553,6 @@ namespace Energy.Base
 
         #region Split
 
-        private static readonly string[] _NewLine = new string[] { "\r\n", "\n", "\r" };
-
         /// <summary>
         /// Split string to array by new line characters.
         /// Elements will not include new line itself.
@@ -471,7 +561,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitNewLine(string content)
         {
-            return content.Split(_NewLine, StringSplitOptions.None);
+            return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
         }
 
         /// <summary>
@@ -483,7 +573,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitNewLine(string content, bool removeEmptyEntries)
         {
-            string[] split = content.Split(_NewLine
+            string[] split = content.Split(NEWLINE_ARRAY
                 , removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
                 );
             return split;
@@ -986,6 +1076,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region Escape
+
         #region EscapeExpression
 
         private static string[] _EscapeExpressionStringArray;
@@ -1015,6 +1107,7 @@ namespace Energy.Base
                 {
                     _EscapeExpressionStringDictionary = new Dictionary<string, string>();
                     _EscapeExpressionStringDictionary.Add("\\", @"\\");
+                    _EscapeExpressionStringDictionary.Add("#", @"\#");
                     _EscapeExpressionStringDictionary.Add(".", @"\.");
                     _EscapeExpressionStringDictionary.Add(" ", @"\ ");
                     _EscapeExpressionStringDictionary.Add("\t", @"\t");
@@ -1058,12 +1151,26 @@ namespace Energy.Base
             return s == null ? text : s.ToString();
         }
 
+        /// <summary>
+        /// Escape character for regular expression.
+        /// </summary>
+        /// <param name="character"></param>
+        /// <returns></returns>
+        public static string EscapeExpression(char character)
+        {
+            return EscapeExpression(character.ToString());
+        }
+
+        #endregion
+
         #endregion
 
         #region Random
 
         /// <summary>
         /// Generate random text.
+        /// Resulting string will contain upper and lower latin letters and numbers only.
+        /// You may expect length from 3 to 10 characters.
         /// </summary>
         /// <returns></returns>
         public static string Random()
@@ -1425,7 +1532,7 @@ namespace Energy.Base
         #region Newline endings
 
         /// <summary>
-        /// Convert newline delimiter to specified one
+        /// Convert new line delimiter to specified one.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="newLine"></param>
@@ -1438,7 +1545,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert newline delimiter to environment default
+        /// Convert newline delimiter to environment default.
+        /// Value of constant **Energy.Base.Text.NL** is used.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>string[]</returns>
@@ -1679,7 +1787,263 @@ namespace Energy.Base
 
         #endregion
 
-        #region TryParse
+        #region Strip
+
+        #region DecodeControlString
+
+        private static Dictionary<Class.ControlStringOptions, string> _ControlStringExpressionCache;
+
+        public static string GetControlStringPattern(Class.ControlStringOptions options)
+        {
+            if (_ControlStringExpressionCache != null)
+            {
+                if (_ControlStringExpressionCache.ContainsKey(options))
+                {
+                    return _ControlStringExpressionCache[options];
+                }
+            }
+
+            List<string> alternatives = new List<string>();
+
+            char quote = options.Quote;
+            bool wide = options.Wide;
+            bool white = options.White;
+            char escape = options.Escape;
+
+            if (quote != '\0')
+            {
+                string doubleQuote = escape == '\0'
+                    ? string.Concat(quote, quote)
+                    : string.Concat(escape, quote)
+                    ;
+                string _quote = EscapeExpression(quote);
+                string _doubleQuote = EscapeExpression(doubleQuote);
+                string pattern = _quote + "(?:" + _doubleQuote + "|[^" + _quote + "])*" + _quote;
+                pattern = "(?<q>" + pattern + ")";
+                alternatives.Add(pattern);
+            }
+
+            List<KeyValuePair<int, string>> codes = new List<KeyValuePair<int, string>>();
+
+            if (options.DecimalPrefix != null)
+            {
+                foreach (string decPrefix in options.DecimalPrefix)
+                {
+                    if (string.IsNullOrEmpty(decPrefix))
+                        continue;
+                    int max = wide ? 5 : 3;
+                    string pattern = "";
+                    if (!white)
+                    {
+                        pattern += EscapeExpression(decPrefix);
+                    }
+                    else
+                    {
+                        pattern += Energy.Base.Expression.EscapeSurround(null, @"\s*", decPrefix.ToCharArray());
+                    }
+                    pattern += "(?<d>[0-9]{1," + max + "})";
+                    codes.Add(new KeyValuePair<int, string>(decPrefix.Length, pattern));
+                }
+            }
+
+            if (options.HexadecimalPrefix != null)
+            {
+                foreach (string hexPrefix in options.HexadecimalPrefix)
+                {
+                    if (string.IsNullOrEmpty(hexPrefix))
+                        continue;
+                    int max = wide ? 5 : 3;
+                    string pattern = "";
+                    if (!white)
+                    {
+                        pattern += EscapeExpression(hexPrefix);
+                    }
+                    else
+                    {
+                        pattern += Energy.Base.Expression.EscapeSurround(null, @"\s*", hexPrefix.ToCharArray());
+                    }
+                    pattern += "(?<h>[0-9A-Fa-f]{1," + max + "})";
+                    codes.Add(new KeyValuePair<int, string>(hexPrefix.Length, pattern));
+                }
+            }
+
+            if (options.OctalPrefix != null)
+            {
+                foreach (string octPrefix in options.OctalPrefix)
+                {
+                    if (string.IsNullOrEmpty(octPrefix))
+                        continue;
+                    int max = wide ? 6 : 3;
+                    string pattern = "";
+                    if (!white)
+                    {
+                        pattern += EscapeExpression(octPrefix);
+                    }
+                    else
+                    {
+                        pattern += Energy.Base.Expression.EscapeSurround(null, @"\s*", octPrefix.ToCharArray());
+                    }
+                    pattern += "(?<o>[0-9]{1," + max + "})";
+                    codes.Add(new KeyValuePair<int, string>(octPrefix.Length, pattern));
+                }
+            }
+
+            if (options.BinaryPrefix != null)
+            {
+                foreach (string binPrefix in options.BinaryPrefix)
+                {
+                    if (string.IsNullOrEmpty(binPrefix))
+                        continue;
+                    int max = wide ? 16 : 8;
+                    string pattern = "";
+                    if (!white)
+                    {
+                        pattern += EscapeExpression(binPrefix);
+                    }
+                    else
+                    {
+                        pattern += Energy.Base.Expression.EscapeSurround(null, @"\s*", binPrefix.ToCharArray());
+                    }
+                    pattern += "(?<b>[0-1]{1," + max + "})";
+                    codes.Add(new KeyValuePair<int, string>(binPrefix.Length, pattern));
+                }
+            }
+
+            codes.Sort(delegate (KeyValuePair<int, string> x1, KeyValuePair<int, string> x2)
+            {
+                return x1.Key.CompareTo(x2.Key);
+            });
+
+            for (int i = codes.Count; --i >= 0;)
+            {
+                alternatives.Add(codes[i].Value);
+            }
+
+            alternatives.Add(@"(?<w>\s+?)");
+
+            alternatives.Add(@"(?<a>.+?)");
+
+            string expression = string.Join("|", alternatives.ToArray());
+
+            if (_ControlStringExpressionCache == null)
+            {
+                _ControlStringExpressionCache = new Dictionary<Class.ControlStringOptions, string>();
+                _ControlStringExpressionCache[options] = expression;
+            }
+
+            return expression;
+        }
+
+        /// <summary>
+        /// Decode control string, like "'Hello'#13#10".
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
+        /// <param name="escape"></param>
+        /// <param name="decPrefix"></param>
+        /// <param name="hexPrefix"></param>
+        /// <param name="octPrefix"></param>
+        /// <param name="binPrefix"></param>
+        /// <param name="encoding"></param>
+        /// <param name="white"></param>
+        /// <param name="unquote"></param>
+        /// <param name="wide"></param>
+        /// <returns></returns>
+        public static string DecodeControlString(string text, char quote, char escape
+           , string decPrefix, string hexPrefix, string octPrefix, string binPrefix
+           , System.Text.Encoding encoding, bool white, bool unquote, bool wide
+           )
+        {
+            return DecodeControlString(text, encoding, new Class.ControlStringOptions()
+            {
+                Quote = quote,
+                Escape = escape,
+                DecimalPrefix = new string[] { decPrefix },
+                HexadecimalPrefix = new string[] { hexPrefix },
+                OctalPrefix = new string[] { octPrefix },
+                BinaryPrefix = new string[] { binPrefix },
+                White = white,
+                Wide = wide,
+            });
+        }
+
+        /// <summary>
+        /// Decode control string, like "'Hello'#13#10".
+        /// Use default System.Text.Encoding.UTF8 as encoding.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string DecodeControlString(string text, Class.ControlStringOptions options)
+        {
+            return DecodeControlString(text, System.Text.Encoding.UTF8, options);
+        }
+
+        /// <summary>
+        ///  Decode control string, like "'Hello'#13#10".
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="encoding"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string DecodeControlString(string text, System.Text.Encoding encoding
+            , Class.ControlStringOptions options
+            )
+        {
+            string pattern = GetControlStringPattern(options);
+            Regex regex = new Regex(pattern, RegexOptions.None);
+            Match match = regex.Match(text);
+            StringBuilder sb = new StringBuilder();
+            while (match.Success)
+            {
+                if (false)
+                { }
+                else if (match.Groups["q"].Success)
+                {
+                    string value = Energy.Base.Text.Strip(match.Groups["q"].Value, options.Quote, options.Escape);
+                    sb.Append(value);
+                }
+                else if (match.Groups["d"].Success)
+                {
+                    int number = Energy.Base.Cast.AsInteger(match.Groups["d"].Value);
+                    sb.Append((char)number);
+                }
+                else if (match.Groups["h"].Success)
+                {
+                    int number = Energy.Base.Cast.HexToInteger(match.Groups["h"].Value);
+                    sb.Append((char)number);
+                }
+                else if (match.Groups["w"].Success)
+                {
+                    if (options.IncludeWhite)
+                    {
+                        sb.Append(match.Groups["w"].Value);
+                    }
+                }
+                else if (match.Groups["a"].Success)
+                {
+                    if (options.IncludeUnknown)
+                    {
+                        sb.Append(match.Groups["a"].Value);
+                    }
+                }
+                else if (match.Groups["o"].Success)
+                {
+                    int number = Energy.Base.Cast.OctToInteger(match.Groups["o"].Value);
+                    sb.Append((char)number);
+                }
+
+                match = match.NextMatch();
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Parse
 
         public static bool TryParse(string text, out bool boolean)
         {
@@ -2027,6 +2391,20 @@ namespace Energy.Base
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, char quote, char escape)
+        {
+            string q = quote.ToString();
+            string e = escape.ToString();
+            return Strip(text, q, e);
+        }
+
+        /// <summary>
+        /// Strip text from quotation characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
         /// <returns></returns>
         public static string Strip(string text, string quote)
         {
@@ -2115,107 +2493,10 @@ namespace Energy.Base
 
         #region Editor
 
-        public class Editor
-        {
-            public string InsertBeforeFirstLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string AppendAfterFirstLine(string text, string line)
-            {
-                if (string.IsNullOrEmpty(line))
-                    return text;
-                if (string.IsNullOrEmpty(text))
-                {
-                    if (text == null && line == null)
-                        return null;
-                }
-                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return string.Concat(text ?? "", line ?? "");
-                }
-                else
-                {
-                    string result = ""
-                        + text.Substring(0, p) + line + text.Substring(p)
-                        ;
-                    return result;
-                }
-            }
-
-            public string InsertBeforeSecondLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string InsertBeforeLastLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string AppendAfterLastLine(string message, string line)
-            {
-                return string.Concat(line, message);
-            }
-
-            public string GetFirstLine(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                    return text;
-
-                int p = Energy.Base.Text.IndexOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return text;
-                }
-                else
-                {
-                    return text.Substring(0, p);
-                }
-            }
-
-            public string GetLastLine(string text)
-            {
-                if (string.IsNullOrEmpty(text))
-                    return text;
-
-                int p = Energy.Base.Text.AfterOfAny(text, _NewLine);
-                if (p < 0)
-                {
-                    return text;
-                }
-                else
-                {
-                    return text.Substring(p);
-                }
-            }
-
-            public string EnsureNewLineAtEnd(string text)
-            {
-                string[] nll = _NewLine;
-                if (nll == null || nll.Length == 0)
-                {
-                    nll = new string[] { Environment.NewLine };
-                }
-                if (string.IsNullOrEmpty(text))
-                {
-                    text = nll[0];
-                }
-                else
-                {
-                    foreach (string nl in nll)
-                    {
-                        if (text.EndsWith(nl))
-                            return text;
-                    }
-                    text = string.Concat(text, nll[0]);
-                }
-                return text;
-            }
-        }
-
+        [Energy.Attribute.Code.Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace")]
+        [Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace", false)]
+        public class Editor : Energy.Core.Text.Editor { }
+        
         #endregion
 
         #region IndexOfAny
@@ -2275,6 +2556,754 @@ namespace Energy.Base
                     m = p;
             }
             return m;
+        }
+
+        #endregion
+
+        #region Cell
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="prefix">
+        /// Optional prefix text that can be added if there is a space in resulting text to match size.
+        /// </param>
+        /// <param name="suffix">
+        /// Optional suffix text that can be added if there is a space in resulting text to match size.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill, string prefix, string suffix, out string remains)
+        {
+            remains = "";
+
+            if (size == 0)
+                return "";
+
+            if (text == null)
+                text = "";
+            if (prefix == null)
+                prefix = "";
+            if (suffix == null)
+                suffix = "";
+
+            if (start < 0)
+            {
+                start = text.Length + start;
+                if (start < 0)
+                {
+                    text = "";
+                    start = 0;
+                }
+            }
+
+            if (size < 0)
+            {
+                size = -size;
+                if (text.Length > size)
+                {
+                    text = text.Substring(text.Length - size);
+                    return text;
+                }
+            }
+
+            if (start > 0)
+            {
+                if (start >= text.Length)
+                    text = "";
+                else if (text.Length - start <= size)
+                    text = text.Substring(start);
+                else
+                {
+                    remains = text.Substring(start + size);
+                    text = text.Substring(start, size);
+                    return text;
+                }
+            }
+
+            if (text.Length == size)
+                return text;
+
+            bool leftJustify = 0 < (pad & Energy.Enumeration.TextPad.Left);
+
+            if (size > 0)
+            {
+                if (text.Length > size)
+                {
+                    remains = text.Substring(size);
+                    text = text.Substring(0, size);
+                    return text;
+                }
+            }
+
+            int width = size;
+
+            if (leftJustify)
+            {
+                if (prefix.Length > 0 && width - text.Length >= prefix.Length)
+                    width -= prefix.Length;
+                if (suffix.Length > 0 && width - text.Length >= suffix.Length)
+                    width -= suffix.Length;
+            }
+            else
+            {
+                if (suffix.Length > 0 && width - text.Length >= suffix.Length)
+                    width -= suffix.Length;
+                if (prefix.Length > 0 && width - text.Length >= prefix.Length)
+                    width -= prefix.Length;
+            }
+
+            string result = Energy.Base.Text.Pad(text, width, fill, pad, true);
+
+            if (leftJustify)
+            {
+                if (prefix.Length > 0 && result.Length + prefix.Length <= size)
+                    result = prefix + result;
+                if (suffix.Length > 0 && result.Length + suffix.Length <= size)
+                    result = result + suffix;
+            }
+            else
+            {
+                if (suffix.Length > 0 && result.Length + suffix.Length <= size)
+                    result = result + suffix;
+                if (prefix.Length > 0 && result.Length + prefix.Length <= size)
+                    result = prefix + result;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, out string remains)
+        {
+            remains = "";
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill, out string remains)
+        {
+            remains = "";
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad)
+        {
+            string remains = "";
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextPad pad, char fill)
+        {
+            string remains = "";
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, out string remains)
+        {
+            remains = "";
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, char fill, out string remains)
+        {
+            remains = "";
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad)
+        {
+            string remains = "";
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad, char fill)
+        {
+            string remains = "";
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="start">
+        /// The initial index of the text to be cut out. 
+        /// If less than zero, it indicates the last characters of the text.
+        /// </param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, start, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <param name="remains"></param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        {
+            remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, ' ', null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align and limit the text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill)
+        {
+            string remains = "";
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Cell(text, 0, size, pad, fill, null, null, out remains);
+        }
+
+        #endregion
+
+        #region Pad
+
+        /// <summary>
+        /// Expand the text on the left or right by filling in the specified character.
+        /// Optionally, cut the text to the desired size.
+        /// </summary>
+        /// <remarks>
+        ///
+        /// GOOD
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left)) &amp;&amp; (0 &lt; (pad &amp; Energy.Enumeration.TextPad.Right)))
+        ///
+        /// WORKS
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left)) &amp; (0 &lt; (pad &amp; Energy.Enumeration.TextPad.Right)))
+        ///
+        /// WRONG
+        ///
+        ///   if (0 &lt; (pad &amp; (Energy.Enumeration.TextPad.Left | Energy.Enumeration.TextPad.Right)))
+        ///
+        /// </remarks>
+        /// <param name="text"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters.
+        /// </param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="pad">
+        /// Padding direction, may be left or right.
+        /// Because padding is defined as flags, center or middle is also avaiable.
+        /// </param>
+        /// <param name="cut">If true, text will be limited to specified size</param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad, bool cut)
+        {
+            if (text == null)
+                text = "";
+
+            if (text == "")
+            {
+                if (size == 0)
+                    return "";
+            }
+
+            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+
+            if (text.Length < size)
+            {
+                if (beLeft && beRight)
+                {
+                    int d = size - text.Length;
+                    int d2 = d / 2;
+                    int d21 = d - d2; // may be higher or equal d2
+                    text = text.PadLeft(text.Length + d21, fill);
+                    if (text.Length < size)
+                    {
+                        text = text.PadRight(text.Length + d2, fill);
+                    }
+                }
+                else if (beLeft)
+                {
+                    text = text.PadLeft(size, fill);
+                }
+                else if (beRight)
+                {
+                    text = text.PadRight(size, fill);
+                }
+            }
+
+            if (cut && text.Length > size)
+            {
+                if (beLeft && beRight)
+                {
+                    int d = text.Length - size;
+                    int d2 = d / 2;
+                    text = text.Substring(d2, size);
+                }
+                else if (beRight)
+                {
+                    text = text.Substring(text.Length - size, size);
+                }
+                else
+                {
+                    text = text.Substring(0, size);
+                }
+            }
+
+            return text;
+        }
+
+        /// <summary>
+        /// Expand the text on the left or right by filling in the specified character.
+        /// If text is longer than size, it will remain untouched.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters
+        /// </param>
+        /// <param name="fill"></param>
+        /// <param name="pad">Padding direction</param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextPad pad)
+        {
+            return Pad(text, size, fill, pad, false);
+        }
+
+        /// <summary>
+        /// Expand the text on the left or right by filling in the specified character.
+        /// If text is longer than size, it will remain untouched.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="size">
+        /// The number of characters in the resulting string, equal to the number of original
+        /// characters plus any additional padding characters
+        /// </param>
+        /// <param name="fill"></param>
+        /// <param name="align">Text alignment</param>
+        /// <returns></returns>
+        public static string Pad(string text, int size, char fill, Energy.Enumeration.TextAlign align)
+        {
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            return Pad(text, size, fill, pad, false);
+        }
+
+        #endregion
+
+        #region Interpolate
+
+        /// <summary>
+        /// Interpolate text content by changing specified texts known also as placeholders
+        /// with specified values.
+        /// This version uses regular expression match, so might be slower.
+        /// It is not recursive so with ":a:" = ":b:" and ":b:" = ":a:" interpolating
+        /// text containing ":a:" will result in ":b:". 
+        /// Be careful about using it in recursion.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="ignoreCase"></param>
+        /// <param name="array">Key value pairs dictionary for interpolation</param>
+        /// <returns></returns>
+        public static string Interpolate(string text, bool ignoreCase, params string[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                return text;
+            }
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            for (int i = 0; i < array.Length / 2; i++)
+            {
+                string key = array[i * 2] ?? "";
+                if (ignoreCase)
+                    key = key.ToUpperInvariant();
+                dictionary[key] = array[1 + i * 2] ?? "";
+            }
+            if (dictionary.Count == 0)
+            {
+                return text;
+            }
+            List<string> suspect = new List<string>();
+            foreach (string key in dictionary.Keys)
+            {
+                suspect.Add(Energy.Base.Text.EscapeExpression(key));
+            }
+            suspect.Sort((string s1, string s2) => { return (s2 ?? "").Length - (s1 ?? "").Length; });
+            string pattern = string.Join("|", suspect.ToArray());
+            int Δ = 0;
+            string result = text;
+            RegexOptions option = RegexOptions.None;
+            if (ignoreCase)
+                option |= RegexOptions.IgnoreCase;
+            Match match = Regex.Match(text, pattern, option);
+            while (match.Success)
+            {
+                int position = match.Index;
+                int length = match.Length;
+                position += Δ;
+                string value = match.Value;
+                if (ignoreCase)
+                    value = value.ToUpperInvariant();
+                string replacement = dictionary[value];
+                result = string.Concat(result.Substring(0, position), replacement, result.Substring(position + length));
+                Δ += replacement.Length - length;
+                match = match.NextMatch();
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region HasDigitsOnly
+
+        /// <summary>
+        /// Checks if string contains only digits.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool HasDigitsOnly(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+            foreach (char c in value)
+            {
+                if (c < '0' || c > '9')
+                    return false;
+            }
+            return true;
+        }
+
+        #endregion
+
+        #region IsInteger
+
+        /// <summary>
+        /// Checks if string is an integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
+        public static bool IsInteger(string value, bool negative)
+        {
+            if (negative)
+            {
+                int useless;
+                return int.TryParse(value, out useless);
+            }
+            else
+            {
+                uint useless;
+                return uint.TryParse(value, out useless);
+            }
+        }
+
+        /// <summary>
+        /// Checks if string is an integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsInteger(string value)
+        {
+            return IsInteger(value, true);
+        }
+
+        #endregion
+
+        #region IsLong
+
+        /// <summary>
+        /// Checks if string is a long integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
+        public static bool IsLong(string value, bool negative)
+        {
+            if (negative)
+            {
+                long useless;
+                return long.TryParse(value, out useless);
+            }
+            else
+            {
+                long useless;
+                return long.TryParse(value, out useless);
+            }
+        }
+
+        /// <summary>
+        /// Checks if string is a long integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsLong(string value)
+        {
+            return IsLong(value, true);
         }
 
         #endregion

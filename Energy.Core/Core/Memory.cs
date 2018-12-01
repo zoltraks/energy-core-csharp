@@ -43,6 +43,10 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Clear MemoryStream object.
+        /// </summary>
+        /// <param name="stream"></param>
         public static void Clear(MemoryStream stream)
         {
             byte[] buffer = stream.GetBuffer();

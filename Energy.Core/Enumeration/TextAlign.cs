@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Enumeration
 {
@@ -9,6 +7,11 @@ namespace Energy.Enumeration
     /// </summary>
     public enum TextAlign
     {
+        /// <summary>
+        /// Don't align
+        /// </summary>
+        None,
+
         /// <summary>
         /// Align left
         /// </summary>

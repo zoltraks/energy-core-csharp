@@ -17,7 +17,7 @@ namespace Energy.Base
         public class Deflate
         {
             /// <summary>
-            /// Compress using deflate algorithm
+            /// Compress using deflate algorithm.
             /// </summary>
             /// <param name="data"></param>
             /// <returns></returns>
@@ -43,7 +43,7 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Decompress using deflate algorithm
+            /// Decompress using deflate algorithm.
             /// </summary>
             /// <param name="data"></param>
             /// <returns></returns>
@@ -83,7 +83,7 @@ namespace Energy.Base
         public class GZip
         {
             /// <summary>
-            /// Compress using gzip algorithm
+            /// Compress using gzip algorithm.
             /// </summary>
             /// <param name="data"></param>
             /// <returns></returns>
@@ -109,7 +109,7 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Decompress using gzip algorithm
+            /// Decompress using gzip algorithm.
             /// </summary>
             /// <param name="data"></param>
             /// <returns></returns>

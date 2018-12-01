@@ -590,7 +590,7 @@ namespace Energy.Base
             {
             }
 
-            public StringDictionary(string[] keyValuePairArray)
+            public StringDictionary(params string[] keyValuePairArray)
             {
                 for (int i = 0; i < keyValuePairArray.Length - 1; i++)
                 {
@@ -600,12 +600,35 @@ namespace Energy.Base
                 }
             }
 
+            public StringDictionary(params object[] keyValuePairArray)
+            {
+                for (int i = 0; i < keyValuePairArray.Length - 1; i++)
+                {
+                    string key = Energy.Base.Cast.ObjectToString(keyValuePairArray[i++]);
+                    T value = Energy.Base.Cast.As<T>(keyValuePairArray[i]);
+                    this[key] = value;
+                }
+            }
+
+
             #endregion
 
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
             public Dictionary<string, string> Index = null;
+
+            private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = MultipleBehaviour.Last;
+
+            /// <summary>
+            /// Specifies behaviour for selecting one element from multiple duplicates
+            /// when case sensitive option is set to false.
+            /// </summary>
+            public Energy.Enumeration.MultipleBehaviour SelectionOfDuplicates
+            {
+                get { lock (_Lock) return _SelectionOfDuplicates; }
+                set { lock (_Lock) _SelectionOfDuplicates = value; }
+            }
 
             private bool _CaseSensitive = true;
 
@@ -657,7 +680,9 @@ namespace Energy.Base
                 foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
-                    if (!Index.ContainsKey(map))
+                    if (_SelectionOfDuplicates == MultipleBehaviour.Last)
+                        Index[map] = key;
+                    else if (!Index.ContainsKey(map))
                         Index.Add(map, key);
                 }
             }
@@ -1368,6 +1393,31 @@ namespace Energy.Base
                 T item = _List[0];
                 _List.RemoveAt(0);
                 return item;
+            }
+        }
+
+        #endregion
+
+        #region KeyValuePairList
+
+        public class KeyValuePairList<TKey, TValue> : List<KeyValuePair<TKey, TValue>>
+        {
+            public bool Empty { get { return IsEmpty(); } }
+
+            private bool IsEmpty()
+            {
+                return this.Count == 0;
+            }
+
+            public KeyValuePair<TKey, TValue> Take()
+            {
+                if (this.Count == 0)
+                {
+                    return default(KeyValuePair<TKey, TValue>);
+                }
+                KeyValuePair<TKey, TValue> result = this[0];
+                this.RemoveAt(0);
+                return result;
             }
         }
 

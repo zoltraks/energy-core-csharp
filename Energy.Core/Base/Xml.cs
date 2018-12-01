@@ -22,9 +22,9 @@ namespace Energy.Base
         #region Serialize
 
         /// <summary>
-        /// Serialize object to XML
+        /// Serialize object to XML.
         /// <para>
-        /// Object class must implement IXmlSerializable interface
+        /// Object class must implement IXmlSerializable interface.
         /// </para>
         /// <code>
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
@@ -62,9 +62,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Serialize object to XML
+        /// Serialize object to XML.
         /// <para>
-        /// Object class must implement IXmlSerializable interface
+        /// Object class must implement IXmlSerializable interface.
         /// </para>
         /// <code>
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
@@ -97,7 +97,6 @@ namespace Energy.Base
         #endregion
 
         #region Deserialize
-
 
         /// <summary>
         /// Deserialize object from XML, root alternatives allowed.
@@ -134,6 +133,20 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Deserialize object from XML, root alternatives allowed.
+        /// Generic XML deserialization method.
+        /// </summary>
+        /// <param name="content">string</param>
+        /// <param name="type">System.Type</param>
+        /// <param name="root">string[]</param>
+        /// <param name="space">string</param>
+        /// <returns>object</returns>
+        public static TDeserialize Deserialize<TDeserialize>(string content, Type type, string[] root, string space)
+        {
+            return (TDeserialize)Deserialize(content, typeof(TDeserialize), root, space);
+        }
+
+        /// <summary>
         /// Generic XML deserialization method.
         /// </summary>
         /// <typeparam name="TDeserialize"></typeparam>
@@ -159,7 +172,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Deserialize object from XML
+        /// Deserialize object from XML.
         /// </summary>
         /// <param name="content">string</param>
         /// <param name="type">System.Type</param>
@@ -198,7 +211,7 @@ namespace Energy.Base
         #endregion
 
         /// <summary>
-        /// Read XML string element
+        /// Read XML string element.
         /// </summary>
         /// <param name="reader">XmlReader</param>
         public static string ReadXmlString(XmlReader reader)
@@ -207,7 +220,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -221,7 +234,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -237,7 +250,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -256,7 +269,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML element
+        /// Write XML element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>

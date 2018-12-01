@@ -83,6 +83,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random text.
+        /// Resulting string will contain upper and lower latin letters and numbers only.
+        /// You may expect length from 3 to 10 characters.
         /// </summary>
         /// <returns></returns>
         public static string GetRandomText()
@@ -92,6 +94,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Generate random text.
+        /// Resulting string will contain upper and lower latin letters and numbers only.
         /// </summary>
         /// <param name="minimum">Minimum number of characters</param>
         /// <param name="maximum">Maximum number of characters</param>

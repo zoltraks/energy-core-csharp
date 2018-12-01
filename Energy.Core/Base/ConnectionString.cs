@@ -10,13 +10,15 @@ using System.Text.RegularExpressions;
 namespace Energy.Base
 {
     /// <summary>
-    /// ODBC style connection string.
+    /// Inspired by classics, a class representing a connection string to a data source.
+    /// Simply, ODBC style connection string.
     /// </summary>
     [Serializable]
     public class ConnectionString : Dictionary<string, string>
     {
         /// <summary>
         /// Gets or sets the value associated with the specified key.
+        /// Case insensitive.
         /// </summary>
         /// <param name="key">Key</param>
         /// <returns>Value</returns>
@@ -75,7 +77,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent as string
+        /// Represent as string.
         /// </summary>
         /// <returns>Connection string</returns>
         public override string ToString()
@@ -98,7 +100,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Escape connection string option name if needed
+        /// Escape connection string value if needed.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -120,7 +122,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Quote connection string option value if needed
+        /// Quote connection string value if needed.
+        /// This method will affect on values containing space, semicolon, apostrophe or quotation mark.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -141,7 +144,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip quotes from option name
+        /// Strip quotes from connection string value.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -162,11 +165,23 @@ namespace Energy.Base
             return value;
         }
 
-        /// <summary>Catalog</summary>
+        /// <summary>
+        /// Catalog name taken from one of alternatives:
+        /// "Database", "Database Name", "Initial Catalog".
+        /// </summary>
         public string Catalog { get { return GetCatalog(); } set { SetCatalog(value); } }
 
-        /// <summary>Server</summary>
+        /// <summary>
+        /// Server name taken from one of alernatives:
+        /// "Data Source", "Server", "DataSource", "Server Name", "Dbq".
+        /// </summary>
         public string Server { get { return GetServer(); } set { SetServer(value); } }
+
+        /// <summary>
+        /// User name taken from one of alernatives:
+        /// "User", "User ID".
+        /// </summary>
+        public string User { get { return GetUser(); } set { SetUser(value); } }
 
         private readonly string[] _ServerAlternatives = new string[]
         {
@@ -177,6 +192,24 @@ namespace Energy.Base
         {
                 "Database", "Database Name", "Initial Catalog",
         };
+
+        private readonly string[] _UserAlternatives = new string[]
+        {
+                "User", "User ID",
+        };
+
+        private string GetUser()
+        {
+            return FindValue(_UserAlternatives);
+        }
+
+        private void SetUser(string value)
+        {
+            string key = FindKey(_UserAlternatives);
+            if (key == null)
+                key = _UserAlternatives[0];
+            this[key] = value;
+        }
 
         private string GetServer()
         {
