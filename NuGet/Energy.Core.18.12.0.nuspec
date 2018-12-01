@@ -6,13 +6,11 @@
     <authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</authors>
     <owners>Filip Golewski &lt;f.golewski@gmail.com&gt;</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</licenseUrl>
-    <projectUrl>http://energy.alyx.pl/</projectUrl>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-3.0.txt</licenseUrl>
+    <projectUrl>http://energy-core.readthedocs.io/</projectUrl>
     <iconUrl>http://energy.alyx.pl/media/icon/nuget.png</iconUrl>
     <description>Class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
-
-To be used by wide range of applications, services, web or console.
-    </description>
+To be used by wide range of applications, services, web or console programs.</description>
     <releaseNotes>How much reality can you take?</releaseNotes>
     <copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</copyright>
     <language>en-us</language>

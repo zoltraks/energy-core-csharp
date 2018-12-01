@@ -2,21 +2,22 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.11.3</Version>
-    <FileVersion>2018.11.29</FileVersion>
-    <AssemblyVersion>18.11.3</AssemblyVersion>
+    <Version>18.12.0</Version>
+    <FileVersion>2018.12.01</FileVersion>
+    <AssemblyVersion>18.11.0</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
-    <Description>Library which boosts your program with static functionality covering various type conversions, database abstraction layer, object mapping and simple application framework. Useful to build simple console applications, services, websites or even big applications. Designed for all purposes as a set of libraries compiled into one include file. No external dependencies, avaliable for most .NET platform versions.</Description>
+    <Description>Class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
+To be used by wide range of applications, services, web or console programs.</Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageProjectUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/</PackageProjectUrl>
-    <PackageIconUrl>http://bigbytes.visualstudio.com/DocumentObject/_git/DocumentObject/media/icon/nuget.png</PackageIconUrl>
+    <PackageProjectUrl>http://energy-core.readthedocs.io/</PackageProjectUrl>
+    <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
     <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
     <NoPackageAnalysis>true</NoPackageAnalysis>
  </PropertyGroup>
