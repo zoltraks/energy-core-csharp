@@ -169,5 +169,51 @@ namespace Energy.Core
             thread.Start();
             return thread;
         }
+
+        /// <summary>
+        /// Create and start named thread with anonymous code.
+        /// Don't do anything if named thread exists and is running.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static Thread Fire(string name, Energy.Base.Anonymous.Function code)
+        {
+            lock (_FireThreadListLock)
+            {
+                Thread thread;
+                if (FireThreadList.ContainsKey(name))
+                {
+                    thread = FireThreadList[name];
+                    if (thread.IsAlive)
+                    {
+                        return thread;
+                    }
+                    else
+                    {
+                        FireThreadList.Remove(name);
+                    }
+                }
+                thread = Fire(code);
+                FireThreadList[name] = thread;
+                return thread;
+            }
+        }
+
+        static readonly Energy.Base.Lock _FireThreadListLock = new Energy.Base.Lock();
+
+        static Dictionary<string, Thread> _FireThreadList;
+
+        static Dictionary<string, Thread> FireThreadList
+        {
+            get
+            {
+                if (_FireThreadList == null)
+                {
+                    _FireThreadList = new Dictionary<string, Thread>();
+                }
+                return _FireThreadList;
+            }
+        }
     }
 }
