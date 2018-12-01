@@ -33,6 +33,11 @@ namespace Energy.Core.Test.Query
             result = format.Text(value);
             Assert.AreEqual(expect, result);
 
+            value = "'Database open'";
+            expect = "'''Database open'''";
+            result = format.Text(value);
+            Assert.AreEqual(expect, result);
+
             format.Bracket.Object = "[]";
             format.Bracket.Object.Include = "[]]";
             value = "[]";
