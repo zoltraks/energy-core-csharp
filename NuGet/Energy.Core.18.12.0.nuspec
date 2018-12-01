@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Energy.Core</id>
+    <version>18.12.0</version>
+    <authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</authors>
+    <owners>Filip Golewski &lt;f.golewski@gmail.com&gt;</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</licenseUrl>
+    <projectUrl>http://energy.alyx.pl/</projectUrl>
+    <iconUrl>http://energy.alyx.pl/media/icon/nuget.png</iconUrl>
+    <description>Class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
+
+To be used by wide range of applications, services, web or console.
+    </description>
+    <releaseNotes>How much reality can you take?</releaseNotes>
+    <copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</copyright>
+    <language>en-us</language>
+    <tags>type-convertion sql database-abstraction-layer utility class-library framework</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework2.0" />
+      <group targetFramework=".NETFramework3.5" />
+      <group targetFramework=".NETFramework4.0" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\Energy.Core\bin\net20\Energy.Core.dll" target="lib\net20\Energy.Core.dll" />
+    <file src="..\Energy.Core\bin\net20\Energy.Core.xml" target="lib\net20\Energy.Core.xml" />
+    <file src="..\Energy.Core\bin\net35\Energy.Core.dll" target="lib\net35\Energy.Core.dll" />
+    <file src="..\Energy.Core\bin\net35\Energy.Core.xml" target="lib\net35\Energy.Core.xml" />
+    <file src="..\Energy.Core\bin\net40\Energy.Core.dll" target="lib\net40\Energy.Core.dll" />
+    <file src="..\Energy.Core\bin\net40\Energy.Core.xml" target="lib\net40\Energy.Core.xml" />
+    <file src="..\Energy.Core\bin\netstandard2.0\Energy.Core.dll" target="lib\netstandard2.0\Energy.Core.dll" />
+    <file src="..\Energy.Core\bin\netstandard2.0\Energy.Core.xml" target="lib\netstandard2.0\Energy.Core.xml" />
+  </files>
+</package>
