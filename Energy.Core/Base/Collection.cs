@@ -618,13 +618,13 @@ namespace Energy.Base
             /// </summary>
             public Dictionary<string, string> Index = null;
 
-            private Energy.Enumeration.SelectionOfDuplicates _SelectionOfDuplicates = SelectionOfDuplicates.Last;
+            private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = MultipleBehaviour.Last;
 
             /// <summary>
             /// Specifies behaviour for selecting one element from multiple duplicates
             /// when case sensitive option is set to false.
             /// </summary>
-            public Energy.Enumeration.SelectionOfDuplicates SelectionOfDuplicates
+            public Energy.Enumeration.MultipleBehaviour SelectionOfDuplicates
             {
                 get { lock (_Lock) return _SelectionOfDuplicates; }
                 set { lock (_Lock) _SelectionOfDuplicates = value; }
@@ -680,7 +680,7 @@ namespace Energy.Base
                 foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
-                    if (_SelectionOfDuplicates == SelectionOfDuplicates.Last)
+                    if (_SelectionOfDuplicates == MultipleBehaviour.Last)
                         Index[map] = key;
                     else if (!Index.ContainsKey(map))
                         Index.Add(map, key);

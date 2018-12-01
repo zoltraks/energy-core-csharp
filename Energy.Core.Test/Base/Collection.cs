@@ -12,7 +12,7 @@ namespace Energy.Core.Test.Base
         {
             var dictionary = new Energy.Base.Collection.StringDictionary<object>();
 
-            dictionary.SelectionOfDuplicates = Energy.Enumeration.SelectionOfDuplicates.First;
+            dictionary.SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.First;
 
             dictionary["One"] = 1;
             dictionary["TWO"] = 2;
