@@ -5,15 +5,21 @@ using System.Text;
 
 namespace Energy.Base
 {
-/// <summary>
-/// Currency information
-/// </summary>
+    /// <summary>
+    /// Currency
+    /// </summary>
     public class Currency
     {
         #region Class
 
+        /// <summary>
+        /// Currency code.
+        /// </summary>
         public string Code { get; private set; }
 
+        /// <summary>
+        /// Currency name.
+        /// </summary>
         public string Name { get; private set; }
 
         public string Symbol { get; private set; }
@@ -82,7 +88,122 @@ namespace Energy.Base
             return !(c1 == c2);
         }
 
-#endregion
+        #endregion
+
+        #region Symbol
+
+        /// <summary>
+        /// Class which represents currency symbol information.
+        /// Related to ISO 4217.
+        /// </summary>
+        public class Symbol
+        {
+            /// <summary>
+            /// Currency symbol unicode character.
+            /// </summary>
+            public char Character;
+
+            /// <summary>
+            /// Currency symbol code.
+            /// Related to ISO 4217.
+            /// </summary>
+            public string Code;
+
+            /// <summary>
+            /// Currency symbol english name.
+            /// </summary>
+            public string English;
+
+            /// <summary>
+            /// Currency symbol local name.
+            /// </summary>
+            public string Local;
+
+            #region Constructor
+
+            public Symbol() { }
+
+            public Symbol(char character)
+            {
+                this.Character = character;
+            }
+
+            public Symbol(char character, string code, string english)
+            {
+                this.Character = character;
+                this.Code = code;
+                this.English = english;
+            }
+
+            public Symbol(char character, string code, string english, string local)
+            {
+                this.Character = character;
+                this.Code = code;
+                this.English = english;
+                this.Local = local;
+            }
+
+            #endregion
+
+            #region Array
+
+            /// <summary>
+            /// Array of currency symbols.
+            /// </summary>
+            public class Array: Energy.Base.Collection.Array<Energy.Base.Currency.Symbol>
+            {
+                public Energy.Base.Currency.Symbol Add(char character)
+                {
+                    Energy.Base.Currency.Symbol item;
+                    item = new Energy.Base.Currency.Symbol(character);
+                    this.Add(item);
+                    return item;
+                }
+
+                public Energy.Base.Currency.Symbol Add(char character, string code, string english)
+                {
+                    Energy.Base.Currency.Symbol item;
+                    item = new Energy.Base.Currency.Symbol(character, code, english);
+                    this.Add(item);
+                    return item;
+                }
+
+                public Energy.Base.Currency.Symbol Add(char character, string code, string english, string local)
+                {
+                    Energy.Base.Currency.Symbol item;
+                    item = new Energy.Base.Currency.Symbol(character, code, english, local);
+                    this.Add(item);
+                    return item;
+                }
+            }
+
+            #endregion
+        }
+
+        public static Energy.Base.Currency.Symbol.Array CreateDefaultCurrencySymbolArray()
+        {
+            Energy.Base.Currency.Symbol.Array array = new Energy.Base.Currency.Symbol.Array();
+            array.Add('$', null, "dollar");
+            array.Add('€', "EUR", "euro");
+
+            array.Add('¢', null, "cent");
+            array.Add('￠', null, "cent");
+            array.Add('＄', null, "dollar");
+
+            array.Add('₵', "GHS", "cedi");
+            array.Add('₡', null, "colón");
+
+            array.Add('؋', "AFN", "afghani");
+            array.Add('₮', "MNT", "tugrik", "tögrög");
+
+            array.Add('₳', "ARA", "austral");
+
+            // TODO
+
+            return array;
+        }
+
+        #endregion
 
         #region Dictionary
 
