@@ -8,13 +8,11 @@ namespace Energy.Query.Dialect
 {
     public class MYSQL: Energy.Interface.IDialect
     {
-        public Energy.Query.Format Format;
+        public Energy.Query.Format Format { get; set; }
 
         public object[] DataTypes;
 
         public string DefaultEngine = "InnoDB";
-
-        Format IDialect.Format { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         #region Constructor
 

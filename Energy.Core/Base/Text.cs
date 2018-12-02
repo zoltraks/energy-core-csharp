@@ -788,7 +788,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region RemoveWhiteSpace
+        #region RemoveWhitespace
 
         /// <summary>
         /// Remove whitespace characters from entire string.
@@ -838,6 +838,24 @@ namespace Energy.Base
                     return true;
             }
             return false;
+        }
+
+        #endregion
+
+        #region ReplaceWhitespace
+
+        /// <summary>
+        /// Replace whitespace characters with replacement string in entire string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="replacement"></param>
+        /// <returns></returns>
+        public static string ReplaceWhitespace(string text, string replacement)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+            text = Regex.Replace(text, @"\s", replacement);
+            return text;
         }
 
         #endregion

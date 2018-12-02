@@ -75,6 +75,7 @@
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\Parameter.cs" />
     <Compile Include="Query\Format.cs" />
     <Compile Include="Query\Type.cs" />
   </ItemGroup>
