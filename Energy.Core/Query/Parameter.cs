@@ -236,11 +236,11 @@ namespace Energy.Query
 
             /// <summary>
             /// Convert SQL query template which uses angle brackets
-            /// to parametrized query which uses at sign to define parameters.
+            /// to parameterized query which uses at sign to define parameters.
             /// </summary>
             /// <param name="template"></param>
             /// <returns></returns>
-            public static string ConvertToParametrizedQuery(string template)
+            public static string ConvertToParameterizedQuery(string template)
             {
                 if (string.IsNullOrEmpty(template))
                     return template;
