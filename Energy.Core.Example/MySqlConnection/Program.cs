@@ -54,7 +54,7 @@ namespace MySqlConnection
             Console.WriteLine(db.Scalar("SELECT CURRENT_TIMESTAMP()"));
 
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
-            Energy.Query.Script script = new Energy.Query.Script.MySQL();
+            Energy.Interface.IDialect script = new Energy.Query.Dialect.MYSQL();
 
             query = script.CreateDescription(table);
             Console.WriteLine(query);

@@ -53,6 +53,13 @@ namespace Energy.Base
                     }
                     return _Global;
                 }
+                set
+                {
+                    lock (_GlobalLock)
+                    {
+                        _Global = value;
+                    }
+                }
             }
         }
 
@@ -100,6 +107,13 @@ namespace Energy.Base
                         }
                     }
                     return _Global;
+                }
+                set
+                {
+                    lock (_GlobalLock)
+                    {
+                        _Global = value;
+                    }
                 }
             }
 

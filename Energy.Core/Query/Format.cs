@@ -8,7 +8,7 @@ using Energy.Base;
 namespace Energy.Query
 {
     /// <summary>
-    /// Text formatter class for SQL queries.
+    /// Value formatter class for SQL queries.
     /// </summary>
     public class Format
     {
