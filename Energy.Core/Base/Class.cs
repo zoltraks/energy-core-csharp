@@ -6,18 +6,31 @@ using System.Text;
 
 namespace Energy.Base
 {
+    /// <summary>
+    /// Functions related to classes, objects and assemblies.
+    /// </summary>
     public class Class
     {
         #region Static utility functions
 
         #region GetDefault
 
+        /// <summary>
+        /// Get default value of specified type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object GetDefault(System.Type type)
         {
             object o = Activator.CreateInstance(type);
             return o;
         }
 
+        /// <summary>
+        /// Get default value of specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static T GetDefault<T>()
         {
             return default(T);
@@ -28,7 +41,7 @@ namespace Energy.Base
         #region GetFieldsAndProperties
 
         /// <summary>
-        /// Get list of names of all fields and propeties for specified class type.
+        /// Get list of names of all fields and properties of specified class type.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="includePrivate"></param>
@@ -60,16 +73,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get list of names of all fields and propeties for specified class type.
-        /// </summary>
-        /// <param name="type">Class type</param>
-        /// <returns>Array of string</returns>
-        public static string[] GetFieldsAndProperties(Type type)
-        {
-            return GetFieldsAndProperties(type, true, true);
-        }
-        /// <summary>
-        /// Get list of names of all fields and propeties for specified class type.
+        /// Get list of names of all fields and properties of specified class type.
         /// </summary>
         /// <param name="type">Class type</param>
         /// <param name="includePrivate"></param>
@@ -79,12 +83,22 @@ namespace Energy.Base
             return GetFieldsAndProperties(type, includePrivate, true);
         }
 
+        /// <summary>
+        /// Get list of names of public fields and properties of specified class type.
+        /// </summary>
+        /// <param name="type">Class type</param>
+        /// <returns>Array of string</returns>
+        public static string[] GetFieldsAndProperties(Type type)
+        {
+            return GetFieldsAndProperties(type, false, true);
+        }
+
         #endregion
 
         #region GetFieldOrPropertyAttribute...
 
         /// <summary>
-        /// Get attribute for a field or property of desired class.
+        /// Get first attribute for a field or property of desired class.
         /// </summary>
         /// <param name="type">Class type</param>
         /// <param name="name">Field or property name</param>
@@ -104,8 +118,8 @@ namespace Energy.Base
                     }
                 }
             }
-            BindingFlags bf = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            foreach (PropertyInfo _ in type.GetProperties(bf))
+            BindingFlags binding = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            foreach (PropertyInfo _ in type.GetProperties(binding))
             {
                 if (_.Name != name) continue;
                 object[] a = _.GetCustomAttributes(true);
@@ -118,6 +132,18 @@ namespace Energy.Base
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Get first attribute for a field or property of desired class.
+        /// </summary>
+        /// <param name="type">Class type</param>
+        /// <param name="name">Field or property name</param>
+        /// <param name="attribute">Attribute class type</param>
+        /// <returns>Attribute or null if not found</returns>
+        public static T GetFieldOrPropertyAttribute<T>(Type type, string name)
+        {
+            return (T)GetFieldOrPropertyAttribute(type, name, typeof(T));
         }
 
         /// <summary>
@@ -648,6 +674,89 @@ namespace Energy.Base
         public static Type[] GetTypes(Assembly assembly, TypeFilter filter)
         {
             return GetTypes(new Assembly[] { assembly }, filter);
+        }
+
+        #endregion
+
+        #region Mangle
+
+        /// <summary>
+        /// Mangle object by applying a function to each field and property of specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject"></param>
+        /// <param name="includePrivate"></param>
+        /// <param name="includePublic"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, bool includePrivate, bool includePublic
+          , Energy.Base.Anonymous.Function<T, T> function)
+        {
+            if (subject == null || function == null)
+                return 0;
+
+            int count = 0;
+
+            Type objectType = subject.GetType();
+            Type filterType = typeof(T);
+
+            BindingFlags f = BindingFlags.Instance;
+            if (includePrivate)
+                f |= BindingFlags.NonPublic;
+            if (includePublic)
+                f |= BindingFlags.Public;
+
+            T value;
+
+            foreach (FieldInfo _ in objectType.GetFields(f))
+            {
+                if (filterType != _.FieldType)
+                    continue;
+                value = (T)_.GetValue(subject);
+                value = function(value);
+                _.SetValue(subject, value);
+                count++;
+            }
+
+            foreach (PropertyInfo _ in objectType.GetProperties(f))
+            {
+                if (filterType != _.PropertyType)
+                    continue;
+                if (null == _.GetSetMethod())
+                    continue;
+                value = (T)_.GetValue(subject, null);
+                value = function(value);
+                _.SetValue(subject, value, null);
+                count++;
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// Mangle object by applying a function to each field and property of specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject"></param>
+        /// <param name="includePrivate"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, bool includePrivate
+          , Energy.Base.Anonymous.Function<T, T> function)
+        {
+            return Mangle<T>(subject, includePrivate, true, function);
+        }
+
+        /// <summary>
+        /// Mangle object by applying a function to each public field and property of specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, Energy.Base.Anonymous.Function<T, T> function)
+        {
+            return Mangle<T>(subject, false, true, function);
         }
 
         #endregion

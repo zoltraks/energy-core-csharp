@@ -36,5 +36,32 @@ namespace Energy.Core.Test.Base
                 , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
             Assert.IsTrue(classList.Length > 0);
         }
+
+        [TestMethod]
+        public void ClassMangle()
+        {
+            int m;
+
+            var o1 = new TestClass1()
+            {
+                Text1 = " a ",
+                Text2 = " b ",
+            };
+
+            m = Energy.Base.Class.Mangle<string>(o1, delegate (string _) { return (_ as string ?? "").Trim(); });
+            Assert.AreEqual(2, m);
+            Assert.AreEqual("a", o1.Text1);
+            Assert.AreEqual("b", o1.Text2);
+
+            var o = new { Text = "READ ONLY" };
+            m = Energy.Base.Class.Mangle<string>(o, delegate (string _) { return (_ as string ?? "").Trim(); });
+            Assert.AreEqual(0, m);
+        }
+
+        public class TestClass1
+        {
+            public string Text1;
+            public string Text2 { get; set; }
+        }
     }
 }
