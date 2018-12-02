@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Query
 {
     /// <summary>
-    /// Support for parametrized queries.
+    /// Support class for parametrized queries.
     /// </summary>
     public class Parameter
     {
         #region Bag
 
+        /// <summary>
+        /// Represents list of parameters and their values.
+        /// Use it to define parameters for parametrized query and to parse it.
+        /// </summary>
         public class Bag : List { }
 
         #endregion
@@ -18,7 +23,7 @@ namespace Energy.Query
         #region List
 
         /// <summary>
-        /// Parameter bag.
+        /// Represents list of parameters and their values.
         /// Use it to define parameters for parametrized query and to parse it.
         /// </summary>
         public class List : Energy.Base.Collection.StringDictionary<object>
@@ -27,10 +32,14 @@ namespace Energy.Query
             /// <summary>Format</summary>
             public Energy.Query.Format Format { get { return _Format; } set { _Format = value; } }
 
+            #region Constructor
+
             public List()
             {
                 this.CaseSensitive = false;
             }
+
+            #endregion
 
             /// <summary>
             /// Parameter format dictionary.
@@ -133,8 +142,7 @@ namespace Energy.Query
             {
                 if (string.IsNullOrEmpty(input))
                     return input;
-                //Energy.Source.Query.Script dialect = _Dialect ?? Energy.Srouce.Dialect.Default;
-                //Energy.Base.Format.Quote = dialect.Quote;
+
                 Energy.Query.Format format = _Format;
                 if (_Format == null)
                     format = Energy.Query.Format.Default;
@@ -213,6 +221,67 @@ namespace Energy.Query
             NullAsZero = 2,
 
             ZeroAsNull = 4,
+        }
+
+        #endregion
+
+        #region Template
+
+        /// <summary>
+        /// Support for query templates.
+        /// </summary>
+        public class Template
+        {
+            #region Static
+
+            /// <summary>
+            /// Convert SQL query template which uses angle brackets
+            /// to parameterized query which uses at sign to define parameters.
+            /// </summary>
+            /// <param name="template"></param>
+            /// <returns></returns>
+            public static string ConvertToParameterizedQuery(string template)
+            {
+                if (string.IsNullOrEmpty(template))
+                    return template;
+
+                StringBuilder sb = new StringBuilder();
+
+                string pattern = @"<([^\r\n,>]+)(?:\s*,\s*[^\r\n\s,>]*)*>";
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(template);
+
+                int p = 0;
+
+                while (match.Success)
+                {
+                    int index = match.Index;
+                    int length = match.Length;
+                    if (index > p)
+                    {
+                        sb.Append(template.Substring(p, index - p));
+                    }
+                    p = index + length;
+                    string variable = match.Groups[1].Value;
+                    if (variable.Length > 0)
+                    {
+                        variable = variable.Trim();
+                        variable = Energy.Base.Text.ReplaceWhitespace(variable, "_");
+                        sb.Append("@");
+                        sb.Append(variable);
+                    }
+                    match = match.NextMatch();
+                }
+
+                if (p < template.Length)
+                {
+                    sb.Append(template.Substring(p));
+                }
+
+                return sb.ToString();
+            }
+
+            #endregion
         }
 
         #endregion

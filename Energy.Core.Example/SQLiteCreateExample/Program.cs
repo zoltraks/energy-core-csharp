@@ -40,7 +40,7 @@ namespace SQLiteCreateExample
             Console.WriteLine(db.Scalar("select time(time(), 'localtime');"));
             Console.WriteLine(db.Scalar("SELECT (STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))"));
             Energy.Interface.IDialect dialect = new Energy.Query.Dialect.SQLITE();
-            Energy.Query.Script script = new Energy.Query.Script.SQLite();
+            Energy.Interface.IDialect script = new Energy.Query.Dialect.SQLITE();
             string query;
             query = "select " + dialect.Format.CurrentStamp;
             Console.WriteLine(query);

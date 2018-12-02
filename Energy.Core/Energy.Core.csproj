@@ -85,7 +85,6 @@ To be used by wide range of applications, services, web or console programs.</De
 
   <ItemGroup>
     <Folder Include="Properties\" />
-    <Folder Include="Query\Standard\" />
   </ItemGroup>
 
 </Project>

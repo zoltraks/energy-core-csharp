@@ -46,7 +46,7 @@ namespace SqlServerPlainReport
         {
             Energy.Source.Structure.Table table = Energy.Source.Structure.Table.Create(typeof(UserTableRecord));
             string query;
-            Energy.Query.Script script = new Energy.Query.Script.MySQL();
+            Energy.Interface.IDialect script = new Energy.Query.Dialect.MYSQL();
 
 			query = script.DropTable(table.Name);
             if (db.Execute(query) < 0)
@@ -59,7 +59,7 @@ namespace SqlServerPlainReport
 
 			Energy.Query.Format format = Energy.Enumeration.SqlDialect.MYSQL;
 
-			query = script.CreateTable(table, null);
+			query = script.CreateTable(table);
             if (db.Execute(query) < 0)
             {
                 Console.WriteLine(db.ErrorMessage);

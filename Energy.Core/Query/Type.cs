@@ -115,8 +115,8 @@ namespace Energy.Query
         /// <returns></returns>
         public static bool IsNumeric(string type)
         {
-            type = Simplify(type);
-            return type == "NUMBER" || type == "INTEGER";
+            string simple = Simplify(type);
+            return simple == "NUMBER" || simple == "INTEGER";
         }
 
         #endregion
