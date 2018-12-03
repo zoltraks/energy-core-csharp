@@ -5,13 +5,14 @@ using System.Text;
 namespace Energy.Base
 {
     /// <summary>
-    /// Byte related functions
+    /// Collection of binary utility functions.
     /// </summary>
-    [Obsolete("Class moved to Energy.Base.Bit")]
-    public class Byte
+    public class Bit
     {
+        #region Reverse
+
         /// <summary>
-        /// Reverse order of bytes
+        /// Reverse order of bytes.
         /// <para>
         /// Exchange lower byte with higher one
         /// </para>
@@ -24,7 +25,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Reverse order of bytes
+        /// Reverse order of bytes.
         /// </summary>
         /// <param name="value">Unsigned int (32-bit)</param>
         /// <returns>Reversed numeric value</returns>
@@ -37,6 +38,8 @@ namespace Energy.Base
 
             return (ulong)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
         }
+
+        #endregion
 
         #region Compare
 
@@ -208,6 +211,34 @@ namespace Energy.Base
                     return 1;
             }
             return 0;
+        }
+
+        #endregion
+
+        #region Endianess
+
+        /// <summary>
+        /// Take up to two 16-bit unsigned words and return them as 32-bit unsigned word.
+        /// MSB / Big-Endian
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static UInt32 GetUInt32MSB(params UInt16[] array)
+        {
+            if (array == null || array.Length == 0)
+                return 0;
+            UInt32 result = 0;
+            switch (array.Length)
+            {
+                case 1:
+                    result = array[0];
+                    break;
+                default:
+                case 2:
+                    result = (uint)((array[0] << 16) + array[1]);
+                    break;
+            }
+            return result;
         }
 
         #endregion
