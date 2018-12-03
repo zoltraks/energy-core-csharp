@@ -63,22 +63,22 @@ VALUES
     )
 GO
 ";
-            result = Energy.Query.Parameter.Template.ConvertToParametrizedQuery(template);
+            result = Energy.Query.Parameter.Template.ConvertToParameterizedQuery(template);
             Assert.AreEqual(expect, result);
 
             template = "<a>";
             expect = "@a";
-            result = Energy.Query.Parameter.Template.ConvertToParametrizedQuery(template);
+            result = Energy.Query.Parameter.Template.ConvertToParameterizedQuery(template);
             Assert.AreEqual(expect, result);
 
             template = "<a>1";
             expect = "@a1";
-            result = Energy.Query.Parameter.Template.ConvertToParametrizedQuery(template);
+            result = Energy.Query.Parameter.Template.ConvertToParameterizedQuery(template);
             Assert.AreEqual(expect, result);
 
             template = "1<a>";
             expect = "1@a";
-            result = Energy.Query.Parameter.Template.ConvertToParametrizedQuery(template);
+            result = Energy.Query.Parameter.Template.ConvertToParameterizedQuery(template);
             Assert.AreEqual(expect, result);
         }
     }
