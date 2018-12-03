@@ -235,7 +235,7 @@ namespace Energy.Base
                     break;
                 default:
                 case 2:
-                    result = (uint)(array[0] << 16 + array[1]);
+                    result = (uint)((array[0] << 16) + array[1]);
                     break;
             }
             return result;
