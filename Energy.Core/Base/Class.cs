@@ -572,14 +572,52 @@ namespace Energy.Base
 
         #endregion
 
+        #region GetTypeWithInterface
+
+        /// <summary>
+        /// Get first type that implements specified interface.
+        /// Return null if not found.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static System.Type GetTypeWithInterface(System.Type[] types, System.Type interfaceType)
+        {
+            if (types == null || interfaceType == null || types.Length == 0)
+                return null;
+            List<System.Type> typeList = new List<System.Type>();
+            foreach (System.Type type in types)
+            {
+                System.Type[] interfaces = type.GetInterfaces();
+                foreach (System.Type needle in interfaces)
+                {
+                    if (needle == interfaceType)
+                    {
+                        return type;
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
         #region GetTypesWithInterface
 
+        /// <summary>
+        /// Filter types that implements specified interface.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
         public static System.Type[] GetTypesWithInterface(System.Type[] types, System.Type interfaceType)
         {
-            if (types == null || types.Length == 0)
-                return types;
+            if (types == null)
+                return null;
             if (interfaceType == null)
                 return null;
+            if (types.Length == 0)
+                return types;
             List<System.Type> typeList = new List<System.Type>();
             foreach (System.Type type in types)
             {
