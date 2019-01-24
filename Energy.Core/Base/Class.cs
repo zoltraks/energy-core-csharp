@@ -453,6 +453,27 @@ namespace Energy.Base
             return null;
         }
 
+        /// <summary>
+        /// Get desired attribute for a class or null if not found.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <typeparam name="T">Attribute type</typeparam>
+        /// <returns></returns>
+        public static T GetClassAttribute<T>(Type type)
+        {
+            System.Reflection.MemberInfo info = type;
+            object[] attributes = info.GetCustomAttributes(true);
+            System.Type attributeType = typeof(T);
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                if (attributes[i].GetType() == attributeType)
+                {
+                    return (T)attributes[i];
+                }
+            }
+            return default(T);
+        }
+
         #endregion
 
         #region GetValueWithAttribute / GetValuesWithAttribute
@@ -572,97 +593,9 @@ namespace Energy.Base
 
         #endregion
 
-        #region GetTypeWithInterface
-
-        /// <summary>
-        /// Get first type that implements specified interface.
-        /// Return null if not found.
-        /// </summary>
-        /// <param name="types"></param>
-        /// <param name="interfaceType"></param>
-        /// <returns></returns>
-        public static System.Type GetTypeWithInterface(System.Type[] types, System.Type interfaceType)
-        {
-            if (types == null || interfaceType == null || types.Length == 0)
-                return null;
-            List<System.Type> typeList = new List<System.Type>();
-            foreach (System.Type type in types)
-            {
-                System.Type[] interfaces = type.GetInterfaces();
-                foreach (System.Type needle in interfaces)
-                {
-                    if (needle == interfaceType)
-                    {
-                        return type;
-                    }
-                }
-            }
-            return null;
-        }
-
-        #endregion
-
-        #region GetTypesWithInterface
-
-        /// <summary>
-        /// Filter types that implements specified interface.
-        /// </summary>
-        /// <param name="types"></param>
-        /// <param name="interfaceType"></param>
-        /// <returns></returns>
-        public static System.Type[] GetTypesWithInterface(System.Type[] types, System.Type interfaceType)
-        {
-            if (types == null)
-                return null;
-            if (interfaceType == null)
-                return null;
-            if (types.Length == 0)
-                return types;
-            List<System.Type> typeList = new List<System.Type>();
-            foreach (System.Type type in types)
-            {
-                System.Type[] interfaces = type.GetInterfaces();
-                foreach (System.Type needle in interfaces)
-                {
-                    if (needle == interfaceType)
-                    {
-                        typeList.Add(type);
-                        break; // foreach
-                    }
-                }
-            }
-            return typeList.ToArray();
-        }
-
-        #endregion
-
-        #region GetTypesWithAttribute
-
-        public static System.Type[] GetTypesWithAttribute(System.Type[] types, System.Type attributeType)
-        {
-            if (types == null || types.Length == 0)
-                return types;
-            if (attributeType == null)
-                return null;
-            List<System.Type> typeList = new List<System.Type>();
-            foreach (System.Type type in types)
-            {
-                object[] look = type.GetCustomAttributes(attributeType, true);
-                if (look.Length > 0)
-                {
-                    typeList.Add(type);
-                }
-            }
-            return typeList.ToArray();
-        }
-
-        #endregion
-
         #region GetTypes
 
-        public delegate bool TypeFilter(System.Type type);
-
-        public static System.Type[] GetTypes(Assembly[] assemblies, TypeFilter filter)
+        public static System.Type[] GetTypes(Assembly[] assemblies, Energy.Base.Anonymous.Function<System.Type, bool> filter)
         {
             if (assemblies == null)
                 return null;
@@ -709,9 +642,124 @@ namespace Energy.Base
             return GetTypes(new Assembly[] { assembly }, null);
         }
 
-        public static Type[] GetTypes(Assembly assembly, TypeFilter filter)
+        public static Type[] GetTypes(Assembly assembly, Energy.Base.Anonymous.Function<System.Type, bool> filter)
         {
             return GetTypes(new Assembly[] { assembly }, filter);
+        }
+
+        #endregion
+
+        #region GetTypeWithInterface
+
+        /// <summary>
+        /// Get first type that implements specified interface.
+        /// Return null if not found.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static System.Type GetTypeWithInterface(System.Type[] types, System.Type interfaceType)
+        {
+            if (types == null || interfaceType == null || types.Length == 0)
+                return null;
+            foreach (System.Type type in types)
+            {
+                System.Type[] interfaces = type.GetInterfaces();
+                foreach (System.Type needle in interfaces)
+                {
+                    if (needle == interfaceType)
+                    {
+                        return type;
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region GetTypesWithInterface
+
+        /// <summary>
+        /// Filter types that implements specified interface.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static System.Type[] GetTypesWithInterface(System.Type[] types, System.Type interfaceType)
+        {
+            if (types == null || interfaceType == null)
+                return null;
+            if (types.Length == 0)
+                return types;
+            List<System.Type> typeList = new List<System.Type>();
+            foreach (System.Type type in types)
+            {
+                System.Type[] interfaces = type.GetInterfaces();
+                foreach (System.Type needle in interfaces)
+                {
+                    if (needle == interfaceType)
+                    {
+                        typeList.Add(type);
+                        break; // foreach
+                    }
+                }
+            }
+            return typeList.ToArray();
+        }
+
+        #endregion
+
+        #region GetTypeWithAttribute
+
+        /// <summary>
+        /// Get first type having specified attribute.
+        /// Return null if not found.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
+        public static System.Type GetTypeWithAttribute(System.Type[] types, System.Type attributeType)
+        {
+            if (types == null || attributeType == null || types.Length == 0)
+                return null;
+            foreach (System.Type type in types)
+            {
+                object[] look = type.GetCustomAttributes(attributeType, true);
+                if (look.Length > 0)
+                {
+                    return type;
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region GetTypesWithAttribute
+
+        /// <summary>
+        /// Filter types that have specified attribute.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="attributeType"></param>
+        /// <returns></returns>
+        public static System.Type[] GetTypesWithAttribute(System.Type[] types, System.Type attributeType)
+        {
+            if (types == null || attributeType == null)
+                return null;
+            if (types.Length == 0)
+                return types;
+            List<System.Type> typeList = new List<System.Type>();
+            foreach (System.Type type in types)
+            {
+                object[] look = type.GetCustomAttributes(attributeType, true);
+                if (look.Length > 0)
+                {
+                    typeList.Add(type);
+                }
+            }
+            return typeList.ToArray();
         }
 
         #endregion

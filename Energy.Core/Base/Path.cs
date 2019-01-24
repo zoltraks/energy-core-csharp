@@ -144,7 +144,7 @@ namespace Energy.Base
         #region Separator
 
         /// <summary>
-        /// Change any directory separator to native one for compatibility
+        /// Change any directory separator to native one for compatibility.
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>

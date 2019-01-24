@@ -111,21 +111,30 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include traling path directory separator if needed
+        /// Include traling path directory separator if needed.
         /// </summary>
         /// <param name="path">string</param>
         /// <returns>string</returns>
         public static string IncludeTrailingPathSeparator(string path)
         {
-            if (String.IsNullOrEmpty(path)) return "";
-            if (System.IO.Path.DirectorySeparatorChar != '/' && path.Contains("/"))
-            {
-                path = path.Replace('/', System.IO.Path.DirectorySeparatorChar);
-            }
-            if (!path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-            {
-                path += System.IO.Path.DirectorySeparatorChar;
-            }
+            if (path == null)
+                return null;
+            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            path += System.IO.Path.DirectorySeparatorChar;
+            return path;
+        }
+
+        /// <summary>
+        /// Include traling path directory separator if needed.
+        /// </summary>
+        /// <param name="path">string</param>
+        /// <returns>string</returns>
+        public static string IncludeTrailingDirectorySeparator(string path)
+        {
+            if (path == null)
+                return null;
+            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            path += System.IO.Path.DirectorySeparatorChar;
             return path;
         }
 
@@ -518,13 +527,13 @@ namespace Energy.Base
 
         #endregion
 
-        #region Make directory
+        #region MakeDirectory
 
         /// <summary>
-        /// Create directory if not exists
+        /// Create directory if not exists.
         /// </summary>
         /// <param name="path"></param>
-        /// <returns>True if directory exists or was created</returns>
+        /// <returns>Returns true if a directory exists or has been created</returns>
         public static bool MakeDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -549,14 +558,14 @@ namespace Energy.Base
 
         #endregion
 
-        #region Remove directory
+        #region RemoveDirectory
 
         /// <summary>
-        /// Remove directory if exists
+        /// Remove directory if exists.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="recursive"></param>
-        /// <returns>True if directory was removed or not exists</returns>
+        /// <returns>Returns true if directory has been removed or not exists</returns>
         public static bool RemoveDirectory(string path, bool recursive)
         {
             if (string.IsNullOrEmpty(path))
@@ -580,10 +589,10 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove directory if exists and is empty
+        /// Remove directory if exists and is empty.
         /// </summary>
         /// <param name="path"></param>
-        /// <returns>True if directory was removed or not exists</returns>
+        /// <returns>Returns true if directory has been removed or not exists</returns>
         public static bool RemoveDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -604,6 +613,40 @@ namespace Energy.Base
                 Energy.Core.Bug.Catch(x);
                 return false;
             }
+        }
+
+        #endregion
+
+        #region GetBaseDirectory
+
+        /// <summary>
+        /// Gets the base directory that the assembly resolver uses to probe for assemblies.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetBaseDirectory()
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            return baseDirectory;
+        }
+
+        #endregion
+
+        #region GetBasePath
+
+        /// <summary>
+        /// Gets the base path that the assembly resolver uses to probe for assemblies.
+        /// Return path with trailing directory separator.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetBasePath()
+        {
+            string path = GetBaseDirectory();
+            int index = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+            if (0 > index || index < path.Length - 1)
+            {
+                path += System.IO.Path.DirectorySeparatorChar;
+            }
+            return path;
         }
 
         #endregion
