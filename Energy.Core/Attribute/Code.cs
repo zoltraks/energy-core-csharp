@@ -550,5 +550,67 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        /// <summary>
+        /// Code is just a draft and should yet to be written
+        /// </summary>
+        public class DraftAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code was abandoned and should be removed
+        /// </summary>
+        public class AbandonedAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
     }
 }
