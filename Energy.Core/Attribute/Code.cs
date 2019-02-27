@@ -612,5 +612,45 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        /// <summary>
+        /// Code needs to be improved
+        /// </summary>
+        public class ImproveAttribute : CodeAttribute
+        {
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImproveAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public ImproveAttribute(string description)
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public ImproveAttribute(string description, string help)
+                : this(help)
+            {
+                this.Help = help;
+            }
+        }
     }
 }
