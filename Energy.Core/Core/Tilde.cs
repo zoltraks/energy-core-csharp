@@ -795,6 +795,14 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Write empty line.
+        /// </summary>
+        public static void WriteLine()
+        {
+            Write(Energy.Base.Text.NL);
+        }
+
+        /// <summary>
         /// Write plain text without formatting.
         /// </summary>
         /// <param name="value"></param>
