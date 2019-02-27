@@ -197,6 +197,11 @@ namespace Energy.Core
             _Colorless = value;
         }
 
+        /// <summary>
+        /// Process writing to console in separate thread.
+        /// </summary>
+        public static bool RunInBackground { get; set; }
+
         public const string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
         private static string _PauseText = DefaultPauseText;
         public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
@@ -501,42 +506,13 @@ namespace Energy.Core
         /// <param name="value"></param>
         public static void Write(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return;
-            ColorTextList list = ColorTextList.Explode(value);
-            if (list.Count == 0)
-                return;
-            lock (_ConsoleLock)
+            if (!RunInBackground)
             {
-                // TODO Fix new lines :)
-                // TODO Optionally wrap words?
-                // TODO Check security
-                System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
-                System.ConsoleColor defaultForegroundColor = _Foreground != null
-                    ? (ConsoleColor)_Foreground
-                    : previousForegroundColor;
-                for (int i = 0; i < list.Count; i++)
-                {
-                    if (!_Colorless)
-                    {
-                        System.ConsoleColor foregroundColor = list[i].Color != null
-                            ? (ConsoleColor)list[i].Color
-                            : defaultForegroundColor;
-                        try
-                        {
-                            System.Console.ForegroundColor = foregroundColor;
-                        }
-                        catch (System.Security.SecurityException)
-                        {
-                            _Colorless = true;
-                        }
-                    }
-                    System.Console.Write(list[i].Text);
-                }
-                if (!_Colorless)
-                {
-                    System.Console.ForegroundColor = previousForegroundColor;
-                }
+                RealWrite(value);
+            }
+            else
+            {
+                EnqueueWrite(value);
             }
         }
 
@@ -755,6 +731,59 @@ namespace Energy.Core
         {
             Write(string.Concat(ConsoleColorToTildeColor(color), Escape(text)
                 , Energy.Base.Text.NL));
+        }
+
+        #endregion
+
+        #region Processing
+
+        private static void RealWrite(object value)
+        {
+            if (value == null)
+                return;
+
+            string text = null;
+
+            if (value is string)
+                text = value as string;
+
+            if (string.IsNullOrEmpty(text))
+                return;
+            ColorTextList list = ColorTextList.Explode(text);
+            if (list.Count == 0)
+                return;
+            lock (_ConsoleLock)
+            {
+                // TODO Fix new lines :)
+                // TODO Optionally wrap words?
+                // TODO Check security
+                System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
+                System.ConsoleColor defaultForegroundColor = _Foreground != null
+                    ? (ConsoleColor)_Foreground
+                    : previousForegroundColor;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (!_Colorless)
+                    {
+                        System.ConsoleColor foregroundColor = list[i].Color != null
+                            ? (ConsoleColor)list[i].Color
+                            : defaultForegroundColor;
+                        try
+                        {
+                            System.Console.ForegroundColor = foregroundColor;
+                        }
+                        catch (System.Security.SecurityException)
+                        {
+                            _Colorless = true;
+                        }
+                    }
+                    System.Console.Write(list[i].Text);
+                }
+                if (!_Colorless)
+                {
+                    System.Console.ForegroundColor = previousForegroundColor;
+                }
+            }
         }
 
         #endregion

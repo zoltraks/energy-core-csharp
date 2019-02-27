@@ -8,6 +8,8 @@ namespace TildeColorText
     {
         static void Main(string[] args)
         {
+            TryBackground();
+
             Energy.Core.Tilde.WriteLine("~white~White text");
             Energy.Core.Tilde.WriteLine("~yellow~Yellow text");
             Energy.Core.Tilde.WriteLine("~green~Green text");
@@ -28,6 +30,20 @@ namespace TildeColorText
                 , example.Length, (int)Energy.Core.Tilde.Length(example));
             Energy.Core.Tilde.WriteLine(ConsoleColor.Yellow, example);
 
+            TryException();
+
+            Energy.Core.Tilde.Break(2);
+
+            Energy.Core.Tilde.Pause();
+        }
+
+        private static void TryBackground()
+        {
+            Energy.Core.Tilde.WriteLine
+        }
+
+        private static void TryException()
+        {
             try
             {
                 throw new NotSupportedException();
@@ -36,10 +52,6 @@ namespace TildeColorText
             {
                 Energy.Core.Tilde.WriteException(exception, true);
             }
-
-            Energy.Core.Tilde.Break(2);
-
-            Energy.Core.Tilde.Pause();
         }
     }
 }
