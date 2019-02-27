@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -200,7 +201,7 @@ namespace Energy.Core
         /// <summary>
         /// Process writing to console in separate thread.
         /// </summary>
-        public static bool RunInBackground { get; set; }
+        public static bool RunInThread { get; set; }
 
         public const string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
         private static string _PauseText = DefaultPauseText;
@@ -252,6 +253,42 @@ namespace Energy.Core
         /// Cheat sheet for all colors defined by default
         /// </summary>
         public static string ExampleColorPalleteTildeString { get { return _ExampleColorPalleteTildeString; } set { _ExampleColorPalleteTildeString = value; } }
+
+        #endregion
+
+        #region Example
+
+        public static class Example
+        {
+            public static string GetRainbowLine(string text, int limit, int offset)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                string[] rainbow = new string[]
+                {
+                    Color.DarkBlue, Color.Blue, Color.Green, Color.Yellow, Color.Red, Color.DarkRed,
+                };
+
+                int n = offset;
+
+                if (limit < 1 || limit == text.Length)
+                {
+                    return rainbow[offset % rainbow.Length] + text;
+                }
+
+                StringBuilder s = new StringBuilder();
+                while (s.Length < limit)
+                {
+                    s.Append(rainbow[n++ % rainbow.Length]);
+                    s.Append(text);
+                }
+
+                return s.ToString();
+            }
+        }
 
         #endregion
 
@@ -504,9 +541,10 @@ namespace Energy.Core
         /// </code>
         /// </example>
         /// <param name="value"></param>
+        [Energy.Attribute.Code.Extend("Add support for non strings with optional color formating", Expected = "feature")]
         public static void Write(string value)
         {
-            if (!RunInBackground)
+            if (!RunInThread)
             {
                 RealWrite(value);
             }
@@ -723,7 +761,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write text using specifed color and escaping any tilde characters in text
+        /// Write text using specifed color and escaping any tilde characters in text.
         /// </summary>
         /// <param name="color"></param>
         /// <param name="text"></param>
@@ -733,10 +771,68 @@ namespace Energy.Core
                 , Energy.Base.Text.NL));
         }
 
+        /// <summary>
+        /// Write plain text without formatting.
+        /// </summary>
+        /// <param name="value"></param>
+        public static void WritePlain(string value)
+        {
+            Write(Escape(value));
+        }
+
+        #endregion
+
+        #region Private
+
+        private static readonly object _ThreadLock = new object();
+
+        private static Energy.Base.Queue _Queue;
+
+        private static Energy.Base.Queue Queue
+        {
+            get
+            {
+                if (_Queue == null)
+                {
+                    lock (_ThreadLock)
+                    {
+                        if (_Queue == null)
+                        {
+                            _Queue = CreateQueue();
+                        }
+                    }
+                }
+                return _Queue;
+            }
+        }
+
+        private static Thread _Thread = null;
+
+        private static int _ThreadAlive = 500;
+
+        private static int ThreadAlive
+        {
+            get
+            {
+                lock (_ThreadLock)
+                {
+                    return _ThreadAlive;
+                }
+            }
+            set
+            {
+                lock (_ThreadLock)
+                {
+                    _ThreadAlive = value;
+                }
+            }
+        }
+
         #endregion
 
         #region Processing
 
+        [Energy.Attribute.Code.Extend("Add support for non strings with optional color formating", Expected = "feature")]
         private static void RealWrite(object value)
         {
             if (value == null)
@@ -784,6 +880,76 @@ namespace Energy.Core
                     System.Console.ForegroundColor = previousForegroundColor;
                 }
             }
+        }
+
+        private static void EnqueueWrite(object value)
+        {
+            Queue.Push(value);
+        }
+
+        private static void EnsureThread()
+        {
+            if (_Thread != null)
+            {
+                lock (_ThreadLock)
+                {
+                    if (_Thread != null)
+                    {
+                        if (!_Thread.IsAlive)
+                        {
+                            _Thread = null;
+                        }
+                    }
+                }
+            }
+            if (_Thread == null)
+            {
+                lock (_ThreadLock)
+                {
+                    if (_Thread == null)
+                    {
+                        _Thread = new Thread(ThreadWork)
+                        {
+                            IsBackground = false,
+                            CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                        };
+                        _Thread.Start();
+                    }
+                }
+            }
+        }
+
+        private static Energy.Base.Queue CreateQueue()
+        {
+            Energy.Base.Queue o = new Energy.Base.Queue();
+            o.OnPush += QueueOnPush;
+            return o;
+        }
+
+        private static ManualResetEvent QueuePush = new ManualResetEvent(false);
+
+        private static void QueueOnPush(object self)
+        {
+            QueuePush.Set();
+            EnsureThread();
+        }
+
+        private static void ThreadWork()
+        {
+            do
+            {
+                while (!Queue.IsEmpty)
+                {
+                    object value = Queue.Pull();
+                    RealWrite(value);
+                }
+                QueuePush.Reset();
+                if (QueuePush.WaitOne(ThreadAlive))
+                {
+                    continue;
+                }
+            }
+            while (false);
         }
 
         #endregion

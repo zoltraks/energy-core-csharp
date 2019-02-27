@@ -8,7 +8,7 @@ namespace TildeColorText
     {
         static void Main(string[] args)
         {
-            TryBackground();
+            TryThread();
 
             Energy.Core.Tilde.WriteLine("~white~White text");
             Energy.Core.Tilde.WriteLine("~yellow~Yellow text");
@@ -37,9 +37,17 @@ namespace TildeColorText
             Energy.Core.Tilde.Pause();
         }
 
-        private static void TryBackground()
+        private static void TryThread()
         {
-            Energy.Core.Tilde.WriteLine
+            Energy.Core.Tilde.RunInThread = true;
+            Energy.Core.Tilde.WritePlain("~y~");
+            string input;
+            input = Energy.Core.Tilde.Input("How many iterations?", "1");
+            int n = Energy.Base.Cast.AsInteger(input);
+            for (int i = 0; i < n; i++)
+            {
+                Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.GetRainbowLine("-", 60, i));
+            }
         }
 
         private static void TryException()
