@@ -39,15 +39,20 @@ namespace TildeColorText
 
         private static void TryThread()
         {
-            Energy.Core.Tilde.RunInThread = true;
-            Energy.Core.Tilde.WritePlain("~y~");
             string input;
             input = Energy.Core.Tilde.Input("How many iterations?", "1");
             int n = Energy.Base.Cast.AsInteger(input);
+            input = Energy.Core.Tilde.Input("Delay between?", "0");
+            int d = Energy.Base.Cast.AsInteger(input);
+
+            Energy.Core.Tilde.RunInThread = true;
             for (int i = 0; i < n; i++)
             {
-                Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.GetRainbowLine("-", 60, i));
+                Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.GetRainbowLine("-=-", Energy.Core.Tilde.Width - 1, i));
+                System.Threading.Thread.Sleep(d);
             }
+
+            Energy.Core.Tilde.Pause();
         }
 
         private static void TryException()

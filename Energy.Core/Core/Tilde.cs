@@ -3,6 +3,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Diagnostics;
+using System.IO;
 
 namespace Energy.Core
 {
@@ -256,6 +258,17 @@ namespace Energy.Core
 
         #endregion
 
+        #region Default
+
+        public static class Default
+        {
+            public static int WindowWidth = 80;
+
+            public static int WindowHeight = 25;
+        }
+
+        #endregion
+
         #region Example
 
         public static class Example
@@ -280,10 +293,20 @@ namespace Energy.Core
                 }
 
                 StringBuilder s = new StringBuilder();
-                while (s.Length < limit)
+                int l = 0;
+                int d = text.Length;
+                while (l < limit)
                 {
                     s.Append(rainbow[n++ % rainbow.Length]);
-                    s.Append(text);
+                    if (l + d <= limit)
+                    {
+                        s.Append(text);
+                    }
+                    else
+                    {
+                        s.Append(text.Substring(0, limit - l));
+                    }
+                    l += d;
                 }
 
                 return s.ToString();
@@ -308,7 +331,7 @@ namespace Energy.Core
                     value = "";
                 string message = value == "" ? AskSimpleText : AskChangeText;
                 message = string.Format(message, question, value);
-                Tilde.Write(message);
+                Energy.Core.Tilde.RealWrite(message);
             }
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
@@ -887,6 +910,8 @@ namespace Energy.Core
             Queue.Push(value);
         }
 
+        private static int bugThreadOrphan;
+
         private static void EnsureThread()
         {
             if (_Thread != null)
@@ -898,6 +923,11 @@ namespace Energy.Core
                         if (!_Thread.IsAlive)
                         {
                             _Thread = null;
+                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " " 
+                                + "Energy.Core.Tilde Thread is not alive anymore ("
+                                + (bugThreadOrphan = Energy.Base.Number.Increment(bugThreadOrphan)).ToString()
+                                + ")"
+                                );
                         }
                     }
                 }
@@ -936,20 +966,56 @@ namespace Energy.Core
 
         private static void ThreadWork()
         {
-            do
+            try
             {
-                while (!Queue.IsEmpty)
+                while (true)
                 {
-                    object value = Queue.Pull();
-                    RealWrite(value);
-                }
-                QueuePush.Reset();
-                if (QueuePush.WaitOne(ThreadAlive))
-                {
-                    continue;
+                    while (!Queue.IsEmpty)
+                    {
+                        object value = Queue.Pull();
+                        RealWrite(value);
+                    }
+                    QueuePush.Reset();
+                    if (!QueuePush.WaitOne(ThreadAlive))
+                    {
+                        break;
+                    }
                 }
             }
-            while (false);
+            catch (ThreadAbortException)
+            {
+                Debug.WriteLine(Energy.Base.Clock.CurrentTime + " "
+                    + "Energy.Core.Tilde Thread aborted"
+                    );
+            }
+        }
+
+        private static int GetWidth()
+        {
+            int width = 0;
+            try
+            {
+                width = Console.WindowWidth;
+            }
+            catch
+            {
+                width = Default.WindowWidth;
+            }
+            return width;
+        }
+
+        private static int GetHeight()
+        {
+            int height = 0;
+            try
+            {
+                height = Console.WindowHeight;
+            }
+            catch
+            {
+                height = Default.WindowHeight;
+            }
+            return height;
         }
 
         #endregion
@@ -1327,7 +1393,7 @@ namespace Energy.Core
                 if (message.Contains("{0}"))
                     message = string.Format(message, defaultValue);
             }
-            Energy.Core.Tilde.Write(message);
+            Energy.Core.Tilde.RealWrite(message);
             string input = Console.ReadLine();
             if (string.IsNullOrEmpty(input))
                 input = defaultValue;
@@ -1342,7 +1408,7 @@ namespace Energy.Core
         }
 
         #endregion
-
+        
         #region Length
 
         /// <summary>
@@ -1354,6 +1420,31 @@ namespace Energy.Core
         public static int Length(string example)
         {
             return ColorTextList.Explode(example).GetTotalLength();
+        }
+
+
+        #endregion
+
+        #region Width
+
+        public static int Width
+        {
+            get
+            {
+                return GetWidth();
+            }
+        }
+
+        #endregion
+
+        #region Height
+
+        public static int Height
+        {
+            get
+            {
+                return GetHeight();
+            }
         }
 
         #endregion
