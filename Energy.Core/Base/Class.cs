@@ -139,7 +139,6 @@ namespace Energy.Base
         /// </summary>
         /// <param name="type">Class type</param>
         /// <param name="name">Field or property name</param>
-        /// <param name="attribute">Attribute class type</param>
         /// <returns>Attribute or null if not found</returns>
         public static T GetFieldOrPropertyAttribute<T>(Type type, string name)
         {
