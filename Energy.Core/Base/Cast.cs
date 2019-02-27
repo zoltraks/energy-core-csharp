@@ -1145,19 +1145,20 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static double StringToDouble(string value, NumberStyles numberStyles)
         {
+            value = Energy.Base.Text.Trim(value);
             if (null == value || 0 == value.Length)
+            {
                 return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
             double result;
             if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
+            {
                 return result;
-            string trim = Energy.Base.Text.Trim(value);
-            bool hasComma = value.IndexOf(',') >= 0;
-            if (trim.Length == value.Length && !hasComma && value.IndexOf('.') < 0)
-                return 0;
-            if (hasComma)
-                value = value.Replace(',', '.');
-            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
-                return result;
+            }
             if (0 == string.Compare(DOUBLE_MIN_STRING, value, true))
                 return double.MinValue;
             if (0 == string.Compare(DOUBLE_MAX_STRING, value, true))

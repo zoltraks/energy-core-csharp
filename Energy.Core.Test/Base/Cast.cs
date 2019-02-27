@@ -52,6 +52,30 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void CastObjectToDecimal()
+        {
+            string s;
+            object o;
+            decimal d;
+
+            s = "15,0001";
+            d = Energy.Base.Cast.StringToDecimal(s);
+            Assert.AreEqual(15.0001m, d);
+
+            s = "15.0001";
+            d = Energy.Base.Cast.StringToDecimal(s);
+            Assert.AreEqual(15.0001m, d);
+
+            o = 15.0001f;
+            d = Energy.Base.Cast.ObjectToDecimal(s);
+            Assert.AreEqual(15.0001m, d);
+
+            o = "15,0001";
+            d = Energy.Base.Cast.ObjectToDecimal(s);
+            Assert.AreEqual(15.0001m, d);
+        }
+
+        [TestMethod]
         public void CastStringToInteger()
         {
             string str1 = "15,001";
@@ -158,7 +182,7 @@ namespace Energy.Core.Test.Base
             string s7 = Energy.Base.Cast.Base64ToString(s6);
             byte[] b2 = System.Text.Encoding.Unicode.GetBytes(s7);
             byte[] b3 = new byte[] { 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff };
-            int c1 = Energy.Base.Byte.Compare(b2, b3);
+            int c1 = Energy.Base.Bit.Compare(b2, b3);
             Assert.AreEqual(0, c1);
         }
 
