@@ -39,9 +39,9 @@ namespace Energy.Core.Test.Query
             Assert.AreEqual(expect, result);
 
             format.Bracket.Object = "[]";
-            format.Bracket.Object.Include = "[]]";
+            format.Bracket.Object.Include = "]]";
             value = "[]";
-            expect = "[[[]]]";
+            expect = "[[]]]";
             result = format.Object(value);
             Assert.AreEqual(expect, result);
         }
