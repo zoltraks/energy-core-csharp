@@ -1805,8 +1805,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Strip
-
         #region DecodeControlString
 
         private static Dictionary<Class.ControlStringOptions, string> _ControlStringExpressionCache;
@@ -2056,8 +2054,6 @@ namespace Energy.Base
 
             return sb.ToString();
         }
-
-        #endregion
 
         #endregion
 
@@ -2439,7 +2435,9 @@ namespace Energy.Base
         public static string Strip(string text, string quote, string escape)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return text;
+            }
             int a = 0;
             int b = text.Length;
             if (text.StartsWith(quote))
@@ -2452,7 +2450,11 @@ namespace Energy.Base
                 b -= quote.Length;
             }
             string cut = text.Substring(a, b);
-            return cut.Replace(escape + quote, quote);
+            if (!string.IsNullOrEmpty(escape))
+            {
+                cut = cut.Replace(escape + quote, quote);
+            }
+            return cut;
         }
 
         #endregion

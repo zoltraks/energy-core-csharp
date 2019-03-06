@@ -195,6 +195,16 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Text.Strip(value, "'", "\\");
             expect = "X'Y";
             Assert.AreEqual(expect, result);
+            value = "]]]]";
+            expect = "]";
+            result = Energy.Base.Text.Strip(value, ']');
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Strip(value, ']', ']');
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Strip(value, "]");
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Strip(value, "]", "]");
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]
