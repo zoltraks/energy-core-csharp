@@ -854,7 +854,7 @@ namespace Energy.Base
         {
             if (string.IsNullOrEmpty(text))
                 return text;
-            text = Regex.Replace(text, @"\s", replacement);
+            text = Regex.Replace(text, @"\s+", replacement);
             return text;
         }
 

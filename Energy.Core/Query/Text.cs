@@ -5,7 +5,8 @@ using System.Text;
 namespace Energy.Query
 {
     /// <summary>
-    /// Query text helpers
+    /// Query script helpers.
+    /// Helper functions for working with SQL query text.
     /// </summary>
     public class Text
     {
@@ -36,6 +37,7 @@ namespace Energy.Query
         /// <summary>
         /// Quote string value using specified quotation mark.
         /// Use apostrophe (') for values and quotes (") for database object names.
+        /// Specify text to be returned when value is null or pass null to use default "NULL".
         /// </summary>
         /// <param name="value"></param>
         /// <param name="quote"></param>
@@ -76,9 +78,11 @@ namespace Energy.Query
         {
             return Quote(value, quote, null);
         }
+
         /// <summary>
         /// Quote string value using specified quotation mark.
         /// You might use square parenthesis ([]) to use T-SQL style quotation for database object names.
+        /// Specify text to be returned when value is null or pass null to use default "NULL".
         /// </summary>
         /// <param name="value"></param>
         /// <param name="quote"></param>

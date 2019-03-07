@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -86,6 +87,40 @@ namespace Energy.Base
         public static readonly string StringListOfValuesWithDescription = "(?<1>[a-zA-Z_0-9]+)\\s*(?:\\((?<2>(?:\\)\\)|[^\\)])*)\\))?\\s*[,|]?\\s*";
 
         /// <summary>
+        /// Matching for database column type, optional argument, nullability option and default values.
+        /// </summary>
+        public static readonly string SqlTypeGenericDefinition = @"
+(?<type>
+  (?:[a-zA-Z][a-zA-Z0-9_]*)
+  (?:\s*(?!NOT)[a-zA-Z][a-zA-Z0-9_]*){0,1}
+)
+
+(?<parameter>
+  (?:\s*)
+  \(
+    (?:\s*(?:(?<size>[0-9]+)\s*))
+    (?:(?:(?:,\s*)(?<extra>[0-9])*\s*)?)*?
+  \)
+)?
+
+(?:\s*(?:
+
+(?<null>(?:NOT\s*)?(?:NULL))
+
+|
+
+(?:DEFAULT\s*)
+(?<default>""(?:""""|[^""])*""|'(?:''|[^'])*'|[a-zA-Z_][a-zA-Z_\-0-9]*)?
+
+|
+
+(?<option>AUTO_INCREMENT|COMMENT|COLLATE|FORMAT|COLUMN_FORMAT)
+(?:\s*(?<value>""(?:""""|[^""])*""|'(?:''|[^'])*'|[a-zA-Z_][a-zA-Z_\-0-9]*))?
+
+))*
+";
+
+        /// <summary>
         /// Expression for splitting path into segments
         /// </summary>
         public static readonly string PathSplitCapture = @"
@@ -117,6 +152,8 @@ namespace Energy.Base
 
         #region Utility
 
+        #region Escape
+
         public static string EscapeJoin(string glue, char[] array)
         {
             if (array == null)
@@ -146,6 +183,125 @@ namespace Energy.Base
                 s.Append(suffix);
             }
             return s.ToString();
+        }
+
+        #endregion
+
+        #region Group
+
+        /// <summary>
+        /// Get group description list from regular expression match.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="value"></param>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static Class.GroupDescription GetGroupDescription(string pattern, string value, RegexOptions option)
+        {
+            Regex regex = new Regex(pattern, option);
+            return GetGroupDescription(regex, regex.Match(value));
+        }
+
+        /// <summary>
+        /// Get group description list from regular expression match.
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public static Class.GroupDescription GetGroupDescription(string pattern, Match match)
+        {
+            Regex regex = new Regex(pattern);
+            return GetGroupDescription(regex, match);
+        }
+
+        /// <summary>
+        /// Get group description list from regular expression match.
+        /// </summary>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public static Class.GroupDescription GetGroupDescription(Match match)
+        {
+            return GetGroupDescription(default(Regex), match);
+        }
+
+        /// <summary>
+        /// Get group description list from regular expression match.
+        /// </summary>
+        /// <param name="regex"></param>
+        /// <param name="match"></param>
+        /// <returns></returns>
+        public static Class.GroupDescription GetGroupDescription(Regex regex, Match match)
+        {
+            Class.GroupDescription result;
+            result = new Class.GroupDescription();
+            string[] groupNames = null == regex ? null : regex.GetGroupNames();
+            for (int i = 0; i < match.Groups.Count; i++)
+            {
+                Group group = match.Groups[i];
+                Class.GroupDescription.Item item = new Class.GroupDescription.Item()
+                {
+                    Key = groupNames != null && groupNames.Length > i 
+                        ? groupNames[i] : null,
+                    Value = group.Value,
+                    Index = group.Index,
+                    Length = group.Length,
+                    Order = i,
+                };
+                result.Add(item);
+            }
+            return result;
+        }
+        #endregion
+
+        #endregion
+
+        #region Class
+
+        public class Class
+        {
+            public class GroupDescription : List<GroupDescription.Item>
+            {
+                public class Item
+                {
+                    public string Key;
+                    public string Value;
+                    public int Index;
+                    public int Length;
+                    public int? Order;
+
+                    public override string ToString()
+                    {
+                        List<string> l = new List<string>();
+                        if (Order != null)
+                        {
+                            l.Add("" + Order + ".");
+                        }
+                        if (Key != null)
+                        {
+                            if (Key != "")
+                                l.Add("(" + Key + ")");
+                        }
+                        if (!string.IsNullOrEmpty(Value))
+                        {
+                            if (l.Count > 0)
+                                l.Add("=");
+                            l.Add(Energy.Base.Text.Quote(Value));
+                        }
+                        l.Add(Index + ":" + Length);
+                        return string.Join(" ", l.ToArray());
+                    }
+                }
+
+                public override string ToString()
+                {
+                    List<string> l = new List<string>();
+                    foreach (Item item in this)
+                    {
+                        l.Add(item.ToString());
+                    }
+                    return string.Join(Environment.NewLine, l.ToArray());
+                }
+            }
         }
 
         #endregion
