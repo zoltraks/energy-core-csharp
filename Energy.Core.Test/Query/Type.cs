@@ -16,12 +16,12 @@ namespace Energy.Core.Test.Query
             string value;
             string result;
 
-            value = "abc nchar not    NULL  ";
+            value = "nchar not    NULL  ";
 
             Energy.Query.Type.Definition def;
             def = Energy.Query.Type.ExtractTypeDefinition(value);
 
-            result = def.Type;
+            result = Energy.Base.Text.Upper(def.Type);
             expect = "NCHAR";
             Assert.AreEqual(expect, result);
 
@@ -33,9 +33,19 @@ namespace Energy.Core.Test.Query
             expect = "NCHAR";
             Assert.AreEqual(expect, result);
 
-            result = Energy.Query.Type.Simplify(value);
-            expect = "TEXT";
+            result = def.Simple;
+            expect = "CHAR";
             Assert.AreEqual(expect, result);
+
+            value = "varchar(10)  not  null ";
+            expect = "NOT NULL";
+            result = Energy.Query.Type.ExtractTypeNull(value);
+            Assert.AreEqual(expect, result);
+
+            value = @"CHARACTER VARYING (2,3,4,5) default 'x' NOT NULL axx ""XXX"" default 'ab' abc utf-8";
+            def = Energy.Query.Type.ExtractTypeDefinition(value);
+            Assert.AreEqual("CHARACTER VARYING", def.Type);
+            Assert.AreEqual("TEXT", def.Simple);
         }
     }
 }

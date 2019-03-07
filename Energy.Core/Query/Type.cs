@@ -78,6 +78,11 @@ namespace Energy.Query
             public string Type;
 
             /// <summary>
+            /// Represents simplified type name.
+            /// </summary>
+            public string Simple;
+
+            /// <summary>
             /// Represents type parameter string. 
             /// Example: "(9,2)".
             /// </summary>
@@ -94,6 +99,17 @@ namespace Energy.Query
             /// Example "NOT NULL", "NULL".
             /// </summary>
             public string Null;
+
+            public string Option;
+
+            public string Value;
+
+            /// <summary>
+            /// Size option.
+            /// </summary>
+            public string Size;
+
+            public string Extra;
 
             public override string ToString()
             {
@@ -138,6 +154,7 @@ namespace Energy.Query
 
         #region Simplify
 
+
         /// <summary>
         /// Simplify type.
         /// </summary>
@@ -145,11 +162,27 @@ namespace Energy.Query
         /// <returns></returns>
         public static string Simplify(string type)
         {
-            string simple = ExtractTypeName(type);
+            return Simplify(type, 0);
+        }
+
+        /// <summary>
+        /// Simplify type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public static string Simplify(string type, int size)
+        {
+            if (string.IsNullOrEmpty(type))
+                return type;
+            string simple = Energy.Base.Text.ReplaceWhitespace(type, " ").Trim();
             if (string.IsNullOrEmpty(simple))
                 return type;
             switch (simple.ToUpper())
             {
+                default:
+                    return "";
+
                 case "BIT":
                     return "BOOL";
                 case "BOOL":
@@ -163,12 +196,16 @@ namespace Energy.Query
                 case "SMALLINT":
                     return "INTEGER";
                 case "TINYINT":
+                    if (size == 1)
+                        return "BOOL";
                     return "INTEGER";
                 case "MEDIUMINT":
                     return "INTEGER";
                 case "VARCHAR":
                 case "NVARCHAR":
                 case "CHARACTER VARYING":
+                    if (size == 1)
+                        return "CHAR";
                     return "TEXT";
                 case "TEXT":
                 case "MEDIUMTEXT":
@@ -193,8 +230,6 @@ namespace Energy.Query
                 case "NUMERIC":
                 case "DECIMAL":
                     return "NUMBER";
-                case "CHAR":
-                case "NCHAR":
                 case "UNIQUEIDENTIFIER":
                     return "TEXT";
                 case "XML":
@@ -205,8 +240,12 @@ namespace Energy.Query
                 case "SET":
                 case "ENUM":
                     return "SET";
+                case "CHAR":
+                case "NCHAR":
+                case "CHARACTER":
+                    return "CHAR";
             }
-            return simple;
+            //return simple;
         }
 
         #endregion
@@ -221,13 +260,7 @@ namespace Energy.Query
         /// <returns></returns>
         public static string ExtractTypeName(string declaration)
         {
-            if (string.IsNullOrEmpty(declaration))
-                return declaration;
-            Match match = Regex.Match(declaration, Energy.Base.Expression.SqlTypeDeclaration);
-            if (!match.Success)
-                return declaration;
-            string simple = match.Groups["type"].Value;
-            return simple;
+            return ExtractTypeDefinition(declaration).Type;
         }
 
         /// <summary>
@@ -239,20 +272,50 @@ namespace Energy.Query
         /// <returns></returns>
         public static string ExtractTypeNull(string declaration)
         {
-            if (string.IsNullOrEmpty(declaration))
-                return "";
-            Match match = Regex.Match(declaration, Energy.Base.Expression.SqlTypeDeclaration);
-            if (!match.Success)
-                return "";
-            string value = match.Groups["null"].Value;
-            value = value.ToUpper().StartsWith("NOT") ? "NOT NULL" : "NULL";
-            return value;
+            return ExtractTypeDefinition(declaration).Null;
         }
 
+        /// <summary>
+        /// Extract SQL data type for declaration string like "VARCHAR(50)".
+        /// </summary>
+        /// <param name="declaration"></param>
+        /// <returns></returns>
         public static Definition ExtractTypeDefinition(string declaration)
         {
-            string pattern = Energy.Base.Expression.SqlDeclarationToken;
-            return default(Definition);
+            string pattern;
+            Match match;
+            Definition result = default(Definition);
+
+            pattern = Energy.Base.Expression.SqlTypeGenericDefinition;
+            match = Regex.Match(declaration, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+            if (match.Success)
+            {
+                result = new Definition()
+                {
+                    Type = Energy.Base.Text.ReplaceWhitespace(Energy.Base.Text.Upper(match.Groups["type"].Value), " "),
+                    Simple = Simplify(match.Groups["type"].Value, Energy.Base.Cast.AsInteger(match.Groups["size"].Value)),
+                    Null = Energy.Base.Text.Upper(Energy.Base.Text.ReplaceWhitespace(match.Groups["null"].Value, " ")),
+                    Default = match.Groups["default"].Value,
+                    Size = match.Groups["size"].Value,
+                    Extra = match.Groups["extra"].Value,
+                    Option = match.Groups["option"].Value,
+                    Value = match.Groups["value"].Value,
+                    Parameter = match.Groups["parameter"].Value,
+                };
+
+                return result;
+            }
+
+            //if (match.Success)
+            //{
+            //    result = new Definition();
+            //}
+
+            //pattern = Energy.Base.Expression.SqlDeclarationToken;
+            //match = Regex.Match(declaration, pattern);
+
+            return result;
         }
 
         #endregion
