@@ -504,5 +504,24 @@ namespace Energy.Core.Test.Base
             });
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void TextFirst()
+        {
+            string text;
+            text = null;
+            Assert.AreEqual("", Energy.Base.Text.First(text));
+            Assert.AreEqual("", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            text = "";
+            Assert.AreEqual("", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            text = "a";
+            Assert.AreEqual("a", Energy.Base.Text.First(text, 2));
+            text = "ab";
+            Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
+            text = "abc";
+            Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
+        }
     }
 }

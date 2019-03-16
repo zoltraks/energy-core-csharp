@@ -3327,5 +3327,51 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region First
+
+        /// <summary>
+        /// Return first character of a string or empty string if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string First(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            else
+                return text[0].ToString();
+        }
+
+        /// <summary>
+        /// Return first characters of a string or empty string if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="maximum">maximum</param>
+        /// <returns></returns>
+        public static string First(string text, int maximum)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            else if (text.Length > maximum)
+                return text.Substring(0, maximum);
+            else
+                return text;
+        }
+
+        /// <summary>
+        /// Return first character of a string or null if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string FirstOrNull(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+            else
+                return text[0].ToString();
+        }
+
+        #endregion
     }
 }
