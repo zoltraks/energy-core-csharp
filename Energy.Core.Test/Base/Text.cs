@@ -516,8 +516,10 @@ namespace Energy.Core.Test.Base
             text = "";
             Assert.AreEqual("", Energy.Base.Text.First(text, 2));
             Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text, 2));
             text = "a";
             Assert.AreEqual("a", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual("a", Energy.Base.Text.FirstOrNull(text, 2));
             text = "ab";
             Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
             text = "abc";

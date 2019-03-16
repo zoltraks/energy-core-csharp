@@ -3344,7 +3344,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return first characters of a string or empty string if doesn't contain any characters.
+        /// Return first maximum characters of a string or empty string if doesn't contain any characters.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="maximum">maximum</param>
@@ -3370,6 +3370,22 @@ namespace Energy.Base
                 return null;
             else
                 return text[0].ToString();
+        }
+
+        /// <summary>
+        /// Return first maximum characters of a string or null if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="maximum">maximum</param>
+        /// <returns></returns>
+        public static string FirstOrNull(string text, int maximum)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+            else if (text.Length > maximum)
+                return text.Substring(0, maximum);
+            else
+                return text;
         }
 
         #endregion
