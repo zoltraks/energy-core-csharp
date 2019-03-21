@@ -763,6 +763,83 @@ namespace Energy.Base
 
         #endregion
 
+        #region IsStatic
+
+        /// <summary>
+        /// True if class is static one and cannot be instantiated.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsStatic(Type type)
+        {
+            if (null == type)
+                return false;
+
+            if (type.IsAbstract && type.IsSealed)
+                return true;
+
+            return false;
+        }
+
+        #endregion
+
+        #region CanCreate
+/*
+        /// <summary>
+        /// True if object of specified class can be created.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static ConstructorInfo[] CanCreate(Type type)
+        {
+            if (null == type)
+                return false;
+
+            if (type.IsAbstract)
+                return false;
+
+            ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public);
+
+            if (constructors.Length > 0)
+                return true;
+
+            return false;
+        }
+*/
+        #endregion
+
+        #region HasParameterlessConstructor
+/*
+        /// <summary>
+        /// True if class has parameterless constructor.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool HasParameterlessConstructor(Type type)
+        {
+            if (null == type)
+                return false;
+
+            if (type.IsAbstract)
+                return false;
+
+            ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+
+            if (null == constructor)
+                return false;
+
+            if (constructor.IsPublic)
+                return true;
+
+            return false;
+        }
+*/
+        #endregion
+
+        #endregion
+
+        #region Object management
+
         #region Mangle
 
         /// <summary>

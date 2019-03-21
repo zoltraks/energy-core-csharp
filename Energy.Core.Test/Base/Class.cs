@@ -63,5 +63,21 @@ namespace Energy.Core.Test.Base
             public string Text1;
             public string Text2 { get; set; }
         }
+
+        public static class TestClass2
+        {
+            public static int Integer1;
+            public static long Long1;
+            public static void Function1()
+            {
+            }
+        }
+
+        [TestMethod]
+        public void ClassIs()
+        {
+            Assert.IsFalse(Energy.Base.Class.IsStatic(typeof(TestClass1)));
+            Assert.IsTrue(Energy.Base.Class.IsStatic(typeof(TestClass2)));
+        }
     }
 }
