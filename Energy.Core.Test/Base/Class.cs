@@ -62,6 +62,9 @@ namespace Energy.Core.Test.Base
         {
             public string Text1;
             public string Text2 { get; set; }
+            public void Function1() { }
+            public static void Function2() { }
+            public TestClass1() { }
         }
 
         public static class TestClass2
@@ -73,11 +76,39 @@ namespace Energy.Core.Test.Base
             }
         }
 
+        public class TestClass3
+        {
+            public string Text1;
+            public TestClass3(string text1) { }
+            public TestClass3(string text1, bool useless) { }
+        }
+
+        public class TestClass4
+        {
+            public string Text1;
+            private TestClass4() { }
+        }
+
         [TestMethod]
         public void ClassIs()
         {
             Assert.IsFalse(Energy.Base.Class.IsStatic(typeof(TestClass1)));
             Assert.IsTrue(Energy.Base.Class.IsStatic(typeof(TestClass2)));
+            Assert.IsTrue(Energy.Base.Class.IsInstance(typeof(TestClass1)));
+            Assert.IsFalse(Energy.Base.Class.IsInstance(typeof(TestClass2)));
+            Assert.IsTrue(Energy.Base.Class.IsInstance(typeof(TestClass3)));
+            Assert.IsFalse(Energy.Base.Class.IsInstance(typeof(TestClass4)));
+            Assert.IsTrue(Energy.Base.Class.HasParameterlessConstructor(typeof(TestClass1)));
+            Assert.IsFalse(Energy.Base.Class.HasParameterlessConstructor(typeof(TestClass2)));
+            Assert.IsFalse(Energy.Base.Class.HasParameterlessConstructor(typeof(TestClass3)));
+            Assert.IsFalse(Energy.Base.Class.HasParameterlessConstructor(typeof(TestClass4)));
+            Assert.IsFalse(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass1)));
+            Assert.IsFalse(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass2)));
+            Assert.IsTrue(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3)));
+            Assert.IsFalse(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass4)));
+            Assert.IsTrue(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3), 2, 0));
+            Assert.IsFalse(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3), 3, 0));
+            Assert.IsTrue(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3), 0, 1));
         }
     }
 }

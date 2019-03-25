@@ -766,7 +766,7 @@ namespace Energy.Base
         #region IsStatic
 
         /// <summary>
-        /// True if class is static one and cannot be instantiated.
+        /// True if class is static and cannot be instantiated.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -783,14 +783,16 @@ namespace Energy.Base
 
         #endregion
 
-        #region CanCreate
-/*
+        #region IsInstance
+
         /// <summary>
         /// True if object of specified class can be created.
+        /// At least one public constructor needs to be found.
+        /// Function will result false for for static class type.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static ConstructorInfo[] CanCreate(Type type)
+        public static bool IsInstance(Type type)
         {
             if (null == type)
                 return false;
@@ -798,20 +800,20 @@ namespace Energy.Base
             if (type.IsAbstract)
                 return false;
 
-            ConstructorInfo[] constructors = type.GetConstructors(BindingFlags.Public);
+            ConstructorInfo[] constructors = type.GetConstructors();
 
             if (constructors.Length > 0)
                 return true;
 
             return false;
         }
-*/
+
         #endregion
 
         #region HasParameterlessConstructor
-/*
+
         /// <summary>
-        /// True if class has parameterless constructor.
+        /// True if class has public parameterless constructor.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -833,7 +835,54 @@ namespace Energy.Base
 
             return false;
         }
-*/
+
+        #endregion
+
+        #region HasParameteredConstructor
+
+        /// <summary>
+        /// True if class has at least one public constructor with specified number parameters.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="maximumParameterCount"></param>
+        /// <param name="minimumParameterCount"></param>
+        /// <returns></returns>
+        public static bool HasParameteredConstructor(Type type, int minimumParameterCount, int maximumParameterCount)
+        {
+            if (null == type)
+                return false;
+
+            if (type.IsAbstract)
+                return false;
+
+            ConstructorInfo[] constructors = type.GetConstructors();
+
+            if (null == constructors)
+                return false;
+
+            foreach (ConstructorInfo constructor in constructors)
+            {
+                ParameterInfo[] parameters = constructor.GetParameters();
+                if (minimumParameterCount > 0 && parameters.Length < minimumParameterCount)
+                    continue;
+                if (maximumParameterCount > 0 && parameters.Length > maximumParameterCount)
+                    continue;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// True if class has constructor with one or more parameters.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool HasParameteredConstructor(Type type)
+        {
+            return HasParameteredConstructor(type, 1, 0);
+        }
+
         #endregion
 
         #endregion
@@ -852,7 +901,7 @@ namespace Energy.Base
         /// <param name="function"></param>
         /// <returns></returns>
         public static int Mangle<T>(object subject, bool includePrivate, bool includePublic
-          , Energy.Base.Anonymous.Function<T, T> function)
+      , Energy.Base.Anonymous.Function<T, T> function)
         {
             if (subject == null || function == null)
                 return 0;
