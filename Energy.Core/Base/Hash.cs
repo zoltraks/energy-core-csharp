@@ -7,6 +7,7 @@ namespace Energy.Base
     /// <summary>
     /// Hashing functions for sequences of characters or bytes
     /// </summary>
+    // TODO Implement PBKDF2, Bcrypt, HMAC/SHA1 and possibly legacy DES or AES 3
     public class Hash
     {
         /// <summary>
