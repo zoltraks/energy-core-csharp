@@ -519,12 +519,15 @@ namespace Energy.Base
                 c = csv[i];
                 if (q == '\0')
                 {
-                    for (int n = 0; n < quote.Length; n++)
+                    if (quote != null)
                     {
-                        if (c == quote[n])
+                        for (int n = 0; n < quote.Length; n++)
                         {
-                            q = quote[n];
-                            continue;
+                            if (c == quote[n])
+                            {
+                                q = quote[n];
+                                continue;
+                            }
                         }
                     }
 

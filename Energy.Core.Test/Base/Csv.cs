@@ -139,6 +139,73 @@ namespace Energy.Core.Test.Base
             expect = new string[] { "A\rB", "C", "" };
             result = Energy.Base.Csv.Split(content);
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            content = ""
+                + "" + "\r\n"
+                + "0" + "\r"
+                + "1" + "\n"
+                + "2" + "\r\n"
+                + @"""3" + "\r\n" + "4" + "\r" + "5" + "\n" + @"6""" + "\r\n"
+                + "7" + "\r\n"
+                + "'8" + "\r\n" + "9'"
+                ;
+
+            result = Energy.Base.Csv.Split(content, new char[] { '"', '\'' });
+            expect = new string[]
+            {
+                "",
+                "0\r1",
+                "2",
+                "\"3\r\n4\r5\n6\"",
+                "7",
+                "'8\r\n9'",
+            };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            result = Energy.Base.Csv.Split(content, new char[] { '"' });
+            expect = new string[]
+            {
+                "",
+                "0\r1",
+                "2",
+                "\"3\r\n4\r5\n6\"",
+                "7",
+                "'8",
+                "9'",
+            };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            result = Energy.Base.Csv.Split(content, new char[] { '\'' });
+            expect = new string[]
+            {
+                "",
+                "0\r1",
+                "2",
+                "\"3",
+                "4\r5",
+                "6\"",
+                "7",
+                "'8\r\n9'",
+            };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            result = Energy.Base.Csv.Split(content, new char[] { });
+            expect = new string[]
+            {
+                "",
+                "0\r1",
+                "2",
+                "\"3",
+                "4\r5",
+                "6\"",
+                "7",
+                "'8",
+                "9'",
+            };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            result = Energy.Base.Csv.Split(content, (char[])null);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
         }
     }
 }
