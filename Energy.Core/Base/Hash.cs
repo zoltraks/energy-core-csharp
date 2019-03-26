@@ -204,5 +204,37 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region SHA512
+
+        /// <summary>
+        /// Return SHA-512 (SHA-2) for a string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <param name="encoding">Text encoding</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA512(string text, Encoding encoding)
+        {
+            if (text == null)
+                return null;
+            using (System.Security.Cryptography.SHA512 cipher = System.Security.Cryptography.SHA512.Create())
+            {
+                byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
+                return Energy.Base.Hex.ByteArrayToHex(array);
+            }
+        }
+
+        /// <summary>
+        /// Return SHA-512 (SHA-2) for UTF-8 string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA512(string text)
+        {
+            return SHA512(text, Encoding.UTF8);
+        }
+
+        #endregion
+
     }
 }
