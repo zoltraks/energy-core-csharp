@@ -134,6 +134,24 @@ namespace Energy.Query
             }
 
             /// <summary>
+            /// Parse numeric zero as NULL.
+            /// </summary>
+            public bool ZeroAsNull
+            {
+                get
+                {
+                    return (_Option & Option.ZeroAsNull) > 0;
+                }
+                set
+                {
+                    if (value)
+                        _Option |= Option.ZeroAsNull;
+                    else
+                        _Option &= ~Option.ZeroAsNull;
+                }
+            }
+
+            /// <summary>
             /// Use N prefix for all non empty texts (Unicode).
             /// </summary>
             public bool Unicode

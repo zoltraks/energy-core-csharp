@@ -95,6 +95,7 @@ GO
             bag.Set("a", "'X'");
             bag.Set("b", true);
             bag.Set("c", 3.1415);
+            bag.Set("@zero", 0);
 
             text = "@not_present @@xx";
             must = "@not_present @@xx";
@@ -136,6 +137,22 @@ GO
             bag.Unicode = true;
             bag.UnknownAsNull = true;
             must = "NULL";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            bag.Type["zero"] = Energy.Enumeration.FormatType.Number;
+
+            text = "@zero @a";
+            bag.ZeroAsNull = true;
+            must = "NULL 'X'";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            text = "@zero @a";
+            bag.Explicit = true;
+            bag.UnknownAsEmpty = false;
+            bag.UnknownAsNull = false;
+            must = "NULL @a";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
         }
