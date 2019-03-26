@@ -5,14 +5,14 @@ using System.Text;
 namespace Energy.Base
 {
     /// <summary>
-    /// Hashing functions for sequences of characters or bytes
+    /// Hashing functions for sequences of characters or bytes.
     /// </summary>
     // TODO Implement PBKDF2, Bcrypt, HMAC/SHA1 and possibly legacy DES or AES 3
     public class Hash
     {
         /// <summary>
         /// For each characters do a 5-bit left circular shift
-        /// and XOR in character numeric value (CRC variant)
+        /// and XOR in character numeric value (CRC variant).
         /// </summary>
         /// <param name="value"></param>
         /// <returns>32-bit hash value for a string (uint)</returns>
@@ -28,7 +28,7 @@ namespace Energy.Base
 
         /// <summary>
         /// For each characters do a 5-bit left circular shift
-        /// and XOR in character numeric value (CRC variant)
+        /// and XOR in character numeric value (CRC variant).
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// For each characters add character numeric value and left shift by 4 bits (PJW hash)
+        /// For each characters add character numeric value and left shift by 4 bits (PJW hash).
         /// </summary>
         /// <remarks>
         /// Aho, Sethi, and Ullman pp. 434-438
@@ -84,7 +84,7 @@ namespace Energy.Base
         #region MD5
 
         /// <summary>
-        /// Return MD5 for hash a string.
+        /// Return MD5 hash for a string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <param name="encoding">Text encoding</param>
