@@ -330,7 +330,7 @@ namespace Energy.Query
             NullAsZero = 2,
 
             /// <summary>
-            /// Paser numeric zero as NULL.
+            /// Parse numeric zero as NULL.
             /// </summary>
             ZeroAsNull = 4,
 
