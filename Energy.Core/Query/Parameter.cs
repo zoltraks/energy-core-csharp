@@ -134,24 +134,6 @@ namespace Energy.Query
             }
 
             /// <summary>
-            /// Parse numeric zero as NULL.
-            /// </summary>
-            public bool ZeroAsNull
-            {
-                get
-                {
-                    return (_Option & Option.ZeroAsNull) > 0;
-                }
-                set
-                {
-                    if (value)
-                        _Option |= Option.ZeroAsNull;
-                    else
-                        _Option &= ~Option.ZeroAsNull;
-                }
-            }
-
-            /// <summary>
             /// Use N prefix for all non empty texts (Unicode).
             /// </summary>
             public bool Unicode
@@ -230,6 +212,7 @@ namespace Energy.Query
                 bool optionUnicode = this.Unicode;
                 bool optionUnknownAsEmpty = this.UnknownAsEmpty;
                 bool optionUnknownAsNull = this.UnknownAsNull;
+                bool optionNullAsZero = this.NullAsZero;
 
                 bool allowUnknow = optionUnknownAsEmpty || optionUnknownAsNull;
 
@@ -283,6 +266,7 @@ namespace Energy.Query
                         type = Energy.Enumeration.FormatType.Text;
                         value = optionUnknownAsEmpty ? "" : null;
                     }
+
                     string text = null;
                     switch (type)
                     {
@@ -295,7 +279,7 @@ namespace Energy.Query
                             break;
 
                         case Energy.Enumeration.FormatType.Number:
-                            text = format.Number(value, !NullAsZero);
+                            text = format.Number(value, !optionNullAsZero);
                             break;
 
                         case Energy.Enumeration.FormatType.Date:
@@ -346,11 +330,6 @@ namespace Energy.Query
             /// Parse null values as numeric zero.
             /// </summary>
             NullAsZero = 2,
-
-            /// <summary>
-            /// Parse numeric zero as NULL.
-            /// </summary>
-            ZeroAsNull = 4,
 
             /// <summary>
             /// Use N prefix for all non empty texts (Unicode).

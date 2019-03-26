@@ -143,8 +143,8 @@ GO
             bag.Type["zero"] = Energy.Enumeration.FormatType.Number;
 
             text = "@zero @a";
-            bag.ZeroAsNull = true;
-            must = "NULL 'X'";
+            bag.Unicode = false;
+            must = "'0' '''X'''";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
@@ -152,7 +152,7 @@ GO
             bag.Explicit = true;
             bag.UnknownAsEmpty = false;
             bag.UnknownAsNull = false;
-            must = "NULL @a";
+            must = "'0' @a";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
         }
