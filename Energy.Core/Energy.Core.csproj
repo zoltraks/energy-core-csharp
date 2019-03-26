@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.12.5</Version>
-    <FileVersion>2019.03.25</FileVersion>
+    <Version>18.12.6</Version>
+    <FileVersion>2019.03.26</FileVersion>
     <AssemblyVersion>18.12.5</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
@@ -20,6 +20,7 @@ To be used by wide range of applications, services, web or console programs.</De
     <PackageIconUrl>http://energy.alyx.pl/media/icon/nuget.png</PackageIconUrl>
     <PackageLicenseUrl>https://www.gnu.org/licenses/lgpl-3.0.txt</PackageLicenseUrl>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <PackageTags>type-conversion sql database-abstraction-layer class-information utility framework brackets class-library colorful-console query-builder</PackageTags>
  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
