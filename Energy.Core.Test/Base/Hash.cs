@@ -47,5 +47,19 @@ namespace Energy.Core.Test.Base
             must = "e5287d6cf15960f2013178f1a3438614837798b6ec0e42f0403886019400398b";
             Assert.AreEqual(must, hash);
         }
+
+        [TestMethod]
+        public void HashSHA384()
+        {
+            string text, hash, must;
+            text = "How are you?";
+            hash = Energy.Base.Hash.SHA384(text);
+            must = "964958303aa7fb4bd7028909df59f5120deec0390ec2b73522e75244920f0d94a30c89d1da457ae97e832a2fcbf02369";
+            Assert.AreEqual(must, hash);
+            text = "Ąę";
+            hash = Energy.Base.Hash.SHA384(text);
+            must = "3488f732829d67d9539aecb72c310c8d47233c436d4a7bc15ca8f246eb072666f342c75b74b14fc4c26545d864bf8d70";
+            Assert.AreEqual(must, hash);
+        }
     }
 }
