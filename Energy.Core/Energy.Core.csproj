@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.12.5</Version>
-    <FileVersion>2019.03.25</FileVersion>
+    <Version>18.12.6</Version>
+    <FileVersion>2019.03.26</FileVersion>
     <AssemblyVersion>18.12.5</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
