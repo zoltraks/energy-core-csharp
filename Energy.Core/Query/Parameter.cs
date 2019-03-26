@@ -97,8 +97,8 @@ namespace Energy.Query
 
             /// <summary>
             /// Parameter names must be explicit.
-            /// If set to false, parameters can be defined in shorter form 
-            /// without at sign.
+            /// If set to false, parameters can be added in shorter form 
+            /// without leading @.
             /// </summary>
             public bool Explicit
             {
@@ -134,6 +134,72 @@ namespace Energy.Query
             }
 
             /// <summary>
+            /// Use N prefix for all non empty texts (Unicode).
+            /// </summary>
+            public bool Unicode
+            {
+                get
+                {
+                    return (Option & Option.Unicode) > 0;
+                }
+                set
+                {
+                    if (value)
+                        _Option |= Option.Unicode;
+                    else
+                        _Option &= ~Option.Unicode;
+                }
+            }
+
+            /// <summary>
+            /// Parse unknown parameters as empty texts.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            public bool UnknownAsEmpty
+            {
+                get
+                {
+                    return (_Option & Option.UnknownAsEmpty) > 0;
+                }
+                set
+                {
+                    if (value)
+                    {
+                        _Option |= Option.UnknownAsEmpty;
+                        _Option &= ~Option.UnknownAsNull;
+                    }
+                    else
+                    {
+                        _Option &= ~Option.UnknownAsEmpty;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Parse unknown parameters as NULL.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            public bool UnknownAsNull
+            {
+                get
+                {
+                    return (_Option & Option.UnknownAsNull) > 0;
+                }
+                set
+                {
+                    if (value)
+                    {
+                        _Option |= Option.UnknownAsNull;
+                        _Option &= ~Option.UnknownAsEmpty;
+                    }
+                    else
+                    {
+                        _Option &= ~Option.UnknownAsNull;
+                    }
+                }
+            }
+
+            /// <summary>
             /// Parse parametrized query string.
             /// </summary>
             /// <param name="input"></param>
@@ -143,6 +209,12 @@ namespace Energy.Query
                 if (string.IsNullOrEmpty(input))
                     return input;
 
+                bool optionUnicode = this.Unicode;
+                bool optionUnknownAsEmpty = this.UnknownAsEmpty;
+                bool optionUnknownAsNull = this.UnknownAsNull;
+
+                bool allowUnknow = optionUnknownAsEmpty || optionUnknownAsNull;
+
                 Energy.Query.Format format = _Format;
                 if (_Format == null)
                     format = Energy.Query.Format.Default;
@@ -150,27 +222,58 @@ namespace Energy.Query
                 foreach (Energy.Base.Bracket.SearchResult _ in Bracket.Search(input))
                 {
                     string variable = _.Value;
-                    if (!this.ContainsKey(variable))
+                    bool found = this.ContainsKey(variable);
+
+                    if (!found)
                     {
-                        if (!Explicit
+                        if (true
+                            && !Explicit
                             && variable.Length > 1
                             && variable.StartsWith("@")
-                            && variable[1] != '@')
+                            && variable[1] != '@'
+                        )
                         {
                             variable = variable.Substring(1);
-                            if (!this.ContainsKey(variable))
-                                continue;
+                            found = this.ContainsKey(variable);
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        if (!allowUnknow)
+                        {
+                            continue;
                         }
                         else
-                            continue;
+                        {
+                            if (variable.StartsWith("@@"))
+                            {
+                                continue;
+                            }
+                        }
                     }
-                    object value = this[variable];
+
+                    object value = null;
+                    Energy.Enumeration.FormatType type;
+                    if (found)
+                    {
+                        value = this[variable];
+                        type = Type[variable];
+                    }
+                    else
+                    {
+                        type = Energy.Enumeration.FormatType.Text;
+                        value = optionUnknownAsEmpty ? "" : null;
+                    }
                     string text = null;
-                    switch (Type[variable])
+                    switch (type)
                     {
                         default:
                         case Energy.Enumeration.FormatType.Text:
-                            text = format.Text(value);
+                            if (optionUnicode)
+                                text = format.Unicode(value);
+                            else
+                                text = format.Text(value);
                             break;
 
                         case Energy.Enumeration.FormatType.Number:
@@ -216,11 +319,37 @@ namespace Energy.Query
         [Flags]
         public enum Option
         {
+            /// <summary>
+            /// Parameters must be explicitly defined.
+            /// </summary>
             Explicit = 1,
 
+            /// <summary>
+            /// Parse null values as numeric zero.
+            /// </summary>
             NullAsZero = 2,
 
+            /// <summary>
+            /// Paser numeric zero as NULL.
+            /// </summary>
             ZeroAsNull = 4,
+
+            /// <summary>
+            /// Use N prefix for all non empty texts (Unicode).
+            /// </summary>
+            Unicode = 8,
+
+            /// <summary>
+            /// Parse unknown parameters as empty texts.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            UnknownAsEmpty = 16,
+
+            /// <summary>
+            /// Parse unknown parameters as NULL.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            UnknownAsNull = 32,
         }
 
         #endregion

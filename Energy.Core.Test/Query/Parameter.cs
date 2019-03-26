@@ -81,5 +81,63 @@ GO
             result = Energy.Query.Parameter.Template.ConvertToParameterizedQuery(template);
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void Option()
+        {
+            string text;
+            string have;
+            string must;
+
+            Energy.Query.Parameter.Bag bag;
+            
+            bag = new Energy.Query.Parameter.Bag();
+            bag.Set("a", "'X'");
+            bag.Set("b", true);
+            bag.Set("c", 3.1415);
+
+            text = "@not_present @@xx";
+            must = "@not_present @@xx";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            text = "@not_present @@xx";
+            must = "'' @@xx";
+            bag.UnknownAsEmpty = true;
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            text = "@a @b @c";
+            must = "'''X''' '1' '3.1415'";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            bag.Type["b"] = Energy.Enumeration.FormatType.Number;
+            bag.Type["c"] = Energy.Enumeration.FormatType.Number;
+
+            text = "@a @b @c";
+            must = "'''X''' 1 3.1415";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            bag.Unicode = true;
+            must = "N'''X''' 1 3.1415";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            text = "@unknown";
+            bag.Unicode = true;
+            bag.UnknownAsEmpty = true;
+            must = "N''";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
+            text = "@unknown";
+            bag.Unicode = true;
+            bag.UnknownAsNull = true;
+            must = "NULL";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+        }
     }
 }
