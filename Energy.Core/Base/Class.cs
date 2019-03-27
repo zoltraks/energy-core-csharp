@@ -893,6 +893,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Mangle object by applying a function to each field and property of specified type.
+        /// Returns number of fields and properties affected.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="subject"></param>
@@ -901,7 +902,7 @@ namespace Energy.Base
         /// <param name="function"></param>
         /// <returns></returns>
         public static int Mangle<T>(object subject, bool includePrivate, bool includePublic
-      , Energy.Base.Anonymous.Function<T, T> function)
+            , Energy.Base.Anonymous.Function<T, T> function)
         {
             if (subject == null || function == null)
                 return 0;
@@ -945,6 +946,98 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Mangle object by applying a function to a field or property of specified class type.
+        /// Returns 1 if value was changed, 0 if not found or read only.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject">Object</param>
+        /// <param name="name">Field or property name</param>
+        /// <param name="includePrivate"></param>
+        /// <param name="includePublic"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, string name, bool includePrivate, bool includePublic
+            , Energy.Base.Anonymous.Function<T, T> function)
+        {
+            if (subject == null || function == null)
+                return 0;
+
+            if (string.IsNullOrEmpty(name))
+                return 0;
+
+            Type objectType = subject.GetType();
+            Type filterType = typeof(T);
+
+            BindingFlags f = BindingFlags.Instance;
+            if (includePrivate)
+                f |= BindingFlags.NonPublic;
+            if (includePublic)
+                f |= BindingFlags.Public;
+
+            T value;
+
+            FieldInfo fieldInfo = objectType.GetField(name, f);
+
+            if (fieldInfo != null)
+            {
+                if (filterType != fieldInfo.FieldType)
+                    return 0;
+
+                value = (T)fieldInfo.GetValue(subject);
+                value = function(value);
+                fieldInfo.SetValue(subject, value);
+                return 1;
+            }
+
+            PropertyInfo propertyInfo = objectType.GetProperty(name, f);
+
+            if (propertyInfo != null)
+            {
+                if (filterType != propertyInfo.PropertyType)
+                    return 0;
+                if (null == propertyInfo.GetSetMethod())
+                    return 0;
+                value = (T)propertyInfo.GetValue(subject, null);
+                value = function(value);
+                propertyInfo.SetValue(subject, value, null);
+                return 1;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Mangle object by applying a function to a field or property of specified class type.
+        /// Returns 1 if value was changed, 0 if not found or read only.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject">Object</param>
+        /// <param name="name">Field or property name</param>
+        /// <param name="includePrivate"></param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, string name, bool includePrivate
+            , Energy.Base.Anonymous.Function<T, T> function)
+        {
+            return Mangle(subject, name, includePrivate, true, function);
+        }
+
+        /// <summary>
+        /// Mangle object by applying a function to public field or property of specified class type.
+        /// Returns 1 if value was changed, 0 if not found or read only.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject">Object</param>
+        /// <param name="name">Field or property name</param>
+        /// <param name="function"></param>
+        /// <returns></returns>
+        public static int Mangle<T>(object subject, string name
+            , Energy.Base.Anonymous.Function<T, T> function)
+        {
+            return Mangle(subject, name, false, true, function);
+        }
+
+        /// <summary>
         /// Mangle object by applying a function to each field and property of specified type.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -953,19 +1046,21 @@ namespace Energy.Base
         /// <param name="function"></param>
         /// <returns></returns>
         public static int Mangle<T>(object subject, bool includePrivate
-          , Energy.Base.Anonymous.Function<T, T> function)
+            , Energy.Base.Anonymous.Function<T, T> function)
         {
             return Mangle<T>(subject, includePrivate, true, function);
         }
 
         /// <summary>
         /// Mangle object by applying a function to each public field and property of specified type.
+        /// Returns number of fields and properties affected.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="subject"></param>
         /// <param name="function"></param>
         /// <returns></returns>
-        public static int Mangle<T>(object subject, Energy.Base.Anonymous.Function<T, T> function)
+        public static int Mangle<T>(object subject
+            , Energy.Base.Anonymous.Function<T, T> function)
         {
             return Mangle<T>(subject, false, true, function);
         }

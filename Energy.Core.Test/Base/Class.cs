@@ -53,15 +53,41 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("a", o1.Text1);
             Assert.AreEqual("b", o1.Text2);
 
-            var o = new { Text = "READ ONLY" };
-            m = Energy.Base.Class.Mangle<string>(o, delegate (string _) { return (_ as string ?? "").Trim(); });
+            var o2 = new { Text = "READ ONLY" };
+            m = Energy.Base.Class.Mangle<string>(o2, delegate (string _) { return (_ as string ?? "").Trim(); });
             Assert.AreEqual(0, m);
+
+            var o3 = new TestClass1() { Decimal1 = 1.2345m };
+            m = Energy.Base.Class.Mangle<decimal>(o3, delegate (decimal _) { return _ - 1m; });
+            Assert.AreEqual(1, m);
+            Assert.AreEqual(0.2345m, o3.Decimal1);
+
+            var msg = new TextClass() { Text = "" };
+            if (1 == Energy.Base.Class.Mangle<string>(msg, "Text", delegate { return "Hello"; }))
+            {
+                Debug.WriteLine("I just set Text field or property to " + msg.Text);
+            }
+            var anon = new { Text = (string)null };
+            if (0 == Energy.Base.Class.Mangle<string>(anon, "Text", delegate { return "Hello"; }))
+            {
+                Debug.WriteLine("I can't change anything in anonymous object");
+            }
+
+            m = Energy.Base.Class.Mangle<string>(o3, "Text1", delegate (string x) { return "Value1"; });
+            Assert.AreEqual(1, m);
+            Assert.AreEqual("Value1", o3.Text1);
+        }
+
+        public class TextClass
+        {
+            public string Text { get; set; }
         }
 
         public class TestClass1
         {
             public string Text1;
             public string Text2 { get; set; }
+            public decimal Decimal1;
             public void Function1() { }
             public static void Function2() { }
             public TestClass1() { }
