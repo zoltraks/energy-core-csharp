@@ -233,17 +233,14 @@ namespace Energy.Core
 
         public static string GetExecutionPath(System.Reflection.Assembly assembly)
         {
+            if (assembly == null)
+                return null;
             return System.IO.Path.GetDirectoryName(assembly.Location);
         }
 
         public static string GetExecutionPath()
         {
             return GetExecutionPath(System.Reflection.Assembly.GetExecutingAssembly());
-        }
-
-        internal static CultureInfo GetCurrentUICulture()
-        {
-            throw new NotImplementedException();
         }
 
         #endregion

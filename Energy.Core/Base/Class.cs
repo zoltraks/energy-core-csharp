@@ -1515,6 +1515,46 @@ namespace Energy.Base
             return dictionary;
         }
 
+        /// <summary>
+        /// Returns the major/minor version number for an assembly formatted as a string.
+        /// </summary>
+        public static string GetAssemblySoftwareVersion(System.Reflection.Assembly assembly)
+        {
+#if NETSTANDARD
+            AssemblyInformationalVersionAttribute attributeAssemblyInformationalVersion
+                = Energy.Base.Class.GetClassAttribute<AssemblyInformationalVersionAttribute>(assembly.GetType());
+            return attributeAssemblyInformationalVersion.InformationalVersion;
+#else
+            return null;
+#endif
+        }
+
+        /// <summary>
+        /// Returns the build/revision number for an assembly formatted as a string.
+        /// </summary>
+        public static string GetAssemblyBuildNumber(System.Reflection.Assembly assembly)
+        {
+#if NETSTANDARD
+            return assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+#else
+            return assembly.ImageRuntimeVersion;
+#endif
+        }
+
+        /// <summary>
+        /// Returns the linker timestamp for an assembly. 
+        /// </summary>
+        public static DateTime GetAssemblyTimestamp(System.Reflection.Assembly assembly)
+        {
+            try
+            {
+                return System.IO.File.GetLastWriteTimeUtc(assembly.Location);
+            }
+            catch
+            { }
+            return DateTime.MinValue;
+        }
+
         #endregion
     }
 }
