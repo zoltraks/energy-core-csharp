@@ -1039,6 +1039,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Mangle object by applying a function to each field and property of specified type.
+        /// Returns number of fields and properties affected.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="subject"></param>
