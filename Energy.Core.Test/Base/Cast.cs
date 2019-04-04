@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -369,6 +371,27 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("-1.79769", Energy.Base.Cast.DoubleToString(_double, 5, false));
             // TODO Should be rounded up
             Assert.AreEqual("-1.7976", Energy.Base.Cast.DoubleToString(_double, 4, false));
+        }
+
+        [TestMethod]
+        public void StringToStream()
+        {
+            string needle = "€";
+            byte[] buffer;
+            using (Stream stream = Energy.Base.Cast.StringToStream(needle))
+            {
+                int length = (int)stream.Length;
+                buffer = new byte[length];
+                stream.Read(buffer, 0, length);
+            }
+            Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 226, 130, 172 }, buffer));
+            using (Stream stream = Energy.Base.Cast.StringToStream(needle, encoding: Encoding.Unicode))
+            {
+                int length = (int)stream.Length;
+                buffer = new byte[length];
+                stream.Read(buffer, 0, length);
+            }
+            Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 172, 32 }, buffer));
         }
     }
 }

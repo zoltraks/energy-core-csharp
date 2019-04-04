@@ -32,7 +32,11 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void ClassFilter()
         {
-            Type[] classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
+            Type[] classList;
+            classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
+                , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
+            Assert.IsTrue(classList.Length > 0);
+            classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
                 , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
             Assert.IsTrue(classList.Length > 0);
         }

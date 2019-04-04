@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 namespace Energy.Base
@@ -1025,6 +1026,35 @@ namespace Energy.Base
         public static string UnsignedLongToStringSign(ulong value, string sign)
         {
             return NumberToStringSign(value.ToString(), sign);
+        }
+
+        /// <summary>
+        /// Convert string to a stream.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Stream StringToStream(string value)
+        {
+            if (value == null)
+                value = string.Empty;
+            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(value));
+            return stream;
+        }
+
+        /// <summary>
+        /// Convert string to a stream using specified encoding.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static Stream StringToStream(string value, Encoding encoding)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            if (value == null)
+                value = string.Empty;
+            MemoryStream stream = new MemoryStream(encoding.GetBytes(value));
+            return stream;
         }
 
         #endregion
