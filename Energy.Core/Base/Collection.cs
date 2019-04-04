@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Energy.Enumeration;
-using Energy.Interface;
-using Energy.Query;
 
 namespace Energy.Base
 {
@@ -618,7 +614,7 @@ namespace Energy.Base
             /// </summary>
             public Dictionary<string, string> Index = null;
 
-            private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = MultipleBehaviour.Last;
+            private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.Last;
 
             /// <summary>
             /// Specifies behaviour for selecting one element from multiple duplicates
@@ -680,7 +676,7 @@ namespace Energy.Base
                 foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
-                    if (_SelectionOfDuplicates == MultipleBehaviour.Last)
+                    if (_SelectionOfDuplicates == Energy.Enumeration.MultipleBehaviour.Last)
                         Index[map] = key;
                     else if (!Index.ContainsKey(map))
                         Index.Add(map, key);
@@ -1009,7 +1005,7 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public StringDictionary<T> Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            public StringDictionary<T> Filter(Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
                 lock (_Lock)
                 {
@@ -1032,9 +1028,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public StringDictionary<T> Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            public StringDictionary<T> Filter(Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                return Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
             }
         }
 
@@ -1050,9 +1046,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public new StringDictionary Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            public new StringDictionary Filter(Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                StringDictionary<string> filteredDictionary = base.Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                StringDictionary<string> filteredDictionary = base.Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
                 StringDictionary dictionary = new StringDictionary();
                 foreach (KeyValuePair<string, string> pair in filteredDictionary)
                 {
@@ -1069,9 +1065,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public new StringDictionary Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            public new StringDictionary Filter(Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                return Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
             }
         }
 
