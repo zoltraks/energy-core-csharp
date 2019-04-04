@@ -641,6 +641,25 @@ namespace Energy.Core
             Write(message);
         }
 
+        /// <summary>
+        /// Write debug message
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        public static void WriteFormat(IFormatProvider provider, string format, params object[] args)
+        {
+            string message = string.Format(provider, format, args);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debug.WriteLine(FormatDebugOutput(message));
+                if ((bool)Trace)
+                {
+                    Energy.Core.Log.Default.Write(message, Enumeration.LogLevel.Bug);
+                }
+            }
+        }
+
         #endregion
 
         #region Trap
