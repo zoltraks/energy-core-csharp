@@ -1028,6 +1028,10 @@ namespace Energy.Base
             return NumberToStringSign(value.ToString(), sign);
         }
 
+        #endregion
+
+        #region Stream
+
         /// <summary>
         /// Convert string to a stream.
         /// </summary>
