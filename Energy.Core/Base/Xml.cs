@@ -22,7 +22,10 @@ namespace Energy.Base
 
         public class Class
         {
-            public class TagLine
+            /// <summary>
+            /// Class representing XML TAG line
+            /// </summary>
+            public class XmlTagLine
             {
                 /// <summary>
                 /// XML Tag Name
@@ -34,6 +37,24 @@ namespace Energy.Base
                 /// </summary>
                 public string Attribute { get; set; }
 
+                /// <summary>
+                /// XML Tag Index
+                /// </summary>
+                public int Index { get; set; }
+
+                /// <summary>
+                /// XML Tag Length
+                /// </summary>
+                public int Length { get; set; }
+
+                /// <summary>
+                /// XML Tag Ending
+                /// </summary>
+                public string End { get; set; }
+
+                /// <summary>
+                /// Returns true if tag is without any attributes.
+                /// </summary>
                 public bool IsSimple { get { return Energy.Base.Text.IsWhite(this.Attribute); } }
             }
         }
@@ -44,7 +65,7 @@ namespace Energy.Base
 
         public class Pattern
         {
-            public static string InformalXmlTag = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)";
+            public static string InformalXmlTagLine = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
         }
 
         #endregion
@@ -341,9 +362,14 @@ namespace Energy.Base
             return "";
         }
 
-        public static Class.TagLine ExtractRootNodeLine(string xml)
+        /// <summary>
+        /// Extract root tag information from XML content.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static Class.XmlTagLine ExtractRootNodeLine(string xml)
         {
-            Match m = Regex.Match(xml, Pattern.InformalXmlTag, RegexOptions.IgnorePatternWhitespace);
+            Match m = Regex.Match(xml, Pattern.InformalXmlTagLine, RegexOptions.IgnorePatternWhitespace);
             while (true)
             {
                 if (!m.Success)
@@ -353,10 +379,13 @@ namespace Energy.Base
                     m = m.NextMatch();
                     continue;
                 }
-                return new Class.TagLine()
+                return new Class.XmlTagLine()
                 {
                     Name = m.Groups["name"].Value,
                     Attribute = m.Groups["attribute"].Value,
+                    Index = m.Index,
+                    Length = m.Length,
+                    End = m.Groups["end"].Value,
                 };
             }
         }

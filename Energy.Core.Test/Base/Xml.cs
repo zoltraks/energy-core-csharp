@@ -16,7 +16,7 @@ namespace Energy.Core.Test.Base
             string expect;
             string result;
             xml = @" < ?xml encoding utf > < !doctype aaa> < ro_ot  xmlns:a=""dfaf"" option_1 xmlns:b=""asdfadsf"" abc / >";
-            Energy.Base.Xml.Class.TagLine n;
+            Energy.Base.Xml.Class.XmlTagLine n;
             n = Energy.Base.Xml.ExtractRootNodeLine(xml);
             result = n.Name;
             expect = "ro_ot";
