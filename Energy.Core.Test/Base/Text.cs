@@ -7,7 +7,7 @@ namespace Energy.Core.Test.Base
     public class Text
     {
         [TestMethod]
-        public void FormatWithNull()
+        public void TextFormatWithNull()
         {
             string value = string.Format("{0} {1}", null, null).Trim();
             Assert.AreEqual(0, value.Length);

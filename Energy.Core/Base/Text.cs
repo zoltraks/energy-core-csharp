@@ -20,6 +20,7 @@ namespace Energy.Base
         #region Constants
 
         private static string _BR = "<br>";
+
         /// <summary>HTML break</summary>
         public static string BR { get { return _BR; } private set { _BR = value; } }
 
@@ -315,6 +316,21 @@ namespace Energy.Base
         public static bool IsLike(string text)
         {
             return text.Contains("%") || text.Contains("_");
+        }
+
+        /// <summary>
+        /// Check if string is null, empty or contains only whitespace.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsWhite(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return true;
+            else if (0 == text.Trim(new char[] { ' ', '\r', '\n', '\t', '\v' }).Length)
+                return true;
+            else
+                return false;
         }
 
         #endregion
