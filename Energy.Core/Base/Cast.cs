@@ -456,7 +456,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert bool to string.
+        /// Convert bool to string. Returns "1" for true and "0" for false.
         /// </summary>
         /// <param name="value">bool</param>
         /// <returns>string</returns>
