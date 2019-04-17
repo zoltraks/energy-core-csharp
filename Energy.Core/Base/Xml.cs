@@ -311,6 +311,40 @@ namespace Energy.Base
             return "";
         }
 
+        public class Class
+        {
+            public class NodeLine
+            {
+                public string Name { get; set; }
+                public string Attribute { get; set; }
+            }
+        }
+
+        public class Pattern
+        {
+            public static string InformalXmlTag = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)";
+        }
+
+        public static Class.NodeLine ExtractRootNodeLine(string xml)
+        {
+            Match m = Regex.Match(xml, Pattern.InformalXmlTag, RegexOptions.IgnorePatternWhitespace);
+            while (true)
+            {
+                if (!m.Success)
+                    return null;
+                if (m.Groups["name"].Value.StartsWith("?") || m.Groups["name"].Value.StartsWith("!"))
+                {
+                    m = m.NextMatch();
+                    continue;
+                }
+                return new Class.NodeLine()
+                {
+                    Name = m.Groups["name"].Value,
+                    Attribute = m.Groups["attribute"].Value,
+                };
+            }
+        }
+
         /// <summary>
         /// Extract root element from XML.
         /// </summary>
