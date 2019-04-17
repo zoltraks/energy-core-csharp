@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -16,6 +15,37 @@ namespace Energy.Base
         #region Lock
 
         private static readonly object _XmlLock = new Energy.Base.Lock();
+
+        #endregion
+
+        #region Class
+
+        public class Class
+        {
+            public class TagLine
+            {
+                /// <summary>
+                /// XML Tag Name
+                /// </summary>
+                public string Name { get; set; }
+
+                /// <summary>
+                /// XML Attribute Line (needs to be processed)
+                /// </summary>
+                public string Attribute { get; set; }
+
+                public bool IsSimple { get { return Energy.Base.Text.IsWhite(this.Attribute); } }
+            }
+        }
+
+        #endregion
+
+        #region Pattern
+
+        public class Pattern
+        {
+            public static string InformalXmlTag = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)";
+        }
 
         #endregion
 
@@ -41,13 +71,13 @@ namespace Energy.Base
             {
                 lock (_XmlLock)
                 {
-                    XmlRootAttribute xra = new XmlRootAttribute(root);
+                    System.Xml.Serialization.XmlRootAttribute xra = new System.Xml.Serialization.XmlRootAttribute(root);
                     xra.Namespace = space;
-                    XmlSerializer xs = new XmlSerializer(data.GetType(), xra);
+                    System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(data.GetType(), xra);
                     StringBuilder sb = new StringBuilder();
                     XmlWriterSettings xws = new XmlWriterSettings() { OmitXmlDeclaration = true };
                     xws.Indent = true;
-                    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                    System.Xml.Serialization.XmlSerializerNamespaces ns = new System.Xml.Serialization.XmlSerializerNamespaces();
                     ns.Add("", space);
                     XmlWriter xw = XmlWriter.Create(sb, xws);
                     xs.Serialize(xw, data, ns);
@@ -114,9 +144,9 @@ namespace Energy.Base
                 {
                     lock (_XmlLock)
                     {
-                        XmlRootAttribute attribute = new XmlRootAttribute(element);
+                        System.Xml.Serialization.XmlRootAttribute attribute = new System.Xml.Serialization.XmlRootAttribute(element);
                         attribute.Namespace = space;
-                        XmlSerializer serializer = new XmlSerializer(type, attribute);
+                        System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(type, attribute);
                         StringReader stream = new StringReader(content);
                         XmlReaderSettings settings = new XmlReaderSettings();
                         settings.CheckCharacters = false;
@@ -299,8 +329,8 @@ namespace Energy.Base
 
         public static string GetXmlRoot(Type type)
         {
-            XmlRootAttribute xmlRootAttribute = (XmlRootAttribute)
-                Energy.Base.Class.GetClassAttribute(type, typeof(XmlRootAttribute));
+            System.Xml.Serialization.XmlRootAttribute xmlRootAttribute = (System.Xml.Serialization.XmlRootAttribute)
+                Energy.Base.Class.GetClassAttribute(type, typeof(System.Xml.Serialization.XmlRootAttribute));
             if (xmlRootAttribute != null)
                 return xmlRootAttribute.ElementName;
             Energy.Attribute.Data.ElementAttribute attributeElement = (Energy.Attribute.Data.ElementAttribute)
@@ -311,21 +341,7 @@ namespace Energy.Base
             return "";
         }
 
-        public class Class
-        {
-            public class NodeLine
-            {
-                public string Name { get; set; }
-                public string Attribute { get; set; }
-            }
-        }
-
-        public class Pattern
-        {
-            public static string InformalXmlTag = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)";
-        }
-
-        public static Class.NodeLine ExtractRootNodeLine(string xml)
+        public static Class.TagLine ExtractRootNodeLine(string xml)
         {
             Match m = Regex.Match(xml, Pattern.InformalXmlTag, RegexOptions.IgnorePatternWhitespace);
             while (true)
@@ -337,7 +353,7 @@ namespace Energy.Base
                     m = m.NextMatch();
                     continue;
                 }
-                return new Class.NodeLine()
+                return new Class.TagLine()
                 {
                     Name = m.Groups["name"].Value,
                     Attribute = m.Groups["attribute"].Value,

@@ -16,7 +16,7 @@ namespace Energy.Core.Test.Base
             string expect;
             string result;
             xml = @" < ?xml encoding utf > < !doctype aaa> < ro_ot  xmlns:a=""dfaf"" option_1 xmlns:b=""asdfadsf"" abc / >";
-            Energy.Base.Xml.Class.NodeLine n;
+            Energy.Base.Xml.Class.TagLine n;
             n = Energy.Base.Xml.ExtractRootNodeLine(xml);
             result = n.Name;
             expect = "ro_ot";
@@ -29,6 +29,7 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Cast.BoolToString(Energy.Base.Text.IsWhite(n.Attribute));
             expect = "1";
             Assert.AreEqual(expect, result);
+            Assert.IsTrue(n.IsSimple);
         }
     }
 }
