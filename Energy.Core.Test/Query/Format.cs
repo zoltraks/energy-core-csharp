@@ -44,6 +44,9 @@ namespace Energy.Core.Test.Query
             expect = "[[]]]";
             result = format.Object(value);
             Assert.AreEqual(expect, result);
+
+            string[] array = new string[] { null, "", "'", "''" };
+            Assert.AreEqual(0, Energy.Base.Text.Compare(format.Text(array), new string[] { "NULL", "''", "''''", "''''''" }));
         }
     }
 }

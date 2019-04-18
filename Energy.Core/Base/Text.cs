@@ -20,6 +20,7 @@ namespace Energy.Base
         #region Constants
 
         private static string _BR = "<br>";
+
         /// <summary>HTML break</summary>
         public static string BR { get { return _BR; } private set { _BR = value; } }
 
@@ -315,6 +316,21 @@ namespace Energy.Base
         public static bool IsLike(string text)
         {
             return text.Contains("%") || text.Contains("_");
+        }
+
+        /// <summary>
+        /// Check if string is null, empty or contains only whitespace.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsWhite(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return true;
+            else if (0 == text.Trim(new char[] { ' ', '\r', '\n', '\t', '\v' }).Length)
+                return true;
+            else
+                return false;
         }
 
         #endregion
@@ -3324,6 +3340,68 @@ namespace Energy.Base
         public static bool IsLong(string value)
         {
             return IsLong(value, true);
+        }
+
+        #endregion
+
+        #region First
+
+        /// <summary>
+        /// Return first character of a string or empty string if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string First(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            else
+                return text[0].ToString();
+        }
+
+        /// <summary>
+        /// Return first maximum characters of a string or empty string if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="maximum">maximum</param>
+        /// <returns></returns>
+        public static string First(string text, int maximum)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            else if (text.Length > maximum)
+                return text.Substring(0, maximum);
+            else
+                return text;
+        }
+
+        /// <summary>
+        /// Return first character of a string or null if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string FirstOrNull(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+            else
+                return text[0].ToString();
+        }
+
+        /// <summary>
+        /// Return first maximum characters of a string or null if doesn't contain any characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="maximum">maximum</param>
+        /// <returns></returns>
+        public static string FirstOrNull(string text, int maximum)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+            else if (text.Length > maximum)
+                return text.Substring(0, maximum);
+            else
+                return text;
         }
 
         #endregion

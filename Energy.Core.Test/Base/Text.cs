@@ -7,7 +7,7 @@ namespace Energy.Core.Test.Base
     public class Text
     {
         [TestMethod]
-        public void FormatWithNull()
+        public void TextFormatWithNull()
         {
             string value = string.Format("{0} {1}", null, null).Trim();
             Assert.AreEqual(0, value.Length);
@@ -503,6 +503,27 @@ namespace Energy.Core.Test.Base
                 IncludeWhite = true,
             });
             Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void TextFirst()
+        {
+            string text;
+            text = null;
+            Assert.AreEqual("", Energy.Base.Text.First(text));
+            Assert.AreEqual("", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            text = "";
+            Assert.AreEqual("", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text, 2));
+            text = "a";
+            Assert.AreEqual("a", Energy.Base.Text.First(text, 2));
+            Assert.AreEqual("a", Energy.Base.Text.FirstOrNull(text, 2));
+            text = "ab";
+            Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
+            text = "abc";
+            Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
         }
     }
 }
