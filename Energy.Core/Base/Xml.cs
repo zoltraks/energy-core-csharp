@@ -261,6 +261,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region Helper
+
         /// <summary>
         /// Read XML string element.
         /// </summary>
@@ -335,6 +337,10 @@ namespace Energy.Base
             writer.WriteEndElement();
         }
 
+        #endregion
+
+        #region GetXmlRoot
+
         public static string GetXmlRoot(object _)
         {
             if (_ == null)
@@ -361,6 +367,10 @@ namespace Energy.Base
 
             return "";
         }
+
+        #endregion
+
+        #region Extract
 
         /// <summary>
         /// Extract root tag information from XML content.
@@ -416,5 +426,7 @@ namespace Energy.Base
                 return root;
             return root.Substring(root.LastIndexOf(":") + 1);
         }
+
+        #endregion
     }
 }
