@@ -265,7 +265,7 @@ namespace Energy.Query
         #region Text
 
         /// <summary>
-        /// Format object value as TEXT.
+        /// Format string value as TEXT.
         /// Null values will be represented as "NULL".
         /// </summary>
         /// <param name="value"></param>
@@ -278,7 +278,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format object value as TEXT.
+        /// Format string value as TEXT.
         /// When nullify parameter is set to true, null values
         /// will be represented as "NULL" instead of "''".
         /// </summary>
@@ -293,7 +293,7 @@ namespace Energy.Query
         }
 
         /// <summary>
-        /// Format object value as TEXT with limited length.
+        /// Format string value as TEXT with limited length.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="limit"></param>
@@ -301,6 +301,20 @@ namespace Energy.Query
         public string Text(string text, int limit)
         {
             return Text(Energy.Base.Text.Limit(text, limit));
+        }
+
+        /// <summary>
+        /// Format string value as TEXT with limited length.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="limit"></param>
+        /// <param name="nullify"></param>
+        /// <returns>string</returns>
+        public string Text(string text, int limit, bool nullify)
+        {
+            return Text(Energy.Base.Text.Limit(text, limit), nullify);
         }
 
         /// <summary>
@@ -313,6 +327,84 @@ namespace Energy.Query
             if (value == null)
                 return "NULL";
             return Text(Energy.Base.Cast.ObjectToString(value));
+        }
+
+        /// <summary>
+        /// Format string values as TEXT.
+        /// Null values will be represented as "NULL".
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public string[] Text(string[] array)
+        {
+            if (null == array || 0 == array.Length)
+                return array;
+            List<string> list = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                list.Add(Text(array[i]));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Format string values as TEXT with limited length.
+        /// Null values will be represented as "NULL".
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public string[] Text(string[] array, int limit)
+        {
+            if (null == array || 0 == array.Length)
+                return array;
+            List<string> list = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                list.Add(Text(array[i], limit));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Format string values as TEXT with limited length.
+        /// When nullify parameter is set to true, null values
+        /// will be represented as "NULL" instead of "''".
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="limit"></param>
+        /// <param name="nullify"></param>
+        /// <returns></returns>
+        public string[] Text(string[] array, int limit, bool nullify)
+        {
+            if (null == array || 0 == array.Length)
+                return array;
+            List<string> list = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                list.Add(Text(array[i], limit, nullify));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Format string values as TEXT.
+        /// Null values will be represented as "NULL".
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public string[] Text(object[] array)
+        {
+            if (null == array)
+                return null;
+            if (0 == array.Length)
+                return new string[] { };
+            List<string> list = new List<string>();
+            for (int i = 0; i < array.Length; i++)
+            {
+                list.Add(Text(array[i]));
+            }
+            return list.ToArray();
         }
 
         #endregion
