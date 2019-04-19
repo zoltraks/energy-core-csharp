@@ -5,9 +5,9 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
 WORKDIR /src
-COPY ["WebAppBackendCore/WebAppBackendCore.csproj", "WebAppBackendCore/"]
+COPY ["./WebAppBackendCore.csproj", "WebAppBackendCore/"]
 RUN dotnet restore "WebAppBackendCore/WebAppBackendCore.csproj"
-COPY . .
+COPY . "WebAppBackendCore/"
 WORKDIR "/src/WebAppBackendCore"
 RUN dotnet build "WebAppBackendCore.csproj" -c Release -o /app
 
