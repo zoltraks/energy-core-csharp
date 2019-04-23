@@ -393,5 +393,52 @@ namespace Energy.Core.Test.Base
             }
             Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 172, 32 }, buffer));
         }
+
+        [TestMethod]
+        public void DateTimeToString()
+        {
+            DateTime value;
+            string result;
+            string expect;
+
+            value = DateTime.MinValue;
+            expect = "";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "1753-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1).AddMilliseconds(1);
+            expect = "1753-01-01 00:00:00.001";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "1753-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "N/A";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, "N/A", new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            result = Energy.Base.Cast.DateTimeToString(value, "", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.IsNull(result);
+
+            value = DateTime.MinValue;
+            expect = "";
+            result = Energy.Base.Cast.DateTimeToString(value, "", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
+
+            value = DateTime.MinValue;
+            expect = "0001-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
+        }
     }
 }

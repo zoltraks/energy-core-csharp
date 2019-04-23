@@ -35,6 +35,14 @@ namespace Energy.Base
 
         private const string SINGLE_STRING_FORMAT = "G9";
 
+        private static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_DATE = "yyyy-MM-dd";
+
         #endregion
 
         #region As
@@ -1729,6 +1737,76 @@ namespace Energy.Base
         public static string DateTimeToString(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToString((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Return DateTime value as text with custom format and empty value. 
+        /// Optional list of "empty" DateTime values may be specified.
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <param name="customTimeFormat">Custom format text, like "yyyy-MM-dd HH:mm:ss.fff"</param>
+        /// <param name="customDateFormat">Custom format text for date, if time part is midnight, like "yyyy-MM-dd"</param>
+        /// <param name="emptyValue">Text representation for empty value, like " N/A "</param>
+        /// <param name="emptyList">Array of DateTime values considered to be empty, like new DateTime[] { DateTime.MinValue, new DateTime(1753, 1, 1) }</param>
+        /// <returns>Date and time string representation</returns>
+        public static string DateTimeToString(DateTime? stamp, string customTimeFormat, string customDateFormat, string emptyValue, DateTime[] emptyList)
+        {
+            if (stamp == null)
+            {
+                return emptyValue;
+            }
+
+            if (emptyList != null && emptyList.Length > 0)
+            {
+                for (int i = 0; i < emptyList.Length; i++)
+                {
+                    if (emptyList[i] == stamp)
+                    {
+                        return emptyValue;
+                    }
+                }
+            }
+            else if (stamp == DateTime.MinValue || stamp == DateTime.MaxValue)
+            {
+                return emptyValue;
+            }
+
+            string customFormat = customTimeFormat;
+
+            if (customDateFormat != null)
+            {
+                if (((DateTime)stamp).TimeOfDay.Ticks == 0)
+                {
+                    customFormat = customDateFormat;
+                }
+            }
+            else if (customFormat == null)
+            {
+                long microseconds = ((DateTime)stamp).TimeOfDay.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
+                if (microseconds % 1000 > 0)
+                {
+                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MICROSECOND;
+                }
+                else if (((DateTime)stamp).Millisecond > 0)
+                {
+                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MILLISECOND;
+                }
+                else
+                {
+                    if (((DateTime)stamp).TimeOfDay.Ticks > 0)
+                    {
+                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_SECOND;
+                    }
+                    else
+                    {
+                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_DATE;
+                    }
+                }
+            }
+
+            string text = "" == customFormat ? "" : ((DateTime)stamp).ToString(customFormat);
+
+            return text;
         }
 
         /// <summary>
