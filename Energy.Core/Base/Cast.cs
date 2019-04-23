@@ -1749,6 +1749,7 @@ namespace Energy.Base
         /// <param name="emptyValue">Text representation for empty value, like " N/A "</param>
         /// <param name="emptyList">Array of DateTime values considered to be empty, like new DateTime[] { DateTime.MinValue, new DateTime(1753, 1, 1) }</param>
         /// <returns>Date and time string representation</returns>
+        //[Energy.Attribute.Code.Refactoring("Extract method for automatic selection of custom format string for DateTime", Progress = 10.5)]
         public static string DateTimeToString(DateTime? stamp, string customTimeFormat, string customDateFormat, string emptyValue, DateTime[] emptyList)
         {
             if (stamp == null)
@@ -1782,6 +1783,7 @@ namespace Energy.Base
             }
             else if (customFormat == null)
             {
+                // TODO Refactoring
                 long microseconds = ((DateTime)stamp).TimeOfDay.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
                 if (microseconds % 1000 > 0)
                 {
