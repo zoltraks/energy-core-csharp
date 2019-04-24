@@ -243,6 +243,7 @@ namespace Energy.Base
         {
             /// <summary>
             /// Split path string as used in environment variables by a platform-specific separator character.
+            /// </summary>
             /// <param name="pathVariable"></param>
             /// <param name="splitChars"></param>
             /// <returns></returns>
