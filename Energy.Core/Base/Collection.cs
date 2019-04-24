@@ -286,6 +286,44 @@ namespace Energy.Base
                 Array.Copy(array, start, data, 0, count);
                 return data;
             }
+
+            /// <summary>
+            /// Exclude every element from source array.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="exclude"></param>
+            /// <returns></returns>
+            public static T[] Exclude(T[] array, T[] exclude)
+            {
+                if (null == array || null == exclude || 0 == array.Length || 0 == exclude.Length)
+                {
+                    return array;
+                }
+                int capacity = array.Length;
+                if (capacity > 100)
+                {
+                    capacity = 100;
+                }
+                List<T> list = capacity > 1 ? new List<T>(capacity) : new List<T>();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    bool found = false;
+                    for (int n = 0; n < exclude.Length; n++)
+                    {
+                        if (array[i].Equals(exclude[n]))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        continue;
+                    }
+                    list.Add(array[i]);
+                }
+                return list.ToArray();
+            }
         }
 
         #endregion
@@ -571,6 +609,45 @@ namespace Energy.Base
                     }
                 }
                 return 0;
+            }
+
+            /// <summary>
+            /// Remove from first array every element from second array by comparisation.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="exclude"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static string[] Exclude(string[] array, string[] exclude, bool ignoreCase)
+            {
+                if (null == array || null == exclude || 0 == array.Length || 0 == exclude.Length)
+                {
+                    return array;
+                }
+                int capacity = array.Length;
+                if (capacity > 100)
+                {
+                    capacity = 100;
+                }
+                List<string> list = capacity > 1 ? new List<string>(capacity) : new List<string>();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    bool found = false;
+                    for (int n = 0; n < exclude.Length; n++)
+                    {
+                        if (0 == string.Compare(array[i], exclude[n], ignoreCase))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        continue;
+                    }
+                    list.Add(array[i]);
+                }
+                return list.ToArray();
             }
         }
 

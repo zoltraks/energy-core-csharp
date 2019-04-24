@@ -165,5 +165,27 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(false, Energy.Base.Cast.AsBool(x["b"]));
             Assert.AreEqual(true, Energy.Base.Cast.AsBool(x["c"]));
         }
+
+        [TestMethod]
+        public void StringArrayExclude()
+        {
+            string[] array, exclude, expect, result;
+
+            array = new string[] { "a", "b", "c", null };
+            exclude = new string[] { null };
+
+            expect = new string[] { "a", "b", "c" };
+            result = Energy.Base.Collection.StringArray.Exclude(array, exclude, false);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            exclude = new string[] { "a", "B", null };
+            expect = new string[] { "b", "c" };
+            result = Energy.Base.Collection.StringArray.Exclude(array, exclude, false);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+
+            expect = new string[] { "c" };
+            result = Energy.Base.Collection.StringArray.Exclude(array, exclude, true);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+        }
     }
 }
