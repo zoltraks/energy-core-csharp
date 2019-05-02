@@ -103,6 +103,9 @@ namespace Energy.Core.Test.Base
             string str7 = long.MaxValue.ToString();
             double num7 = Energy.Base.Cast.StringToInteger(str7);
             Assert.AreEqual(0, num7);
+            string str8 = " 987654321 ";
+            int num8 = Energy.Base.Cast.StringToInteger(str8);
+            Assert.AreEqual(987654321, num8);
         }
 
         private class ExampleTypeStructure
