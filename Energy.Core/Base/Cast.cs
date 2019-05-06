@@ -1070,6 +1070,99 @@ namespace Energy.Base
             return stream;
         }
 
+        /// <summary>
+        /// Read data from a stream until limit is reached.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream, int limit)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, limit <= 0 || limit > buffer.Length ? buffer.Length : limit)))
+                {
+                    ms.Write(buffer, 0, count);
+                    if (limit > 0)
+                    {
+                        limit -= count;
+                    }
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Read all data from stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, buffer.Length)))
+                {
+                    ms.Write(buffer, 0, count);
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using specified encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream, Encoding encoding)
+        {
+            if (null == encoding)
+            {
+                encoding = Encoding.UTF8;
+            }
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using UTF-8 encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream)
+        {
+            Encoding encoding = System.Text.Encoding.UTF8;
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
         #endregion
 
         #region Decimal
