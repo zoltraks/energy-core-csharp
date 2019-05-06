@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -3380,36 +3381,59 @@ namespace Energy.Base
 
         #region Enumeration
 
-        public static Energy.Enumeration.TextPad EnumerationTextAlignToTextPad(Energy.Enumeration.TextAlign align)
+        /// <summary>
+        /// Enumeration conversions
+        /// </summary>
+        public static class Enumeration
         {
-            switch (align)
+            public static Energy.Enumeration.TextPad TextAlignToTextPad(Energy.Enumeration.TextAlign align)
             {
-                default:
-                    return Enumeration.TextPad.None;
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextPad.None;
 
-                case Enumeration.TextAlign.Center:
-                    return Enumeration.TextPad.Center;
+                    case Energy.Enumeration.TextAlign.Center:
+                        return Energy.Enumeration.TextPad.Center;
 
-                case Enumeration.TextAlign.Left:
-                    return Enumeration.TextPad.Right;
+                    case Energy.Enumeration.TextAlign.Left:
+                        return Energy.Enumeration.TextPad.Right;
 
-                case Enumeration.TextAlign.Right:
-                    return Enumeration.TextPad.Left;
+                    case Energy.Enumeration.TextAlign.Right:
+                        return Energy.Enumeration.TextPad.Left;
+                }
             }
-        }
 
-        public static Energy.Enumeration.TextAlign EnumerationTextPadToTextAlign(Energy.Enumeration.TextPad pad)
-        {
-            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
-            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
-            if (beLeft && beRight)
-                return Enumeration.TextAlign.Center;
-            else if (beLeft)
-                return Enumeration.TextAlign.Right;
-            else if (beRight)
-                return Enumeration.TextAlign.Left;
-            else
-                return Enumeration.TextAlign.None;
+            public static Energy.Enumeration.TextAlign TextPadToTextAlign(Energy.Enumeration.TextPad pad)
+            {
+                bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+                bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+                if (beLeft && beRight)
+                    return Energy.Enumeration.TextAlign.Center;
+                else if (beLeft)
+                    return Energy.Enumeration.TextAlign.Right;
+                else if (beRight)
+                    return Energy.Enumeration.TextAlign.Left;
+                else
+                    return Energy.Enumeration.TextAlign.None;
+            }
+
+            public static Energy.Enumeration.TextAlign CharToTextAlign(char align)
+            {
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextAlign.None;
+                    case '<':
+                        return Energy.Enumeration.TextAlign.Left;
+                    case '>':
+                        return Energy.Enumeration.TextAlign.Right;
+                    case '-':
+                        return Energy.Enumeration.TextAlign.Center;
+                    case '=':
+                        return Energy.Enumeration.TextAlign.Justify;
+                }
+            }
         }
 
         #endregion
