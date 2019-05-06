@@ -21,6 +21,7 @@ namespace Energy.Core.Test.Core
         [TestMethod]
         public void ProgramGetCommandName()
         {
+            System.Reflection.Assembly asm = Energy.Core.Program.GetAssembly();
             string cmd = Energy.Core.Program.GetCommandName();
             Assert.IsNotNull(cmd);
         }

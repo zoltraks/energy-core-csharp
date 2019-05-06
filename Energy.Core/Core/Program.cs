@@ -12,31 +12,33 @@ namespace Energy.Core
         #region Utility
 
         /// <summary>
-        /// Get current assembly from GetCallingAssembly or GetExecutingAssembly.
+        /// Get current assembly from GetExecutingAssembly or GetCallingAssembly.
         /// This function will not throw any exception, returning null on any error.
         /// </summary>
         /// <returns></returns>
         public static System.Reflection.Assembly GetAssembly()
         {
-            System.Reflection.Assembly assembly = null;
+            System.Reflection.Assembly assembly;
 
             try
             {
-                if (null == assembly)
-                    assembly = System.Reflection.Assembly.GetCallingAssembly();
+                assembly = System.Reflection.Assembly.GetCallingAssembly();
+                if (null != assembly)
+                    return assembly;
             }
             catch
             { }
 
             try
             {
-                if (null == assembly)
-                    assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                if (null != assembly)
+                    return assembly;
             }
             catch
             { }
 
-            return assembly;
+            return null;
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        public static string GetExecutionDirectory(System.Reflection.Assembly assembly)
         {
             if (assembly == null)
                 return null;
@@ -52,12 +54,15 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Get execution directory from assembly location.
+        /// Get execution directory from executing assembly location.
         /// </summary>
         /// <returns></returns>
-        public static string GetExecutionPath()
+        public static string GetExecutionDirectory()
         {
-            return GetExecutionPath(GetAssembly());
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            if (null == assembly)
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return System.IO.Path.GetDirectoryName(assembly.Location);
         }
 
         /// <summary>
@@ -84,7 +89,10 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
-            return GetCommandName(GetAssembly());
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            if (null == assembly)
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return GetCommandName(assembly);
         }
 
         public static System.Globalization.CultureInfo SetLanguage(string culture)

@@ -170,6 +170,7 @@ namespace Energy.Core
 
         #region Utility
 
+        [Obsolete("Use Energy.Program.SetLanguage instead")]
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
             try
@@ -186,11 +187,13 @@ namespace Energy.Core
             }
         }
 
+        [Obsolete("Use Energy.Program.SetLanguage without any parameters instead")]
         public static System.Globalization.CultureInfo SetDefaultLanguage()
         {
             return SetLanguage("en-US");
         }
 
+        [Obsolete("Use Energy.Program.GetCultureInfo instead")]
         public static System.Globalization.CultureInfo GetDefaultCultureInfo()
         {
             System.Globalization.CultureInfo cultureInfo;
@@ -206,6 +209,7 @@ namespace Energy.Core
             }
         }
 
+        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
             try
@@ -221,42 +225,16 @@ namespace Energy.Core
             }
         }
 
+        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(string encoding)
         {
             SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
+        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding()
         {
             SetConsoleEncoding(System.Text.Encoding.UTF8);
-        }
-
-        /// <summary>
-        /// Get current assembly from GetCallingAssembly or GetExecutingAssembly.
-        /// This function will not throw any exception, returning null on any error.
-        /// </summary>
-        /// <returns></returns>
-        public static System.Reflection.Assembly GetAssembly()
-        {
-            System.Reflection.Assembly assembly = null;
-
-            try
-            {
-                if (null == assembly)
-                    assembly = System.Reflection.Assembly.GetCallingAssembly();
-            }
-            catch
-            { }
-
-            try
-            {
-                if (null == assembly)
-                    assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            }
-            catch
-            { }
-
-            return assembly;
         }
 
         /// <summary>
@@ -264,6 +242,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Program.GetExecutionDirectory instead")]
         public static string GetExecutionPath(System.Reflection.Assembly assembly)
         {
             if (assembly == null)
@@ -275,36 +254,13 @@ namespace Energy.Core
         /// Get execution directory from assembly location.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("Use Energy.Program.GetExecutionDirectory instead")]
         public static string GetExecutionPath()
         {
-            return GetExecutionPath(GetAssembly());
-        }
-
-        /// <summary>
-        /// Get short command name from assembly location.
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <returns></returns>
-        public static string GetCommandName(System.Reflection.Assembly assembly)
-        {
-            try
-            {
-                string location = assembly.Location;
-                return Energy.Base.File.GetCommandName(location);
-            }
-            catch (NotSupportedException)
-            {
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// Get short command name from current assembly location.
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCommandName()
-        {
-            return GetCommandName(GetAssembly());
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            if (null == assembly)
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return System.IO.Path.GetDirectoryName(assembly.Location);
         }
 
         #endregion
