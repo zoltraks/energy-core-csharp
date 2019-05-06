@@ -288,6 +288,7 @@ namespace Energy.Base
 
             /// <summary>
             /// Split path string as used in environment variables by a platform-specific separator character.
+            /// </summary>
             /// <param name="pathVariable"></param>
             /// <returns></returns>
             public static string[] Split(string pathVariable)

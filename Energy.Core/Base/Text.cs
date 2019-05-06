@@ -238,7 +238,9 @@ namespace Energy.Base
                 if (!text.StartsWith(prefix))
                     text = prefix + text;
                 if (!text.EndsWith(suffix))
+#pragma warning disable IDE0054 // Use compound assignment
                     text = text + suffix;
+#pragma warning restore IDE0054 // Use compound assignment
                 return text;
             }
         }
@@ -2868,24 +2870,6 @@ namespace Energy.Base
         /// </summary>
         /// <param name="text">Text value to be aligned in a cell</param>
         /// <param name="size"></param>
-        /// <param name="pad">
-        /// Padding direction, may be left or right.
-        /// Because padding is defined as flags, center or middle is also avaiable.
-        /// </param>
-        /// <returns></returns>
-        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad)
-        {
-            string remains = "";
-            return Cell(text, 0, size, pad, ' ', null, null, out remains);
-        }
-
-        /// <summary>
-        /// Align and limit the text to the specified size. 
-        /// Cut the initial characters from the text value. 
-        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
-        /// </summary>
-        /// <param name="text">Text value to be aligned in a cell</param>
-        /// <param name="size"></param>
         /// <param name="fill">
         /// Character that will be used if text is shorter than specified size.
         /// </param>
@@ -2916,15 +2900,13 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, out string remains)
         {
-            remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, ' ', null, null, out remains);
         }
 
         /// <summary>
-        /// Align and limit the text to the specified size. 
+        /// Align and limit text to the specified size. 
         /// Cut the initial characters from the text value. 
-        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
         /// </summary>
         /// <param name="text">Text value to be aligned in a cell</param>
         /// <param name="start">
@@ -2935,14 +2917,51 @@ namespace Energy.Base
         /// <param name="fill">
         /// Character that will be used if text is shorter than specified size.
         /// </param>
-        /// <param name="align">Text alignment</param>
-        /// <param name="remains"></param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <param name="remains">Output remaining string</param>
         /// <returns></returns>
-        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        public static string Cell(string text, int start, int size, char align, char fill, out string remains)
         {
-            remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
-            return Cell(text, start, size, pad, fill, null, null, out remains);
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            return Cell(text, start, size, textPad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <param name="remains">Output remaining string</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, char align, char fill, out string remains)
+        {
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            return Cell(text, 0, size, textPad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align text to the specified size. 
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, char align, char fill)
+        {
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            string useless;
+            return Cell(text, 0, size, textPad, fill, null, null, out useless);
         }
 
         /// <summary>
@@ -2961,7 +2980,7 @@ namespace Energy.Base
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, ' ', null, null, out remains);
         }
 
@@ -2984,7 +3003,7 @@ namespace Energy.Base
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, fill, null, null, out remains);
         }
 
@@ -3001,7 +3020,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, out string remains)
         {
             remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, ' ', null, null, out remains);
         }
 
@@ -3021,7 +3040,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
         {
             remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, fill, null, null, out remains);
         }
 
@@ -3037,7 +3056,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, ' ', null, null, out remains);
         }
 
@@ -3056,7 +3075,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, fill, null, null, out remains);
         }
 
@@ -3186,7 +3205,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Pad(string text, int size, char fill, Energy.Enumeration.TextAlign align)
         {
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Pad(text, size, fill, pad, false);
         }
 

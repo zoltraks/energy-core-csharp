@@ -455,6 +455,17 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, result);
             expect = "g";
             Assert.AreEqual(expect, remains);
+
+            text = "Another";
+            result = Energy.Base.Text.Cell(text, 9, '<', ' ');
+            expect = "Another  ";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 9, '>', ' ');
+            expect = "  Another";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 9, '-', ' ');
+            expect = " Another ";
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]
