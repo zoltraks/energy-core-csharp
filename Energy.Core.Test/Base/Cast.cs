@@ -398,6 +398,12 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void StreamToString()
+        {
+
+        }
+
+        [TestMethod]
         public void DateTimeToString()
         {
             DateTime value;
