@@ -7,7 +7,7 @@ namespace Energy.Core.Test.Core
     public class Bug
     {
         [TestMethod]
-        public void CoreBugSuppress()
+        public void BugSuppress()
         {
             Energy.Core.Bug.Suppress("C002", false);
             Energy.Base.Lock lock1 = new Energy.Base.Lock();

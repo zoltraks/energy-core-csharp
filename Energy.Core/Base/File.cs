@@ -185,6 +185,36 @@ namespace Energy.Base
             return path;
         }
 
+        /// <summary>
+        /// Get short command name from file path.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static string GetCommandName(string file)
+        {
+            if (string.IsNullOrEmpty(file))
+                return "";
+            try
+            {
+                string ext = System.IO.Path.GetExtension(file);
+                if (Energy.Base.Text.InArray(new string[] { ".exe", ".bat", ".cmd" }
+                    , new string[] { ext, null }, true))
+                {
+                    string cmd = System.IO.Path.GetFileNameWithoutExtension(file);
+                    return cmd;
+                }
+                else
+                {
+                    string cmd = System.IO.Path.GetFileName(file);
+                    return cmd;
+                }
+            }
+            catch (NotSupportedException)
+            {
+                return "";
+            }
+        }
+
         #endregion
 
         /// <summary>

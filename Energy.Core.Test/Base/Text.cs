@@ -260,7 +260,8 @@ namespace Energy.Core.Test.Base
             string[] a = new string[] { "a", "B", null };
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "a"));
             Assert.AreEqual(false, Energy.Base.Text.InArray(a, "A"));
-            Assert.AreEqual(true, Energy.Base.Text.InArray(a, null));
+            // illegal
+            //Assert.AreEqual(true, Energy.Base.Text.InArray(a, null));
             Assert.AreEqual(false, Energy.Base.Text.InArray(null, "A"));
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "b", true));
         }

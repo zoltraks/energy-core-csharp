@@ -2516,6 +2516,40 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Search an array for any of elements to look for.
+        /// If array or look is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="look"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string[] look, bool ignoreCase)
+        {
+            if (null == array || array.Length == 0)
+                return false;
+            if (null == look || look.Length == 0)
+                return false;
+            for (int i = 0; i < look.Length; i++)
+            {
+                if (InArray(array, look[i], ignoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Search an array for any of elements to look for.
+        /// If array or look is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="look"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string[] look)
+        {
+            return InArray(array, look, false);
+        }
+
+        /// <summary>
         /// Check if string element is a part of string array.
         /// If array is null or empty, function will result false.
         /// </summary>

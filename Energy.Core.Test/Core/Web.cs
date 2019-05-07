@@ -7,7 +7,7 @@ namespace Energy.Core.Test.Core
     public class Web
     {
         [TestMethod]
-        public void CoreWebTestMethod()
+        public void WebTestMethod()
         {
         }
     }

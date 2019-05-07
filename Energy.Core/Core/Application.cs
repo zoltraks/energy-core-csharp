@@ -168,7 +168,7 @@ namespace Energy.Core
 
         #endregion
 
-        #region Static
+        #region Utility
 
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
@@ -231,6 +231,39 @@ namespace Energy.Core
             SetConsoleEncoding(System.Text.Encoding.UTF8);
         }
 
+        /// <summary>
+        /// Get current assembly from GetCallingAssembly or GetExecutingAssembly.
+        /// This function will not throw any exception, returning null on any error.
+        /// </summary>
+        /// <returns></returns>
+        public static System.Reflection.Assembly GetAssembly()
+        {
+            System.Reflection.Assembly assembly = null;
+
+            try
+            {
+                if (null == assembly)
+                    assembly = System.Reflection.Assembly.GetCallingAssembly();
+            }
+            catch
+            { }
+
+            try
+            {
+                if (null == assembly)
+                    assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            }
+            catch
+            { }
+
+            return assembly;
+        }
+
+        /// <summary>
+        /// Get execution directory from assembly location.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
         public static string GetExecutionPath(System.Reflection.Assembly assembly)
         {
             if (assembly == null)
@@ -238,9 +271,40 @@ namespace Energy.Core
             return System.IO.Path.GetDirectoryName(assembly.Location);
         }
 
+        /// <summary>
+        /// Get execution directory from assembly location.
+        /// </summary>
+        /// <returns></returns>
         public static string GetExecutionPath()
         {
-            return GetExecutionPath(System.Reflection.Assembly.GetExecutingAssembly());
+            return GetExecutionPath(GetAssembly());
+        }
+
+        /// <summary>
+        /// Get short command name from assembly location.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        public static string GetCommandName(System.Reflection.Assembly assembly)
+        {
+            try
+            {
+                string location = assembly.Location;
+                return Energy.Base.File.GetCommandName(location);
+            }
+            catch (NotSupportedException)
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Get short command name from current assembly location.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCommandName()
+        {
+            return GetCommandName(GetAssembly());
         }
 
         #endregion
