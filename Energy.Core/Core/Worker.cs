@@ -1,31 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading;
 
 namespace Energy.Core
 {
     /// <summary>
-    /// Thread worker base class for making threading even simpler.
+    /// Thread worker generic base class.
+    /// Override Work method in derrived class.
     /// </summary>
-    public class Worker<T>
+    public class Worker<T>: Energy.Interface.IWork
     {
-        private DateTime _LastStartTime;
-        private readonly object _StartTimeLock = new object();
-
-        /// <summary>Time of last start of execution</summary>
-        public DateTime LastStartTime {
-            get { lock (_StartTimeLock) return _LastStartTime; }
-            private set { lock (_StartTimeLock) _LastStartTime = value; }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Worker()
+        {
         }
 
-        private readonly object _IsRunningLock = new object();
-        /// <summary>Is thread still running?</summary>
+        private readonly object _ThreadLock = new object();
+
+        private DateTime _LastStart;
+        /// <summary>
+        /// Time of last start of execution
+        /// </summary>
+        public DateTime LastStart
+        {
+            get
+            {
+                return _LastStart;
+            }
+            private set
+            {
+                _LastStart = value;
+            }
+        }
+
+        /// <summary>
+        /// Is thread running?
+        /// </summary>
         public bool IsRunning
         {
             get
             {
-                lock (_IsRunningLock)
+                lock (_ThreadLock)
                 {
                     if (_Thread == null)
                         return false;
@@ -37,27 +56,120 @@ namespace Energy.Core
         }
 
         private T _State;
-        private readonly object _StateLock = new object();
-        /// <summary>State</summary>
-        public T State {
-            get { lock (_StateLock) return _State; }
-            set { lock (_StateLock) _State = value; }
+        /// <summary>
+        /// Represents state object.
+        /// Thread safety must be implemented by class if needed.
+        /// </summary>
+        public T State
+        {
+            get
+            {
+                return _State;
+            }
+            set
+            {
+                _State = value;
+            }
         }
 
         private bool _Stopped = true;
-        private readonly object _StoppedLock = new object();
-        /// <summary>Stopped</summary>
-        public bool Stopped { get { lock (_StoppedLock) return _Stopped; } set { lock (_StoppedLock) _Stopped = value; } }
-
-        private System.Threading.Thread _Thread;
-        /// <summary>Thread</summary>
-        public System.Threading.Thread Thread {
-            get { return _Thread; }
-            private set { _Thread = value; }
+        /// <summary>
+        /// Stopped state
+        /// </summary>
+        public bool Stopped
+        {
+            get
+            {
+                lock (_ThreadLock)
+                {
+                    return _Stopped;
+                }
+            }
+            set
+            {
+                lock (_ThreadLock)
+                {
+                    _Stopped = value;
+                }
+            }
         }
 
-        public Worker()
+        private bool _Background = true;
+        /// <summary>
+        /// Run thread in background. 
+        /// Otherwise block program execution until thread is stopped.
+        /// </summary>
+        public bool Background
         {
+            get
+            {
+                lock (_ThreadLock)
+                {
+                    return _Background;
+                }
+            }
+            set
+            {
+                lock (_ThreadLock)
+                {
+                    _Background = value;
+                    if (null != _Thread)
+                    {
+                        _Thread.IsBackground = value;
+                    }
+                }
+            }
+        }
+
+        private CultureInfo _CurrentCulture;
+        /// <summary>
+        /// Run thread in background. 
+        /// Otherwise block program execution until thread is stopped.
+        /// </summary>
+        public CultureInfo CurrentCulture
+        {
+            get
+            {
+                lock (_ThreadLock)
+                {
+                    if (null != _Thread)
+                    {
+                        return _Thread.CurrentCulture;
+                    }
+                    else
+                    {
+                        return _CurrentCulture;
+                    }
+                }
+            }
+            set
+            {
+                lock (_ThreadLock)
+                {
+                    _CurrentCulture = value;
+                    if (null != _Thread)
+                    {
+                        _Thread.CurrentCulture = value;
+                        _Thread.CurrentUICulture = value;
+                    }
+                }
+            }
+        }
+
+        private System.Threading.Thread _Thread;
+        /// <summary>
+        /// Represents working thread
+        /// </summary>
+        public System.Threading.Thread Thread
+        {
+            get
+            {
+                return _Thread;
+            }
+            private set
+            {
+                _Thread = value;
+            }
         }
 
         public static Worker<T> Create()
@@ -66,87 +178,138 @@ namespace Energy.Core
             return _;
         }
 
-        public void Start()
-        {
-            if (IsRunning)
-                return;
-            this.Stopped = false;
-            System.Threading.Thread thread = new System.Threading.Thread(Work);
-            thread.Start(this);
-            this.Thread = thread;
-        }
-
-        public void Stop()
-        {
-            Stopped = true;
-        }
-
-        public virtual void Work(object parameter)
+        public virtual void Work()
         {
             throw new NotImplementedException();
         }
 
-        public bool WaitForExit(int time)
+        public virtual bool Start()
         {
-            return Worker.WaitForExit(_Thread, time);
+            lock (_ThreadLock)
+            {
+                if (null != _Thread)
+                {
+                    if (_Thread.IsAlive)
+                    {
+                        return false;
+                    }
+                }
+                _Thread = new System.Threading.Thread(Work);
+                _Thread.IsBackground = _Background;
+                if (null != _CurrentCulture)
+                {
+                    _Thread.CurrentCulture = _CurrentCulture;
+                    _Thread.CurrentUICulture = _CurrentCulture;
+                }
+                _Stopped = false;
+                _LastStart = DateTime.Now;
+                try
+                {
+                    _Thread.Start(this);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        public virtual void Stop()
+        {
+            Stopped = true;
+        }
+
+        public bool Wait(int time)
+        {
+            return Worker.Wait(_Thread, time);
         }
     }
 
-    public class Worker : Worker<object>
+    /// <summary>
+    /// Worker thread utility class
+    /// </summary>
+    public class Worker
     {
+        #region Class
+
+        public class Simple: Worker<object>
+        {
+
+        }
+
         public class Loop<T>: Worker<T>
         {
 
         }
 
+        public class Event<T>: Worker<T>
+        {
+
+        }
+
+        #endregion
+
+        #region Utility
+
+        #region Wait
+
         /// <summary>
         /// Wait for thread exit, return true if exited, false if still running.
         /// </summary>
         /// <param name="thread"></param>
-        /// <param name="time"></param>
+        /// <param name="time">Time in milliseconds</param>
         /// <returns></returns>
-        public static bool WaitForExit(System.Threading.Thread thread, int time)
+        public static bool Wait(System.Threading.Thread thread, int time)
         {
-            if (thread == null || !thread.IsAlive)
+            if (null == thread || !thread.IsAlive)
+            {
                 return true;
+            }
             System.Threading.ManualResetEvent manualResetEvent = new System.Threading.ManualResetEvent(false);
-            WaitForExitParameter parameter = new Core.Worker.WaitForExitParameter()
+            System.Threading.Thread guardian = new System.Threading.Thread(() =>
             {
-                ManualResetEvent = manualResetEvent,
-                Thread = thread,
-            };
-            System.Threading.Thread guardian = new System.Threading.Thread(WaitForParameter);
-            guardian.Start(parameter);
+                try
+                {
+                    thread.Join();
+                    manualResetEvent.Set();
+                }
+                catch (System.Threading.ThreadAbortException)
+                {
+                }
+            });
+            guardian.IsBackground = true;
+            guardian.Start();
             bool success = manualResetEvent.WaitOne(time);
-            if (!success)
+            if (success)
             {
+                return true;
+            }
+            else
+            { 
                 guardian.Abort();
                 return false;
             }
-            return true;
         }
 
-        private static void WaitForParameter(object parameter)
+        #endregion
+
+        #region Fire
+
+        private static readonly Energy.Base.Lock _FireThreadListLock = new Energy.Base.Lock();
+
+        private static Dictionary<string, Thread> _FireThreadList;
+
+        private static Dictionary<string, Thread> FireThreadList
         {
-            WaitForExitParameter data = parameter as WaitForExitParameter;
-            try
+            get
             {
-                data.Thread.Join();
-                data.Result = true;
-                data.ManualResetEvent.Set();
+                if (_FireThreadList == null)
+                {
+                    _FireThreadList = new Dictionary<string, Thread>();
+                }
+                return _FireThreadList;
             }
-            catch (System.Threading.ThreadAbortException)
-            {
-            }
-        }
-
-        private class WaitForExitParameter
-        {
-            public System.Threading.ManualResetEvent ManualResetEvent;
-
-            public System.Threading.Thread Thread;
-
-            public bool Result;
         }
 
         /// <summary>
@@ -200,20 +363,8 @@ namespace Energy.Core
             }
         }
 
-        static readonly Energy.Base.Lock _FireThreadListLock = new Energy.Base.Lock();
+        #endregion
 
-        static Dictionary<string, Thread> _FireThreadList;
-
-        static Dictionary<string, Thread> FireThreadList
-        {
-            get
-            {
-                if (_FireThreadList == null)
-                {
-                    _FireThreadList = new Dictionary<string, Thread>();
-                }
-                return _FireThreadList;
-            }
-        }
+        #endregion
     }
 }
