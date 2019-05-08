@@ -74,6 +74,7 @@
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Http.cs" />
     <Compile Include="Base\Xml.cs" />
+    <Compile Include="Core\Worker.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />

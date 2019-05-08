@@ -12,12 +12,23 @@ namespace Energy.Core
     /// </summary>
     public class Worker<T>: Energy.Interface.IWork
     {
+        #region Constructor
+
         /// <summary>
         /// Constructor
         /// </summary>
         public Worker()
         {
         }
+
+        public static Worker<T> Create()
+        {
+            return new Worker<T>();
+        }
+
+        #endregion
+
+        #region Property
 
         private readonly object _ThreadLock = new object();
 
@@ -58,7 +69,7 @@ namespace Energy.Core
         private T _State;
         /// <summary>
         /// Represents state object.
-        /// Thread safety must be implemented by class if needed.
+        /// Thread safety must be implemented by object itself if needed.
         /// </summary>
         public T State
         {
@@ -157,6 +168,7 @@ namespace Energy.Core
         }
 
         private System.Threading.Thread _Thread;
+        /*
         /// <summary>
         /// Represents working thread
         /// </summary>
@@ -171,12 +183,9 @@ namespace Energy.Core
                 _Thread = value;
             }
         }
+        */
 
-        public static Worker<T> Create()
-        {
-            Worker<T> _ = new Worker<T>();
-            return _;
-        }
+        #endregion
 
         public virtual void Work()
         {
@@ -194,8 +203,10 @@ namespace Energy.Core
                         return false;
                     }
                 }
-                _Thread = new System.Threading.Thread(Work);
-                _Thread.IsBackground = _Background;
+                _Thread = new System.Threading.Thread(Work)
+                {
+                    IsBackground = _Background
+                };
                 if (null != _CurrentCulture)
                 {
                     _Thread.CurrentCulture = _CurrentCulture;
@@ -205,11 +216,12 @@ namespace Energy.Core
                 _LastStart = DateTime.Now;
                 try
                 {
-                    _Thread.Start(this);
+                    _Thread.Start();
                     return true;
                 }
-                catch
+                catch (Exception x)
                 {
+                    Core.Bug.Write("EC505", x);
                     return false;
                 }
             }
@@ -220,16 +232,42 @@ namespace Energy.Core
             Stopped = true;
         }
 
+        /// <summary>
+        /// Wait for thread to finish work for specified time.
+        /// </summary>
+        /// <param name="time">Time in milliseconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
         public bool Wait(int time)
         {
-            return Worker.Wait(_Thread, time);
+            return Energy.Core.Worker.Wait(_Thread, time);
+        }
+
+        /// <summary>
+        /// Abort thread process.
+        /// Raises a System.Threading.ThreadAbortException to begin the process of terminating the thread.
+        /// Calling this method usually terminates the thread.
+        /// </summary>
+        public void Abort()
+        {
+            lock (_ThreadLock)
+            {
+                _Stopped = true;
+                if (null == _Thread)
+                    return;
+                if (!_Thread.IsAlive)
+                {
+                    _Thread = null;
+                    return;
+                }
+                _Thread.Abort();
+            }
         }
     }
 
     /// <summary>
     /// Worker thread utility class
     /// </summary>
-    public class Worker
+    public static class Worker
     {
         #region Class
 
@@ -255,11 +293,11 @@ namespace Energy.Core
         #region Wait
 
         /// <summary>
-        /// Wait for thread exit, return true if exited, false if still running.
+        /// Wait for thread to finish work for specified time.
         /// </summary>
-        /// <param name="thread"></param>
+        /// <param name="thread">Thread object</param>
         /// <param name="time">Time in milliseconds</param>
-        /// <returns></returns>
+        /// <returns>True if thread exited, false if still running</returns>
         public static bool Wait(System.Threading.Thread thread, int time)
         {
             if (null == thread || !thread.IsAlive)
@@ -277,8 +315,10 @@ namespace Energy.Core
                 catch (System.Threading.ThreadAbortException)
                 {
                 }
-            });
-            guardian.IsBackground = true;
+            })
+            {
+                IsBackground = true
+            };
             guardian.Start();
             bool success = manualResetEvent.WaitOne(time);
             if (success)
