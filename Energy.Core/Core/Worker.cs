@@ -271,20 +271,46 @@ namespace Energy.Core
     {
         #region Class
 
-        public class Simple: Worker<object>
+        #region Simple
+
+        public class Simple<T> : Worker<T>
         {
 
         }
+
+        public class Simple : Simple<object>
+        {
+
+        }
+
+        #endregion
+
+        #region Loop
 
         public class Loop<T>: Worker<T>
         {
 
         }
+        public class Loop : Loop<object>
+        {
+
+        }
+
+        #endregion
+
+        #region Event
 
         public class Event<T>: Worker<T>
         {
 
         }
+
+        public class Event : Event<object>
+        {
+
+        }
+
+        #endregion
 
         #endregion
 
