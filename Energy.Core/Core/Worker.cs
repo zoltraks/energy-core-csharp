@@ -10,7 +10,7 @@ namespace Energy.Core
     /// Thread worker generic base class.
     /// Override Work method in derrived class.
     /// </summary>
-    public class Worker<T>: Energy.Interface.IWork
+    public class Worker<T> : Energy.Interface.IWork
     {
         #region Constructor
 
@@ -187,6 +187,12 @@ namespace Energy.Core
 
         #endregion
 
+        #region Function
+
+        /// <summary>
+        /// Override this method to add implementation for worker process.
+        /// Do not call base.Work() in overriden method.
+        /// </summary>
         public virtual void Work()
         {
             throw new NotImplementedException();
@@ -262,6 +268,8 @@ namespace Energy.Core
                 _Thread.Abort();
             }
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -287,7 +295,7 @@ namespace Energy.Core
 
         #region Loop
 
-        public class Loop<T>: Worker<T>
+        public class Loop<T> : Worker<T>
         {
 
         }
@@ -300,7 +308,7 @@ namespace Energy.Core
 
         #region Event
 
-        public class Event<T>: Worker<T>
+        public class Event<T> : Worker<T>
         {
 
         }
@@ -352,7 +360,7 @@ namespace Energy.Core
                 return true;
             }
             else
-            { 
+            {
                 guardian.Abort();
                 return false;
             }
