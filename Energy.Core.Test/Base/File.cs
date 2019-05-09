@@ -15,5 +15,16 @@ namespace Energy.Core.Test.Base
             bool empty = string.IsNullOrEmpty(file1);
             Assert.AreEqual(false, empty);
         }
+
+        [TestMethod]
+        public void State()
+        {
+            string fileName = Energy.Core.Program.GetExecutionFile();
+            Energy.Base.File.State state = new Energy.Base.File.State(fileName);
+            Assert.IsTrue(state.Exists());
+            Assert.IsTrue(state.IsChanged());
+            state.Refresh();
+            Assert.IsFalse(state.IsChanged());
+        }
     }
 }

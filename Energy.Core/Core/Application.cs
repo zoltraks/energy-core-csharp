@@ -251,10 +251,10 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Get execution directory from assembly location.
+        /// Get execution file directory from current working assembly (calling or executing).
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Use Energy.Program.GetExecutionDirectory instead")]
+        [Obsolete("Use Energy.Program.GetExecutionPath instead")]
         public static string GetExecutionPath()
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();

@@ -42,6 +42,18 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Get execution file from current working assembly (calling or executing).
+        /// </summary>
+        /// <returns></returns>
+        public static string GetExecutionFile()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            if (null == assembly)
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return assembly.Location;
+        }
+
+        /// <summary>
         /// Get execution directory from assembly location.
         /// </summary>
         /// <param name="assembly"></param>
