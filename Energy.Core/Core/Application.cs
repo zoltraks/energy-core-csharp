@@ -51,7 +51,7 @@ namespace Energy.Core
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
-        private ICommandProgram _CommandProgram { get; set; }
+        private ICommandProgram _CommandProgram;
 
         public string[] Arguments { get; private set; }
 
@@ -170,7 +170,7 @@ namespace Energy.Core
 
         #region Utility
 
-        [Obsolete("Use Energy.Program.SetLanguage instead")]
+        [Obsolete("Use Energy.Core.Program.SetLanguage instead")]
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
             try
@@ -187,13 +187,13 @@ namespace Energy.Core
             }
         }
 
-        [Obsolete("Use Energy.Program.SetLanguage without any parameters instead")]
+        [Obsolete("Use Energy.Core.Program.SetLanguage without any parameters instead")]
         public static System.Globalization.CultureInfo SetDefaultLanguage()
         {
             return SetLanguage("en-US");
         }
 
-        [Obsolete("Use Energy.Program.GetCultureInfo instead")]
+        [Obsolete("Use Energy.Core.Program.GetCultureInfo instead")]
         public static System.Globalization.CultureInfo GetDefaultCultureInfo()
         {
             System.Globalization.CultureInfo cultureInfo;
@@ -209,7 +209,7 @@ namespace Energy.Core
             }
         }
 
-        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
             try
@@ -225,13 +225,13 @@ namespace Energy.Core
             }
         }
 
-        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(string encoding)
         {
             SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
-        [Obsolete("Use Energy.Program.SetConsoleEncoding instead")]
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding()
         {
             SetConsoleEncoding(System.Text.Encoding.UTF8);
@@ -242,7 +242,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        [Obsolete("Use Energy.Program.GetExecutionDirectory instead")]
+        [Obsolete("Use Energy.Core.Program.GetExecutionDirectory instead")]
         public static string GetExecutionPath(System.Reflection.Assembly assembly)
         {
             if (assembly == null)
@@ -254,7 +254,7 @@ namespace Energy.Core
         /// Get execution file directory from current working assembly (calling or executing).
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Use Energy.Program.GetExecutionPath instead")]
+        [Obsolete("Use Energy.Core.Program.GetExecutionDirectory instead")]
         public static string GetExecutionPath()
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();

@@ -472,7 +472,7 @@ namespace Energy.Core
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
                                     IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                                 };
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
@@ -690,7 +690,7 @@ namespace Energy.Core
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
                                     IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                                 };
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
@@ -843,7 +843,7 @@ namespace Energy.Core
                         Thread thread = new Thread(() => { WriteUnsafe(log); })
                         {
                             IsBackground = true,
-                            CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                            CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                         };
                         thread.Start();
                         return true;

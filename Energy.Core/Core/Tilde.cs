@@ -949,7 +949,7 @@ namespace Energy.Core
                         _Thread = new Thread(ThreadWork)
                         {
                             IsBackground = false,
-                            CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                            CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                         };
                         _Thread.Start();
                     }
@@ -1000,7 +1000,7 @@ namespace Energy.Core
 
         private static int GetWidth()
         {
-            int width = 0;
+            int width;
             try
             {
                 width = Console.WindowWidth;
@@ -1014,7 +1014,7 @@ namespace Energy.Core
 
         private static int GetHeight()
         {
-            int height = 0;
+            int height;
             try
             {
                 height = Console.WindowHeight;
