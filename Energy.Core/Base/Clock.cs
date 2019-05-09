@@ -9,7 +9,7 @@ namespace Energy.Base
     /// <summary>
     /// Date and time
     /// </summary>
-    public class Clock
+    public static class Clock
     {
         #region Constant
 
@@ -422,6 +422,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region Pattern
+
         private static readonly object _RegexLock = new object();
 
         private static Regex _DateRegex;
@@ -463,6 +465,10 @@ namespace Energy.Base
                 return _TimeRegex;
             }
         }
+
+        #endregion
+
+        #region Parse
 
         /// <summary>
         /// Parse stamp string
@@ -530,6 +536,8 @@ namespace Energy.Base
             return result;
         }
 
+        #endregion
+
         #region Leap
 
         /// <summary>
@@ -537,7 +545,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="year">Year</param>
         /// <returns>True if a year is a leap year</returns>
-        public bool IsLeapYear(int year)
+        public static bool IsLeapYear(int year)
         {
             return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
         }
@@ -650,6 +658,132 @@ namespace Energy.Base
                 , ((DateTime)value).Hour, ((DateTime)value).Minute, ((DateTime)value).Second, ((DateTime)value).Millisecond
                 , ((DateTime)value).Kind
                 );
+        }
+
+        #endregion
+
+        #region HasExpired
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <param name="next">New check time</param>
+        /// <param name="now">Moment of time to check for expiration</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime? last, double time, out DateTime? next, DateTime? now)
+        {
+            next = last;
+
+            if (time < 0)
+            {
+                return false;
+            }
+            if (null == now || now == DateTime.MinValue)
+            {
+                now = DateTime.Now;
+            }
+            if (0 == time || null == last || last == DateTime.MinValue)
+            {
+                next = now;
+                return true;
+            }
+            TimeSpan span = (DateTime)last - (DateTime)now;
+            if (span.TotalSeconds < time)
+            {
+                return false;
+            }
+            else
+            {
+                next = now;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <param name="next">New check time</param>
+        /// <param name="now">Moment of time to check for expiration</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime last, double time, out DateTime next, DateTime now)
+        {
+            next = last;
+
+            if (time < 0)
+            {
+                return false;
+            }
+            if (null == now || now == DateTime.MinValue)
+            {
+                now = DateTime.Now;
+            }
+            if (0 == time || null == last || last == DateTime.MinValue)
+            {
+                next = now;
+                return true;
+            }
+            TimeSpan span = last - now;
+            if (span.TotalSeconds < time)
+            {
+                return false;
+            }
+            else
+            {
+                next = now;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <param name="next">New check time</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime? last, double time, out DateTime? next)
+        {
+            return HasExpired(last, time, out next, null);
+        }
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime? last, double time)
+        {
+            DateTime? useless;
+            return HasExpired(last, time, out useless);
+        }
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <param name="next">New check time</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime last, double time, out DateTime next)
+        {
+            return HasExpired(last, time, out next, DateTime.MinValue);
+        }
+
+        /// <summary>
+        /// Check if the time has expired.
+        /// </summary>
+        /// <param name="last">Last check time</param>
+        /// <param name="time">Time limit in seconds</param>
+        /// <returns></returns>
+        public static bool HasExpired(DateTime last, double time)
+        {
+            DateTime useless;
+            return HasExpired(last, time, out useless);
         }
 
         #endregion
