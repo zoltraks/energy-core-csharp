@@ -58,7 +58,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
-        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        public static string GetExecutionDirectory(System.Reflection.Assembly assembly)
         {
             if (assembly == null)
                 return null;
