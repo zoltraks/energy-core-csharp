@@ -50,7 +50,10 @@ namespace Energy.Base
             public State(string file, bool read)
             {
                 _Name = file;
-                Refresh();
+                if (read)
+                {
+                    Refresh();
+                }
             }
 
             #endregion
