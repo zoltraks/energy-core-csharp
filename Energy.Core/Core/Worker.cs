@@ -286,36 +286,29 @@ namespace Energy.Core
             public abstract override void Work();
         }
 
-        public abstract class Simple : Simple<object>
-        {
-        }
+        public abstract class Simple : Simple<object> { }
 
         #endregion
 
         #region Loop
 
-        public class Loop<T> : Worker<T>
-            {
+        public abstract class Loop<T> : Worker<T>
+        {
+            public abstract override void Work();
+        }
 
-            }
-            public class Loop : Loop<object>
-            {
+        public abstract class Loop : Loop<object> { }
 
-            }
-
-            #endregion
+        #endregion
 
         #region Event
 
-        public class Event<T> : Worker<T>
+        public abstract class Event<T> : Worker<T>
         {
-
+            public abstract override void Work();
         }
 
-        public class Event : Event<object>
-        {
-
-        }
+        public abstract class Event : Event<object> { }
 
         #endregion
 
