@@ -54,7 +54,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Get execution directory from assembly location.
+        /// Get execution directory name from the assembly location.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -66,7 +66,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Get execution directory from executing assembly location.
+        /// Get execution directory name from executing assembly location.
         /// </summary>
         /// <returns></returns>
         public static string GetExecutionDirectory()
