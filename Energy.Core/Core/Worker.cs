@@ -281,14 +281,13 @@ namespace Energy.Core
 
         #region Simple
 
-        public class Simple<T> : Worker<T>
+        public abstract class Simple<T> : Worker<T>
         {
-
+            public abstract override void Work();
         }
 
-        public class Simple : Simple<object>
+        public abstract class Simple : Simple<object>
         {
-
         }
 
         #endregion
@@ -296,15 +295,15 @@ namespace Energy.Core
         #region Loop
 
         public class Loop<T> : Worker<T>
-        {
+            {
 
-        }
-        public class Loop : Loop<object>
-        {
+            }
+            public class Loop : Loop<object>
+            {
 
-        }
+            }
 
-        #endregion
+            #endregion
 
         #region Event
 

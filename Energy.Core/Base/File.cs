@@ -42,9 +42,18 @@ namespace Energy.Base
 
             public State() { }
 
-            public State(string fileName)
+            public State(string file)
             {
-                _Name = fileName;
+                _Name = file;
+            }
+
+            public State(string file, bool read)
+            {
+                _Name = file;
+                if (read)
+                {
+                    Refresh();
+                }
             }
 
             #endregion

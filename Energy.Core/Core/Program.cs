@@ -69,7 +69,7 @@ namespace Energy.Core
         /// Get execution directory name from executing assembly location.
         /// </summary>
         /// <returns></returns>
-        public static string GetExecutionPath()
+        public static string GetExecutionDirectory()
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
             if (null == assembly)
