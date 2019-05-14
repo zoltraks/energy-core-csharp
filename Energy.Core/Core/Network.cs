@@ -71,6 +71,14 @@ namespace Energy.Core
             return GetHostAddress(host, addressFamily);
         }
 
+        /// <summary>
+        /// Return System.Net.Sockets.AddressFamily appropriate to host address.
+        /// This function will try parse IPAddress or use Dns.GetHostEntry to find correct value.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns>
+        /// AddressFamily.Unknown might be returned if correct value could not be determined.
+        /// </returns>
         public static AddressFamily GetAddressFamily(string address)
         {
             if (address == "localhost" || address == "127.0.0.1")
@@ -200,8 +208,9 @@ namespace Energy.Core
                 return false;
             if (!socket.Connected)
                 return false;
-            bool result = !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
-            return result;
+            if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+                return false;
+            return true;
         }
 
         #endregion
