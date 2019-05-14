@@ -208,8 +208,9 @@ namespace Energy.Core
                 return false;
             if (!socket.Connected)
                 return false;
-            bool result = !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
-            return result;
+            if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+                return false;
+            return true;
         }
 
         #endregion
