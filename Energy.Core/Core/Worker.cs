@@ -83,6 +83,8 @@ namespace Energy.Core
             }
         }
 
+        public ManualResetEvent StoppedResetEvent = new ManualResetEvent(false);
+
         private bool _Stopped = true;
         /// <summary>
         /// Stopped state
@@ -101,6 +103,14 @@ namespace Energy.Core
                 lock (_ThreadLock)
                 {
                     _Stopped = value;
+                }
+                if (value)
+                {
+                    StoppedResetEvent.Set();
+                }
+                else
+                {
+                    StoppedResetEvent.Reset();
                 }
             }
         }
