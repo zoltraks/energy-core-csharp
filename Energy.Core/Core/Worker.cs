@@ -26,6 +26,11 @@ namespace Energy.Core
             return new Worker<T>();
         }
 
+        public Worker(T state)
+        {
+            State = state;
+        }
+
         #endregion
 
         #region Property
