@@ -28,6 +28,16 @@ namespace Energy.Core.Test.Base
             Assert.IsFalse(string.IsNullOrEmpty(file7));
             string file8 = Energy.Base.File.Locate("Energy.Core.Test.csproj", new string[] { "..\\.." }, "");
             Assert.IsFalse(string.IsNullOrEmpty(file8));
+            string[] fileArray;
+            fileArray = new string[]
+            {
+                "SQLServerManager14.msc",
+                "SQLServerManager12.msc",
+                "SQLServerManager10.msc",
+                "SQLServerManager.msc",
+            };
+            string file9 = Energy.Base.File.Locate(fileArray, null, null, Enumeration.LocateBehaviour.Default);
+            Assert.IsNotNull(file9);
         }
 
         [TestMethod]

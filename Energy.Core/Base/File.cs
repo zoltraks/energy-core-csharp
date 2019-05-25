@@ -684,7 +684,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it.
+        /// Locate file or comand with one of possible extensions in any directory and return full path to it.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -812,16 +812,46 @@ namespace Energy.Base
             return "";
         }
 
+        /// <summary>
+        /// Locate file or command with one of possible extensions in any directory and return full path to it.
+        /// </summary>
+        /// <param name="list>Array of file names with or without extension and leading path</param>
+        /// <param name="search">Directory search list</param>
+        /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
+        /// <param name="behaviour">Lookup behaviour (iterate over directories or extensions)</param>
+        /// <returns>Empty string if file not found or full path to found one</returns>
+        public static string Locate(string[] list, string[] search, string[] extension, Energy.Enumeration.LocateBehaviour behaviour)
+        {
+            if (null == list)
+            {
+                return "";
+            }
+            string result = "";
+            foreach (string file in list)
+            {
+                result = Locate(file, search, extension, behaviour);
+                if (string.IsNullOrEmpty(result))
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
         #endregion
 
         #region MakeDirectory
 
-        /// <summary>
-        /// Create directory if not exists.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns>Returns true if a directory exists or has been created</returns>
-        public static bool MakeDirectory(string path)
+            /// <summary>
+            /// Create directory if not exists.
+            /// </summary>
+            /// <param name="path"></param>
+            /// <returns>Returns true if a directory exists or has been created</returns>
+            public static bool MakeDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
