@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -22,6 +23,17 @@ namespace Energy.Core.Test.Base
             string[] a2 = new string[] { "A", "A" };
             string t = Energy.Base.Text.Join(glue, format, a1, a2);
             Assert.AreEqual("AA-A", t);
+            Dictionary<string, string> d = new Dictionary<string, string>();
+            d["a"] = "B";
+            d["c"] = "D";
+            t = Energy.Base.Text.Join(null, "{0}{1}", d);
+            Assert.IsNull(t);
+            t = Energy.Base.Text.Join(".", "{0}{1}", d);
+            Assert.AreEqual("aB.cD", t);
+            t = Energy.Base.Text.Join("", "{1}", d);
+            Assert.AreEqual("BD", t);
+            t = Energy.Base.Text.Join("", null, d);
+            Assert.AreEqual("aBcD", t);
         }
 
         [TestMethod]

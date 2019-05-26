@@ -20,7 +20,6 @@ namespace Energy.Base
         #region Constants
 
         private static string _BR = "<br>";
-
         /// <summary>HTML break</summary>
         public static string BR { get { return _BR; } private set { _BR = value; } }
 
@@ -533,7 +532,6 @@ namespace Energy.Base
             return string.Join(glue, list.ToArray());
         }
 
-
         /// <summary>
         /// Join strings into one list with separator.
         /// For example Energy.Base.Text.Join(" : ", "A", "B", "", "C") will return "A : B : : C".
@@ -544,6 +542,70 @@ namespace Energy.Base
         public static string Join(string glue, params string[] array)
         {
             return Energy.Base.Text.Join(glue, true, array);
+        }
+
+        /// <summary>
+        /// Join multiple arrays using format string for each set of elements from every array.
+        /// </summary>
+        /// <param name="glue">Separator string</param>
+        /// <param name="format">String format for each dictionary set, i.e. "{0}: {1}, {2}"</param>
+        /// <param name="array">Arrays (one for each dimension)</param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, params object[][] array)
+        {
+            if (array == null)
+                return null;
+
+            int count = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null || array[i].Length == 0)
+                    continue;
+                if (array[i].Length > count)
+                    count = array[i].Length;
+            }
+
+            List<string> list = new List<string>();
+            List<string> args = new List<string>();
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = 0; j < array.Length; j++)
+                {
+                    if (array[j] != null && array[j].Length > i)
+                        args.Add(Energy.Base.Cast.ObjectToString(array[j][i]));
+                    else
+                        args.Add("");
+                }
+                list.Add(string.Format(format, args.ToArray()));
+                args.Clear();
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        /// <summary>
+        /// Join elements of string dictionary.
+        /// </summary>
+        /// <param name="glue"></param>
+        /// <param name="format">String format for each dictionary key-value pair, i.e. "{0}: {1}"</param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, Dictionary<string, string> dictionary)
+        {
+            if (null == glue)
+            {
+                return null;
+            }
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "{0}" + glue + "{1}";
+            }
+            List<string> list = new List<string>();
+            foreach (KeyValuePair<string, string> e in dictionary)
+            {
+                string s = string.Format(format, new string[] { e.Key, e.Value });
+                list.Add(s);
+            }
+            return string.Join(glue, list.ToArray());
         }
 
         #endregion
@@ -1224,41 +1286,6 @@ namespace Energy.Base
         public static string Random(string available, int minimum, int maximum)
         {
             return Energy.Base.Random.GetRandomText(available, minimum, maximum);
-        }
-
-        #endregion
-
-        #region Join
-
-        public static string Join(string glue, string format, params object[][] array)
-        {
-            if (array == null)
-                return null;
-
-            int count = 0;
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i] == null || array[i].Length == 0)
-                    continue;
-                if (array[i].Length > count)
-                    count = array[i].Length;
-            }
-
-            List<string> list = new List<string>();
-            List<string> args = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                for (int j = 0; j < array.Length; j++)
-                {
-                    if (array[j] != null && array[j].Length > i)
-                        args.Add(Energy.Base.Cast.ObjectToString(array[j][i]));
-                    else
-                        args.Add("");
-                }
-                list.Add(string.Format(format, args.ToArray()));
-                args.Clear();
-            }
-            return string.Join(glue, list.ToArray());
         }
 
         #endregion
