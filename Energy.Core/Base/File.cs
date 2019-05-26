@@ -815,7 +815,7 @@ namespace Energy.Base
         /// <summary>
         /// Locate file or command with one of possible extensions in any directory and return full path to it.
         /// </summary>
-        /// <param name="list>Array of file names with or without extension and leading path</param>
+        /// <param name="list">Array of file names with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
         /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
         /// <param name="behaviour">Lookup behaviour (iterate over directories or extensions)</param>
