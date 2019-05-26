@@ -7,16 +7,20 @@ namespace Energy.Core.Test.Core
     public class Bug
     {
         [TestMethod]
-        public void CoreBugSuppress()
+        public void BugSuppress()
         {
             Energy.Core.Bug.Suppress("C002", false);
             Energy.Base.Lock lock1 = new Energy.Base.Lock();
+            Assert.IsNotNull(lock1);
             Assert.IsTrue(Energy.Core.Bug.Last.Code.Equals("C002"));
+#pragma warning disable IDE0034 // Simplify 'default' expression
             Energy.Core.Bug.Entry defaultEntry = default(Energy.Core.Bug.Entry);
+#pragma warning restore IDE0034 // Simplify 'default' expression
             Energy.Core.Bug.Last = defaultEntry;
             Energy.Core.Bug.Clear();
             Energy.Core.Bug.Suppress("C002");
             Energy.Base.Lock lock2 = new Energy.Base.Lock();
+            Assert.IsNotNull(lock2);
             Assert.IsFalse(Energy.Core.Bug.Last.Code.Equals("C002"));
         }
     }

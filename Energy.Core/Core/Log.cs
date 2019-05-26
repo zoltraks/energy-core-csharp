@@ -100,7 +100,7 @@ namespace Energy.Core
 
             #region Buffer
 
-            private List<Energy.Base.Log.Entry> _List = new List<Base.Log.Entry>();
+            private readonly List<Energy.Base.Log.Entry> _List = new List<Base.Log.Entry>();
 
             #endregion
 
@@ -419,7 +419,7 @@ namespace Energy.Core
             {
                 private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
 
-                private ManualResetEvent _ActivateResetEvent = new ManualResetEvent(false);
+                private readonly ManualResetEvent _ActivateResetEvent = new ManualResetEvent(false);
 
                 private const double SLEEP_DELAY = 0.5;
 
@@ -429,7 +429,7 @@ namespace Energy.Core
 
                 private TimeSpan _InactivityLimit = TimeSpan.FromSeconds(INACTIVITY_LIMIT);
 
-                private List<Energy.Base.Log.Entry> _Buffer = new List<Energy.Base.Log.Entry>();
+                private readonly List<Energy.Base.Log.Entry> _Buffer = new List<Energy.Base.Log.Entry>();
 
                 private Thread _Thread;
 
@@ -472,7 +472,7 @@ namespace Energy.Core
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
                                     IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                                 };
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
@@ -690,7 +690,7 @@ namespace Energy.Core
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
                                     IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                                 };
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
@@ -843,7 +843,7 @@ namespace Energy.Core
                         Thread thread = new Thread(() => { WriteUnsafe(log); })
                         {
                             IsBackground = true,
-                            CurrentUICulture = Energy.Core.Application.GetDefaultCultureInfo(),
+                            CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
                         };
                         thread.Start();
                         return true;

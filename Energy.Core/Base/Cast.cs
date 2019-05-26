@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -34,6 +35,14 @@ namespace Energy.Base
         private const string DOUBLE_STRING_FORMAT = "G17";
 
         private const string SINGLE_STRING_FORMAT = "G9";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
+
+        private static readonly string DATETIME_FORMAT_DEFAULT_DATE = "yyyy-MM-dd";
 
         #endregion
 
@@ -1061,6 +1070,99 @@ namespace Energy.Base
             return stream;
         }
 
+        /// <summary>
+        /// Read data from a stream until limit is reached.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream, int limit)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, limit <= 0 || limit > buffer.Length ? buffer.Length : limit)))
+                {
+                    ms.Write(buffer, 0, count);
+                    if (limit > 0)
+                    {
+                        limit -= count;
+                    }
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Read all data from stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, buffer.Length)))
+                {
+                    ms.Write(buffer, 0, count);
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using specified encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream, Encoding encoding)
+        {
+            if (null == encoding)
+            {
+                encoding = Encoding.UTF8;
+            }
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using UTF-8 encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream)
+        {
+            Encoding encoding = System.Text.Encoding.UTF8;
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
         #endregion
 
         #region Decimal
@@ -1729,6 +1831,78 @@ namespace Energy.Base
         public static string DateTimeToString(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToString((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Return DateTime value as text with custom format and empty value. 
+        /// Optional list of "empty" DateTime values may be specified.
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <param name="customTimeFormat">Custom format text, like "yyyy-MM-dd HH:mm:ss.fff"</param>
+        /// <param name="customDateFormat">Custom format text for date, if time part is midnight, like "yyyy-MM-dd"</param>
+        /// <param name="emptyValue">Text representation for empty value, like " N/A "</param>
+        /// <param name="emptyList">Array of DateTime values considered to be empty, like new DateTime[] { DateTime.MinValue, new DateTime(1753, 1, 1) }</param>
+        /// <returns>Date and time string representation</returns>
+        //[Energy.Attribute.Code.Refactoring("Extract method for automatic selection of custom format string for DateTime", Progress = 10.5)]
+        public static string DateTimeToString(DateTime? stamp, string customTimeFormat, string customDateFormat, string emptyValue, DateTime[] emptyList)
+        {
+            if (stamp == null)
+            {
+                return emptyValue;
+            }
+
+            if (emptyList != null && emptyList.Length > 0)
+            {
+                for (int i = 0; i < emptyList.Length; i++)
+                {
+                    if (emptyList[i] == stamp)
+                    {
+                        return emptyValue;
+                    }
+                }
+            }
+            else if (stamp == DateTime.MinValue || stamp == DateTime.MaxValue)
+            {
+                return emptyValue;
+            }
+
+            string customFormat = customTimeFormat;
+
+            if (customDateFormat != null)
+            {
+                if (((DateTime)stamp).TimeOfDay.Ticks == 0)
+                {
+                    customFormat = customDateFormat;
+                }
+            }
+            else if (customFormat == null)
+            {
+                // TODO Refactoring
+                long microseconds = ((DateTime)stamp).TimeOfDay.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
+                if (microseconds % 1000 > 0)
+                {
+                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MICROSECOND;
+                }
+                else if (((DateTime)stamp).Millisecond > 0)
+                {
+                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MILLISECOND;
+                }
+                else
+                {
+                    if (((DateTime)stamp).TimeOfDay.Ticks > 0)
+                    {
+                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_SECOND;
+                    }
+                    else
+                    {
+                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_DATE;
+                    }
+                }
+            }
+
+            string text = "" == customFormat ? "" : ((DateTime)stamp).ToString(customFormat);
+
+            return text;
         }
 
         /// <summary>
@@ -3300,36 +3474,59 @@ namespace Energy.Base
 
         #region Enumeration
 
-        public static Energy.Enumeration.TextPad EnumerationTextAlignToTextPad(Energy.Enumeration.TextAlign align)
+        /// <summary>
+        /// Enumeration conversions
+        /// </summary>
+        public static class Enumeration
         {
-            switch (align)
+            public static Energy.Enumeration.TextPad TextAlignToTextPad(Energy.Enumeration.TextAlign align)
             {
-                default:
-                    return Enumeration.TextPad.None;
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextPad.None;
 
-                case Enumeration.TextAlign.Center:
-                    return Enumeration.TextPad.Center;
+                    case Energy.Enumeration.TextAlign.Center:
+                        return Energy.Enumeration.TextPad.Center;
 
-                case Enumeration.TextAlign.Left:
-                    return Enumeration.TextPad.Right;
+                    case Energy.Enumeration.TextAlign.Left:
+                        return Energy.Enumeration.TextPad.Right;
 
-                case Enumeration.TextAlign.Right:
-                    return Enumeration.TextPad.Left;
+                    case Energy.Enumeration.TextAlign.Right:
+                        return Energy.Enumeration.TextPad.Left;
+                }
             }
-        }
 
-        public static Energy.Enumeration.TextAlign EnumerationTextPadToTextAlign(Energy.Enumeration.TextPad pad)
-        {
-            bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
-            bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
-            if (beLeft && beRight)
-                return Enumeration.TextAlign.Center;
-            else if (beLeft)
-                return Enumeration.TextAlign.Right;
-            else if (beRight)
-                return Enumeration.TextAlign.Left;
-            else
-                return Enumeration.TextAlign.None;
+            public static Energy.Enumeration.TextAlign TextPadToTextAlign(Energy.Enumeration.TextPad pad)
+            {
+                bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+                bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+                if (beLeft && beRight)
+                    return Energy.Enumeration.TextAlign.Center;
+                else if (beLeft)
+                    return Energy.Enumeration.TextAlign.Right;
+                else if (beRight)
+                    return Energy.Enumeration.TextAlign.Left;
+                else
+                    return Energy.Enumeration.TextAlign.None;
+            }
+
+            public static Energy.Enumeration.TextAlign CharToTextAlign(char align)
+            {
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextAlign.None;
+                    case '<':
+                        return Energy.Enumeration.TextAlign.Left;
+                    case '>':
+                        return Energy.Enumeration.TextAlign.Right;
+                    case '-':
+                        return Energy.Enumeration.TextAlign.Center;
+                    case '=':
+                        return Energy.Enumeration.TextAlign.Justify;
+                }
+            }
         }
 
         #endregion

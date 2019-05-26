@@ -7,7 +7,7 @@ namespace Energy.Core.Test.Core
     public class Program
     {
         [TestMethod]
-        public void CoreProgramClass()
+        public void ProgramClass()
         {
             Energy.Base.Lock lock1 = new Energy.Base.Lock();
             Assert.IsTrue(Energy.Core.Bug.Last.Code.Equals("C002"));
@@ -16,6 +16,14 @@ namespace Energy.Core.Test.Core
             Energy.Core.Bug.Suppress("C002");
             Energy.Base.Lock lock2 = new Energy.Base.Lock();
             Assert.IsFalse(Energy.Core.Bug.Last.Code.Equals("C002"));
+        }
+
+        [TestMethod]
+        public void ProgramGetCommandName()
+        {
+            System.Reflection.Assembly asm = Energy.Core.Program.GetAssembly();
+            string cmd = Energy.Core.Program.GetCommandName();
+            Assert.IsNotNull(cmd);
         }
     }
 }

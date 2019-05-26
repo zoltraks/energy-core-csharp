@@ -12,6 +12,8 @@ namespace Energy.Base
     {
         #region Constant
 
+        private readonly static string SPECIAL_CHARACTERS_STRING = "\\.$^{[(|)*+?";
+
         /// <summary>
         /// Connection string pattern
         /// </summary>
@@ -153,6 +155,32 @@ namespace Energy.Base
         #region Utility
 
         #region Escape
+
+        /// <summary>
+        /// Escape character with backslash if is one of special for regular expressions.
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="special">Special characters string, like "\\.$^{[(|)*+?"</param>
+        /// <returns></returns>
+        public static string Escape(char? character, string special)
+        {
+            if (character == null)
+                return null;
+            else if (special == null || 0 >= special.IndexOf((char)character))
+                return ((char)character).ToString();
+            else
+                return string.Concat('\\', (char)character);
+        }
+
+        /// <summary>
+        /// Escape character with backslash if is one of special for regular expressions.
+        /// </summary>
+        /// <param name="character"></param>
+        /// <returns></returns>
+        public static string Escape(char? character)
+        {
+            return Escape(character, SPECIAL_CHARACTERS_STRING);
+        }
 
         public static string EscapeJoin(string glue, char[] array)
         {

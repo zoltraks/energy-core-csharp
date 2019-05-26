@@ -232,5 +232,87 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Environment
+
+        /// <summary>
+        /// Functions related to environmental path variable. 
+        /// You may pass %PATH% as System.Environment.GetEnvironmentVariable("PATH").
+        /// </summary>
+        public class Environment
+        {
+            /// <summary>
+            /// Split path string as used in environment variables by a platform-specific separator character.
+            /// </summary>
+            /// <param name="pathVariable"></param>
+            /// <param name="splitChars"></param>
+            /// <returns></returns>
+            public static string[] Split(string pathVariable, char[] splitChars)
+            {
+                if (false)
+                { }
+                else if (null == pathVariable)
+                {
+                    return null;
+                }
+                else if ("" == pathVariable)
+                {
+                    return new string[] { "" };
+                }
+                else if (null == splitChars)
+                {
+                    splitChars = new char[] { System.IO.Path.PathSeparator };
+                }
+                else if (0 == splitChars.Length)
+                {
+                    return new string[] { pathVariable };
+                }
+
+                string token = "";
+                if (splitChars.Length == 1)
+                {
+                    token = Energy.Base.Expression.Escape(splitChars[0]);
+                }
+                else
+                {
+                    token += "[";
+                    foreach (char splitChar in splitChars)
+                    {
+                        token += Energy.Base.Expression.Escape(splitChar);
+                    }
+                    token += "]";
+                }
+                string pattern = token + @"(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
+                return Regex.Split(pathVariable, pattern);
+            }
+
+            /// <summary>
+            /// Split path string as used in environment variables by a platform-specific separator character.
+            /// </summary>
+            /// <param name="pathVariable"></param>
+            /// <returns></returns>
+            public static string[] Split(string pathVariable)
+            {
+                return Split(pathVariable, null);
+            }
+
+            /// <summary>
+            /// Get array of directories to search for executable files from PATH enviromental variable.
+            /// </summary>
+            public static string[] AsArray
+            {
+                get
+                {
+                    return GetAsArray();
+                }
+            }
+
+            private static string[] GetAsArray()
+            {
+                return Split(System.Environment.GetEnvironmentVariable("PATH"), null);
+            }
+        }
+
+        #endregion
     }
 }

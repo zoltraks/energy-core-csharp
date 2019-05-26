@@ -103,6 +103,9 @@ namespace Energy.Core.Test.Base
             string str7 = long.MaxValue.ToString();
             double num7 = Energy.Base.Cast.StringToInteger(str7);
             Assert.AreEqual(0, num7);
+            string str8 = " 987654321 ";
+            int num8 = Energy.Base.Cast.StringToInteger(str8);
+            Assert.AreEqual(987654321, num8);
         }
 
         private class ExampleTypeStructure
@@ -392,6 +395,59 @@ namespace Energy.Core.Test.Base
                 stream.Read(buffer, 0, length);
             }
             Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 172, 32 }, buffer));
+        }
+
+        [TestMethod]
+        public void StreamToString()
+        {
+
+        }
+
+        [TestMethod]
+        public void DateTimeToString()
+        {
+            DateTime value;
+            string result;
+            string expect;
+
+            value = DateTime.MinValue;
+            expect = "";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "1753-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1).AddMilliseconds(1);
+            expect = "1753-01-01 00:00:00.001";
+            result = Energy.Base.Cast.DateTimeToString(value, null, null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "1753-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, "", null);
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            expect = "N/A";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, "N/A", new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
+
+            value = new DateTime(1753, 1, 1);
+            result = Energy.Base.Cast.DateTimeToString(value, "", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.IsNull(result);
+
+            value = DateTime.MinValue;
+            expect = "";
+            result = Energy.Base.Cast.DateTimeToString(value, "", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
+
+            value = DateTime.MinValue;
+            expect = "0001-01-01";
+            result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
+            Assert.AreEqual(expect, result);
         }
     }
 }

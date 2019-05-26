@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -22,6 +23,17 @@ namespace Energy.Core.Test.Base
             string[] a2 = new string[] { "A", "A" };
             string t = Energy.Base.Text.Join(glue, format, a1, a2);
             Assert.AreEqual("AA-A", t);
+            Dictionary<string, string> d = new Dictionary<string, string>();
+            d["a"] = "B";
+            d["c"] = "D";
+            t = Energy.Base.Text.Join(null, "{0}{1}", d);
+            Assert.IsNull(t);
+            t = Energy.Base.Text.Join(".", "{0}{1}", d);
+            Assert.AreEqual("aB.cD", t);
+            t = Energy.Base.Text.Join("", "{1}", d);
+            Assert.AreEqual("BD", t);
+            t = Energy.Base.Text.Join("", null, d);
+            Assert.AreEqual("aBcD", t);
         }
 
         [TestMethod]
@@ -260,7 +272,8 @@ namespace Energy.Core.Test.Base
             string[] a = new string[] { "a", "B", null };
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "a"));
             Assert.AreEqual(false, Energy.Base.Text.InArray(a, "A"));
-            Assert.AreEqual(true, Energy.Base.Text.InArray(a, null));
+            // illegal
+            //Assert.AreEqual(true, Energy.Base.Text.InArray(a, null));
             Assert.AreEqual(false, Energy.Base.Text.InArray(null, "A"));
             Assert.AreEqual(true, Energy.Base.Text.InArray(a, "b", true));
         }
@@ -455,6 +468,17 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, result);
             expect = "g";
             Assert.AreEqual(expect, remains);
+
+            text = "Another";
+            result = Energy.Base.Text.Cell(text, 9, '<', ' ');
+            expect = "Another  ";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 9, '>', ' ');
+            expect = "  Another";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Cell(text, 9, '-', ' ');
+            expect = " Another ";
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]

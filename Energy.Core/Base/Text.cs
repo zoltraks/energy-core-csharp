@@ -20,7 +20,6 @@ namespace Energy.Base
         #region Constants
 
         private static string _BR = "<br>";
-
         /// <summary>HTML break</summary>
         public static string BR { get { return _BR; } private set { _BR = value; } }
 
@@ -238,7 +237,9 @@ namespace Energy.Base
                 if (!text.StartsWith(prefix))
                     text = prefix + text;
                 if (!text.EndsWith(suffix))
+#pragma warning disable IDE0054 // Use compound assignment
                     text = text + suffix;
+#pragma warning restore IDE0054 // Use compound assignment
                 return text;
             }
         }
@@ -531,7 +532,6 @@ namespace Energy.Base
             return string.Join(glue, list.ToArray());
         }
 
-
         /// <summary>
         /// Join strings into one list with separator.
         /// For example Energy.Base.Text.Join(" : ", "A", "B", "", "C") will return "A : B : : C".
@@ -542,6 +542,96 @@ namespace Energy.Base
         public static string Join(string glue, params string[] array)
         {
             return Energy.Base.Text.Join(glue, true, array);
+        }
+
+        /// <summary>
+        /// Join multiple arrays using format string for each set of elements from every array.
+        /// </summary>
+        /// <param name="glue">Separator string</param>
+        /// <param name="format">String format for each dictionary set, i.e. "{0}: {1}, {2}"</param>
+        /// <param name="array">Arrays (one for each dimension)</param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, params object[][] array)
+        {
+            if (array == null)
+                return null;
+
+            int count = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null || array[i].Length == 0)
+                    continue;
+                if (array[i].Length > count)
+                    count = array[i].Length;
+            }
+
+            List<string> list = new List<string>();
+            List<string> args = new List<string>();
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = 0; j < array.Length; j++)
+                {
+                    if (array[j] != null && array[j].Length > i)
+                        args.Add(Energy.Base.Cast.ObjectToString(array[j][i]));
+                    else
+                        args.Add("");
+                }
+                list.Add(string.Format(format, args.ToArray()));
+                args.Clear();
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        /// <summary>
+        /// Join elements of string dictionary.
+        /// </summary>
+        /// <param name="glue"></param>
+        /// <param name="format">String format for each dictionary key-value pair, i.e. "{0}: {1}"</param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, Dictionary<string, string> dictionary)
+        {
+            if (null == glue)
+            {
+                return null;
+            }
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "{0}" + glue + "{1}";
+            }
+            List<string> list = new List<string>();
+            foreach (KeyValuePair<string, string> e in dictionary)
+            {
+                string s = string.Format(format, new string[] { e.Key, e.Value });
+                list.Add(s);
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
+        /// <summary>
+        /// Join elements of dictionary.
+        /// </summary>
+        /// <param name="glue"></param>
+        /// <param name="format">String format for each dictionary key-value pair, i.e. "{0}: {1}"</param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, Dictionary<string, object> dictionary)
+        {
+            if (null == glue)
+            {
+                return null;
+            }
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "{0}" + glue + "{1}";
+            }
+            List<string> list = new List<string>();
+            foreach (KeyValuePair<string, object> e in dictionary)
+            {
+                string s = string.Format(format, new string[] { e.Key, Energy.Base.Cast.AsString(e.Value) });
+                list.Add(s);
+            }
+            return string.Join(glue, list.ToArray());
         }
 
         #endregion
@@ -1222,41 +1312,6 @@ namespace Energy.Base
         public static string Random(string available, int minimum, int maximum)
         {
             return Energy.Base.Random.GetRandomText(available, minimum, maximum);
-        }
-
-        #endregion
-
-        #region Join
-
-        public static string Join(string glue, string format, params object[][] array)
-        {
-            if (array == null)
-                return null;
-
-            int count = 0;
-            for (int i = 0; i < array.Length; i++)
-            {
-                if (array[i] == null || array[i].Length == 0)
-                    continue;
-                if (array[i].Length > count)
-                    count = array[i].Length;
-            }
-
-            List<string> list = new List<string>();
-            List<string> args = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                for (int j = 0; j < array.Length; j++)
-                {
-                    if (array[j] != null && array[j].Length > i)
-                        args.Add(Energy.Base.Cast.ObjectToString(array[j][i]));
-                    else
-                        args.Add("");
-                }
-                list.Add(string.Format(format, args.ToArray()));
-                args.Clear();
-            }
-            return string.Join(glue, list.ToArray());
         }
 
         #endregion
@@ -2514,6 +2569,40 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Search an array for any of elements to look for.
+        /// If array or look is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="look"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string[] look, bool ignoreCase)
+        {
+            if (null == array || array.Length == 0)
+                return false;
+            if (null == look || look.Length == 0)
+                return false;
+            for (int i = 0; i < look.Length; i++)
+            {
+                if (InArray(array, look[i], ignoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Search an array for any of elements to look for.
+        /// If array or look is null or empty, function will result false.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="look"></param>
+        /// <returns></returns>
+        public static bool InArray(string[] array, string[] look)
+        {
+            return InArray(array, look, false);
+        }
+
+        /// <summary>
         /// Check if string element is a part of string array.
         /// If array is null or empty, function will result false.
         /// </summary>
@@ -2868,24 +2957,6 @@ namespace Energy.Base
         /// </summary>
         /// <param name="text">Text value to be aligned in a cell</param>
         /// <param name="size"></param>
-        /// <param name="pad">
-        /// Padding direction, may be left or right.
-        /// Because padding is defined as flags, center or middle is also avaiable.
-        /// </param>
-        /// <returns></returns>
-        public static string Cell(string text, int size, Energy.Enumeration.TextPad pad)
-        {
-            string remains = "";
-            return Cell(text, 0, size, pad, ' ', null, null, out remains);
-        }
-
-        /// <summary>
-        /// Align and limit the text to the specified size. 
-        /// Cut the initial characters from the text value. 
-        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
-        /// </summary>
-        /// <param name="text">Text value to be aligned in a cell</param>
-        /// <param name="size"></param>
         /// <param name="fill">
         /// Character that will be used if text is shorter than specified size.
         /// </param>
@@ -2916,15 +2987,13 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, out string remains)
         {
-            remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, ' ', null, null, out remains);
         }
 
         /// <summary>
-        /// Align and limit the text to the specified size. 
+        /// Align and limit text to the specified size. 
         /// Cut the initial characters from the text value. 
-        /// If there are enough space, add a prefix and a suffix in order from the alignment direction of the text.
         /// </summary>
         /// <param name="text">Text value to be aligned in a cell</param>
         /// <param name="start">
@@ -2935,14 +3004,51 @@ namespace Energy.Base
         /// <param name="fill">
         /// Character that will be used if text is shorter than specified size.
         /// </param>
-        /// <param name="align">Text alignment</param>
-        /// <param name="remains"></param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <param name="remains">Output remaining string</param>
         /// <returns></returns>
-        public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
+        public static string Cell(string text, int start, int size, char align, char fill, out string remains)
         {
-            remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
-            return Cell(text, start, size, pad, fill, null, null, out remains);
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            return Cell(text, start, size, textPad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align text to the specified size. 
+        /// Cut the initial characters from the text value. 
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <param name="remains">Output remaining string</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, char align, char fill, out string remains)
+        {
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            return Cell(text, 0, size, textPad, fill, null, null, out remains);
+        }
+
+        /// <summary>
+        /// Align text to the specified size. 
+        /// </summary>
+        /// <param name="text">Text value to be aligned in a cell</param>
+        /// <param name="size"></param>
+        /// <param name="fill">
+        /// Character that will be used if text is shorter than specified size.
+        /// </param>
+        /// <param name="align">Text alignment (&lt; for left, &gt; for right, - for center and = for justification)</param>
+        /// <returns></returns>
+        public static string Cell(string text, int size, char align, char fill)
+        {
+            Energy.Enumeration.TextAlign textAlign = Energy.Base.Cast.Enumeration.CharToTextAlign(align);
+            Energy.Enumeration.TextPad textPad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(textAlign);
+            string useless;
+            return Cell(text, 0, size, textPad, fill, null, null, out useless);
         }
 
         /// <summary>
@@ -2961,7 +3067,7 @@ namespace Energy.Base
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, ' ', null, null, out remains);
         }
 
@@ -2984,7 +3090,7 @@ namespace Energy.Base
         public static string Cell(string text, int start, int size, Energy.Enumeration.TextAlign align, char fill)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, start, size, pad, fill, null, null, out remains);
         }
 
@@ -3001,7 +3107,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, out string remains)
         {
             remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, ' ', null, null, out remains);
         }
 
@@ -3021,7 +3127,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill, out string remains)
         {
             remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, fill, null, null, out remains);
         }
 
@@ -3037,7 +3143,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, ' ', null, null, out remains);
         }
 
@@ -3056,7 +3162,7 @@ namespace Energy.Base
         public static string Cell(string text, int size, Energy.Enumeration.TextAlign align, char fill)
         {
             string remains = "";
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Cell(text, 0, size, pad, fill, null, null, out remains);
         }
 
@@ -3186,7 +3292,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Pad(string text, int size, char fill, Energy.Enumeration.TextAlign align)
         {
-            Energy.Enumeration.TextPad pad = Energy.Base.Cast.EnumerationTextAlignToTextPad(align);
+            Energy.Enumeration.TextPad pad = Energy.Base.Cast.Enumeration.TextAlignToTextPad(align);
             return Pad(text, size, fill, pad, false);
         }
 
