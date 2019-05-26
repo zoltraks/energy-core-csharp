@@ -608,6 +608,32 @@ namespace Energy.Base
             return string.Join(glue, list.ToArray());
         }
 
+        /// <summary>
+        /// Join elements of dictionary.
+        /// </summary>
+        /// <param name="glue"></param>
+        /// <param name="format">String format for each dictionary key-value pair, i.e. "{0}: {1}"</param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string Join(string glue, string format, Dictionary<string, object> dictionary)
+        {
+            if (null == glue)
+            {
+                return null;
+            }
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "{0}" + glue + "{1}";
+            }
+            List<string> list = new List<string>();
+            foreach (KeyValuePair<string, object> e in dictionary)
+            {
+                string s = string.Format(format, new string[] { e.Key, Energy.Base.Cast.AsString(e.Value) });
+                list.Add(s);
+            }
+            return string.Join(glue, list.ToArray());
+        }
+
         #endregion
 
         #region Each
