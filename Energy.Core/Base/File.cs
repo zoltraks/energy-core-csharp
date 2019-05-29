@@ -168,6 +168,23 @@ namespace Energy.Base
                 }
             }
 
+            /// <summary>
+            /// Check if path was changed or file was modified by checking write stamp and size.
+            /// </summary>
+            /// <param name="file"></param>
+            /// <returns></returns>
+            public bool IsChanged(string file)
+            {
+                if (0 != string.Compare(file, _Path))
+                {
+                    return true;
+                }
+                else
+                {
+                    return IsChanged();
+                }
+            }
+
             #endregion
 
             #region GetCreateStamp
