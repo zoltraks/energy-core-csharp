@@ -384,7 +384,7 @@ namespace Energy.Base
             /// <returns>True if file write time was changed or file was succesfully created</returns>
             public bool Touch()
             {
-                if (this.Exists())
+                if (Exists())
                 {
                     return SetWriteStamp();
                 }
