@@ -32,13 +32,14 @@ To be used by wide range of applications, services, web or console programs.</De
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>bin\Energy.Core.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
@@ -56,7 +57,6 @@ To be used by wide range of applications, services, web or console programs.</De
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|net20'">
     <DefineConstants>RELEASE;NET20</DefineConstants>
   </PropertyGroup>
-
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|net35'">
     <DefineConstants>TRACE;DEBUG;NET35</DefineConstants>
