@@ -56,20 +56,22 @@ namespace Energy.Core
         /// <summary>
         /// Is thread running?
         /// </summary>
-        public bool IsRunning
+        private bool GetRunning()
         {
-            get
+            lock (_ThreadLock)
             {
-                lock (_ThreadLock)
-                {
-                    if (_Thread == null)
-                        return false;
-                    if (_Thread.IsAlive)
-                        return true;
+                if (_Thread == null)
                     return false;
-                }
+                if (_Thread.IsAlive)
+                    return true;
+                return false;
             }
         }
+
+        /// <summary>
+        /// Is thread running?
+        /// </summary>
+        public bool Running { get { return GetRunning();  } }
 
         private T _State;
         /// <summary>
