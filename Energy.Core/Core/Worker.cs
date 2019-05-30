@@ -286,6 +286,19 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Sleep for specific time or until stop whatever comes first.
+        /// </summary>
+        /// <param name="time">Time in milliseconds to sleep</param>
+        /// <returns>
+        /// Returns false if stopped signal was received. 
+        /// Returns true when specific amout of time just passed.
+        /// </returns>
+        public bool Sleep(int time)
+        {
+            return !StoppedResetEvent.WaitOne(time);
+        }
+
         #endregion
     }
 
