@@ -978,7 +978,7 @@ namespace Energy.Core
             {
                 while (true)
                 {
-                    while (!Queue.IsEmpty)
+                    while (!Queue.Empty)
                     {
                         object value = Queue.Pull();
                         RealWrite(value);
