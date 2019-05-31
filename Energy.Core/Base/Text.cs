@@ -665,7 +665,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static string[] SplitNewLine(string content)
+        public static string[] SplitLine(string content)
         {
             return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
         }
@@ -677,7 +677,7 @@ namespace Energy.Base
         /// <param name="content"></param>
         /// <param name="removeEmptyEntries"></param>
         /// <returns></returns>
-        public static string[] SplitNewLine(string content, bool removeEmptyEntries)
+        public static string[] SplitLine(string content, bool removeEmptyEntries)
         {
             string[] split = content.Split(NEWLINE_ARRAY
                 , removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
