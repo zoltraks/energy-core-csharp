@@ -331,11 +331,6 @@ namespace Energy.Core
             return Sleep((int)(1000 * time));
         }
 
-        void ISleepTime.Sleep(double seconds)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
     }
 
@@ -376,6 +371,21 @@ namespace Energy.Core
                     }
                 }
                 return false;
+            }
+
+            public void Add(T o)
+            {
+                _List.Add(o);
+            }
+
+            public void Remove(T o)
+            {
+                _List.Remove(o);
+            }
+
+            public List<T> FindAll(Predicate<T> match)
+            {
+                return _List.FindAll(match);
             }
 
             private T[] GetArray()
@@ -429,6 +439,30 @@ namespace Energy.Core
                     {
                         Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
                         w.Stop();
+                    }
+                }
+            }
+
+            public void Purge()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    bool remove = false;
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        if (!w.Running)
+                        {
+                            remove = true;
+                        }
+                    }
+                    if (remove)
+                    {
+                        Remove(o);
                     }
                 }
             }
