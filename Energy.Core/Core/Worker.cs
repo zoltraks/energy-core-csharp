@@ -215,7 +215,7 @@ namespace Energy.Core
             throw new NotImplementedException();
         }
 
-        public virtual bool Start()
+        public virtual void Start()
         {
             lock (_ThreadLock)
             {
@@ -223,7 +223,7 @@ namespace Energy.Core
                 {
                     if (_Thread.IsAlive)
                     {
-                        return false;
+                        return;
                     }
                 }
                 _Thread = new System.Threading.Thread(Work)
@@ -240,12 +240,11 @@ namespace Energy.Core
                 try
                 {
                     _Thread.Start();
-                    return true;
                 }
                 catch (Exception x)
                 {
                     Core.Bug.Write("EC505", x);
-                    return false;
+                    throw;
                 }
             }
         }
@@ -308,6 +307,29 @@ namespace Energy.Core
     public static class Worker
     {
         #region Class
+
+        #region Pool
+
+        public class Pool<T> : Energy.Interface.IPool
+        {
+            public T Context { get; set; }
+
+            private List<T> _List = new List<T>();
+
+            public void Spawn(Type type)
+            {
+                object o = Activator.CreateInstance(type);
+                if (o is Energy.Interface.IWorker)
+                {
+                    Energy.Interface.IWorker worker = o as Energy.Interface.IWorker;
+                    worker.Start();
+                }
+            }
+        }
+
+        public class Pool : Pool<object> { }
+
+        #endregion
 
         #region Simple
 
