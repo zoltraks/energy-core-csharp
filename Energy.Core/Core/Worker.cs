@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -265,6 +266,16 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Wait for thread to finish work for specified time.
+        /// </summary>
+        /// <param name="time">Time in seconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
+        public bool Wait(double time)
+        {
+            return Energy.Core.Worker.Wait(_Thread, time);
+        }
+
+        /// <summary>
         /// Abort thread process.
         /// Raises a System.Threading.ThreadAbortException to begin the process of terminating the thread.
         /// Calling this method usually terminates the thread.
@@ -286,6 +297,15 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Stop thread until the end. 
+        /// Execution will be resumed after Stopped will be set to true which usually comes after Stop.
+        /// </summary>
+        public void Sleep()
+        {
+            StoppedResetEvent.WaitOne();
+        }
+
+        /// <summary>
         /// Sleep for specific time or until stop whatever comes first.
         /// </summary>
         /// <param name="time">Time in milliseconds to sleep</param>
@@ -296,6 +316,24 @@ namespace Energy.Core
         public bool Sleep(int time)
         {
             return !StoppedResetEvent.WaitOne(time);
+        }
+
+        /// <summary>
+        /// Sleep for specific time or until stop whatever comes first.
+        /// </summary>
+        /// <param name="time">Time in milliseconds to sleep</param>
+        /// <returns>
+        /// Returns false if stopped signal was received. 
+        /// Returns true when specific amout of time just passed.
+        /// </returns>
+        public bool Sleep(double time)
+        {
+            return Sleep((int)(1000 * time));
+        }
+
+        void ISleepTime.Sleep(double seconds)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -440,7 +478,18 @@ namespace Energy.Core
         #region Wait
 
         /// <summary>
-        /// Wait for thread to finish work for specified time.
+        /// Wait for thread to finish work for specified time in seconds.
+        /// </summary>
+        /// <param name="thread">Thread object</param>
+        /// <param name="time">Time in seconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
+        public static bool Wait(System.Threading.Thread thread, double time)
+        {
+            return Wait(thread, (int)1000 * time);
+        }
+
+        /// <summary>
+        /// Wait for thread to finish work for specified time in milliseconds.
         /// </summary>
         /// <param name="thread">Thread object</param>
         /// <param name="time">Time in milliseconds</param>
