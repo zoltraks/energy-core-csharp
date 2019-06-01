@@ -10,7 +10,7 @@ namespace Energy.Core
     /// Thread worker generic base class.
     /// Override Work method in derrived class.
     /// </summary>
-    public class Worker<T> : Energy.Interface.IWork
+    public class Worker<T> : Energy.Interface.IWorker
     {
         #region Constructor
 
@@ -71,7 +71,7 @@ namespace Energy.Core
         /// <summary>
         /// Is thread running?
         /// </summary>
-        public bool Running { get { return GetRunning();  } }
+        public bool Running { get { return GetRunning(); } }
 
         private T _State;
         /// <summary>
@@ -456,6 +456,91 @@ namespace Energy.Core
                 thread = Fire(code);
                 FireThreadList[name] = thread;
                 return thread;
+            }
+        }
+
+        #endregion
+
+        #region RemoveUnused
+
+        public static object[] RemoveUnused(object[] workerArray
+            , Func<object, int> onRemove
+            , Func<Exception, int> onException
+            )
+        {
+            if (null == workerArray || 0 == workerArray.Length)
+            {
+                return workerArray;
+            }
+            List<object> result = new List<object>();
+            for (int i = 0; i < workerArray.Length; i++)
+            {
+                Energy.Interface.IWorker worker = workerArray[i] as Energy.Interface.IWorker;
+                if (null != worker)
+                {
+                    if (!worker.Stopped || worker.Running)
+                    {
+                        result.Add(worker);
+                        continue;
+                    }
+                    try
+                    {
+                        if (null != onRemove)
+                        {
+                            onRemove(worker);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        if (null != onException)
+                        {
+                            onException(x);
+                        }
+                    }
+                }
+            }
+            return result.ToArray();
+        }
+
+        #endregion
+
+        #region StopRunning
+
+        public static void StopRunning(object[] workerArray
+            , Func<object, object> onStopped
+            , Func<Exception, object> onException
+            )
+        {
+            if (null == workerArray)
+            {
+                return;
+            }
+            Exception exception = null;
+            for (int i = 0; i < workerArray.Length; i++)
+            {
+                Energy.Interface.IWorker worker = workerArray[i] as Energy.Interface.IWorker;
+                if (null != worker)
+                {
+                    if (!worker.Running)
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        worker.Stop();
+                        if (null != onStopped)
+                        {
+                            onStopped(worker);
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        if (null != onException)
+                        {
+                            onException(x);
+                        }
+                    }
+                }
             }
         }
 

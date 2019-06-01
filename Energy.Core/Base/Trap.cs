@@ -27,13 +27,13 @@ namespace Energy.Base
             Limit = timeLimit;
         }
 
-        public Trap(double timeLimit, Energy.Base.Anonymous.Function action)
+        public Trap(double timeLimit, Energy.Base.Anonymous.Action action)
             : this(timeLimit)
         {
             _ActionFunction = action;
         }
 
-        public Trap(double timeLimit, Energy.Base.Anonymous.Function<TimeSpan> action)
+        public Trap(double timeLimit, Energy.Base.Anonymous.Action<TimeSpan> action)
           : this(timeLimit)
         {
             _ActionFunctionTimeSpan = action;
@@ -44,9 +44,9 @@ namespace Energy.Base
             return GetSpan().TotalSeconds;
         }
 
-        private Energy.Base.Anonymous.Function _ActionFunction;
+        private Energy.Base.Anonymous.Action _ActionFunction;
 
-        private Energy.Base.Anonymous.Function<TimeSpan> _ActionFunctionTimeSpan;
+        private Energy.Base.Anonymous.Action<TimeSpan> _ActionFunctionTimeSpan;
 
         private TimeSpan GetSpan()
         {
