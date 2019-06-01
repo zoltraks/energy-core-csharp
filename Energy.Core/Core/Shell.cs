@@ -140,7 +140,7 @@ namespace Energy.Core
             public static ArgumentList Create(string[] args, Energy.Core.Shell.OptionStyle style)
             {
                 Energy.Base.Anonymous.Function<string, string> testDelA = delegate (string s) { return s; };
-                Energy.Base.Anonymous.Function<string> testDelB = delegate (string s) { Console.WriteLine(s); };
+                Energy.Base.Anonymous.Action<string> testDelB = delegate (string s) { Console.WriteLine(s); };
 
                 ArgumentList list = new Core.Shell.ArgumentList();
                 List<string> o = new List<string>();
