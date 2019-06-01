@@ -10,7 +10,7 @@ namespace Energy.Core
     /// Thread worker generic base class.
     /// Override Work method in derrived class.
     /// </summary>
-    public class Worker<T> : Energy.Interface.IWork
+    public class Worker<T> : Energy.Interface.IWorker
     {
         #region Constructor
 
@@ -71,7 +71,7 @@ namespace Energy.Core
         /// <summary>
         /// Is thread running?
         /// </summary>
-        public bool Running { get { return GetRunning();  } }
+        public bool Running { get { return GetRunning(); } }
 
         private T _State;
         /// <summary>
