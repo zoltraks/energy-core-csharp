@@ -1,6 +1,6 @@
 ﻿namespace Energy.Interface
 {
-    public interface IPool: ISpawn
+    public interface IPool: ISpawn, IStart, IStop, IRunning
     {
     }
 }

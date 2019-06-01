@@ -318,6 +318,28 @@ namespace Energy.Core
 
             public T[] Array { get { return GetArray(); } }
 
+            public bool Running { get { return GetRunning(); } }
+
+            private bool GetRunning()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        if (w.Running)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
             private T[] GetArray()
             {
                 return _List.ToArray();
@@ -338,6 +360,38 @@ namespace Energy.Core
                 catch (MissingMethodException)
                 {
                     System.Diagnostics.Debug.WriteLine("Missing method for constructing new object for spawn");
+                }
+            }
+
+            public void Start()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        w.Start();
+                    }
+                }
+            }
+
+            public void Stop()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        w.Stop();
+                    }
                 }
             }
         }
