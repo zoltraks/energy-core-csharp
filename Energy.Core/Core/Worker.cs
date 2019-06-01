@@ -413,7 +413,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static Thread Fire(Energy.Base.Anonymous.Function code)
+        public static Thread Fire(Energy.Base.Anonymous.Action code)
         {
             Thread thread = new Thread(() =>
             {
@@ -436,7 +436,7 @@ namespace Energy.Core
         /// <param name="name"></param>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static Thread Fire(string name, Energy.Base.Anonymous.Function code)
+        public static Thread Fire(string name, Energy.Base.Anonymous.Action code)
         {
             lock (_FireThreadListLock)
             {
@@ -464,8 +464,8 @@ namespace Energy.Core
         #region RemoveUnused
 
         public static object[] RemoveUnused(object[] workerArray
-            , Func<object, int> onRemove
-            , Func<Exception, int> onException
+            , Energy.Base.Anonymous.Action<object> onRemove
+            , Energy.Base.Anonymous.Action<Exception> onException
             )
         {
             if (null == workerArray || 0 == workerArray.Length)
@@ -507,15 +507,14 @@ namespace Energy.Core
         #region StopRunning
 
         public static void StopRunning(object[] workerArray
-            , Func<object, object> onStopped
-            , Func<Exception, object> onException
+            , Energy.Base.Anonymous.Action<object> onStopped
+            , Energy.Base.Anonymous.Action<Exception> onException
             )
         {
             if (null == workerArray)
             {
                 return;
             }
-            Exception exception = null;
             for (int i = 0; i < workerArray.Length; i++)
             {
                 Energy.Interface.IWorker worker = workerArray[i] as Energy.Interface.IWorker;
