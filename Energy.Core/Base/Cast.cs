@@ -504,8 +504,8 @@ namespace Energy.Base
         {
             switch (style)
             {
-                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : "";
-                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : "";
+                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : " ";
+                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : " ";
                 case Energy.Enumeration.BooleanStyle.B: return value ? "1" : "0";
                 case Energy.Enumeration.BooleanStyle.Y: return BoolToString(value, "Y/N");
                 case Energy.Enumeration.BooleanStyle.T: return BoolToString(value, "T/F");
