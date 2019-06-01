@@ -5,6 +5,6 @@
     /// </summary>
     public interface ISpawn
     {
-        void Spawn(System.Type type);
+        void Spawn();
     }
 }

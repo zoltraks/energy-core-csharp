@@ -316,13 +316,28 @@ namespace Energy.Core
 
             private List<T> _List = new List<T>();
 
-            public void Spawn(Type type)
+            public T[] Array { get { return GetArray(); } }
+
+            private T[] GetArray()
             {
-                object o = Activator.CreateInstance(type);
-                if (o is Energy.Interface.IWorker)
+                return _List.ToArray();
+            }
+
+            public void Spawn()
+            {
+                try
                 {
-                    Energy.Interface.IWorker worker = o as Energy.Interface.IWorker;
-                    worker.Start();
+                    T o = Activator.CreateInstance<T>();
+                    _List.Add(o);
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker worker = o as Energy.Interface.IWorker;
+                        worker.Start();
+                    }
+                }
+                catch (MissingMethodException)
+                {
+                    System.Diagnostics.Debug.WriteLine("Missing method for constructing new object for spawn");
                 }
             }
         }
