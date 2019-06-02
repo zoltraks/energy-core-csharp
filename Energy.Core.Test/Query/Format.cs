@@ -48,5 +48,17 @@ namespace Energy.Core.Test.Query
             string[] array = new string[] { null, "", "'", "''" };
             Assert.AreEqual(0, Energy.Base.Text.Compare(format.Text(array), new string[] { "NULL", "''", "''''", "''''''" }));
         }
+
+        [TestMethod]
+        public void Binary()
+        {
+            byte[] b;
+            b = new byte[] { 1, 2, 3, 4 };
+            Energy.Query.Format format = new Energy.Query.Format();
+            string s;
+            s = format.Binary(b);
+            Assert.IsNotNull(s);
+            Assert.AreEqual("0x01020304", s);
+        }
     }
 }

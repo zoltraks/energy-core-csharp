@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -215,7 +216,7 @@ namespace Energy.Core
             throw new NotImplementedException();
         }
 
-        public virtual bool Start()
+        public virtual void Start()
         {
             lock (_ThreadLock)
             {
@@ -223,7 +224,7 @@ namespace Energy.Core
                 {
                     if (_Thread.IsAlive)
                     {
-                        return false;
+                        return;
                     }
                 }
                 _Thread = new System.Threading.Thread(Work)
@@ -240,12 +241,11 @@ namespace Energy.Core
                 try
                 {
                     _Thread.Start();
-                    return true;
                 }
                 catch (Exception x)
                 {
                     Core.Bug.Write("EC505", x);
-                    return false;
+                    throw;
                 }
             }
         }
@@ -261,6 +261,16 @@ namespace Energy.Core
         /// <param name="time">Time in milliseconds</param>
         /// <returns>True if thread exited, false if still running</returns>
         public bool Wait(int time)
+        {
+            return Energy.Core.Worker.Wait(_Thread, time);
+        }
+
+        /// <summary>
+        /// Wait for thread to finish work for specified time.
+        /// </summary>
+        /// <param name="time">Time in seconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
+        public bool Wait(double time)
         {
             return Energy.Core.Worker.Wait(_Thread, time);
         }
@@ -287,6 +297,15 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Stop thread until the end. 
+        /// Execution will be resumed after Stopped will be set to true which usually comes after Stop.
+        /// </summary>
+        public void Sleep()
+        {
+            StoppedResetEvent.WaitOne();
+        }
+
+        /// <summary>
         /// Sleep for specific time or until stop whatever comes first.
         /// </summary>
         /// <param name="time">Time in milliseconds to sleep</param>
@@ -299,6 +318,19 @@ namespace Energy.Core
             return !StoppedResetEvent.WaitOne(time);
         }
 
+        /// <summary>
+        /// Sleep for specific time or until stop whatever comes first.
+        /// </summary>
+        /// <param name="time">Time in milliseconds to sleep</param>
+        /// <returns>
+        /// Returns false if stopped signal was received. 
+        /// Returns true when specific amout of time just passed.
+        /// </returns>
+        public bool Sleep(double time)
+        {
+            return Sleep((int)(1000 * time));
+        }
+
         #endregion
     }
 
@@ -308,6 +340,142 @@ namespace Energy.Core
     public static class Worker
     {
         #region Class
+
+        #region Pool
+
+        public class Pool<T> : Energy.Interface.IPool
+        {
+            public T Context { get; set; }
+
+            private List<T> _List = new List<T>();
+
+            public T[] Array { get { return GetArray(); } }
+
+            public bool Running { get { return GetRunning(); } }
+
+            private bool GetRunning()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        if (w.Running)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            public void Add(T o)
+            {
+                _List.Add(o);
+            }
+
+            public void Remove(T o)
+            {
+                _List.Remove(o);
+            }
+
+            public List<T> FindAll(Predicate<T> match)
+            {
+                return _List.FindAll(match);
+            }
+
+            public T Find(Predicate<T> match)
+            {
+                return _List.Find(match);
+            }
+
+            private T[] GetArray()
+            {
+                return _List.ToArray();
+            }
+
+            public void Spawn()
+            {
+                try
+                {
+                    T o = Activator.CreateInstance<T>();
+                    _List.Add(o);
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker worker = o as Energy.Interface.IWorker;
+                        worker.Start();
+                    }
+                }
+                catch (MissingMethodException)
+                {
+                    System.Diagnostics.Debug.WriteLine("Missing method for constructing new object for spawn");
+                }
+            }
+
+            public void Start()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        w.Start();
+                    }
+                }
+            }
+
+            public void Stop()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        w.Stop();
+                    }
+                }
+            }
+
+            public void Purge()
+            {
+                foreach (T o in GetArray())
+                {
+                    if (null == o)
+                    {
+                        continue;
+                    }
+                    bool remove = false;
+                    if (o is Energy.Interface.IWorker)
+                    {
+                        Energy.Interface.IWorker w = o as Energy.Interface.IWorker;
+                        if (!w.Running)
+                        {
+                            remove = true;
+                        }
+                    }
+                    if (remove)
+                    {
+                        Remove(o);
+                    }
+                }
+            }
+        }
+
+        public class Pool : Pool<object> { }
+
+        #endregion
 
         #region Simple
 
@@ -349,7 +517,18 @@ namespace Energy.Core
         #region Wait
 
         /// <summary>
-        /// Wait for thread to finish work for specified time.
+        /// Wait for thread to finish work for specified time in seconds.
+        /// </summary>
+        /// <param name="thread">Thread object</param>
+        /// <param name="time">Time in seconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
+        public static bool Wait(System.Threading.Thread thread, double time)
+        {
+            return Wait(thread, (int)1000 * time);
+        }
+
+        /// <summary>
+        /// Wait for thread to finish work for specified time in milliseconds.
         /// </summary>
         /// <param name="thread">Thread object</param>
         /// <param name="time">Time in milliseconds</param>
@@ -413,7 +592,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static Thread Fire(Energy.Base.Anonymous.Function code)
+        public static Thread Fire(Energy.Base.Anonymous.Action code)
         {
             Thread thread = new Thread(() =>
             {
@@ -436,7 +615,7 @@ namespace Energy.Core
         /// <param name="name"></param>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static Thread Fire(string name, Energy.Base.Anonymous.Function code)
+        public static Thread Fire(string name, Energy.Base.Anonymous.Action code)
         {
             lock (_FireThreadListLock)
             {
@@ -464,8 +643,8 @@ namespace Energy.Core
         #region RemoveUnused
 
         public static object[] RemoveUnused(object[] workerArray
-            , Func<object, int> onRemove
-            , Func<Exception, int> onException
+            , Energy.Base.Anonymous.Action<object> onRemove
+            , Energy.Base.Anonymous.Action<Exception> onException
             )
         {
             if (null == workerArray || 0 == workerArray.Length)
@@ -507,15 +686,14 @@ namespace Energy.Core
         #region StopRunning
 
         public static void StopRunning(object[] workerArray
-            , Func<object, object> onStopped
-            , Func<Exception, object> onException
+            , Energy.Base.Anonymous.Action<object> onStopped
+            , Energy.Base.Anonymous.Action<Exception> onException
             )
         {
             if (null == workerArray)
             {
                 return;
             }
-            Exception exception = null;
             for (int i = 0; i < workerArray.Length; i++)
             {
                 Energy.Interface.IWorker worker = workerArray[i] as Energy.Interface.IWorker;
