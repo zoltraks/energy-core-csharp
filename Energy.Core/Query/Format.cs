@@ -91,6 +91,12 @@ namespace Energy.Query
 
         public string CurrentStamp;
 
+        private System.Text.Encoding _Encoding = System.Text.Encoding.UTF8;
+        /// <summary>
+        /// Encoding for conversions
+        /// </summary>
+        public System.Text.Encoding Encoding { get { return _Encoding; } set { _Encoding = value; } }
+
         #endregion
 
         #region Constructor
@@ -739,6 +745,57 @@ namespace Energy.Query
         public string Stamp(object value)
         {
             return Stamp(Energy.Base.Cast.ObjectToDateTime(value));
+        }
+
+        #endregion
+
+        #region Binary
+
+        /// <summary>
+        /// Format as BINARY.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public string Binary(byte[] data)
+        {
+            if (null == data || 0 == data.Length)
+            {
+                return "NULL";
+            }
+            string result = string.Concat("0x", BitConverter.ToString(data).Replace("-", null));
+            return result;
+        }
+
+        /// <summary>
+        /// Format as BINARY.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public string Binary(string text)
+        {
+            return Binary(this.Encoding.GetBytes(text));
+        }
+
+        /// <summary>
+        /// Format as BINARY.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string Binary(object value)
+        {
+            if (null == value)
+            {
+                return "NULL";
+            }
+            if (value is byte[])
+            {
+                return Binary((byte[])value);
+            }
+            if (value is string)
+            {
+                return Binary((string)value);
+            }
+            return Binary(Text(value));
         }
 
         #endregion

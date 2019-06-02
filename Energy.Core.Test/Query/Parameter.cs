@@ -32,6 +32,13 @@ namespace Energy.Core.Test.Query
             expect = "INSERT INTO table1 ( column1 , column2 ) VALUES ( '1.23' , '''AB''' )";
             result = bag.Parse(query);
             Assert.AreEqual(expect, result);
+
+            bag.Clear();
+            bag.Set("b", new byte[] { 1, 2, 3, 4 }, "binary");
+            query = "@b";
+            expect = "0x01020304";
+            result = bag.Parse(query);
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]

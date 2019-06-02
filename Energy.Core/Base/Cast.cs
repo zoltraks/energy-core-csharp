@@ -3185,7 +3185,9 @@ namespace Energy.Base
         public static object StringToEnum(string value, Type type)
         {
             if (String.IsNullOrEmpty(value))
+            {
                 return 0;
+            }
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
@@ -3197,7 +3199,9 @@ namespace Energy.Base
             int length = value.Length;
             value = Energy.Base.Text.Trim(value);
             if (value.Length == length)
+            {
                 return 0;
+            }
             for (int i = 0; i < names.Length; i++)
             {
                 if (String.Compare(value, names[i], true) == 0)
