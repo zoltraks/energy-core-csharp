@@ -293,6 +293,10 @@ namespace Energy.Query
                         case Energy.Enumeration.FormatType.Stamp:
                             text = format.Stamp(value);
                             break;
+
+                        case Enumeration.FormatType.Binary:
+                            text = format.Binary(value);
+                            break;
                     }
                     int n = δ + _.Position;
                     string s1 = input.Substring(0, n);
@@ -304,10 +308,15 @@ namespace Energy.Query
                 return input;
             }
 
-            public void Set(string key, string value, Enumeration.FormatType format)
+            public void Set(string key, object value, Enumeration.FormatType format)
             {
                 base.Set(key, value);
                 this.Type[key] = format;
+            }
+
+            public void Set(string key, object value, string format)
+            {
+                Set(key, value, (Enumeration.FormatType)Energy.Base.Cast.StringToEnum(format, typeof(Enumeration.FormatType)));
             }
         }
 

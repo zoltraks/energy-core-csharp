@@ -594,7 +594,7 @@ namespace Energy.Base
 
         #region GetTypes
 
-        public static System.Type[] GetTypes(Assembly[] assemblies, Energy.Base.Anonymous.Function<System.Type, bool> filter)
+        public static System.Type[] GetTypes(Assembly[] assemblies, Energy.Base.Anonymous.Function<bool, System.Type> filter)
         {
             if (assemblies == null)
                 return null;
@@ -641,7 +641,7 @@ namespace Energy.Base
             return GetTypes(new Assembly[] { assembly }, null);
         }
 
-        public static Type[] GetTypes(Assembly assembly, Energy.Base.Anonymous.Function<System.Type, bool> filter)
+        public static Type[] GetTypes(Assembly assembly, Energy.Base.Anonymous.Function<bool, System.Type> filter)
         {
             return GetTypes(new Assembly[] { assembly }, filter);
         }

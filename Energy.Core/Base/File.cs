@@ -16,24 +16,29 @@ namespace Energy.Base
         /// <summary>
         /// Represents file state and provides functions for monitoring changes.
         /// </summary>
-        public class State
+        [Energy.Attribute.Code.Improve("Object might be able to mangle Directory and Path properties together")]
+        public class State: ICloneable
         {
             #region Property
 
             private string _Name;
-            /// <summary>Filename</summary>
+            /// <summary>Name of a file</summary>
             public string Name { get { return _Name; } set { _Name = value; } }
 
             private string _Path;
-            /// <summary>File path</summary>
+            /// <summary>Full path to a file</summary>
             public string Path { get { return _Path; } set { _Path = value; } }
+
+            private string _Directory;
+            /// <summary>Directory where file is located</summary>
+            public string Directory { get { return _Directory; } set { _Directory = value; } }
 
             private DateTime _Stamp;
             /// <summary>File modification stamp</summary>
             public DateTime Stamp { get { return _Stamp; } set { _Stamp = value; } }
 
             private long _Size;
-            /// <summary>Size</summary>
+            /// <summary>File size</summary>
             public long Size { get { return _Size; } set { _Size = value; } }
 
             #endregion
@@ -44,12 +49,19 @@ namespace Energy.Base
 
             public State(string file)
             {
-                _Name = file;
+                _Size = -1;
+                _Path = file;
+                if (string.IsNullOrEmpty(file))
+                {
+                    return;
+                }
+                _Name = System.IO.Path.GetFileName(file);
+                _Directory = System.IO.Path.GetDirectoryName(file);
             }
 
             public State(string file, bool read)
+                : this(file)
             {
-                _Name = file;
                 if (read)
                 {
                     Refresh();
@@ -72,14 +84,15 @@ namespace Energy.Base
             {
                 _Stamp = DateTime.MinValue;
                 _Size = -1;
-                if (string.IsNullOrEmpty(_Name))
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
                     return false;
                 try
                 {
-                    if (!System.IO.File.Exists(_Name))
+                    if (!System.IO.File.Exists(fileName))
                         return false;
-                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(_Name);
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(_Name);
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
                     _Stamp = lastWriteTime;
                     _Size = fileInfo.Length;
                     return true;
@@ -101,11 +114,12 @@ namespace Energy.Base
             /// <returns></returns>
             public bool Exists()
             {
-                if (string.IsNullOrEmpty(_Name))
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
                     return false;
                 try
                 {
-                    bool exists = System.IO.File.Exists(_Name);
+                    bool exists = System.IO.File.Exists(fileName);
                     return exists;
                 }
                 catch (Exception x)
@@ -117,7 +131,7 @@ namespace Energy.Base
 
             #endregion
 
-            #region IsChanged()
+            #region IsChanged
 
             /// <summary>
             /// Check if file was modified by checking write stamp and size.
@@ -125,11 +139,12 @@ namespace Energy.Base
             /// <returns></returns>
             public bool IsChanged()
             {
-                if (string.IsNullOrEmpty(_Name))
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
                     return false;
                 try
                 {
-                    if (!System.IO.File.Exists(_Name))
+                    if (!System.IO.File.Exists(fileName))
                     {
                         if (_Stamp == DateTime.MinValue && _Size == -1)
                             return true;
@@ -137,10 +152,10 @@ namespace Energy.Base
                             return false;
                     }
 
-                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(_Name);
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
                     if (_Stamp != lastWriteTime)
                         return true;
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(_Name);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
                     if (_Size != fileInfo.Length)
                         return true;
 
@@ -150,6 +165,23 @@ namespace Energy.Base
                 {
                     Energy.Core.Bug.Write("E404", x);
                     return false;
+                }
+            }
+
+            /// <summary>
+            /// Check if path was changed or file was modified by checking write stamp and size.
+            /// </summary>
+            /// <param name="file"></param>
+            /// <returns></returns>
+            public bool IsChanged(string file)
+            {
+                if (0 != string.Compare(file, _Path))
+                {
+                    return true;
+                }
+                else
+                {
+                    return IsChanged();
                 }
             }
 
@@ -164,13 +196,18 @@ namespace Energy.Base
             /// <returns></returns>
             public DateTime GetCreateStamp()
             {
-                if (string.IsNullOrEmpty(_Name))
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
                     return DateTime.MinValue;
+                }
                 try
                 {
-                    if (!System.IO.File.Exists(_Name))
+                    if (!System.IO.File.Exists(fileName))
+                    {
                         return DateTime.MinValue;
-                    DateTime lastWriteTime = System.IO.File.GetCreationTime(_Name);
+                    }
+                    DateTime lastWriteTime = System.IO.File.GetCreationTime(fileName);
                     return lastWriteTime;
                 }
                 catch (Exception x)
@@ -191,13 +228,18 @@ namespace Energy.Base
             /// <returns></returns>
             public DateTime GetWriteStamp()
             {
-                if (string.IsNullOrEmpty(_Name))
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
                     return DateTime.MinValue;
+                }
                 try
                 {
-                    if (!System.IO.File.Exists(_Name))
+                    if (!System.IO.File.Exists(fileName))
+                    {
                         return DateTime.MinValue;
-                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(_Name);
+                    }
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
                     return lastWriteTime;
                 }
                 catch (Exception x)
@@ -205,6 +247,51 @@ namespace Energy.Base
                     Energy.Core.Bug.Write("E403", x);
                     return DateTime.MinValue;
                 }
+            }
+
+            #endregion
+
+            #region SetWriteStamp
+
+            /// <summary>
+            /// Set current time of last write for a file.
+            /// </summary>
+            /// <returns></returns>
+            public bool SetWriteStamp(DateTime now)
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return false;
+                }
+                try
+                {
+                    if (!System.IO.File.Exists(_Name))
+                    {
+                        return false;
+                    }
+                    if (DateTime.MinValue == now)
+                    {
+                        now = DateTime.Now;
+                    }
+                    System.IO.File.SetLastWriteTime(fileName, now);
+                    _Stamp = System.IO.File.GetLastWriteTime(fileName);
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E205", x);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Set current time as time of last write for a file.
+            /// </summary>
+            /// <returns></returns>
+            public bool SetWriteStamp()
+            {
+                return SetWriteStamp(DateTime.MinValue);
             }
 
             #endregion
@@ -231,6 +318,96 @@ namespace Energy.Base
                 {
                     Energy.Core.Bug.Write("E403", x);
                     return -1;
+                }
+            }
+
+            #endregion
+
+            #region Clone
+
+            public object Clone()
+            {
+                State o = new State(_Path)
+                {
+                    Size = _Size,
+                    Stamp = _Stamp,
+                };
+                return o;
+            }
+
+            #endregion
+
+            #region CreateFile
+
+            /// <summary>
+            /// Create a file if not exists.
+            /// </summary>
+            /// <returns>Return true if file was created</returns>
+            public bool CreateFile()
+            {
+                try
+                {
+                    string file = _Path;
+                    using (System.IO.FileStream _ = System.IO.File.Open(file, System.IO.FileMode.CreateNew))
+                    {
+                        _.Close();
+                    }
+                    _Stamp = System.IO.File.GetLastWriteTime(file);
+                    _Size = 0;
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Core.Bug.Write(x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region DeleteFile
+
+            /// <summary>
+            /// Delete a file if exists.
+            /// </summary>
+            /// <returns>Return true if file was deleted</returns>
+            public bool DeleteFile()
+            {
+                try
+                {
+                    string file = _Path;
+                    if (System.IO.File.Exists(file))
+                    {
+                        System.IO.File.Delete(file);
+                    }
+                    _Stamp = DateTime.MinValue;
+                    _Size = -1;
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Core.Bug.Write(x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region Touch
+
+            /// <summary>
+            /// If file exists, change last write time. Create new file otherwise.
+            /// </summary>
+            /// <returns>True if file write time was changed or file was succesfully created</returns>
+            public bool Touch()
+            {
+                if (Exists())
+                {
+                    return SetWriteStamp();
+                }
+                else
+                {
+                    return CreateFile();
                 }
             }
 

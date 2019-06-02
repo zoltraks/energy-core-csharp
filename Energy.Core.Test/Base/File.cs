@@ -44,11 +44,21 @@ namespace Energy.Core.Test.Base
         public void State()
         {
             string fileName = Energy.Core.Program.GetExecutionFile();
-            Energy.Base.File.State state = new Energy.Base.File.State(fileName);
+            Energy.Base.File.State state;
+            state = new Energy.Base.File.State(fileName);
             Assert.IsTrue(state.Exists());
             Assert.IsTrue(state.IsChanged());
-            state.Refresh();
+            Assert.IsTrue(state.Refresh());
             Assert.IsFalse(state.IsChanged());
+            Random random = new Random();
+            state = new Energy.Base.File.State(fileName + "." + random.Next(100, 999) + ".tmp");
+            Assert.IsFalse(state.Exists());
+            Assert.IsTrue(state.Touch());
+            Energy.Base.File.State clone = state.Clone() as Energy.Base.File.State;
+            Assert.IsNotNull(clone);
+            Assert.IsTrue(clone.SetWriteStamp()); // execution file might not be changed
+            Assert.IsTrue(state.IsChanged());
+            Assert.IsTrue(state.DeleteFile());
         }
     }
 }

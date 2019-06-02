@@ -30,7 +30,7 @@ namespace Energy.Base
         /// <summary>
         /// Check if queue is empty.
         /// </summary>
-        public bool IsEmpty
+        public bool Empty
         {
             get
             {

@@ -11,8 +11,10 @@ namespace Energy.Core.Test.Core
         {
             Class.Worker1 worker1 = new Class.Worker1();
             Class.Worker2 worker2 = new Class.Worker2();
-            Assert.IsTrue(worker1.Start());
-            Assert.IsTrue(worker2.Start());
+            worker1.Start();
+            worker2.Start();
+            Assert.IsTrue(worker1.Running);
+            Assert.IsTrue(worker2.Running);
             worker1.Stop();
             worker2.Stop();
             Assert.IsTrue(worker1.Wait(10));
@@ -26,6 +28,7 @@ namespace Energy.Core.Test.Core
                 public override void Work()
                 {
                     this.State = "OK";
+                    Sleep(int.MaxValue);
                 }
             }
 
@@ -34,6 +37,7 @@ namespace Energy.Core.Test.Core
                 public override void Work()
                 {
                     this.State = "OK";
+                    Sleep(int.MaxValue);
                 }
             }
         }

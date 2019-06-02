@@ -504,8 +504,8 @@ namespace Energy.Base
         {
             switch (style)
             {
-                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : "";
-                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : "";
+                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : " ";
+                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : " ";
                 case Energy.Enumeration.BooleanStyle.B: return value ? "1" : "0";
                 case Energy.Enumeration.BooleanStyle.Y: return BoolToString(value, "Y/N");
                 case Energy.Enumeration.BooleanStyle.T: return BoolToString(value, "T/F");
@@ -3185,7 +3185,9 @@ namespace Energy.Base
         public static object StringToEnum(string value, Type type)
         {
             if (String.IsNullOrEmpty(value))
+            {
                 return 0;
+            }
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
@@ -3197,7 +3199,9 @@ namespace Energy.Base
             int length = value.Length;
             value = Energy.Base.Text.Trim(value);
             if (value.Length == length)
+            {
                 return 0;
+            }
             for (int i = 0; i < names.Length; i++)
             {
                 if (String.Compare(value, names[i], true) == 0)

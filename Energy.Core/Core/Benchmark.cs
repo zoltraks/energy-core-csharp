@@ -102,7 +102,7 @@ namespace Energy.Core
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="warm"></param>
-        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, int warm)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Action function, int iterations, int warm)
         {
             Result result = new Result() { Name = function.Method.Name, Iterations = iterations };
 
@@ -156,7 +156,7 @@ namespace Energy.Core
         /// <param name="function"></param>
         /// <param name="iterations"></param>
         /// <param name="name"></param>
-        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, string name)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Action function, int iterations, string name)
         {
             Result result = Profile(function, iterations, 0);
             if (!string.IsNullOrEmpty(name))
@@ -172,7 +172,7 @@ namespace Energy.Core
         /// <param name="iterations"></param>
         /// <param name="warm"></param>
         /// <param name="name"></param>
-        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations, int warm, string name)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Action function, int iterations, int warm, string name)
         {
             Result result = Profile(function, iterations, warm);
             if (!string.IsNullOrEmpty(name))
@@ -186,7 +186,7 @@ namespace Energy.Core
         /// </summary>
         /// <param name="function"></param>
         /// <param name="iterations"></param>
-        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function, int iterations)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Action function, int iterations)
         {
             return Profile(function, iterations, 0);
         }
@@ -196,7 +196,7 @@ namespace Energy.Core
         /// and returning the result of the profiling.
         /// </summary>
         /// <param name="function"></param>
-        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Function function)
+        public static Energy.Core.Benchmark.Result Profile(Energy.Base.Anonymous.Action function)
         {
             return Profile(function, 1, 0);
         }
@@ -306,7 +306,7 @@ namespace Energy.Core
         /// <param name="function"></param>
         /// <param name="timeSpan"></param>
         /// <returns></returns>
-        public static int Loop(Energy.Base.Anonymous.Function function, TimeSpan timeSpan)
+        public static int Loop(Energy.Base.Anonymous.Action function, TimeSpan timeSpan)
         {
             if (timeSpan == null || timeSpan.TotalSeconds == 0)
             {
@@ -337,12 +337,12 @@ namespace Energy.Core
         /// Repeat action for a specified time and return number of iterations done during the specified time.
         /// If no operation has been performed before the specified time has elapsed, the function will return a zero value.
         /// </summary>
-        /// <param name="function"></param>
+        /// <param name="action"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public static int Loop(Energy.Base.Anonymous.Function function, double time)
+        public static int Loop(Energy.Base.Anonymous.Action action, double time)
         {
-            return Loop(function, TimeSpan.FromSeconds(time));
+            return Loop(action, TimeSpan.FromSeconds(time));
         }
 
         #endregion

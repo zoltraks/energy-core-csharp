@@ -147,7 +147,7 @@ namespace Energy.Source
 
         #region Option
 
-        private bool? _ThreadOpen;
+        private bool _ThreadOpen;
 
         /// <summary>
         /// Persistent connection
@@ -262,20 +262,7 @@ namespace Energy.Source
         {
             lock (_Lock)
             {
-                if (_ThreadOpen == null)
-                {
-                    bool result = true;
-
-                    // MS Sqlite can't open on background thread.
-                    if (Vendor.FullName == "Microsoft.Data.Sqlite.SqliteConnection")
-                        result = false;
-
-                    return result;
-                }
-                else
-                {
-                    return (bool)_ThreadOpen;
-                }
+                return _ThreadOpen;
             }
         }
 
@@ -1251,8 +1238,10 @@ namespace Energy.Source
                 copy.Persistent = this._Persistent;
                 copy.Logger = this._Logger;
                 copy.Dialect = this._Dialect;
-                if (this._ThreadOpen != null)
+                if (this._ThreadOpen)
+                {
                     copy.ThreadOpen = (bool)this._ThreadOpen;
+                }
             }
             return copy;
         }

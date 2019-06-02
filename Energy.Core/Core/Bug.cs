@@ -661,7 +661,7 @@ namespace Energy.Core
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>
         /// <returns></returns>
-        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Function<TimeSpan> action)
+        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Action<TimeSpan> action)
         {
             Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
             return trap;
@@ -673,7 +673,7 @@ namespace Energy.Core
         /// <param name="timeLimit">Time limit in seconds. When finished in shorter time, action will not be executed.</param>
         /// <param name="action">Action when time exceeds limit</param>
         /// <returns></returns>
-        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Function action)
+        public static Energy.Base.Trap Trap(double timeLimit, Energy.Base.Anonymous.Action action)
         {
             Energy.Base.Trap trap = new Energy.Base.Trap(timeLimit, action);
             return trap;
