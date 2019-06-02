@@ -388,6 +388,11 @@ namespace Energy.Core
                 return _List.FindAll(match);
             }
 
+            public T Find(Predicate<T> match)
+            {
+                return _List.Find(match);
+            }
+
             private T[] GetArray()
             {
                 return _List.ToArray();
