@@ -636,6 +636,57 @@ namespace Energy.Base
 
         #endregion
 
+        #region Implode
+
+        /// <summary>
+        /// Concatenate the maximum number of elements at once and return the array of such joins.
+        /// If maximum elements is less than 1, null value will be returned.
+        /// </summary>
+        /// <param name="glue"></param>
+        /// <param name="maximum"></param>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string[] Implode(string glue, int maximum, string[] array)
+        {
+            if (null == array || 1 > maximum)
+            {
+                return null;
+            }
+            else if (maximum == 1 || 0 == array.Length)
+            {
+                return array;
+            }
+            if (null == glue)
+            {
+                glue = "";
+            }
+            List<string> result = new List<string>();
+            string[] a = null;
+            int n = 0;
+            while (n < array.Length)
+            {
+                if (n + maximum >= array.Length)
+                {
+                    int l = array.Length - n;
+                    a = new string[l];
+                    Array.Copy(array, n, a, 0, l);
+                }
+                else
+                {
+                    if (null == a)
+                    {
+                        a = new string[maximum];
+                    }
+                    Array.Copy(array, n, a, 0, maximum);
+                }
+                result.Add(Join(glue, false, a));
+                n += maximum;
+            }
+            return result.ToArray();
+        }
+
+        #endregion
+
         #region Each
 
         public static IEnumerable<string> Each(string input)

@@ -549,5 +549,42 @@ namespace Energy.Core.Test.Base
             text = "abc";
             Assert.AreEqual("ab", Energy.Base.Text.First(text, 2));
         }
+
+        [TestMethod]
+        public void TextImplode()
+        {
+            string[] expect;
+            string[] result;
+            string[] array;
+            string glue;
+            glue = "-";
+            array = null;
+            expect = null;
+            result = Energy.Base.Text.Implode(glue, -1, array);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Implode(glue, 0, array);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Implode(glue, 1, array);
+            Assert.AreEqual(expect, result);
+            array = new string[] { };
+            result = Energy.Base.Text.Implode(glue, -1, array);
+            Assert.IsNull(result);
+            result = Energy.Base.Text.Implode(glue, 0, array);
+            Assert.IsNull(result);
+            result = Energy.Base.Text.Implode(glue, 1, array);
+            expect = new string[] { };
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+            array = new string[] { "a", "b", "c" };
+            result = Energy.Base.Text.Implode(glue, 1, array);
+            expect = new string[] { "a", "b", "c" };
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+            result = Energy.Base.Text.Implode(glue, 2, array);
+            expect = new string[] { "a-b", "c" };
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+            array = new string[] { "a", "b", "c" };
+            result = Energy.Base.Text.Implode(glue, 4, array);
+            expect = new string[] { "a-b-c" };
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+        }
     }
 }
