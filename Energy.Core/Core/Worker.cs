@@ -307,6 +307,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Sleep for specific time or until stop whatever comes first.
+        /// Returns false if stopped signal was received.
         /// </summary>
         /// <param name="time">Time in milliseconds to sleep</param>
         /// <returns>
@@ -320,6 +321,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Sleep for specific time or until stop whatever comes first.
+        /// Returns false if stopped signal was received.
         /// </summary>
         /// <param name="time">Time in milliseconds to sleep</param>
         /// <returns>
