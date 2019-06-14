@@ -457,8 +457,14 @@ namespace Energy.Core
                 }
             }
 
-            public void Purge()
+            /// <summary>
+            /// Purge worker pool by removing all workres that are currently stopped (not working).
+            /// Returns amount of workers removed this way.
+            /// </summary>
+            /// <returns></returns>
+            public int Purge()
             {
+                int count = 0;
                 foreach (T o in GetArray())
                 {
                     if (null == o)
@@ -477,8 +483,10 @@ namespace Energy.Core
                     if (remove)
                     {
                         Remove(o);
+                        count++;
                     }
                 }
+                return count;
             }
         }
 
