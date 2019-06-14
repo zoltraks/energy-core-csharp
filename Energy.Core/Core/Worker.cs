@@ -355,6 +355,8 @@ namespace Energy.Core
 
             public bool Running { get { return GetRunning(); } }
 
+            public int Count { get { return GetCount(); } }
+
             private bool GetRunning()
             {
                 foreach (T o in GetArray())
@@ -373,6 +375,11 @@ namespace Energy.Core
                     }
                 }
                 return false;
+            }
+
+            private int GetCount()
+            {
+                return _List.Count;
             }
 
             public void Add(T o)

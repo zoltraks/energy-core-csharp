@@ -7,6 +7,25 @@ namespace Energy.Core.Test.Base
     public class Counter
     {
         [TestMethod]
+        public void Increment()
+        {
+            Energy.Base.Counter counter;
+            counter = new Energy.Base.Counter(1, 3, 2);
+            Assert.AreEqual(3, counter.Increment());
+            Assert.IsFalse(counter.Overflow);
+            Assert.AreEqual(3, counter.Increment());
+            Assert.IsTrue(counter.Overflow);
+            Assert.AreEqual(1, counter.Reset());
+            Assert.IsFalse(counter.Overflow);
+            Assert.AreEqual(3, counter.Increment(4));
+            Assert.IsTrue(counter.Overflow);
+            counter.Loop = true;
+            Assert.AreEqual(1, counter.Increment());
+            Assert.AreEqual(1, counter.Increment(3));
+            Assert.AreEqual(2, counter.Increment(4));
+        }
+
+        [TestMethod]
         public void Decrement()
         {
             Energy.Base.Counter counter1 = new Energy.Base.Counter(1);

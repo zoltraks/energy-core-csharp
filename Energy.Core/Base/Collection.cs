@@ -12,13 +12,13 @@ namespace Energy.Base
         #region Array
 
         /// <summary>
-        /// Thread safe array of objects
+        /// Thread safe array of objects.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         [Serializable]
         public class Array<T> : System.Collections.Generic.List<T>
         {
-            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+            private readonly object _Lock = new object();
 
             /// <summary>
             /// Gets or sets the element at the specified index
@@ -342,6 +342,21 @@ namespace Energy.Base
                 return sub[0];
             }
             return default(T);
+        }
+
+        #endregion
+
+        #region IsNullOrEmpty
+
+        /// <summary>
+        /// Returns true if array is null or empty.
+        /// </summary>
+        /// <typeparam name="T">Type of element</typeparam>
+        /// <param name="array">Array of elements</param>
+        /// <returns>True if array is null or empty</returns>
+        public static bool IsNullOrEmpty<T>(T[] array)
+        {
+            return null == array || 0 == array.Length;
         }
 
         #endregion
