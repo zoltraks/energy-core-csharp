@@ -745,19 +745,38 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Split string to array by separators with optional quoted elements.
-        /// May be used to explode from strings like "1,2,3", "abc def xyz", "'Smith''s Home'|'Special | New'|Other value".
+        /// Split string to an array by separators with optional quoted elements.
+        /// May be used to explode from strings like "1,2,3", "abc def xyz", 
+        /// or "'Smith''s Home'|'Special | New'|Other value".
         /// </summary>
+        /// <param name="text">Text to split</param>
+        /// <param name="commas">
+        /// Separator characters string.
+        /// Example value of ",:=" will allow three different characters to be used.
+        /// Space character will indicate any of white characters, including new line or tabulation characters.
+        /// </param>
+        /// <param name="quotes">
+        /// Available characters for quoting values.
+        /// Example value of "'\"" will allow use of apostrophes together with ASCII quotation marks. 
+        /// </param>
         /// <returns></returns>
-        public static string[] SplitList(string text, string commas, string quotes)
+        public static string[] SplitArray(string text, string commas, string quotes)
         {
+            if (null == text)
+            {
+                return null;
+            }
+            if (0 == text.Length)
+            {
+                return new string[] { };
+            }
             List<string> list = new List<string>();
             if (!string.IsNullOrEmpty(quotes))
             {
                 foreach (char c in quotes.ToCharArray())
                 {
-                    string quote = Regex.Escape(c.ToString()).Replace(@"\ ", @"\s");
-                    string escape = Regex.Escape(new string(c, 2)).Replace(@"\ ", @"\s");
+                    string quote = Regex.Escape(c.ToString());
+                    string escape = quote + quote;
                     list.Add(string.Concat(quote, "(?:", escape, "|[^", quote, "])*", quote));
                 }
             }
