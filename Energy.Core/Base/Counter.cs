@@ -267,8 +267,16 @@ namespace Energy.Base
         /// <returns></returns>
         public long Increment(long by)
         {
+            if (0 > by)
+            {
+                return Decrement(by);
+            }
             lock (_Lock)
             {
+                if (0 == by)
+                {
+                    return _Value;
+                }
                 try
                 {
                     if (_Maximum - by < _Value)
@@ -313,8 +321,54 @@ namespace Energy.Base
             {
                 try
                 {
-
                     if (_Value <= _Minimum)
+                    {
+                        _Overflow = true;
+                        if (_Loop)
+                        {
+                            _Value = _Maximum;
+                        }
+                        else
+                        {
+                            _Value = _Minimum;
+                        }
+                        return _Value;
+                    }
+                    if (_Overflow)
+                    {
+                        _Overflow = false;
+                    }
+                    return --_Value;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    _Overflow = true;
+                    _Value = _Minimum;
+                    return _Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Decrement value.
+        /// </summary>
+        /// <param name="by"></param>
+        /// <returns></returns>
+        public long Decrement(long by)
+        {
+            if (0 > by)
+            {
+                return Increment(by);
+            }
+            lock (_Lock)
+            {
+                if (0 == by)
+                {
+                    return _Value;
+                }
+                try
+                {
+                    if (_Minimum + by <= _Minimum)
                     {
                         _Overflow = true;
                         if (_Loop)
