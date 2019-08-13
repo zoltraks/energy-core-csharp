@@ -516,7 +516,6 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
             expect = 67;
             Assert.AreEqual(expect, result);
-
         }
     }
 }
