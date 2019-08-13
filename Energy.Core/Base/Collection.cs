@@ -328,81 +328,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region GetFirstOrDefault
-
-        public static T GetFirstOrDefault<T>(params T[][] array)
-        {
-            if (array == null || array.Length == 0)
-                return default(T);
-            for (int i = 0; i < array.Length; i++)
-            {
-                T[] sub = array[i];
-                if (sub == null || sub.Length == 0)
-                    continue;
-                return sub[0];
-            }
-            return default(T);
-        }
-
-        #endregion
-
-        #region IsNullOrEmpty
-
-        /// <summary>
-        /// Returns true if array is null or empty.
-        /// </summary>
-        /// <typeparam name="T">Type of element</typeparam>
-        /// <param name="array">Array of elements</param>
-        /// <returns>True if array is null or empty</returns>
-        public static bool IsNullOrEmpty<T>(T[] array)
-        {
-            return null == array || 0 == array.Length;
-        }
-
-        #endregion
-
-        #region Static utility functions
-
-        public static TValue GetDictionaryValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key)
-        {
-            if (key == null)
-                return default(TValue);
-            if (dictionary == null || dictionary.Count == 0)
-                return default(TValue);
-            if (dictionary.ContainsKey(key))
-                return dictionary[key];
-            else
-                return default(TValue);
-        }
-
-        public static TValue GetStringDictionaryValue<TValue>(Dictionary<string, TValue> dictionary, string key, bool ignoreCase)
-        {
-            if (key == null)
-                return default(TValue);
-            if (dictionary == null || dictionary.Count == 0)
-                return default(TValue);
-            if (ignoreCase)
-            {
-                string[] keys = new string[dictionary.Count];
-                dictionary.Keys.CopyTo(keys, 0);
-                for (int i = 0; i < keys.Length; i++)
-                {
-                    if (0 == string.Compare(keys[i], key, true))
-                        return dictionary[keys[i]];
-                }
-                return default(TValue);
-            }
-            else
-            {
-                if (dictionary.ContainsKey(key))
-                    return dictionary[key];
-                else
-                    return default(TValue);
-            }
-        }
-
-        #endregion
-
         #region Associative
 
         /// <summary>
@@ -1506,6 +1431,109 @@ namespace Energy.Base
                 KeyValuePair<TKey, TValue> result = this[0];
                 this.RemoveAt(0);
                 return result;
+            }
+        }
+
+        #endregion
+
+        #region Static utility functions
+
+        #region IsNullOrEmpty
+
+        /// <summary>
+        /// Returns true if array is null or empty.
+        /// </summary>
+        /// <typeparam name="T">Type of element</typeparam>
+        /// <param name="array">Array of elements</param>
+        /// <returns>True if array is null or empty</returns>
+        public static bool IsNullOrEmpty<T>(T[] array)
+        {
+            return null == array || 0 == array.Length;
+        }
+
+        #endregion
+
+        #region GetFirstOrDefault
+
+        public static T GetFirstOrDefault<T>(params T[][] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            for (int i = 0; i < array.Length; i++)
+            {
+                T[] sub = array[i];
+                if (sub == null || sub.Length == 0)
+                    continue;
+                return sub[0];
+            }
+            return default(T);
+        }
+
+        #endregion
+
+        #region Compare
+
+        public static int Compare(string[] left, string[] right, bool ignoreCase)
+        {
+            return StringArray.Compare(left, right, ignoreCase);
+        }
+
+        public static int Compare(string[] left, string[] right)
+        {
+            return StringArray.Compare(left, right, false);
+        }
+
+        #endregion
+
+        #region Same
+
+        public static bool Same(string[] left, string[] right, bool ignoreCase)
+        {
+            return 0 == StringArray.Compare(left, right, ignoreCase);
+        }
+
+        public static bool Same(string[] left, string[] right)
+        {
+            return 0 == StringArray.Compare(left, right, false);
+        }
+
+        #endregion
+
+        public static TValue GetDictionaryValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (dictionary.ContainsKey(key))
+                return dictionary[key];
+            else
+                return default(TValue);
+        }
+
+        public static TValue GetStringDictionaryValue<TValue>(Dictionary<string, TValue> dictionary, string key, bool ignoreCase)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (ignoreCase)
+            {
+                string[] keys = new string[dictionary.Count];
+                dictionary.Keys.CopyTo(keys, 0);
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    if (0 == string.Compare(keys[i], key, true))
+                        return dictionary[keys[i]];
+                }
+                return default(TValue);
+            }
+            else
+            {
+                if (dictionary.ContainsKey(key))
+                    return dictionary[key];
+                else
+                    return default(TValue);
             }
         }
 

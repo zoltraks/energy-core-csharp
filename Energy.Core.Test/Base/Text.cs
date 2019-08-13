@@ -586,5 +586,32 @@ namespace Energy.Core.Test.Base
             expect = new string[] { "a-b-c" };
             Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
         }
+
+        [TestMethod]
+        public void TextSplitArray()
+        {
+            string[] expect = null;
+            string[] result = null;
+            result = Energy.Base.Text.SplitArray(null, null, null);
+            Assert.IsNull(result);
+            result = Energy.Base.Text.SplitArray("1  2,3", null, null);
+            expect = new string[] { "1", "2,3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+            result = Energy.Base.Text.SplitArray("1 2,3", " ", null);
+            expect = new string[] { "1", "2,3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+            result = Energy.Base.Text.SplitArray("1  2,3", " ", null);
+            expect = new string[] { "1", "2,3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+            result = Energy.Base.Text.SplitArray("1 2,3", ", ", null);
+            expect = new string[] { "1", "2", "3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+            result = Energy.Base.Text.SplitArray("1, , \t , 2,3", ", ", null);
+            expect = new string[] { "1", "2", "3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+            result = Energy.Base.Text.SplitArray("1, ' ' , '\t' , 2,3", ", ", "'");
+            expect = new string[] { "1", " ", "\t", "2", "3" };
+            Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
+        }
     }
 }

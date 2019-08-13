@@ -583,6 +583,37 @@ namespace Energy.Attribute
         }
 
         /// <summary>
+        /// Code is up to be implemeted
+        /// </summary>
+        public class ImplementAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
         /// Code was abandoned and should be removed
         /// </summary>
         public class AbandonedAttribute : CodeAttribute

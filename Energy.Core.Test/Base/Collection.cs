@@ -124,7 +124,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void StringList()
+        public void StringArrayHasDuplicates()
         {
             string[] array;
             array = new string[] { "A", "B", "a" };
