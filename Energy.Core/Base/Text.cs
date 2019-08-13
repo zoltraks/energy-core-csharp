@@ -837,6 +837,7 @@ namespace Energy.Base
         /// <returns></returns>
         // TODO Implement
         [Energy.Attribute.Code.Draft]
+        [Energy.Attribute.Code.Implement]
         private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
         {
             //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
