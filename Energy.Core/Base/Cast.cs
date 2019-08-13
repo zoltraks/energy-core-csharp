@@ -12,40 +12,6 @@ namespace Energy.Base
     /// </summary>
     public static class Cast
     {
-        #region Constant
-
-        private const bool INTEGER_ALLOW_DECIMAL = true;
-
-        private const bool BYTE_ALLOW_DECIMAL = true;
-
-        private const NumberStyles DECIMAL_NUMBER_STYLES = NumberStyles.Float;
-
-        private readonly static string DOUBLE_MIN_STRING = double.MinValue.ToString(CultureInfo.InvariantCulture);
-
-        private readonly static string DOUBLE_MAX_STRING = double.MaxValue.ToString(CultureInfo.InvariantCulture);
-
-        private readonly static string DOUBLE_MAX_STRING_PLUS = "+" + DOUBLE_MAX_STRING;
-
-        private readonly static string DECIMAL_MIN_STRING = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
-
-        private readonly static string DECIMAL_MAX_STRING = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
-
-        private readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
-
-        private const string DOUBLE_STRING_FORMAT = "G17";
-
-        private const string SINGLE_STRING_FORMAT = "G9";
-
-        private static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
-
-        private static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
-
-        private static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
-
-        private static readonly string DATETIME_FORMAT_DEFAULT_DATE = "yyyy-MM-dd";
-
-        #endregion
-
         #region As
 
         #region Generic
@@ -174,7 +140,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static long AsLong(string value)
         {
-            return Energy.Base.Cast.StringToLong(value, INTEGER_ALLOW_DECIMAL);
+            return Energy.Base.Cast.StringToLong(value, Behaviour.INTEGER_COMMA);
         }
 
         /// <summary>
@@ -204,7 +170,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static ulong AsUnsignedLong(string value)
         {
-            return Energy.Base.Cast.StringToUnsignedLong(value, INTEGER_ALLOW_DECIMAL);
+            return Energy.Base.Cast.StringToUnsignedLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
         }
 
         #endregion
@@ -399,6 +365,58 @@ namespace Energy.Base
 
         #endregion
 
+        #region Behaviour
+
+        /// <summary>
+        /// Behaviour settings
+        /// </summary>
+        public static class Behaviour
+        {
+            #region Constant
+
+            /// <summary>
+            /// Allow to use decimal point in integer numbers when converting
+            /// </summary>
+            public const bool INTEGER_COMMA = true;
+
+            public const bool INTEGER_EXCEED = false;
+
+            /// <summary>
+            /// Allow to use decimal point in integer numbers when converting
+            /// </summary>
+            public const bool BYTE_COMMA = true;
+
+            public const NumberStyles DECIMAL_NUMBER_STYLES = NumberStyles.Float;
+
+            public readonly static string DOUBLE_MIN_STRING = double.MinValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DOUBLE_MAX_STRING = double.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DOUBLE_MAX_STRING_PLUS = "+" + DOUBLE_MAX_STRING;
+
+            public readonly static string DECIMAL_MIN_STRING = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DECIMAL_MAX_STRING = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
+
+            public const string DOUBLE_STRING_FORMAT = "G17";
+
+            public const string SINGLE_STRING_FORMAT = "G9";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_DATE = "yyyy-MM-dd";
+
+            #endregion
+        }
+
+        #endregion
+
         #region RemoveNumericalDifferences
 
         /// <summary>
@@ -448,7 +466,9 @@ namespace Energy.Base
         public static bool StringToBool(string text)
         {
             if (string.IsNullOrEmpty(text) || text == "0")
+            {
                 return false;
+            }
             switch (text.Trim().ToUpper())
             {
                 case "":
@@ -859,7 +879,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static long StringToLong(string value)
         {
-            return StringToLong(value, INTEGER_ALLOW_DECIMAL);
+            return StringToLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
         }
 
         /// <summary>
@@ -900,7 +920,7 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static ulong StringToUnsignedLong(string value)
         {
-            return StringToUnsignedLong(value, INTEGER_ALLOW_DECIMAL);
+            return StringToUnsignedLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
         }
 
         /// <summary>
@@ -965,13 +985,13 @@ namespace Energy.Base
         {
             if (negative)
             {
-                long useless;
-                return long.TryParse(value, out useless);
+                long _;
+                return long.TryParse(value, out _);
             }
             else
             {
-                ulong useless;
-                return ulong.TryParse(value, out useless);
+                ulong _;
+                return ulong.TryParse(value, out _);
             }
         }
 
@@ -1035,6 +1055,231 @@ namespace Energy.Base
         public static string UnsignedLongToStringSign(ulong value, string sign)
         {
             return NumberToStringSign(value.ToString(), sign);
+        }
+
+        #endregion
+
+        #region Short
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <returns>Short number</returns>
+        public static short StringToShort(string value, bool point, bool exceed)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            short result = 0;
+            if (short.TryParse(value, out result))
+            {
+                return result;
+            }
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length != value.Length)
+            {
+                if (short.TryParse(value, out result))
+                {
+                    return result;
+                }
+            }
+            if (exceed)
+            {
+                long _;
+                if (long.TryParse(value, out _))
+                {
+                    return (short)(_ % (1 + short.MaxValue));
+                }
+            }
+            if (!point)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number;
+            if (decimal.TryParse(value, out number))
+            {
+                if (number < short.MinValue || number > short.MaxValue)
+                {
+                    if (exceed)
+                    {
+                        return (short)(number % (1 + short.MaxValue));
+                    }
+                    return 0;
+                }
+                else
+                {
+                    return (short)number;
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value, bool point, bool exceed)
+        {
+            if (value == null || value.Length == 0)
+            {
+                return 0;
+            }
+            ushort result = 0;
+            if (ushort.TryParse(value, out result))
+            {
+                return result;
+            }
+            string trim = Energy.Base.Text.Trim(value);
+            if (0 == trim.Length)
+            {
+                return 0;
+            }
+            if (trim.Length != value.Length)
+            {
+                if (ushort.TryParse(value, out result))
+                {
+                    return result;
+                }
+            }
+            if (exceed)
+            {
+                if (value.StartsWith("-"))
+                {
+                    long _;
+                    if (long.TryParse(value, out _))
+                    {
+                        return (ushort)(-_ % (1 + ushort.MaxValue));
+                    }
+                }
+                else
+                {
+                    ulong _;
+                    if (ulong.TryParse(value, out _))
+                    {
+                        return (ushort)(_ % (1 + ushort.MaxValue));
+                    }
+                }
+            }
+            if (!point)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number;
+            if (decimal.TryParse(value, out number))
+            {
+                if (false)
+                { }
+                else if (number < 0)
+                {
+                    if (exceed)
+                    {
+                        return (ushort)(-number % (1 + ushort.MaxValue));
+                    }
+                    return 0;
+                }
+                else if (number > ushort.MaxValue)
+                {
+                    if (exceed)
+                    {
+                        return (ushort)(number % (1 + ushort.MaxValue));
+                    }
+                    return 0;
+                }
+                else
+                {
+                    return (ushort)number;
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// Allows decimal numbers by default.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static short StringToShort(string value)
+        {
+            return StringToShort(value
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// Allows decimal numbers by default.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value)
+        {
+            return StringToUnsignedShort(value
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static short StringToShortSmart(string value)
+        {
+            return StringToShort(RemoveNumericalDifferences(value)
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to unsigned short integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUsignedShortSmart(string value)
+        {
+            return StringToUnsignedShort(RemoveNumericalDifferences(value)
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Represent short number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ShortToString(short value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedShortToString(ushort value)
+        {
+            return value.ToString();
         }
 
         #endregion
@@ -1175,7 +1420,7 @@ namespace Energy.Base
         /// <returns>decimal</returns>
         public static decimal StringToDecimal(string value)
         {
-            return StringToDecimal(value, DECIMAL_NUMBER_STYLES);
+            return StringToDecimal(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
         }
 
         /// <summary>
@@ -1269,7 +1514,7 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static double StringToDouble(string value)
         {
-            return StringToDouble(value, DECIMAL_NUMBER_STYLES);
+            return StringToDouble(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
         }
 
         /// <summary>
@@ -1295,11 +1540,11 @@ namespace Energy.Base
             {
                 return result;
             }
-            if (0 == string.Compare(DOUBLE_MIN_STRING, value, true))
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MIN_STRING, value, true))
                 return double.MinValue;
-            if (0 == string.Compare(DOUBLE_MAX_STRING, value, true))
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING, value, true))
                 return double.MaxValue;
-            if (0 == string.Compare(DOUBLE_MAX_STRING_PLUS, value, true))
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING_PLUS, value, true))
                 return double.MaxValue;
             return 0;
         }
@@ -1337,7 +1582,7 @@ namespace Energy.Base
             }
             else
             {
-                string result = value.ToString(DOUBLE_STRING_FORMAT, culture);
+                string result = value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, culture);
                 string decimalPoint = culture.NumberFormat.NumberDecimalSeparator;
                 int exponent = result.IndexOfAny(new char[] { 'E', 'e' });
                 string exponentString = null;
@@ -1385,7 +1630,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            return value.ToString(DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
+            return value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1543,7 +1788,7 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static byte StringToByte(string value)
         {
-            return StringToByte(value, BYTE_ALLOW_DECIMAL);
+            return StringToByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
         }
 
         /// <summary>
@@ -1588,7 +1833,7 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static sbyte StringToSignedByte(string value)
         {
-            return StringToSignedByte(value, BYTE_ALLOW_DECIMAL);
+            return StringToSignedByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
         }
 
         /// <summary>
@@ -1881,21 +2126,21 @@ namespace Energy.Base
                 long microseconds = ((DateTime)stamp).TimeOfDay.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
                 if (microseconds % 1000 > 0)
                 {
-                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MICROSECOND;
+                    customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_MICROSECOND;
                 }
                 else if (((DateTime)stamp).Millisecond > 0)
                 {
-                    customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_MILLISECOND;
+                    customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_MILLISECOND;
                 }
                 else
                 {
                     if (((DateTime)stamp).TimeOfDay.Ticks > 0)
                     {
-                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_SECOND;
+                        customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_SECOND;
                     }
                     else
                     {
-                        customFormat = Energy.Base.Cast.DATETIME_FORMAT_DEFAULT_DATE;
+                        customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_DATE;
                     }
                 }
             }
@@ -2770,7 +3015,7 @@ namespace Energy.Base
 
             string s = value is string ? (string)value : value.ToString();
 
-            return StringToSignedByte(s, BYTE_ALLOW_DECIMAL);
+            return StringToSignedByte(s, Energy.Base.Cast.Behaviour.BYTE_COMMA);
         }
 
         /// <summary>

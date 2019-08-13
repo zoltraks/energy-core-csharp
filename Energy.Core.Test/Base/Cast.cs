@@ -449,5 +449,74 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Cast.DateTimeToString(value, "yyyy-MM-dd", null, null, new DateTime[] { new DateTime(1753, 1, 1) });
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void StringToShort()
+        {
+            short expect;
+            short result;
+            string needle;
+
+            needle = "1234567";
+            result = Energy.Base.Cast.StringToShort(needle, false, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, false, true);
+            expect = 22151;
+            Assert.AreEqual(expect, result);
+
+            needle = " \t1234567.9999999 \r\n ";
+            result = Energy.Base.Cast.StringToShort(needle, false, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, true, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, false, true);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, true, true);
+            expect = 22151;
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void StringToUnsignedShort()
+        {
+            ushort expect;
+            ushort result;
+            string needle;
+
+            needle = "1234567";
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
+            expect = 54919;
+            Assert.AreEqual(expect, result);
+
+            needle = " \t1234567.9999999 \r\n ";
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, true, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, true, true);
+            expect = 54919;
+            Assert.AreEqual(expect, result);
+
+            needle = "-67";
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, false);
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
+            expect = 67;
+            Assert.AreEqual(expect, result);
+
+        }
     }
 }
