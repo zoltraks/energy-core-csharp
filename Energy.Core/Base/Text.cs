@@ -744,10 +744,13 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        #region SplitArray
+
         /// <summary>
         /// Split string to an array by separators with optional quoted elements.
         /// May be used to explode from strings like "1,2,3", "abc def xyz", 
         /// or "'Smith''s Home'|'Special | New'|Other value".
+        /// Quotation marks in values will be stripped.
         /// </summary>
         /// <param name="text">Text to split</param>
         /// <param name="commas">
@@ -824,15 +827,23 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        #endregion
+
+        #region SplitDictionary
+
         /// <summary>
         /// Split string by new line
         /// </summary>
         /// <returns></returns>
-        public static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
+        // TODO Implement
+        [Energy.Attribute.Code.Draft]
+        private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
         {
             //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
             return null;
         }
+
+        #endregion
 
         #endregion
 
