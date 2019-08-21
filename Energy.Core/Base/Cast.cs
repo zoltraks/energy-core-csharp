@@ -338,6 +338,16 @@ namespace Energy.Base
         #region AsDateTime
 
         /// <summary>
+        /// Return as DateTime using StringToDateTime method.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(string text)
+        {
+            return StringToDateTime(text);
+        }
+
+        /// <summary>
         /// Return as DateTime using ObjectToDateTime method.
         /// </summary>
         /// <param name="o"></param>
@@ -345,6 +355,30 @@ namespace Energy.Base
         public static DateTime AsDateTime(object o)
         {
             return ObjectToDateTime(o);
+        }
+
+        /// <summary>
+        /// Return as DateTime value using StringToDateTime method.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(string text, DateTime minimum, DateTime maximum)
+        {
+            return StringToDateTime(text, minimum, maximum);
+        }
+
+        /// <summary>
+        /// Return as DateTime value using ObjectToDateTime method.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(object o, DateTime minimum, DateTime maximum)
+        {
+            return ObjectToDateTime(o, minimum, maximum);
         }
 
         #endregion
@@ -2029,7 +2063,7 @@ namespace Energy.Base
         #region Text
 
         /// <summary>
-        /// Join multiline text into single string
+        /// Join multiline text into single string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -2044,13 +2078,34 @@ namespace Energy.Base
         #region DateTime
 
         /// <summary>
-        /// Convert stamp text to DateTime.
+        /// Convert date and time text to DateTime value.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>DateTime</returns>
         public static DateTime StringToDateTime(string text)
         {
             return Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Convert date and time text to DateTime value within range.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns>DateTime</returns>
+        public static DateTime StringToDateTime(string text, DateTime minimum, DateTime maximum)
+        {
+            DateTime value = Clock.Parse(text);
+            if (minimum != DateTime.MinValue && value < minimum)
+            {
+                value = minimum;
+            }
+            else if (maximum != DateTime.MaxValue && value > maximum)
+            {
+                value = maximum;
+            }
+            return value;
         }
 
         /// <summary>
@@ -2284,7 +2339,7 @@ namespace Energy.Base
         #region TimeSpan
 
         /// <summary>
-        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000".
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
@@ -3347,14 +3402,57 @@ namespace Energy.Base
                 return (UInt16)number;
         }
 
-        public static DateTime ObjectToDateTime(object value)
+        /// <summary>
+        /// Convert object to DateTime value.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static DateTime ObjectToDateTime(object o)
         {
-            if (value == null)
+            if (null == o)
+            {
                 return DateTime.MinValue;
-            if (value is DateTime)
-                return (DateTime)value;
-            string text = value is string ? (string)value : value.ToString();
+            }
+            if (o is DateTime)
+            {
+                return (DateTime)o;
+            }
+            string text = o is string ? (string)o : o.ToString();
             return Energy.Base.Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Convert object to DateTime value within specified range.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns>DateTime</returns>
+        public static DateTime ObjectToDateTime(object o, DateTime minimum, DateTime maximum)
+        {
+            if (null == o)
+            {
+                return minimum;
+            }
+            DateTime value;
+            if (o is DateTime)
+            {
+                value = (DateTime)o;
+            }
+            else
+            {
+                string text = o is string ? (string)o : o.ToString();
+                value = Clock.Parse(text);
+            }
+            if (minimum != DateTime.MinValue && value < minimum)
+            {
+                value = minimum;
+            }
+            else if (maximum != DateTime.MaxValue && value > maximum)
+            {
+                value = maximum;
+            }
+            return value;
         }
 
         public static TStringToObject StringToObject<TStringToObject>(string input)

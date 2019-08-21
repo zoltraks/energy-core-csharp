@@ -10,6 +10,27 @@ namespace Energy.Core.Test.Base
     [TestClass]
     public class Cast
     {
+        private class Class
+        {
+            public class ExampleTypeStructure
+            {
+                private Int64? _NInt64;
+                public Int64? NInt64 { get { return _NInt64; } set { _NInt64 = value; } }
+            }
+
+            public class TextRepresentation
+            {
+                private string _Text;
+                /// <summary>Text</summary>
+                public string Text { get { return _Text; } set { _Text = value; } }
+
+                public override string ToString()
+                {
+                    return _Text;
+                }
+            }
+        }
+
         [TestMethod]
         public void CastStringToDouble()
         {
@@ -106,12 +127,6 @@ namespace Energy.Core.Test.Base
             string str8 = " 987654321 ";
             int num8 = Energy.Base.Cast.StringToInteger(str8);
             Assert.AreEqual(987654321, num8);
-        }
-
-        private class ExampleTypeStructure
-        {
-            private Int64? _NInt64;
-            public Int64? NInt64 { get { return _NInt64; } set { _NInt64 = value; } }
         }
 
         [TestMethod]
@@ -333,6 +348,20 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(float.MinValue, Energy.Base.Cast.As<float>(_float));
                 _float = test as string;
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(_float));
+
+                Class.TextRepresentation textRepresentation = new Class.TextRepresentation();
+                textRepresentation.Text = "2001-01-01";
+                DateTime resultDateTime;
+                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation);
+                DateTime expectDateTime;
+                expectDateTime = new DateTime(2001, 01, 01);
+                Assert.AreEqual(expectDateTime, resultDateTime);
+                expectDateTime = new DateTime(2002, 01, 01);
+                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, expectDateTime, DateTime.MaxValue);
+                Assert.AreEqual(expectDateTime, resultDateTime);
+                expectDateTime = new DateTime(2000, 01, 01);
+                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, DateTime.MinValue, expectDateTime);
+                Assert.AreEqual(expectDateTime, resultDateTime);
             }
         }
 
