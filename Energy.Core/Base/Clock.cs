@@ -860,9 +860,16 @@ namespace Energy.Base
 
         #endregion
 
-        public static bool IsValidString(string text)
+        /// <summary>
+        /// Check if string is valid date and time string.
+        /// Examples for positive match: "2019-01-20T00:00:01.345Z", " 2019-01-20 T 00:00:00.123456 Z + 03:30 ".
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsValidDateTimeString(string input)
         {
-            throw new NotImplementedException();
+            string pattern = @"(?<date>(\d{4}-\d{2}-\d{2}))\s*[Tt]?\s*(?<time>(\d{2}:\d{2}(:\d{2})?(.\d+)?))\s*[Zz]?\s*(?<zone>[+-]\s*\d{1,2}(:\d{2})?)?";
+            return Regex.Match(input, pattern).Success;
         }
 
         public static bool IsValidDateString(string text, bool allowTime)
