@@ -254,7 +254,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// Represent DateTime as simplified ISO time string with milliseconds, i.e. "22:39:07.503".
         /// </summary>
         /// <param name="stamp">DateTime?</param>
         /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
@@ -266,7 +266,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent DateTime as simplified ISO time string, i.e. "22:39:07.350"
+        /// Represent DateTime as simplified ISO time string with microseconds, i.e. "22:39:07.503726".
         /// </summary>
         /// <param name="stamp">DateTime?</param>
         /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
@@ -275,6 +275,18 @@ namespace Energy.Base
             if (stamp == null || stamp == DateTime.MinValue)
                 return String.Empty;
             return ((DateTime)stamp).ToString("HH:mm:ss.ffffff");
+        }
+
+        /// <summary>
+        /// Represent DateTime as simplified ISO time string with machine ticks (1/10 μs), i.e. "22:39:07.5039217".
+        /// </summary>
+        /// <param name="stamp">DateTime?</param>
+        /// <returns>Date string, empty if null or equal to DateTime.MinValue</returns>
+        public static string GetTimeStringTicks(DateTime? stamp)
+        {
+            if (stamp == null || stamp == DateTime.MinValue)
+                return String.Empty;
+            return ((DateTime)stamp).ToString("HH:mm:ss.fffffff");
         }
 
         /// <summary>
@@ -349,31 +361,66 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent date and time as ISO readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00".
-        /// If day is not set (equal to "0001-01-01", only time will be returned. Milliseconds are optional.
+        /// Represent date and time as ISO 8601 readable format with zone setting, like "2016-03-02 12:00:01.432 +01:00".
+        /// On minimum value or null empty string will be returned.
+        /// If day is equal to "0001-01-01", only time will be returned. Fractional part of second is optional.
+        /// If precision value is negative, fractional part will always be present.
         /// </summary>
         /// <param name="stamp">Date and time</param>
+        /// <param name="precision">Fractional part precision</param>
         /// <returns>Date, time and zone ISO readable string</returns>
-        public static string GetZoneString(DateTime? stamp)
+        public static string GetZoneString(DateTime? stamp, int precision)
         {
             if (stamp == null || stamp == DateTime.MinValue)
             {
                 return String.Empty;
             }
 
-            string format = "yyyy-MM-dd HH:mm:ss.fff zzz";
+            DateTime value = (DateTime)stamp;
 
-            if (((DateTime)stamp).Day == DateTime.MinValue.Day)
+            string date = "";
+            string time = "HH:mm:ss";
+            string fraction = "";
+            string zone = " zzz";
+
+            if (precision < 0 || Energy.Base.Clock.HasFractionalPart(value))
             {
-                format = format.Replace("yyyy-MM-dd ", "");
+                if (precision < 0)
+                {
+                    precision = -precision;
+                }
+
+                if (precision > 7)
+                {
+                    precision = 7; // added to prevent exception "Input string was not in a correct format"
+                }
+
+                if (precision > 0)
+                {
+                    fraction = "." + new string('f', precision);
+                }
             }
 
-            if (((DateTime)stamp).Millisecond == 0)
+            if (value.Date != DateTime.MinValue.Date)
             {
-                format = format.Replace(".fff", "");
+                date = "yyyy-MM-dd ";
             }
 
-            return ((DateTime)stamp).ToString(format);
+            string format = date + time + fraction + zone;
+
+            return value.ToString(format);
+        }
+
+        /// <summary>
+        /// Represent date and time as ISO 8601 readable format with zone setting, like "2016-03-02 12:00:01.340 +01:00".
+        /// On minimum value or null empty string will be returned.
+        /// If day is equal to "0001-01-01", only time will be returned. Milliseconds are optionally added if present.
+        /// </summary>
+        /// <param name="stamp">Date and time</param>
+        /// <returns>Date, time and zone ISO readable string</returns>
+        public static string GetZoneString(DateTime? stamp)
+        {
+            return GetZoneString(stamp, 3);
         }
 
         #endregion
@@ -525,7 +572,8 @@ namespace Energy.Base
                 if (!string.IsNullOrEmpty(match.Groups["fraction"].Value))
                 {
                     double d;
-                    if (double.TryParse(string.Concat("0.", match.Groups["fraction"]), System.Globalization.NumberStyles.Any
+                    if (double.TryParse(string.Concat("0.", match.Groups["fraction"])
+                        , System.Globalization.NumberStyles.AllowDecimalPoint
                         , System.Globalization.CultureInfo.InvariantCulture, out d))
                     {
                         result = result.AddSeconds(d);
@@ -787,5 +835,44 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region HasFractionalPart
+
+        /// <summary>
+        /// Check if DateTime value contains fractional part of seconds.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool HasFractionalPart(DateTime value)
+        {
+            return 0 != value.Ticks % TimeSpan.TicksPerSecond;
+        }
+
+        /// <summary>
+        /// Check if TimeSpan value contains fractional part of seconds.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool HasFractionalPart(TimeSpan value)
+        {
+            return 0 != value.Ticks % TimeSpan.TicksPerSecond;
+        }
+
+        #endregion
+
+        public static bool IsValidString(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsValidDateString(string text, bool allowTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsValidTimeString(string text, bool allowDate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
