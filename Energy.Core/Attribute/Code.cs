@@ -583,7 +583,7 @@ namespace Energy.Attribute
         }
 
         /// <summary>
-        /// Code is up to be implemeted
+        /// Code needs to be written
         /// </summary>
         public class ImplementAttribute : CodeAttribute
         {
@@ -645,7 +645,7 @@ namespace Energy.Attribute
         }
 
         /// <summary>
-        /// Code needs to be improved
+        /// Improve that thing
         /// </summary>
         public class ImproveAttribute : CodeAttribute
         {
@@ -668,6 +668,7 @@ namespace Energy.Attribute
             /// </summary>
             /// <param name="description"></param>
             public ImproveAttribute(string description)
+                : this()
             {
                 this.Description = description;
             }
@@ -678,7 +679,7 @@ namespace Energy.Attribute
             /// <param name="description"></param>
             /// <param name="help"></param>
             public ImproveAttribute(string description, string help)
-                : this(help)
+                : this(description)
             {
                 this.Help = help;
             }
