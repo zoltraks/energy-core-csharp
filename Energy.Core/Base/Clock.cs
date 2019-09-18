@@ -33,6 +33,17 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Return current time in 24h/ms format with trailing space, i.e. "17:33:15.176 "
+        /// </summary>
+        public static string CurrentTimeSpace
+        {
+            get
+            {
+                return CurrentTimeMilliseconds + " ";
+            }
+        }
+
+        /// <summary>
         /// Return current time in 24h/ms format, i.e. "17:33"
         /// </summary>
         public static string CurrentTimeShort
