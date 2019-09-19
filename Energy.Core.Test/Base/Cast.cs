@@ -243,6 +243,10 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void As()
         {
+            string _number;
+            string _double;
+            string _decimal;
+            string _float;
             foreach (object test in new object[] { "123.456", "123,456 " })
             {
                 Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
@@ -257,113 +261,124 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual((UInt32)123, Energy.Base.Cast.As<UInt32>(test));
                 Assert.AreEqual((Int64)123, Energy.Base.Cast.As<Int64>(test));
                 Assert.AreEqual((UInt64)123, Energy.Base.Cast.As<UInt64>(test));
+                Assert.IsTrue(Energy.Base.Cast.As<bool>(test));
 
-                // int + uint
-
-                string _int;
-                _int = int.MinValue.ToString();
-                Assert.AreEqual(int.MinValue, Energy.Base.Cast.As<int>(_int));
-                Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
-                _int = ((decimal)int.MinValue - 1).ToString();
-                Assert.AreEqual((int)0, Energy.Base.Cast.As<int>(_int));
-                Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
-                _int = int.MaxValue.ToString();
-                Assert.AreEqual(int.MaxValue, Energy.Base.Cast.As<int>(_int));
-                Assert.AreEqual((uint)int.MaxValue, Energy.Base.Cast.As<uint>(_int));
-                _int = ((uint)int.MaxValue + 1).ToString();
-                Assert.AreEqual(0, Energy.Base.Cast.As<int>(_int));
-                Assert.AreEqual((uint)int.MaxValue + 1, Energy.Base.Cast.As<uint>(_int));
-
-                // long + ulong
-
-                string _long;
-                _long = long.MinValue.ToString();
-                Assert.AreEqual(long.MinValue, Energy.Base.Cast.As<long>(_long));
-                Assert.AreEqual((ulong)0, Energy.Base.Cast.As<ulong>(_long));
-                _long = ((decimal)long.MinValue - 1).ToString(); // test for -9223372036854775808
-                Assert.AreEqual((long)0, Energy.Base.Cast.As<long>(_long));
-                Assert.AreEqual((ulong)0, Energy.Base.Cast.As<ulong>(_long));
-                _long = long.MaxValue.ToString();
-                Assert.AreEqual(long.MaxValue, Energy.Base.Cast.As<long>(_long));
-                Assert.AreEqual((ulong)long.MaxValue, Energy.Base.Cast.As<ulong>(_long));
-                _long = ((ulong)long.MaxValue + 1).ToString(); // test for +9223372036854775807
-                Assert.AreEqual(0, Energy.Base.Cast.As<long>(_long));
-                Assert.AreEqual((ulong)long.MaxValue + 1, Energy.Base.Cast.As<ulong>(_long));
-
-                // number string
-
-                string _number;
-                _number = "1";
-                Assert.AreEqual("+1", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(".1", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                _number = "-1";
-                Assert.AreEqual("-1", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual("$1", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                _number = "";
-                Assert.AreEqual(" 0", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual("#0", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-                _number = "0.0";
-                Assert.AreEqual(" 0.0", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(" 0.0", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                Assert.AreEqual("#0.0", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-                _number = "0,";
-                Assert.AreEqual(" 0,", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(" 0,", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                Assert.AreEqual("#0,", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-                _number = "0.";
-                Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                Assert.AreEqual("#0.", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-                _number = "0.e+12";
-                Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                Assert.AreEqual("#0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-                _number = "0.0e+12";
-                Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number));
-                Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
-                Assert.AreEqual("#0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
-
-                // double + decimal + float
-
-                string _double;
-                _double = double.MinValue.ToString(CultureInfo.InvariantCulture);
-                Assert.AreEqual(double.MinValue, Energy.Base.Cast.As<double>(_double));
-                _double = double.MaxValue.ToString(CultureInfo.InvariantCulture);
-                Assert.AreEqual(double.MaxValue, Energy.Base.Cast.As<double>(_double));
                 _double = test as string;
                 Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(_double));
-
-                string _decimal;
-                _decimal = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
-                Assert.AreEqual(decimal.MinValue, Energy.Base.Cast.As<decimal>(_decimal));
-                _decimal = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
-                Assert.AreEqual(decimal.MaxValue, Energy.Base.Cast.As<decimal>(_decimal));
                 _decimal = test as string;
                 Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(_decimal));
-
-                string _float;
-                _float = "3.40282347E+38";
-                Assert.AreEqual(float.MaxValue, Energy.Base.Cast.As<float>(_float));
-                _float = "-3.40282347E+38";
-                Assert.AreEqual(float.MinValue, Energy.Base.Cast.As<float>(_float));
                 _float = test as string;
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(_float));
-
-                Class.TextRepresentation textRepresentation = new Class.TextRepresentation();
-                textRepresentation.Text = "2001-01-01";
-                DateTime resultDateTime;
-                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation);
-                DateTime expectDateTime;
-                expectDateTime = new DateTime(2001, 01, 01);
-                Assert.AreEqual(expectDateTime, resultDateTime);
-                expectDateTime = new DateTime(2002, 01, 01);
-                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, expectDateTime, DateTime.MaxValue);
-                Assert.AreEqual(expectDateTime, resultDateTime);
-                expectDateTime = new DateTime(2000, 01, 01);
-                resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, DateTime.MinValue, expectDateTime);
-                Assert.AreEqual(expectDateTime, resultDateTime);
             }
+
+            // bool
+
+            Assert.IsFalse(Energy.Base.Cast.As<bool>("NULL"));
+            Assert.IsFalse(Energy.Base.Cast.As<bool>("FALSE"));
+            Assert.IsFalse(Energy.Base.Cast.As<bool>("0"));
+
+            Assert.IsTrue(Energy.Base.Cast.As<bool>("0.0"));
+
+            // int + uint
+
+            string _int;
+            _int = int.MinValue.ToString();
+            Assert.AreEqual(int.MinValue, Energy.Base.Cast.As<int>(_int));
+            Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
+            _int = ((decimal)int.MinValue - 1).ToString();
+            Assert.AreEqual((int)0, Energy.Base.Cast.As<int>(_int));
+            Assert.AreEqual((uint)0, Energy.Base.Cast.As<uint>(_int));
+            _int = int.MaxValue.ToString();
+            Assert.AreEqual(int.MaxValue, Energy.Base.Cast.As<int>(_int));
+            Assert.AreEqual((uint)int.MaxValue, Energy.Base.Cast.As<uint>(_int));
+            _int = ((uint)int.MaxValue + 1).ToString();
+            Assert.AreEqual(0, Energy.Base.Cast.As<int>(_int));
+            Assert.AreEqual((uint)int.MaxValue + 1, Energy.Base.Cast.As<uint>(_int));
+
+            // long + ulong
+
+            string _long;
+            _long = long.MinValue.ToString();
+            Assert.AreEqual(long.MinValue, Energy.Base.Cast.As<long>(_long));
+            Assert.AreEqual((ulong)0, Energy.Base.Cast.As<ulong>(_long));
+            _long = ((decimal)long.MinValue - 1).ToString(); // test for -9223372036854775808
+            Assert.AreEqual((long)0, Energy.Base.Cast.As<long>(_long));
+            Assert.AreEqual((ulong)0, Energy.Base.Cast.As<ulong>(_long));
+            _long = long.MaxValue.ToString();
+            Assert.AreEqual(long.MaxValue, Energy.Base.Cast.As<long>(_long));
+            Assert.AreEqual((ulong)long.MaxValue, Energy.Base.Cast.As<ulong>(_long));
+            _long = ((ulong)long.MaxValue + 1).ToString(); // test for +9223372036854775807
+            Assert.AreEqual(0, Energy.Base.Cast.As<long>(_long));
+            Assert.AreEqual((ulong)long.MaxValue + 1, Energy.Base.Cast.As<ulong>(_long));
+
+            // number string
+
+            _number = "1";
+            Assert.IsTrue(Energy.Base.Cast.As<bool>(_number));
+            _number = "0";
+            Assert.IsFalse(Energy.Base.Cast.As<bool>(_number));
+            _number = "1";
+            Assert.AreEqual("+1", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(".1", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            _number = "-1";
+            Assert.AreEqual("-1", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual("$1", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            _number = "";
+            Assert.AreEqual(" 0", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual("#0", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+            _number = "0.0";
+            Assert.AreEqual(" 0.0", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(" 0.0", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            Assert.AreEqual("#0.0", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+            _number = "0,";
+            Assert.AreEqual(" 0,", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(" 0,", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            Assert.AreEqual("#0,", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+            _number = "0.";
+            Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(" 0.", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            Assert.AreEqual("#0.", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+            _number = "0.e+12";
+            Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(" 0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            Assert.AreEqual("#0.e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+            _number = "0.0e+12";
+            Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number));
+            Assert.AreEqual(" 0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$"));
+            Assert.AreEqual("#0.0e+12", Energy.Base.Cast.NumberToStringSign(_number, ".$#"));
+
+            // double + decimal + float
+
+            _double = double.MinValue.ToString(CultureInfo.InvariantCulture);
+            Assert.AreEqual(double.MinValue, Energy.Base.Cast.As<double>(_double));
+            _double = double.MaxValue.ToString(CultureInfo.InvariantCulture);
+            Assert.AreEqual(double.MaxValue, Energy.Base.Cast.As<double>(_double));
+
+            _decimal = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
+            Assert.AreEqual(decimal.MinValue, Energy.Base.Cast.As<decimal>(_decimal));
+            _decimal = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+            Assert.AreEqual(decimal.MaxValue, Energy.Base.Cast.As<decimal>(_decimal));
+
+            _float = "3.40282347E+38";
+            Assert.AreEqual(float.MaxValue, Energy.Base.Cast.As<float>(_float));
+            _float = "-3.40282347E+38";
+            Assert.AreEqual(float.MinValue, Energy.Base.Cast.As<float>(_float));
+
+            Class.TextRepresentation textRepresentation = new Class.TextRepresentation();
+            textRepresentation.Text = "2001-01-01";
+            DateTime resultDateTime;
+            resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation);
+            DateTime expectDateTime;
+            expectDateTime = new DateTime(2001, 01, 01);
+            Assert.AreEqual(expectDateTime, resultDateTime);
+            expectDateTime = new DateTime(2002, 01, 01);
+            resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, expectDateTime, DateTime.MaxValue);
+            Assert.AreEqual(expectDateTime, resultDateTime);
+            expectDateTime = new DateTime(2000, 01, 01);
+            resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, DateTime.MinValue, expectDateTime);
+            Assert.AreEqual(expectDateTime, resultDateTime);
         }
+
 
         [TestMethod]
         public void CastIntegerToString()

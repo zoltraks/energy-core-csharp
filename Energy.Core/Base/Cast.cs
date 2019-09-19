@@ -76,6 +76,8 @@ namespace Energy.Base
                 return ObjectToLong(value);
             if (r == typeof(UInt64))
                 return ObjectToUnsignedLong(value);
+            if (r == typeof(bool))
+                return ObjectToBool(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
