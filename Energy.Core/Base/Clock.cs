@@ -22,7 +22,8 @@ namespace Energy.Base
         #region CurrentTime
 
         /// <summary>
-        /// Return current time in 24h/ms format, i.e. "17:33:15.176"
+        /// Return current time as time string with millisecond part in 24h format.
+        /// Example: "17:33:15.176".
         /// </summary>
         public static string CurrentTime
         {
@@ -33,7 +34,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return current time in 24h/ms format with trailing space, i.e. "17:33:15.176 "
+        /// Return current time as time string with millisecond part in 24h format and trailing space.
+        /// Example: "17:33:15.176 ".
         /// </summary>
         public static string CurrentTimeSpace
         {
@@ -597,7 +599,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Leap
+        #region IsLeapYear
 
         /// <summary>
         /// Sample subroutine to calculate if a year is a leap year.
@@ -614,38 +616,39 @@ namespace Energy.Base
         #region Truncate
 
         /// <summary>
-        /// Truncate DateTime to desired decimal precision of seconds
+        /// Round down DateTime value to desired precision of seconds
         /// </summary>
-        /// <param name="dateTime"></param>
+        /// <param name="value"></param>
         /// <param name="precision"></param>
         /// <returns></returns>
-        public static DateTime Truncate(DateTime dateTime, int precision)
+        public static DateTime Truncate(DateTime value, int precision)
         {
-            TimeSpan time = Truncate(dateTime.TimeOfDay, precision);
-            return dateTime.Date.Add(time);
+            TimeSpan time = Truncate(value.TimeOfDay, precision);
+            return value.Date.Add(time);
         }
 
         /// <summary>
-        /// Truncate DateTime to whole seconds
+        /// Round down DateTime to whole seconds
         /// </summary>
-        /// <param name="dateTime"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        public static DateTime Truncate(DateTime dateTime)
+        public static DateTime Truncate(DateTime value)
         {
-            return Truncate(dateTime, 0);
+            return new DateTime(value.Year, value.Month, value.Day
+                , value.Hour, value.Minute, value.Second);
         }
 
         /// <summary>
-        /// Truncate TimeSpan to desired decimal precision of seconds
+        /// Round down TimeSpan to desired precision of seconds
         /// </summary>
-        /// <param name="timeSpan"></param>
+        /// <param name="value"></param>
         /// <param name="precision"></param>
         /// <returns></returns>
-        public static TimeSpan Truncate(TimeSpan timeSpan, int precision)
+        public static TimeSpan Truncate(TimeSpan value, int precision)
         {
             if (precision >= 7)
-                return timeSpan;
-            long ticks = timeSpan.Ticks;
+                return value;
+            long ticks = value.Ticks;
             long seconds = ticks / System.TimeSpan.TicksPerSecond;
             if (precision < 1)
                 return new TimeSpan(seconds * System.TimeSpan.TicksPerSecond);
@@ -895,6 +898,17 @@ namespace Energy.Base
 
         #region Floor
 
+        /// <summary>
+        /// Round time to specified precision.
+        /// 
+        /// Precision may be positive or negative number. 
+        /// On positive precision function will include as many fractional second digits as possible(up to 7).
+        /// On negative precision function may round to minute, hour or even a year.
+        /// Use 3 for milliseconds, 6 for microseconds, -2 for minutes, -4 for hours, etc.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="precision"></param>
+        /// <returns></returns>
         public static DateTime Floor(DateTime value, int precision)
         {
             if (DateTime.MinValue == value)
