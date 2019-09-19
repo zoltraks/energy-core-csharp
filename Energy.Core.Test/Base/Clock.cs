@@ -63,5 +63,72 @@ namespace Energy.Core.Test.Base
             s = Energy.Base.Clock.GetZoneString(d, -3);
             Assert.IsTrue(s.StartsWith("0001-01-02 00:00:01.000 "));
         }
+
+        [TestMethod]
+        public void Floor()
+        {
+            DateTime needle;
+            DateTime result;
+            DateTime expect;
+            needle = new DateTime(2121, 12, 16, 21, 17, 33, 456);
+            expect = new DateTime(2121, 12, 16, 21, 17, 33, 456);
+            result = Energy.Base.Clock.Floor(needle, 4);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Clock.Floor(needle, 3);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 17, 33, 450);
+            result = Energy.Base.Clock.Floor(needle, 2);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 17, 33, 400);
+            result = Energy.Base.Clock.Floor(needle, 1);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 17, 33, 0);
+            result = Energy.Base.Clock.Floor(needle, 0);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 17, 30, 0);
+            result = Energy.Base.Clock.Floor(needle, -1);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 17, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -2);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 10, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -3);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 21, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -4);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 20, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -5);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 16, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -6);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 10, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -7);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 12, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -8);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 10, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -9);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2121, 1, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -10);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2120, 1, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -11);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2100, 1, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -12);
+            Assert.AreEqual(expect, result);
+            expect = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+            result = Energy.Base.Clock.Floor(needle, -13);
+            Assert.AreEqual(expect, result);
+            expect = DateTime.MinValue;
+            result = Energy.Base.Clock.Floor(needle, -14);
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Clock.Floor(needle, -15);
+            Assert.AreEqual(expect, result);
+        }
     }
 }
