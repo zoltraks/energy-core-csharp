@@ -892,5 +892,126 @@ namespace Energy.Base
         {
             throw new NotImplementedException();
         }
+
+        #region Floor
+
+        public static DateTime Floor(DateTime value, int precision)
+        {
+            if (DateTime.MinValue == value)
+            {
+                return DateTime.MinValue;
+            }
+            if (precision == 0)
+            {
+                return new DateTime(value.Year, value.Month, value.Day
+                    , value.Hour, value.Minute, value.Second);
+            }
+            if (precision > 0)
+            {
+                if (precision > 7)
+                {
+                    precision = 7;
+                }
+                string format;
+                if (precision == 1)
+                {
+                    format = "ff";
+                }
+                else
+                {
+                    format = new string('f', precision);
+                }
+                string text = value.ToString(format);
+                if (precision == 1)
+                {
+                    text = text.Substring(0, 1);
+                }
+                double fraction = int.Parse(text);
+                //for (int i = 0; i < precision; i++)
+                //{
+                //    fraction /= 10.0;
+                //} // value will not have correct representation "0.4560000...7" instead of just "0.456"
+                fraction /= Math.Pow(10, precision); // correct option
+                DateTime result = new DateTime(value.Year, value.Month, value.Day
+                    , value.Hour, value.Minute, value.Second);
+                //result = result.AddTicks((long)fraction * TimeSpan.TicksPerSecond); // wrong version, will cast fraction to long first
+                result = result.AddTicks((long)(fraction * TimeSpan.TicksPerSecond)); // correct version
+                //result = result.AddTicks((long)TimeSpan.TicksPerSecond * fraction); // working version but still casting to longcorrect version
+                //
+                // fraction
+                // 0.456
+                // (long)fraction* TimeSpan.TicksPerSecond
+                // 0
+                // fraction* TimeSpan.TicksPerSecond
+                // 4560000
+                // (long) TimeSpan.TicksPerSecond* fraction
+                // 4560000
+                // (long)(fraction * TimeSpan.TicksPerSecond)
+                // 4560000
+                //
+                return result;
+            }
+            if (precision < 0)
+            {
+                int year = value.Year;
+                int month = value.Month;
+                int day = value.Day;
+                int hour = value.Hour;
+                int minute = value.Minute;
+                int second = value.Second;
+                switch (precision)
+                {
+                    case 0:
+                        break;
+                    case -1:
+                        second = second - (second % 10);
+                        break;
+                    case -2:
+                        second = 0;
+                        break;
+                    case -3:
+                        minute = minute - (minute % 10);
+                        goto case -2;
+                    case -4:
+                        minute = 0;
+                        goto case -2;
+                    case -5:
+                        hour = hour - (hour % 10);
+                        goto case -4;
+                    case -6:
+                        hour = 0;
+                        goto case -4;
+                    case -7:
+                        day = day - (day % 10);
+                        goto case -6;
+                    case -8:
+                        day = 1;
+                        goto case -6;
+                    case -9:
+                        month = month - (month % 10);
+                        goto case -8;
+                    case -10:
+                        month = 1;
+                        goto case -8;
+                    case -11:
+                        year = year - (year % 10);
+                        goto case -10;
+                    case -12:
+                        year = year - (year % 100);
+                        goto case -10;
+                    case -13:
+                        year = year - (year % 1000);
+                        goto case -10;
+                    default:
+                    case -14:
+                        year = 1;
+                        goto case -10;
+                }
+                return new DateTime(year, month, day, hour, minute, second);
+            }
+            return DateTime.MinValue;
+        }
+
+        #endregion
     }
 }
