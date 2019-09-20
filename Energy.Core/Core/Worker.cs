@@ -257,6 +257,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Wait for thread to finish work for specified time.
+        /// Returns true if thread exited and false if still running.
         /// </summary>
         /// <param name="time">Time in milliseconds</param>
         /// <returns>True if thread exited, false if still running</returns>
@@ -267,6 +268,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Wait for thread to finish work for specified time.
+        /// Returns true if thread exited and false if still running.
         /// </summary>
         /// <param name="time">Time in seconds</param>
         /// <returns>True if thread exited, false if still running</returns>
@@ -579,7 +581,14 @@ namespace Energy.Core
             }
             else
             {
-                guardian.Abort();
+                try
+                {
+                    guardian.Abort();
+                }
+                catch (PlatformNotSupportedException xPlatformNotSupportedException)
+                {
+                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.GetExceptionMessage(xPlatformNotSupportedException, true));
+                }
                 return false;
             }
         }

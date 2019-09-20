@@ -19,7 +19,7 @@ namespace WorkerCreateSimple
 
             Console.WriteLine("Waiting");
 
-            if (!Energy.Core.Worker.WaitForExit(t1, 1000))
+            if (!Energy.Core.Worker.Wait(t1, 1000))
             {
                 Console.WriteLine("Aborting");
                 Thread.Sleep(1000);                

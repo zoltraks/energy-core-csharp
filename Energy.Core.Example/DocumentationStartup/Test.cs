@@ -37,11 +37,11 @@ namespace DocumentationStartup
             string l1 = "1,2,3";
             string l2 = "abc def xyz";
             string l3 = "A(12) B(13)";
-            string[] a1 = Energy.Base.Text.SplitList(l1, ",;", "\"");
+            string[] a1 = Energy.Base.Text.SplitArray(l1, ",;", "\"");
             Console.WriteLine("a1[] = " + string.Join(", ", a1));
-            string[] a2 = Energy.Base.Text.SplitList(l2, " ", "\"");
+            string[] a2 = Energy.Base.Text.SplitArray(l2, " ", "\"");
             Console.WriteLine("a2[] = " + string.Join(", ", a2));
-            string[] a3 = Energy.Base.Text.SplitList(l3, " ", "\"");
+            string[] a3 = Energy.Base.Text.SplitArray(l3, " ", "\"");
             Console.WriteLine("a3[] = " + string.Join(", ", a3));
         }
 

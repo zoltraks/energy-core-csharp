@@ -133,6 +133,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogFileThreadStress", "Ener
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppBackendCore", "Energy.Core.Example\WebAppBackendCore\WebAppBackendCore.csproj", "{51D2C8FD-70FE-40CA-AD85-51C40543C7A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerSimpleControl", "Energy.Core.Example\WorkerSimpleControl\WorkerSimpleControl.csproj", "{A25B190A-E99B-473A-B478-6C98AEA06485}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -707,6 +709,18 @@ Global
 		{51D2C8FD-70FE-40CA-AD85-51C40543C7A3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{51D2C8FD-70FE-40CA-AD85-51C40543C7A3}.Release|x86.ActiveCfg = Release|Any CPU
 		{51D2C8FD-70FE-40CA-AD85-51C40543C7A3}.Release|x86.Build.0 = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Debug|x86.Build.0 = Debug|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|x86.ActiveCfg = Release|Any CPU
+		{A25B190A-E99B-473A-B478-6C98AEA06485}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -761,6 +775,7 @@ Global
 		{3571E14B-FFDE-463F-98A4-CE95C2501A5C} = {F9446512-A7A6-4B1D-995A-9EEF1D41DB30}
 		{E9BD18DC-9816-4F26-837C-392E2DC59891} = {E9726BBF-A312-485B-80E8-625CB26265B9}
 		{51D2C8FD-70FE-40CA-AD85-51C40543C7A3} = {43C70BAA-B55F-4C02-9AB8-1C7CB185F3D4}
+		{A25B190A-E99B-473A-B478-6C98AEA06485} = {45B9062A-05F6-492A-9967-61CF8E3AC10E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9995435E-AB59-47BE-9090-2A1DB2B69497}

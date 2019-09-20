@@ -849,18 +849,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it.
-        /// </summary>
-        /// <param name="file">File name with or without extension and leading path</param>
-        /// <param name="search">Directory search list</param>
-        /// <param name="extension">Desired extension</param>
-        /// <returns>Empty string if file not found or full path to found one</returns>
-        public static string Locate(string file, string[] search, string extension)
-        {
-            return Locate(file, search, new string[] { extension }, Energy.Enumeration.LocateBehaviour.Default);
-        }
-
-        /// <summary>
         /// Locate file or comand with one of possible extensions in any directory and return full path to it.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
