@@ -140,5 +140,13 @@ namespace Energy.Core.Test.Base
             Assert.IsFalse(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3), 3, 0));
             Assert.IsTrue(Energy.Base.Class.HasParameteredConstructor(typeof(TestClass3), 0, 1));
         }
+
+        [TestMethod]
+        public void ClassAssembly()
+        {
+            var a = System.Reflection.Assembly.GetExecutingAssembly();
+            var x = Energy.Base.Class.GetAssemblyFile(a);
+
+        }
     }
 }

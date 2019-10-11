@@ -11,7 +11,7 @@ namespace Energy.Base
     /// </summary>
     public class Class
     {
-        #region Static utility functions
+        #region Utility functions
 
         #region GetDefault
 
@@ -1553,6 +1553,38 @@ namespace Energy.Base
             catch
             { }
             return DateTime.MinValue;
+        }
+
+        /// <summary>
+        /// Get filename of assembly.
+        /// This is just a simple alias for Location field of assembly object.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        public static string GetAssemblyFile(System.Reflection.Assembly assembly)
+        {
+            if (null == assembly)
+            {
+                return null;
+            }
+            string fileName = assembly.Location;
+            return fileName;
+        }
+
+        /// <summary>
+        /// Get directory name of assembly.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        public static string GetAssemblyDirectory(System.Reflection.Assembly assembly)
+        {
+            if (null == assembly)
+            {
+                return null;
+            }
+            string fileName = assembly.Location;
+            string directoryName = System.IO.Path.GetDirectoryName(fileName);
+            return directoryName;
         }
 
         #endregion
