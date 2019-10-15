@@ -394,10 +394,11 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void CastDoubleToString()
+        public void DoubleToString()
         {
             double _double;
             _double = -1234567890.0987654321;
+            Assert.AreEqual(-1234567890.0987654, _double);
             Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double));
             Assert.AreEqual("-1234567890.0987654000", Energy.Base.Cast.DoubleToString(_double, 10, false));
             Assert.AreEqual("-1234567890.0987654", Energy.Base.Cast.DoubleToString(_double, 10, true));
@@ -418,6 +419,20 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("-1.79769", Energy.Base.Cast.DoubleToString(_double, 5, false));
             // TODO Should be rounded up
             Assert.AreEqual("-1.7976", Energy.Base.Cast.DoubleToString(_double, 4, false));
+
+            byte[] bytes;
+            bytes = new byte[] { 102, 102, 102, 102, 102, 166, 78, 64 };
+            double d;
+            d = BitConverter.ToDouble(bytes, 0);
+            double e;
+            e = 61.3;
+            Assert.AreEqual(e, d);
+            string s;
+            Energy.Core.Bug.Suppress("Energy.Base.Cast.*");
+            Energy.Core.Bug.Suppress("Energy.Base.Cast.*", false);
+            s = Energy.Base.Cast.DoubleToString(e);
+            Assert.AreNotEqual("61.299999999999997", s);
+            Assert.AreEqual("61.3", s);
         }
 
         [TestMethod]

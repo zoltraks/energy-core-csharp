@@ -436,7 +436,12 @@ namespace Energy.Base
 
             public readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
 
-            public const string DOUBLE_STRING_FORMAT = "G17";
+            public static string DOUBLE_STRING_FORMAT = "G17";  // this one is G17 with special treatment. Contains workaround for 61.3 being represented as 61.299999999999997.
+            //public static string DOUBLE_STRING_FORMAT = "G18"; // wrong for 61.3. Actual:<61.299999999999997>.
+            //public static string DOUBLE_STRING_FORMAT = "G16"; // wrong for -1234567890.0987654. Actual:<-1234567890.098765>.
+            //public static string DOUBLE_STRING_FORMAT = "";     // fall back to bad code which corrupt values by rounding. Tests will not pass. Expected:<-1234567890.0987654>. Actual:<-1234567890.09877>.
+            //public static string DOUBLE_STRING_FORMAT = "G";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+            //public static string DOUBLE_STRING_FORMAT = "$G17";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
 
             public const string SINGLE_STRING_FORMAT = "G9";
 
@@ -1666,7 +1671,47 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            return value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
+            if ("G17" == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT)
+            {
+                string s17 = value.ToString("G17", CultureInfo.InvariantCulture);
+                int dot = s17.IndexOf(".");
+                if (0 > dot)
+                {
+                    return s17;
+                }
+                if (s17.Length - dot > 10)
+                {
+                    string s16 = value.ToString("G16", CultureInfo.InvariantCulture);
+                    if (s17.Length - s16.Length > 10)
+                    {
+                        Energy.Core.Bug.Write("Energy.Base.Cast.DoubleToString"
+                            , delegate () {
+                                return string.Format("Choosing {0} over {1}", s16, s17);
+                            });
+                        return s16;
+                    }
+                }
+                return s17;
+            }
+            if (string.IsNullOrEmpty(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT))
+            {
+                return value.ToString(CultureInfo.InvariantCulture);
+            }
+            else if ("$" == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT)
+            {
+                decimal cast = (decimal)value;
+                return cast.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT.StartsWith("$"))
+            {
+                decimal cast = (decimal)value;
+                return cast.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT.Substring(1)
+                    , CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                return value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>

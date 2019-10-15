@@ -115,6 +115,11 @@ namespace Energy.Core
                     public string Code;
 
                     public bool Suppress;
+
+                    public override string ToString()
+                    {
+                        return (" " + (Suppress ? "-" : "+") + " " + Code).Trim();
+                    }
                 }
 
                 public Item Find(string code, bool ignoreCase)
@@ -122,7 +127,16 @@ namespace Energy.Core
                     for (int i = 0; i < this.Count; i++)
                     {
                         if (0 == string.Compare(this[i].Code, code, ignoreCase))
+                        {
                             return this[i];
+                        }
+                        if (Energy.Base.Text.IsWild(this[i].Code))
+                        {
+                            if (Energy.Base.Text.CheckWild(code, this[i].Code, ignoreCase))
+                            {
+                                return this[i];
+                            }
+                        }
                     }
                     return null;
                 }
