@@ -2446,7 +2446,8 @@ namespace Energy.Base
         #region Quote
 
         /// <summary>
-        /// Surround text with quotation characters.
+        /// Surround text with quotation characters (").
+        /// Escape existing quotation characters with additional quotation character ("").
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -2456,7 +2457,25 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Surround text with quotation characters.
+        /// Surround text with quotation characters (") optionally.
+        /// If optional parameter is true, text will be quoted only when text contains specified quotation character.
+        /// Escape existing quotation characters with additional quotation character ("").
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, bool optional)
+        {
+            if (optional && !text.Contains("\""))
+            {
+                return text;
+            }
+            return Quote(text, "\"", "\"");
+        }
+
+        /// <summary>
+        /// Surround text with specified quotation characters.
+        /// Escape existing quotation characters with additional quotation character.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="with"></param>
@@ -2467,7 +2486,26 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Surround text with quotation characters.
+        /// Surround text with specified quotation characters optionally.
+        /// If optional parameter is true, text will be quoted only when text contains specified quotation character.
+        /// Escape existing quotation characters with additional quotation character.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="with"></param>
+        /// <param name="optional"></param>
+        /// <returns></returns>
+        public static string Quote(string text, string with, bool optional)
+        {
+            if (optional && !text.Contains(with))
+            {
+                return text;
+            }
+            return Quote(text, with, with);
+        }
+
+        /// <summary>
+        /// Surround text with specified quotation characters.
+        /// Escape existing quotation character with specified escape character.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="with"></param>
@@ -2476,7 +2514,9 @@ namespace Energy.Base
         public static string Quote(string text, string with, string escape)
         {
             if (text == null || text.Length == 0)
+            {
                 return string.Concat(with, with);
+            }
 
             if (text.Contains(with))
             {
@@ -2489,7 +2529,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Surround text with quotation characters.
+        /// Surround text with specified quotation characters optionally.
+        /// If optional parameter is true, text will be quoted only when text contains specified quotation character.
+        /// Escape existing quotation character with specified escape character.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="with"></param>
@@ -2499,10 +2541,16 @@ namespace Energy.Base
         public static string Quote(string text, string with, string escape, bool optional)
         {
             if (optional && !text.Contains(with))
+            {
                 return text;
+            }
             return Quote(text, with, escape);
         }
 
+/*
+ * Removed to avoid using any value and possible problem in future when
+ * new methods with different parameter types will appear.
+ * 
 
         /// <summary>
         /// Surround text with quotation characters.
@@ -2526,6 +2574,8 @@ namespace Energy.Base
             string text = Energy.Base.Cast.AsString(value);
             return Quote(text, with, with);
         }
+                
+ */
 
         #endregion
 
