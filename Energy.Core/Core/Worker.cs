@@ -546,58 +546,58 @@ namespace Energy.Core
             return Wait(thread, (int)1000 * time);
         }
 
-        /*
-         * Code commented out, because it's not proper way to wait for a thread anymore with separate guardian thread.
-         * Aborting thread is no longer supported (.NET Core).
-         *
+/*
+ * Code commented out, because it's not proper way to wait for a thread anymore with separate guardian thread.
+ * Aborting thread is no longer supported (.NET Core).
+ *
 
-            /// <summary>
-            /// Wait for thread to finish work for specified time in milliseconds.
-            /// </summary>
-            /// <param name="thread">Thread object</param>
-            /// <param name="time">Time in milliseconds</param>
-            /// <returns>True if thread exited, false if still running</returns>
-            public static bool Wait(System.Threading.Thread thread, int time)
+        /// <summary>
+        /// Wait for thread to finish work for specified time in milliseconds.
+        /// </summary>
+        /// <param name="thread">Thread object</param>
+        /// <param name="time">Time in milliseconds</param>
+        /// <returns>True if thread exited, false if still running</returns>
+        public static bool Wait(System.Threading.Thread thread, int time)
+        {
+            if (null == thread || !thread.IsAlive)
             {
-                if (null == thread || !thread.IsAlive)
-                {
-                    return true;
-                }
-                System.Threading.ManualResetEvent manualResetEvent = new System.Threading.ManualResetEvent(false);
-                System.Threading.Thread guardian = new System.Threading.Thread(() =>
-                {
-                    try
-                    {
-                        thread.Join();
-                        manualResetEvent.Set();
-                    }
-                    catch (System.Threading.ThreadAbortException)
-                    {
-                    }
-                })
-                {
-                    IsBackground = true
-                };
-                guardian.Start();
-                bool success = manualResetEvent.WaitOne(time);
-                if (success)
-                {
-                    return true;
-                }
-                else
-                {
-                    try
-                    {
-                        guardian.Abort();
-                    }
-                    catch (PlatformNotSupportedException xPlatformNotSupportedException)
-                    {
-                        System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.GetExceptionMessage(xPlatformNotSupportedException, true));
-                    }
-                    return false;
-                }
+                return true;
             }
-         */
+            System.Threading.ManualResetEvent manualResetEvent = new System.Threading.ManualResetEvent(false);
+            System.Threading.Thread guardian = new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    thread.Join();
+                    manualResetEvent.Set();
+                }
+                catch (System.Threading.ThreadAbortException)
+                {
+                }
+            })
+            {
+                IsBackground = true
+            };
+            guardian.Start();
+            bool success = manualResetEvent.WaitOne(time);
+            if (success)
+            {
+                return true;
+            }
+            else
+            {
+                try
+                {
+                    guardian.Abort();
+                }
+                catch (PlatformNotSupportedException xPlatformNotSupportedException)
+                {
+                    System.Diagnostics.Debug.WriteLine(Energy.Core.Bug.GetExceptionMessage(xPlatformNotSupportedException, true));
+                }
+                return false;
+            }
+        }
+ */
 
         /// <summary>
         /// Wait for thread to finish work for specified time in milliseconds.
