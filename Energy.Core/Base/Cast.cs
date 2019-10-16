@@ -436,18 +436,22 @@ namespace Energy.Base
 
             public readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
 
-            public static string DOUBLE_STRING_FORMAT = "G17";  // this one is G17 with special treatment. Contains workaround for 61.3 being represented as 61.299999999999997.
-            //public static string DOUBLE_STRING_FORMAT = "G18"; // wrong for 61.3. Actual:<61.299999999999997>.
-            //public static string DOUBLE_STRING_FORMAT = "G16"; // wrong for -1234567890.0987654. Actual:<-1234567890.098765>.
-            //public static string DOUBLE_STRING_FORMAT = "";     // fall back to bad code which corrupt values by rounding. Tests will not pass. Expected:<-1234567890.0987654>. Actual:<-1234567890.09877>.
-            //public static string DOUBLE_STRING_FORMAT = "G";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
-            //public static string DOUBLE_STRING_FORMAT = "$G17";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+            public const string DOUBLE_STRING_FORMAT_G17 = "G17";
 
-            public const string SINGLE_STRING_FORMAT = "G9";
+            public static string DOUBLE_STRING_FORMAT = "G17";  // this one is G17 with special treatment. Contains workaround for 61.3 being represented as 61.299999999999997.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G18"; // wrong for 61.3. Actual:<61.299999999999997>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G16"; // wrong for -1234567890.0987654. Actual:<-1234567890.098765>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "";     // fall back to bad code which corrupt values by rounding. Tests will not pass. Expected:<-1234567890.0987654>. Actual:<-1234567890.09877>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "$G17";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+
+            public static string SINGLE_STRING_FORMAT = "G9";
 
             public static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
 
             public static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_TICK = "yyyy-MM-dd HH:mm:ss.fffffff";
 
             public static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
 
@@ -1671,7 +1675,8 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            if ("G17" == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT)
+            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT 
+                == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT_G17)
             {
                 string s17 = value.ToString("G17", CultureInfo.InvariantCulture);
                 int dot = s17.IndexOf(".");
