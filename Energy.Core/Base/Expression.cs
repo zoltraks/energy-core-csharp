@@ -69,9 +69,9 @@ namespace Energy.Base
         public static readonly string Time = @"(((?<hour>\d{1,2}):)?(?<minute>\d{1,2}):)?(?<second>\d{1,2})[,\.](?<fraction>\d{1,6})|((?<hour>\d{1,2}):(?<minute>\d{1,2}))(:(?<second>\d{1,2}))?";
 
         /// <summary>
-        /// URI pattern (scheme + user + password + host + port + path + query + fragment)
+        /// URI pattern (scheme + : + // + user + : + password + @ + host + : + port + / + path + ? + query + # + fragment).
         /// </summary>
-        public static readonly string Url = @"(?:(?<scheme>\w+):)?(?://)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
+        public static readonly string Url = @"(?:(?<scheme>\w+):(?<slash>//)?)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^:@\r\n]*))?@)?(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?\r\n]*)?(?:\?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";
 
         /// <summary>
         /// Matching for "VARCHAR(50) NOT NULL" or "DECIMAL(20, 3) NULL DEFAULT = '';"

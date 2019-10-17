@@ -8,44 +8,63 @@ namespace Energy.Base
     public class Url: Energy.Interface.ICopy<Url>
     {
         /// <summary>
-        /// Scheme
+        /// Scheme (protocol).
+        /// Examples of popular schemes include http, https, ftp, mailto, file, data, and irc.
         /// </summary>
         public string Scheme;
 
         /// <summary>
-        /// Host
+        /// Optional slashes which may be not present, i.e. mailto:user@host.
+        /// </summary>
+        public string Slash;
+
+        /// <summary>
+        /// Host address.
         /// </summary>
         public string Host;
 
         /// <summary>
-        /// Port
+        /// Port number or empty string if not specified.
         /// </summary>
         public string Port;
 
         /// <summary>
-        /// Path
+        /// Path.
         /// </summary>
         public string Path;
 
         /// <summary>
-        /// Query
+        /// Query string.
         /// </summary>
         public string Query;
 
         /// <summary>
-        /// Fragment
+        /// Fragment.
         /// </summary>
         public string Fragment;
 
         /// <summary>
-        /// User
+        /// User name.
         /// </summary>
         public string User;
 
         /// <summary>
-        /// Password
+        /// Optional password.
         /// </summary>
         public string Password;
+
+        public Url()
+        {
+            //this.Scheme = "";
+            //this.Slash = "";
+            //this.User = "";
+            //this.Password = "";
+            //this.Host = "";
+            //this.Port = "";
+            //this.Path = "";
+            //this.Query = "";
+            //this.Fragment = "";
+        }
 
         /// <summary>
         /// Represent URL structure as string
@@ -54,6 +73,7 @@ namespace Energy.Base
         public override string ToString()
         {
             string scheme = this.Scheme;
+            string slash = this.Slash;
             string user = this.User;
             string password = this.Password;
             string host = this.Host;
@@ -66,7 +86,11 @@ namespace Energy.Base
             if (!string.IsNullOrEmpty(scheme))
             {
                 list.Add(scheme);
-                list.Add("://");
+                list.Add(":");
+            }
+            if (!string.IsNullOrEmpty(slash))
+            {
+                list.Add(slash);
             }
             if (!string.IsNullOrEmpty(user))
             {
@@ -113,20 +137,31 @@ namespace Energy.Base
         /// <returns></returns>
         public static Url Explode(string url)
         {
+            if (null == url)
+            {
+                return null;
+            }
+            else if ("" == url)
+            {
+                return new Energy.Base.Url();
+            }
             string pattern = Energy.Base.Expression.Url;
             Regex r = new Regex(pattern);
             Match m = r.Match(url);
             if (!m.Success)
+            {
                 return null;
+            }
             Energy.Base.Url result = new Energy.Base.Url();
             result.Scheme = m.Groups["scheme"].Value;
+            result.Slash = m.Groups["slash"].Value;
             result.Host = m.Groups["host"].Value;
             result.Port = m.Groups["port"].Value;
             result.Path = m.Groups["path"].Value;
             result.Query = m.Groups["query"].Value;
             result.Fragment = m.Groups["fragment"].Value;
             result.User = m.Groups["user"].Value;
-            result.Password = m.Groups["user"].Value;
+            result.Password = m.Groups["password"].Value;
             return result;
         }
 
@@ -182,8 +217,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Make URL address overriding parts of it. Use null as parameter 
-        /// to ignore or empty value to remove it.
+        /// Make URL address overriding parts of it. 
+        /// Pass null as parameter to skip it or empty value to remove specified part from URL.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="scheme"></param>
@@ -238,21 +273,37 @@ namespace Energy.Base
             if (overwrite)
             {
                 if (url2.Scheme != null)
+                {
                     url0.Scheme = url2.Scheme;
+                }
                 if (url2.Host != null)
+                {
                     url0.Host = url2.Host;
+                }
                 if (url2.Port != null)
+                {
                     url0.Port = url2.Port;
+                }
                 if (url2.Path != null)
+                {
                     url0.Path = url2.Path;
+                }
                 if (url2.Query != null)
+                {
                     url0.Query = url2.Query;
+                }
                 if (url2.Fragment != null)
+                {
                     url0.Fragment = url2.Fragment;
+                }
                 if (url2.User != null)
+                {
                     url0.User = url2.User;
+                }
                 if (url2.Password != null)
+                {
                     url0.Password = url2.Password;
+                }
             }
             else
             {
@@ -317,6 +368,7 @@ namespace Energy.Base
             Url o = new Url()
             {
                 Scheme = this.Scheme,
+                Slash = this.Slash,
                 Host = this.Host,
                 Port = this.Port,
                 Path = this.Path,
@@ -326,6 +378,27 @@ namespace Energy.Base
                 Password = this.Password,
             };
             return o;
+        }
+
+        /// <summary>
+        /// Returns true if URL is empty.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return true
+                    && string.IsNullOrEmpty(this.Scheme)
+                    && string.IsNullOrEmpty(this.Slash)
+                    && string.IsNullOrEmpty(this.Host)
+                    && string.IsNullOrEmpty(this.Port)
+                    && string.IsNullOrEmpty(this.Path)
+                    && string.IsNullOrEmpty(this.Query)
+                    && string.IsNullOrEmpty(this.Fragment)
+                    && string.IsNullOrEmpty(this.User)
+                    && string.IsNullOrEmpty(this.Password)
+                    ;
+            }
         }
     }
 }
