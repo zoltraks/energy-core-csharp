@@ -2,17 +2,18 @@
 
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.12.11</Version>
-    <FileVersion>2019.09.19</FileVersion>
-    <AssemblyVersion>18.12.11</AssemblyVersion>
+    <Version>18.12.12</Version>
+    <FileVersion>2019.10.17</FileVersion>
+    <AssemblyVersion>18.12.12</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
-    <Description>Class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
-To be used by wide range of applications, services, web or console programs.</Description>
+    <Description>This package contains class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
+
+Meant to be used by wide range of applications, services, web or console programs.</Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
