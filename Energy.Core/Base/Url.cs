@@ -55,15 +55,15 @@ namespace Energy.Base
 
         public Url()
         {
-            //this.Scheme = "";
-            //this.Slash = "";
-            //this.User = "";
-            //this.Password = "";
-            //this.Host = "";
-            //this.Port = "";
-            //this.Path = "";
-            //this.Query = "";
-            //this.Fragment = "";
+            this.Scheme = "";
+            this.Slash = "";
+            this.User = "";
+            this.Password = "";
+            this.Host = "";
+            this.Port = "";
+            this.Path = "";
+            this.Query = "";
+            this.Fragment = "";
         }
 
         /// <summary>
@@ -261,46 +261,50 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Combine two URLs, overwriting all or only empty values with second one.
+        /// Combine two URLs, overwriting all or only empty parts from second one.
         /// </summary>
         /// <param name="url1"></param>
         /// <param name="url2"></param>
-        /// <param name="overwrite">When overwrite is true, not null parameters from second object will always be overwritten. If not, only null and empty values will be overwritten.</param>
+        /// <param name="overwrite">When overwrite is true, values will always be overwritten with not empty parameters from second address. If not, only empty values will be overwritten.</param>
         /// <returns></returns>
         public static Url Combine(Url url1, Url url2, bool overwrite)
         {
             Url url0 = url1.Copy();
             if (overwrite)
             {
-                if (url2.Scheme != null)
+                if (!string.IsNullOrEmpty(url2.Scheme))
                 {
                     url0.Scheme = url2.Scheme;
                 }
-                if (url2.Host != null)
+                if (!string.IsNullOrEmpty(url2.Slash))
+                {
+                    url0.Slash = url2.Slash;
+                }
+                if (!string.IsNullOrEmpty(url2.Host))
                 {
                     url0.Host = url2.Host;
                 }
-                if (url2.Port != null)
+                if (!string.IsNullOrEmpty(url2.Port))
                 {
                     url0.Port = url2.Port;
                 }
-                if (url2.Path != null)
+                if (!string.IsNullOrEmpty(url2.Path))
                 {
                     url0.Path = url2.Path;
                 }
-                if (url2.Query != null)
+                if (!string.IsNullOrEmpty(url2.Query))
                 {
                     url0.Query = url2.Query;
                 }
-                if (url2.Fragment != null)
+                if (!string.IsNullOrEmpty(url2.Fragment))
                 {
                     url0.Fragment = url2.Fragment;
                 }
-                if (url2.User != null)
+                if (!string.IsNullOrEmpty(url2.User))
                 {
                     url0.User = url2.User;
                 }
-                if (url2.Password != null)
+                if (!string.IsNullOrEmpty(url2.Password))
                 {
                     url0.Password = url2.Password;
                 }
@@ -308,21 +312,37 @@ namespace Energy.Base
             else
             {
                 if (string.IsNullOrEmpty(url0.Scheme) && url2.Scheme != null)
+                {
                     url0.Scheme = url2.Scheme;
+                }
                 if (string.IsNullOrEmpty(url0.Host) && url2.Host != null)
+                {
                     url0.Host = url2.Host;
+                }
                 if (string.IsNullOrEmpty(url0.Port) && url2.Port != null)
+                {
                     url0.Port = url2.Port;
+                }
                 if (string.IsNullOrEmpty(url0.Path) && url2.Path != null)
+                {
                     url0.Path = url2.Path;
+                }
                 if (string.IsNullOrEmpty(url0.Query) && url2.Query != null)
+                {
                     url0.Query = url2.Query;
+                }
                 if (string.IsNullOrEmpty(url0.Fragment) && url2.Fragment != null)
+                {
                     url0.Fragment = url2.Fragment;
+                }
                 if (string.IsNullOrEmpty(url0.User) && url2.User != null)
+                {
                     url0.User = url2.User;
+                }
                 if (string.IsNullOrEmpty(url0.Password) && url2.Password != null)
+                {
                     url0.Password = url2.Password;
+                }
             }
             return url0;
         }

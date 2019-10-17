@@ -27,7 +27,7 @@ namespace Energy.Core.Test.Base
             url = input;
             output = url.ToString();
             Assert.AreEqual(output, input);
-            Assert.AreEqual(".", url.Host);
+            Assert.AreEqual("host", url.Host);
             Assert.AreEqual("1", url.Port);
             input = "localhost/path";
             url = input;
