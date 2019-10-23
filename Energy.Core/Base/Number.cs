@@ -392,5 +392,229 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Median
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public static int Median(int[] array, bool sort)
+        {
+            if (sort)
+            {
+                List<int> l = new List<int>(array);
+                l.Sort();
+                array = l.ToArray();
+
+            }
+            if (array.Length <= 0)
+            {
+                return 0;
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            int h = array.Length / 2;
+            if (array.Length % 2 != 0)
+            {
+                return array[h];
+            }
+            else
+            {
+                return (int)((array[h - 1] + array[h]) / 2.0);
+            }
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static int Median(int[] array)
+        {
+            return Median(array, true);
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public static long Median(long[] array, bool sort)
+        {
+            if (sort)
+            {
+                List<long> l = new List<long>(array);
+                l.Sort();
+                array = l.ToArray();
+
+            }
+            if (array.Length <= 0)
+            {
+                return 0;
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            int h = array.Length / 2;
+            if (array.Length % 2 != 0)
+            {
+                return array[h];
+            }
+            else
+            {
+                return (long)((array[h - 1] + array[h]) / 2.0);
+            }
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static long Median(long[] array)
+        {
+            return Median(array, true);
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public static ulong Median(ulong[] array, bool sort)
+        {
+            if (sort)
+            {
+                List<ulong> l = new List<ulong>(array);
+                l.Sort();
+                array = l.ToArray();
+
+            }
+            if (array.Length <= 0)
+            {
+                return 0;
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            int h = array.Length / 2;
+            if (array.Length % 2 != 0)
+            {
+                return array[h];
+            }
+            else
+            {
+                return (ulong)((array[h - 1] + array[h]) / 2.0);
+            }
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static ulong Median(ulong[] array)
+        {
+            return Median(array, true);
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public static double Median(double[] array, bool sort)
+        {
+            if (sort)
+            {
+                List<double> l = new List<double>(array);
+                l.Sort();
+                array = l.ToArray();
+
+            }
+            if (array.Length <= 0)
+            {
+                return 0;
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            int h = array.Length / 2;
+            if (array.Length % 2 != 0)
+            {
+                return array[h];
+            }
+            else
+            {
+                return (double)((array[h - 1] + array[h]) / 2.0);
+            }
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double Median(double[] array)
+        {
+            return Median(array, true);
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public static decimal Median(decimal[] array, bool sort)
+        {
+            if (sort)
+            {
+                List<decimal> l = new List<decimal>(array);
+                l.Sort();
+                array = l.ToArray();
+
+            }
+            if (array.Length <= 0)
+            {
+                return 0;
+            }
+            if (array.Length == 1)
+            {
+                return array[0];
+            }
+            int h = array.Length / 2;
+            if (array.Length % 2 != 0)
+            {
+                return array[h];
+            }
+            else
+            {
+                return (decimal)((array[h - 1] + array[h]) / 2.0m);
+            }
+        }
+
+        /// <summary>
+        /// Return the middle number from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal Median(decimal[] array)
+        {
+            return Median(array, true);
+        }
+
+        #endregion
     }
 }
