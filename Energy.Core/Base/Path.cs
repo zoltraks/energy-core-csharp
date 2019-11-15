@@ -314,5 +314,17 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Walk
+
+        #endregion
+
+        #region Element
+
+        #endregion
+
+        #region Each
+
+        #endregion
     }
 }
