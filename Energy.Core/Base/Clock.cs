@@ -1027,5 +1027,134 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region SelectEarlier
+
+        /// <summary>
+        /// Select earlier date from nullable DateTime parameters.
+        /// </summary>
+        /// <returns>Earliest date or null if not specified</returns>
+        public static DateTime? SelectEarlier(params DateTime?[] dates)
+        {
+            DateTime? stamp = null;
+            if (null == dates || 0 == dates.Length)
+            {
+                return stamp;
+            }
+            for (int i = 0; i < dates.Length; i++)
+            {
+                if (null == dates[i])
+                {
+                    continue;
+                }
+                else if (null == stamp)
+                {
+                    stamp = (DateTime)dates[i];
+                    continue;
+                }
+                if ((DateTime)dates[i] < (DateTime)stamp)
+                {
+                    stamp = (DateTime)dates[i];
+                }
+            }
+            return stamp;
+        }
+
+        /// <summary>
+        /// Select earlier date from DateTime parameters.
+        /// </summary>
+        /// <returns>Earliest date or DateTime.MinValue if not specified</returns>
+        public static DateTime SelectEarlier(params DateTime[] dates)
+        {
+            DateTime stamp = DateTime.MinValue;
+            if (null == dates || 0 == dates.Length)
+            {
+                return stamp;
+            }
+            for (int i = 0; i < dates.Length; i++)
+            {
+                if (null == dates[i])
+                {
+                    continue;
+                }
+                else if (DateTime.MinValue == stamp)
+                {
+                    stamp = dates[i];
+                    continue;
+                }
+                if (dates[i] < stamp)
+                {
+                    stamp = dates[i];
+                }
+            }
+            return stamp;
+        }
+
+        #endregion
+
+        #region SelectLater
+
+        /// <summary>
+        /// Select later date from nullable DateTime parameters.
+        /// </summary>
+        /// <returns>Most recent date or DateTime.MinValue if not specified</returns>
+        public static DateTime? SelectLater(params DateTime?[] dates)
+        {
+            //DateTime stamp = DateTime.MinValue;
+            DateTime? stamp = null;
+            if (null == dates || 0 == dates.Length)
+            {
+                return stamp;
+            }
+            for (int i = 0; i < dates.Length; i++)
+            {
+                if (null == dates[i])
+                {
+                    continue;
+                }
+                else if (null == stamp)
+                {
+                    stamp = dates[i];
+                    continue;
+                }
+                if (dates[i] > stamp)
+                {
+                    stamp = dates[i];
+                }
+            }
+            return stamp;
+        }
+
+        /// <summary>
+        /// Select later date from nullable DateTime parameters.
+        /// </summary>
+        /// <returns>Most recent date or DateTime.MinValue if not specified</returns>
+        public static DateTime SelectLater(params DateTime[] dates)
+        {
+            DateTime stamp = DateTime.MinValue;
+            if (null == dates || 0 == dates.Length)
+            {
+                return stamp;
+            }
+            for (int i = 0; i < dates.Length; i++)
+            {
+                if (null == dates[i])
+                {
+                    continue;
+                }
+                else if (DateTime.MinValue == stamp)
+                {
+                    stamp = dates[i];
+                    continue;
+                }
+                if (dates[i] > stamp)
+                {
+                    stamp = dates[i];
+                }
+            }
+            return stamp;
+        }
+
+        #endregion
     }
 }
