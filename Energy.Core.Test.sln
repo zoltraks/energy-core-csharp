@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Core", "Energy.Core\Energy.Core.csproj", "{434F5245-DEAD-0100-0100-0000000000A0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Test", "Energy.Core.Test\Energy.Core.Test.csproj", "{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8FE05090-0A5F-423C-8B0C-0C2E5211224C}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energy.Core", "Energy.Core\Energy.Core.csproj", "{434F5245-DEAD-0100-0100-0000000000A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Test", "Energy.Core.Test\Energy.Core.Test.csproj", "{EF49DE43-BCCC-4EE8-92DA-58F9A2A5D255}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
