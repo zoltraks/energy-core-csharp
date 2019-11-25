@@ -130,5 +130,29 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Clock.Floor(needle, -15);
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void SeletEarlier()
+        {
+            DateTime dt1, dt2, now;
+            DateTime? ndt1, ndt2;
+            now = DateTime.Now;
+            dt1 = DateTime.MinValue;
+            dt2 = DateTime.MaxValue;
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt1, dt2));
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1)); 
+            dt1 = now.AddTicks(-1);
+            dt2 = now.AddTicks(-2);
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt1, dt2));
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1));
+            ndt1 = DateTime.MinValue;
+            ndt2 = DateTime.MaxValue;
+            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt1, ndt2));
+            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt2, ndt1));
+            ndt1 = now.AddTicks(-1);
+            ndt2 = now.AddTicks(-2);
+            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt1, ndt2));
+            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt2, ndt1));
+        }
     }
 }
