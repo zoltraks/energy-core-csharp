@@ -134,6 +134,36 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void StringArrayIndexOf()
+        {
+            string[] array;
+            array = new string[] { "A", "B", "a" };
+            Assert.AreEqual(2, Energy.Base.Collection.StringArray.IndexOf(array, "a"));
+            Assert.AreEqual(2, Energy.Base.Collection.StringArray.IndexOf(array, "a", false));
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.IndexOf(array, "a", true));
+            Assert.AreEqual(2, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 1));
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 0));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, null));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "c"));
+            array = new string[] { };
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a"));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", false));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 1));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 0));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, null));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "c"));
+            array = null;
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a"));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", false));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 1));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "a", true, 0));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, null));
+            Assert.AreEqual(-1, Energy.Base.Collection.StringArray.IndexOf(array, "c"));
+        }
+
+        [TestMethod]
         public void StringDictionaryConstructor()
         {
             Dictionary<string, object> d;

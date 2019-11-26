@@ -70,6 +70,21 @@ namespace Energy.Base
                 }
             }
 
+            public long RowMaximum
+            {
+                get
+                {
+                    if (Row > 0)
+                    {
+                        return Row;
+                    }
+                    else
+                    {
+                        return long.MaxValue;
+                    }
+                }
+            }
+
             private static readonly string COLUMN_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             private long GetColumnIndex()

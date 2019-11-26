@@ -726,12 +726,12 @@ namespace Energy.Base
         /// Elements will not include new line itself.
         /// </summary>
         /// <param name="content"></param>
-        /// <param name="removeEmptyEntries"></param>
+        /// <param name="removeEmpty"></param>
         /// <returns></returns>
-        public static string[] SplitLine(string content, bool removeEmptyEntries)
+        public static string[] SplitLine(string content, bool removeEmpty)
         {
             string[] split = content.Split(NEWLINE_ARRAY
-                , removeEmptyEntries ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
+                , removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
                 );
             return split;
         }
@@ -3640,6 +3640,21 @@ namespace Energy.Base
                 return text.Substring(0, maximum);
             else
                 return text;
+        }
+
+        #endregion
+
+        #region EmptyIfNull
+
+        /// <summary>
+        /// Return empty string when string parameter is null or string parameter itself otherwise.
+        /// This function ensures string objects are always defined.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EmptyIfNull(string value)
+        {
+            return value == null ? "" : value;
         }
 
         #endregion

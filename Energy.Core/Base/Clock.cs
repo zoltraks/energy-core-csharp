@@ -1066,28 +1066,24 @@ namespace Energy.Base
         /// <returns>Earliest date or DateTime.MinValue if not specified</returns>
         public static DateTime SelectEarlier(params DateTime[] dates)
         {
-            DateTime stamp = DateTime.MinValue;
             if (null == dates || 0 == dates.Length)
             {
-                return stamp;
+                return DateTime.MinValue;
             }
+            DateTime? stamp = null;
             for (int i = 0; i < dates.Length; i++)
             {
-                if (null == dates[i])
-                {
-                    continue;
-                }
-                else if (DateTime.MinValue == stamp)
+                if (null == stamp)
                 {
                     stamp = dates[i];
                     continue;
                 }
-                if (dates[i] < stamp)
+                if (dates[i] < (DateTime)stamp)
                 {
                     stamp = dates[i];
                 }
             }
-            return stamp;
+            return (DateTime)stamp;
         }
 
         #endregion

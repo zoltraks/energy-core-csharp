@@ -620,5 +620,32 @@ namespace Energy.Core.Test.Base
             expect = new string[] { "1", " ", "\t", "2", "3" };
             Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
         }
+
+//        [TestMethod]
+//        public void TextCut()
+//        {
+//            string text;
+//            string line;
+//            text = @"
+//A + B
+//'
+//This will be multilne,
+//with \'Hello world\'
+//'
+//""
+//Another
+//""
+//";
+//            line = Energy.Base.Text.Cut(text, new string[] { "\r\n", "$" }, new string[] { @"""""", @"'\''" });
+//            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, true, new string[] { @"""""", @"'\''" });
+//        }
+
+        [TestMethod]
+        public void TextEmptyIfNull()
+        {
+            Assert.AreEqual("", Energy.Base.Text.EmptyIfNull(null));
+            Assert.AreEqual("", Energy.Base.Text.EmptyIfNull(""));
+            Assert.AreEqual("A", Energy.Base.Text.EmptyIfNull("A"));
+        }
     }
 }

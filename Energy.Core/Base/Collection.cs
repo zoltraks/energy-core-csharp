@@ -429,6 +429,14 @@ namespace Energy.Base
                 }
             }
 
+            public int Count
+            {
+                get
+                {
+                    return _Array.Length;
+                }
+            }
+
             public int TotalLength
             {
                 get
@@ -589,6 +597,84 @@ namespace Energy.Base
                 }
                 return list.ToArray();
             }
+
+            #region IndexOf
+
+            public int IndexOf(string element)
+            {
+                return IndexOf(element, 0, false);
+            }
+
+            public int IndexOf(string element, int index)
+            {
+                return IndexOf(element, index, false);
+            }
+
+            public int IndexOf(string element, bool ignoreCase)
+            {
+                return IndexOf(element, 0, ignoreCase);
+            }
+
+            public int IndexOf(string element, bool ignoreCase, int index)
+            {
+                return IndexOf(element, index, ignoreCase);
+            }
+
+            public int IndexOf(string element, int index, bool ignoreCase)
+            {
+                int length;
+                if (null == _Array || 0 == (length = _Array.Length))
+                {
+                    return -1;
+                }
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, _Array[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            public static int IndexOf(string[] array, string element)
+            {
+                return IndexOf(array, element, 0, false);
+            }
+
+            public static int IndexOf(string[] array, string element, int index)
+            {
+                return IndexOf(array, element, index, false);
+            }
+
+            public static int IndexOf(string[] array, string element, bool ignoreCase)
+            {
+                return IndexOf(array, element, 0, ignoreCase);
+            }
+
+            public static int IndexOf(string[] array, string element, bool ignoreCase, int index)
+            {
+                return IndexOf(array, element, index, ignoreCase);
+            }
+
+            public static int IndexOf(string[] array, string element, int index, bool ignoreCase)
+            {
+                if (null == array || 0 == array.Length)
+                {
+                    return -1;
+                }
+                int length = array.Length;
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, array[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            #endregion
         }
 
         #endregion
@@ -1169,6 +1255,33 @@ namespace Energy.Base
                     check.Add(array[i]);
                 }
                 return false;
+            }
+
+            public int IndexOf(string element, bool ignoreCase)
+            {
+                return IndexOf(element, 0, ignoreCase);
+            }
+
+            public int IndexOf(string element, bool ignoreCase, int index)
+            {
+                return IndexOf(element, index, ignoreCase);
+            }
+
+            public int IndexOf(string element, int index, bool ignoreCase)
+            {
+                int length;
+                if (0 == (length = this.Count))
+                {
+                    return -1;
+                }
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, this[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
             }
         }
 

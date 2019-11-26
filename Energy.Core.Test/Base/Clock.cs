@@ -143,16 +143,31 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1)); 
             dt1 = now.AddTicks(-1);
             dt2 = now.AddTicks(-2);
-            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt1, dt2));
-            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1));
+            Assert.AreEqual(dt2, Energy.Base.Clock.SelectEarlier(dt1, dt2));
+            Assert.AreEqual(dt2, Energy.Base.Clock.SelectEarlier(dt2, dt1));
             ndt1 = DateTime.MinValue;
             ndt2 = DateTime.MaxValue;
             Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt1, ndt2));
             Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt2, ndt1));
             ndt1 = now.AddTicks(-1);
             ndt2 = now.AddTicks(-2);
-            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt1, ndt2));
-            Assert.AreEqual(ndt1, Energy.Base.Clock.SelectEarlier(ndt2, ndt1));
+            Assert.AreEqual(ndt2, Energy.Base.Clock.SelectEarlier(ndt1, ndt2));
+            Assert.AreEqual(ndt2, Energy.Base.Clock.SelectEarlier(ndt2, ndt1));
+        }
+
+        [TestMethod]
+        public void SeletLater()
+        {
+            DateTime dt1, dt2, now;
+            now = DateTime.Now;
+            dt1 = DateTime.MinValue;
+            dt2 = DateTime.MaxValue;
+            Assert.AreEqual(dt2, Energy.Base.Clock.SelectLater(dt1, dt2));
+            Assert.AreEqual(dt2, Energy.Base.Clock.SelectLater(dt2, dt1));
+            dt1 = now.AddTicks(-1);
+            dt2 = now.AddTicks(-2);
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectLater(dt1, dt2));
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectLater(dt2, dt1));
         }
     }
 }
