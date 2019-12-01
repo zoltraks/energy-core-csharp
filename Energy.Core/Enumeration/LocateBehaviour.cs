@@ -8,6 +8,11 @@ namespace Energy.Enumeration
     public enum LocateBehaviour
     {
         /// <summary>
+        /// Default behaviour. Equivalent to Directories.
+        /// </summary>
+        Default,
+
+        /// <summary>
         /// Search in any directory for every possible filename extension
         /// </summary>
         Directories,
@@ -16,10 +21,5 @@ namespace Energy.Enumeration
         /// Search for every possible filename extension in any of directory
         /// </summary>
         Extensions,
-
-        /// <summary>
-        /// Default behaviour
-        /// </summary>
-        Default = Directories,
     }
 }

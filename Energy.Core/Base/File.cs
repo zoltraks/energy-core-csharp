@@ -11,6 +11,411 @@ namespace Energy.Base
     /// </summary>
     public class File
     {
+        #region State
+
+        /// <summary>
+        /// Represents file state and provides functions for monitoring changes.
+        /// </summary>
+        [Energy.Attribute.Code.Improve("Object might be able to mangle Directory and Path properties together")]
+        public class State: ICloneable
+        {
+            #region Property
+
+            private string _Name;
+            /// <summary>Name of a file</summary>
+            public string Name { get { return _Name; } set { _Name = value; } }
+
+            private string _Path;
+            /// <summary>Full path to a file</summary>
+            public string Path { get { return _Path; } set { _Path = value; } }
+
+            private string _Directory;
+            /// <summary>Directory where file is located</summary>
+            public string Directory { get { return _Directory; } set { _Directory = value; } }
+
+            private DateTime _Stamp;
+            /// <summary>File modification stamp</summary>
+            public DateTime Stamp { get { return _Stamp; } set { _Stamp = value; } }
+
+            private long _Size;
+            /// <summary>File size</summary>
+            public long Size { get { return _Size; } set { _Size = value; } }
+
+            #endregion
+
+            #region Constructor
+
+            public State() { }
+
+            public State(string file)
+            {
+                _Size = -1;
+                _Path = file;
+                if (string.IsNullOrEmpty(file))
+                {
+                    return;
+                }
+                _Name = System.IO.Path.GetFileName(file);
+                _Directory = System.IO.Path.GetDirectoryName(file);
+            }
+
+            public State(string file, bool read)
+                : this(file)
+            {
+                if (read)
+                {
+                    Refresh();
+                }
+            }
+
+            #endregion
+
+            #region Private
+
+            #endregion
+
+            #region Refresh
+
+            /// <summary>
+            /// Refresh file state
+            /// </summary>
+            /// <returns></returns>
+            public bool Refresh()
+            {
+                _Stamp = DateTime.MinValue;
+                _Size = -1;
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                    return false;
+                try
+                {
+                    if (!System.IO.File.Exists(fileName))
+                        return false;
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
+                    _Stamp = lastWriteTime;
+                    _Size = fileInfo.Length;
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E404", x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region Exists
+
+            /// <summary>
+            /// Check if file exists
+            /// </summary>
+            /// <returns></returns>
+            public bool Exists()
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                    return false;
+                try
+                {
+                    bool exists = System.IO.File.Exists(fileName);
+                    return exists;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E404", x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region IsChanged
+
+            /// <summary>
+            /// Check if file was modified by checking write stamp and size.
+            /// </summary>
+            /// <returns></returns>
+            public bool IsChanged()
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                    return false;
+                try
+                {
+                    if (!System.IO.File.Exists(fileName))
+                    {
+                        if (_Stamp == DateTime.MinValue && _Size == -1)
+                            return true;
+                        else
+                            return false;
+                    }
+
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
+                    if (_Stamp != lastWriteTime)
+                        return true;
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(fileName);
+                    if (_Size != fileInfo.Length)
+                        return true;
+
+                    return false;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E404", x);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Check if path was changed or file was modified by checking write stamp and size.
+            /// </summary>
+            /// <param name="file"></param>
+            /// <returns></returns>
+            public bool IsChanged(string file)
+            {
+                if (0 != string.Compare(file, _Path))
+                {
+                    return true;
+                }
+                else
+                {
+                    return IsChanged();
+                }
+            }
+
+            #endregion
+
+            #region GetCreateStamp
+
+            /// <summary>
+            /// Returns the creation date and time of the file.
+            /// Returns DateTime.MinValue on error.
+            /// </summary>
+            /// <returns></returns>
+            public DateTime GetCreateStamp()
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return DateTime.MinValue;
+                }
+                try
+                {
+                    if (!System.IO.File.Exists(fileName))
+                    {
+                        return DateTime.MinValue;
+                    }
+                    DateTime lastWriteTime = System.IO.File.GetCreationTime(fileName);
+                    return lastWriteTime;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E403", x);
+                    return DateTime.MinValue;
+                }
+            }
+
+            #endregion
+
+            #region GetWriteStamp
+
+            /// <summary>
+            /// Returns the date and time the file was last written to.
+            /// Returns DateTime.MinValue on error.
+            /// </summary>
+            /// <returns></returns>
+            public DateTime GetWriteStamp()
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return DateTime.MinValue;
+                }
+                try
+                {
+                    if (!System.IO.File.Exists(fileName))
+                    {
+                        return DateTime.MinValue;
+                    }
+                    DateTime lastWriteTime = System.IO.File.GetLastWriteTime(fileName);
+                    return lastWriteTime;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E403", x);
+                    return DateTime.MinValue;
+                }
+            }
+
+            #endregion
+
+            #region SetWriteStamp
+
+            /// <summary>
+            /// Set current time of last write for a file.
+            /// </summary>
+            /// <returns></returns>
+            public bool SetWriteStamp(DateTime now)
+            {
+                string fileName = _Path;
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return false;
+                }
+                try
+                {
+                    if (!System.IO.File.Exists(_Name))
+                    {
+                        return false;
+                    }
+                    if (DateTime.MinValue == now)
+                    {
+                        now = DateTime.Now;
+                    }
+                    System.IO.File.SetLastWriteTime(fileName, now);
+                    _Stamp = System.IO.File.GetLastWriteTime(fileName);
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E205", x);
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Set current time as time of last write for a file.
+            /// </summary>
+            /// <returns></returns>
+            public bool SetWriteStamp()
+            {
+                return SetWriteStamp(DateTime.MinValue);
+            }
+
+            #endregion
+
+            #region GetSize
+
+            /// <summary>
+            /// Returns the size in bytes of the file.
+            /// Returns -1 on error.
+            /// </summary>
+            /// <returns></returns>
+            public long GetSize()
+            {
+                if (string.IsNullOrEmpty(_Name))
+                    return -1;
+                try
+                {
+                    if (!System.IO.File.Exists(_Name))
+                        return -1;
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(_Name);
+                    return fileInfo.Length;
+                }
+                catch (Exception x)
+                {
+                    Energy.Core.Bug.Write("E403", x);
+                    return -1;
+                }
+            }
+
+            #endregion
+
+            #region Clone
+
+            public object Clone()
+            {
+                State o = new State(_Path)
+                {
+                    Size = _Size,
+                    Stamp = _Stamp,
+                };
+                return o;
+            }
+
+            #endregion
+
+            #region CreateFile
+
+            /// <summary>
+            /// Create a file if not exists.
+            /// </summary>
+            /// <returns>Return true if file was created</returns>
+            public bool CreateFile()
+            {
+                try
+                {
+                    string file = _Path;
+                    using (System.IO.FileStream _ = System.IO.File.Open(file, System.IO.FileMode.CreateNew))
+                    {
+                        _.Close();
+                    }
+                    _Stamp = System.IO.File.GetLastWriteTime(file);
+                    _Size = 0;
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Core.Bug.Write(x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region DeleteFile
+
+            /// <summary>
+            /// Delete a file if exists.
+            /// </summary>
+            /// <returns>Return true if file was deleted</returns>
+            public bool DeleteFile()
+            {
+                try
+                {
+                    string file = _Path;
+                    if (System.IO.File.Exists(file))
+                    {
+                        System.IO.File.Delete(file);
+                    }
+                    _Stamp = DateTime.MinValue;
+                    _Size = -1;
+                    return true;
+                }
+                catch (Exception x)
+                {
+                    Core.Bug.Write(x);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region Touch
+
+            /// <summary>
+            /// If file exists, change last write time. Create new file otherwise.
+            /// </summary>
+            /// <returns>True if file write time was changed or file was succesfully created</returns>
+            public bool Touch()
+            {
+                if (Exists())
+                {
+                    return SetWriteStamp();
+                }
+                else
+                {
+                    return CreateFile();
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         #region Naming
 
         /// <summary>
@@ -111,21 +516,30 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include traling path directory separator if needed
+        /// Include traling path directory separator if needed.
         /// </summary>
         /// <param name="path">string</param>
         /// <returns>string</returns>
         public static string IncludeTrailingPathSeparator(string path)
         {
-            if (String.IsNullOrEmpty(path)) return "";
-            if (System.IO.Path.DirectorySeparatorChar != '/' && path.Contains("/"))
-            {
-                path = path.Replace('/', System.IO.Path.DirectorySeparatorChar);
-            }
-            if (!path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
-            {
-                path += System.IO.Path.DirectorySeparatorChar;
-            }
+            if (path == null)
+                return null;
+            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            path += System.IO.Path.DirectorySeparatorChar;
+            return path;
+        }
+
+        /// <summary>
+        /// Include traling path directory separator if needed.
+        /// </summary>
+        /// <param name="path">string</param>
+        /// <returns>string</returns>
+        public static string IncludeTrailingDirectorySeparator(string path)
+        {
+            if (path == null)
+                return null;
+            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            path += System.IO.Path.DirectorySeparatorChar;
             return path;
         }
 
@@ -176,7 +590,39 @@ namespace Energy.Base
             return path;
         }
 
+        /// <summary>
+        /// Get short command name from file path.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static string GetCommandName(string file)
+        {
+            if (string.IsNullOrEmpty(file))
+                return "";
+            try
+            {
+                string ext = System.IO.Path.GetExtension(file);
+                if (Energy.Base.Text.InArray(new string[] { ".exe", ".bat", ".cmd" }
+                    , new string[] { ext, null }, true))
+                {
+                    string cmd = System.IO.Path.GetFileNameWithoutExtension(file);
+                    return cmd;
+                }
+                else
+                {
+                    string cmd = System.IO.Path.GetFileName(file);
+                    return cmd;
+                }
+            }
+            catch (NotSupportedException)
+            {
+                return "";
+            }
+        }
+
         #endregion
+
+        #region FileUniqueIdentity
 
         /// <summary>
         /// Return unique name for file by checking it's not exists.
@@ -251,6 +697,10 @@ namespace Energy.Base
             return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), false);
         }
 
+        #endregion
+
+        #region HasNoExtension
+
         /// <summary>
         /// Return true if file name does not contain extension
         /// </summary>
@@ -262,6 +712,10 @@ namespace Energy.Base
             int index = name.IndexOf('.');
             return index <= 0 || index == name.Length - 1;
         }
+
+        #endregion
+
+        #region IsDirectory
 
         /// <summary>
         /// Check if path is directory
@@ -280,6 +734,10 @@ namespace Energy.Base
                 return false;
             }
         }
+
+        #endregion
+
+        #region GetAbsolutePath
 
         /// <summary>
         /// Get absolute path
@@ -308,6 +766,8 @@ namespace Energy.Base
             string path = IncludeTrailingPathSeparator(current);
             return String.Concat(path, file);
         }
+
+        #endregion
 
         #region IsRelativePath
 
@@ -389,7 +849,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it.
+        /// Locate file or comand with one of possible extensions in any directory and return full path to it.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -456,6 +916,7 @@ namespace Energy.Base
 
             switch (behaviour)
             {
+                case Energy.Enumeration.LocateBehaviour.Default:
                 case Energy.Enumeration.LocateBehaviour.Directories:
 
                     for (int i = 0; i < search.Length; i++)
@@ -516,16 +977,46 @@ namespace Energy.Base
             return "";
         }
 
+        /// <summary>
+        /// Locate file or command with one of possible extensions in any directory and return full path to it.
+        /// </summary>
+        /// <param name="list">Array of file names with or without extension and leading path</param>
+        /// <param name="search">Directory search list</param>
+        /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
+        /// <param name="behaviour">Lookup behaviour (iterate over directories or extensions)</param>
+        /// <returns>Empty string if file not found or full path to found one</returns>
+        public static string Locate(string[] list, string[] search, string[] extension, Energy.Enumeration.LocateBehaviour behaviour)
+        {
+            if (null == list)
+            {
+                return "";
+            }
+            string result = "";
+            foreach (string file in list)
+            {
+                result = Locate(file, search, extension, behaviour);
+                if (string.IsNullOrEmpty(result))
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
         #endregion
 
-        #region Make directory
+        #region MakeDirectory
 
-        /// <summary>
-        /// Create directory if not exists
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns>True if directory exists or was created</returns>
-        public static bool MakeDirectory(string path)
+            /// <summary>
+            /// Create directory if not exists.
+            /// </summary>
+            /// <param name="path"></param>
+            /// <returns>Returns true if a directory exists or has been created</returns>
+            public static bool MakeDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -549,14 +1040,14 @@ namespace Energy.Base
 
         #endregion
 
-        #region Remove directory
+        #region RemoveDirectory
 
         /// <summary>
-        /// Remove directory if exists
+        /// Remove directory if exists.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="recursive"></param>
-        /// <returns>True if directory was removed or not exists</returns>
+        /// <returns>Returns true if directory has been removed or not exists</returns>
         public static bool RemoveDirectory(string path, bool recursive)
         {
             if (string.IsNullOrEmpty(path))
@@ -580,10 +1071,10 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Remove directory if exists and is empty
+        /// Remove directory if exists and is empty.
         /// </summary>
         /// <param name="path"></param>
-        /// <returns>True if directory was removed or not exists</returns>
+        /// <returns>Returns true if directory has been removed or not exists</returns>
         public static bool RemoveDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -604,6 +1095,40 @@ namespace Energy.Base
                 Energy.Core.Bug.Catch(x);
                 return false;
             }
+        }
+
+        #endregion
+
+        #region GetBaseDirectory
+
+        /// <summary>
+        /// Gets the base directory that the assembly resolver uses to probe for assemblies.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetBaseDirectory()
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            return baseDirectory;
+        }
+
+        #endregion
+
+        #region GetBasePath
+
+        /// <summary>
+        /// Gets the base path that the assembly resolver uses to probe for assemblies.
+        /// Return path with trailing directory separator.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetBasePath()
+        {
+            string path = GetBaseDirectory();
+            int index = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+            if (0 > index || index < path.Length - 1)
+            {
+                path += System.IO.Path.DirectorySeparatorChar;
+            }
+            return path;
         }
 
         #endregion

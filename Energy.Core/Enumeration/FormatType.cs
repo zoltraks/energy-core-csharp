@@ -31,5 +31,10 @@ namespace Energy.Enumeration
         /// Format as timestamp
         /// </summary>
         Stamp,
+
+        /// <summary>
+        /// Format as binary
+        /// </summary>
+        Binary,
     }
 }

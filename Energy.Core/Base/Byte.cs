@@ -7,6 +7,7 @@ namespace Energy.Base
     /// <summary>
     /// Byte related functions
     /// </summary>
+    [Obsolete("Class moved to Energy.Base.Bit")]
     public class Byte
     {
         /// <summary>

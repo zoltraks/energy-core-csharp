@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
+using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -24,17 +26,8 @@ namespace Energy.Base
         {
             if (value == null)
                 return default(T);
-
-            Type r = typeof(T);
-            Type t = value.GetType();
-
-            if (t == r)
-                return (T)value;
-
-            if (r == typeof(string))
-                return (T)(object)(ObjectToString(value));
-
-            return default(T);
+            Type type = typeof(T);
+            return (T)As(type, value);
         }
 
         /// <summary>
@@ -54,8 +47,37 @@ namespace Energy.Base
             if (t == r)
                 return value;
 
+            if (r == typeof(object))
+                return (object)value;
+
             if (r == typeof(string))
-                return (object)(ObjectToString(value));
+                return ObjectToString(value);
+            if (r == typeof(byte))
+                return ObjectToByte(value);
+            if (r == typeof(sbyte))
+                return ObjectToSignedByte(value);
+            if (r == typeof(char))
+                return ObjectToChar(value);
+            if (r == typeof(float))
+                return ObjectToFloat(value);
+            if (r == typeof(double))
+                return ObjectToDouble(value);
+            if (r == typeof(decimal))
+                return ObjectToDecimal(value);
+            if (r == typeof(Int16))
+                return ObjectToWord(value);
+            if (r == typeof(UInt16))
+                return ObjectToUnsignedWord(value);
+            if (r == typeof(Int32))
+                return ObjectToInteger(value);
+            if (r == typeof(UInt32))
+                return ObjectToUnsignedInteger(value);
+            if (r == typeof(Int64))
+                return ObjectToLong(value);
+            if (r == typeof(UInt64))
+                return ObjectToUnsignedLong(value);
+            if (r == typeof(bool))
+                return ObjectToBool(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
@@ -74,6 +96,11 @@ namespace Energy.Base
             return Energy.Base.Cast.StringToInteger(value);
         }
 
+        public static string TimeSpanToStringMicroseconds(object p)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Convert string to integer value without exception.
         /// </summary>
@@ -81,14 +108,27 @@ namespace Energy.Base
         /// <returns>Integer number</returns>
         public static int AsInteger(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return 0;
-            string stringValue = "";
-            if (value is string)
-                stringValue = (string)value;
-            else
-                stringValue = value.ToString();
-            return Energy.Base.Cast.StringToInteger((string)value);
+            return Energy.Base.Cast.ObjectToInteger(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static uint AsUnsignedInteger(string value)
+        {
+            return Energy.Base.Cast.StringToUnsignedInteger(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Integer number</returns>
+        public static uint AsUnsignedInteger(object value)
+        {
+            return Energy.Base.Cast.ObjectToUnsignedInteger(value);
         }
 
         #endregion
@@ -96,13 +136,13 @@ namespace Energy.Base
         #region AsLong
 
         /// <summary>
-        /// Convert string to long integer (Int64) value without exception.
+        /// Convert string to long integer value without exception.
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Long number</returns>
         public static long AsLong(string value)
         {
-            return Energy.Base.Cast.StringToLong(value);
+            return Energy.Base.Cast.StringToLong(value, Behaviour.INTEGER_COMMA);
         }
 
         /// <summary>
@@ -115,9 +155,29 @@ namespace Energy.Base
             return Energy.Base.Cast.ObjectToLong(value);
         }
 
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static ulong AsUnsignedLong(object value)
+        {
+            return Energy.Base.Cast.ObjectToUnsignedLong(value);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>Long number</returns>
+        public static ulong AsUnsignedLong(string value)
+        {
+            return Energy.Base.Cast.StringToUnsignedLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
+        }
+
         #endregion
 
-        #region Decimal
+        #region AsDecimal
 
         /// <summary>
         /// Convert string to decimal value without exception.
@@ -138,7 +198,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Double
+        #region AsDouble
 
         /// <summary>
         /// Convert string to double value without exception.
@@ -147,14 +207,41 @@ namespace Energy.Base
         /// <returns>Long number</returns>
         public static double AsDouble(object value)
         {
-            if (value == null || value == DBNull.Value)
-                return 0;
-            string stringValue = "";
-            if (value is string)
-                stringValue = (string)value;
-            else
-                stringValue = value.ToString();
-            return StringToDouble((string)value);
+            return ObjectToDouble(value);
+        }
+
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsDouble(string value)
+        {
+            return StringToDouble(value);
+        }
+
+        #endregion
+
+        #region AsFloat
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsFloat(object value)
+        {
+            return ObjectToFloat(value);
+        }
+
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">Object</param>
+        /// <returns>Long number</returns>
+        public static double AsFloat(string value)
+        {
+            return StringToFloat(value);
         }
 
         #endregion
@@ -253,6 +340,16 @@ namespace Energy.Base
         #region AsDateTime
 
         /// <summary>
+        /// Return as DateTime using StringToDateTime method.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(string text)
+        {
+            return StringToDateTime(text);
+        }
+
+        /// <summary>
         /// Return as DateTime using ObjectToDateTime method.
         /// </summary>
         /// <param name="o"></param>
@@ -260,6 +357,30 @@ namespace Energy.Base
         public static DateTime AsDateTime(object o)
         {
             return ObjectToDateTime(o);
+        }
+
+        /// <summary>
+        /// Return as DateTime value using StringToDateTime method.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(string text, DateTime minimum, DateTime maximum)
+        {
+            return StringToDateTime(text, minimum, maximum);
+        }
+
+        /// <summary>
+        /// Return as DateTime value using ObjectToDateTime method.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns></returns>
+        public static DateTime AsDateTime(object o, DateTime minimum, DateTime maximum)
+        {
+            return ObjectToDateTime(o, minimum, maximum);
         }
 
         #endregion
@@ -280,10 +401,73 @@ namespace Energy.Base
 
         #endregion
 
-        #region Class
+        #region Behaviour
+
+        /// <summary>
+        /// Behaviour settings
+        /// </summary>
+        public static class Behaviour
+        {
+            #region Constant
+
+            /// <summary>
+            /// Allow to use decimal point in integer numbers when converting
+            /// </summary>
+            public const bool INTEGER_COMMA = true;
+
+            public const bool INTEGER_EXCEED = false;
+
+            /// <summary>
+            /// Allow to use decimal point in integer numbers when converting
+            /// </summary>
+            public const bool BYTE_COMMA = true;
+
+            public const NumberStyles DECIMAL_NUMBER_STYLES = NumberStyles.Float;
+
+            public readonly static string DOUBLE_MIN_STRING = double.MinValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DOUBLE_MAX_STRING = double.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DOUBLE_MAX_STRING_PLUS = "+" + DOUBLE_MAX_STRING;
+
+            public readonly static string DECIMAL_MIN_STRING = decimal.MinValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DECIMAL_MAX_STRING = decimal.MaxValue.ToString(CultureInfo.InvariantCulture);
+
+            public readonly static string DECIMAL_MAX_STRING_PLUS = "+" + DECIMAL_MAX_STRING;
+
+            public const string DOUBLE_STRING_FORMAT_G17 = "G17";
+
+            public static string DOUBLE_STRING_FORMAT = "G17";  // this one is G17 with special treatment. Contains workaround for 61.3 being represented as 61.299999999999997.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G18"; // wrong for 61.3. Actual:<61.299999999999997>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G16"; // wrong for -1234567890.0987654. Actual:<-1234567890.098765>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "";     // fall back to bad code which corrupt values by rounding. Tests will not pass. Expected:<-1234567890.0987654>. Actual:<-1234567890.09877>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "G";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+            //public readonly static string DOUBLE_STRING_FORMAT = "$G17";  // wrong for -1234567890.0987654. Actual:<-1234567890.09877>.
+
+            public static string SINGLE_STRING_FORMAT = "G9";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_MILLISECOND = "yyyy-MM-dd HH:mm:ss.fff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_MICROSECOND = "yyyy-MM-dd HH:mm:ss.ffffff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_TICK = "yyyy-MM-dd HH:mm:ss.fffffff";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_SECOND = "yyyy-MM-dd HH:mm:ss";
+
+            public static readonly string DATETIME_FORMAT_DEFAULT_DATE = "yyyy-MM-dd";
+
+            #endregion
+        }
+
+        #endregion
+
+        #region RemoveNumericalDifferences
 
         /// <summary>
         /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -327,7 +511,9 @@ namespace Energy.Base
         public static bool StringToBool(string text)
         {
             if (string.IsNullOrEmpty(text) || text == "0")
+            {
                 return false;
+            }
             switch (text.Trim().ToUpper())
             {
                 case "":
@@ -344,7 +530,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert bool to string.
+        /// Convert bool to string. Returns "1" for true and "0" for false.
         /// </summary>
         /// <param name="value">bool</param>
         /// <returns>string</returns>
@@ -374,7 +560,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert bool to string
+        /// Convert boolean value to its string representation.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="style"></param>
@@ -383,8 +569,8 @@ namespace Energy.Base
         {
             switch (style)
             {
-                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : "";
-                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : "";
+                case Energy.Enumeration.BooleanStyle.X: return value ? "X" : " ";
+                case Energy.Enumeration.BooleanStyle.V: return value ? "V" : " ";
                 case Energy.Enumeration.BooleanStyle.B: return value ? "1" : "0";
                 case Energy.Enumeration.BooleanStyle.Y: return BoolToString(value, "Y/N");
                 case Energy.Enumeration.BooleanStyle.T: return BoolToString(value, "T/F");
@@ -433,7 +619,8 @@ namespace Energy.Base
         #region Char
 
         /// <summary>
-        /// Get first character from a string without exception
+        /// Get first character from a string without exception.
+        /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -443,7 +630,8 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get character from a string without exception
+        /// Get character at specified position from a string without exception.
+        /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
         /// <param name="position"></param>
@@ -458,14 +646,105 @@ namespace Energy.Base
 
         #endregion
 
+        #region Number
+
+        /// <summary>
+        /// Represent number string as prefixed with positive sign and empty on zero.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string NumberToStringSign(string value)
+        {
+            return NumberToStringSign(value, null);
+        }
+
+        /// <summary>
+        /// Represent number string as prefixed with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string NumberToStringSign(string value, string sign)
+        {
+            if (string.IsNullOrEmpty(sign))
+                sign = "+";
+
+            if (string.IsNullOrEmpty(value))
+                value = "0";
+
+            bool isZero = value == "0";
+
+            if (!isZero)
+            {
+                if (value[0] == '0' && value.Length > 1 
+                    && (value[1] == '.' || value[1] == ',')
+                    )
+                {
+                    bool allZeroes = true;
+                    for (int i = 2; i < value.Length; i++)
+                    {
+                        if (value[i] == 'e' || value[i] == 'E')
+                            break;
+                        if (value[i] != '0')
+                        {
+                            allZeroes = false;
+                            break;
+                        }
+                    }
+                    if (allZeroes)
+                        isZero = true;
+                }
+            }
+
+            if (isZero)
+            {
+                char signZero = sign.Length <= 2 ? '\0' : sign[2];
+                if (signZero == '\0')
+                    signZero = ' ';
+                return string.Concat(signZero, value);
+            }
+            else if (value.StartsWith("-"))
+            {
+                char signNegative = sign.Length <= 1 ? '\0' : sign[1];
+                if (signNegative == '\0' || signNegative == '-')
+                    return value;
+                else
+                    return string.Concat(signNegative, value.Substring(1));
+            }
+            else
+            {
+                char signPositive = sign[0];
+                return string.Concat(signPositive, value);
+            }
+        }
+
+        #endregion
+
         #region Integer
 
         /// <summary>
         /// Convert string to integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
         public static int StringToInteger(string value)
+        {
+            return StringToInteger(value, true);
+        }
+
+        /// <summary>
+        /// Convert string to integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInteger(string value, bool allowDecimal)
         {
             if (null == value || 0 == value.Length)
                 return 0;
@@ -474,35 +753,77 @@ namespace Energy.Base
                 return result;
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length != value.Length)
-            {
                 if (int.TryParse(value, out result))
                     return result;
-            }
+            if (!allowDecimal)
+                return 0;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
-                try
-                {
-                    return (int)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < int.MinValue || number > int.MaxValue)
                     return 0;
-                }
-            }
+                else
+                    return (int)number;
             return 0;
         }
 
+        /// <summary>
+        /// Convert string to integer value removing numerical differences without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
         public static int StringToIntegerSmart(string value)
         {
-            return StringToInteger(RemoveNumericalDifferences(value));
+            return StringToInteger(RemoveNumericalDifferences(value), true);
         }
 
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static uint StringToUnsignedInteger(string value)
+        {
+            long x = StringToLong(value, true);
+            if (x < uint.MinValue || x > uint.MaxValue)
+                return 0;
+            else
+                return (uint)x;
+        }
+
+        /// <summary>
+        /// Represent integer number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToString(int value)
         {
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent integer number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string IntegerToStringSign(int value)
+        {
+            return NumberToStringSign(value.ToString(), null);
+        }
+
+        /// <summary>
+        /// Represent integer number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string IntegerToStringSign(int value, string sign)
+        {
+            return NumberToStringSign(value.ToString(), sign);
         }
 
         /// <summary>
@@ -512,19 +833,40 @@ namespace Energy.Base
         /// <returns></returns>
         public static short IntegerToShort(int value)
         {
+            if (value < short.MinValue || value > short.MaxValue)
+                return 0;
             return (short)value;
         }
 
         public static byte IntegerToByte(int value)
         {
+            if (value < byte.MinValue || value > byte.MaxValue)
+                return 0;
             return (byte)value;
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have always 8 digits or letters (A-F).
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value)
         {
             return Energy.Base.Hex.IntegerToHex(value);
         }
 
+        /// <summary>
+        /// Convert integer to hexadecimal value.
+        /// 
+        /// Resulting string will have count specified by size of digits or letters (A-F).
+        /// If number representation will be larger than size, it will be truncated to the last characters.
+        /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public static string IntegerToHex(int value, int size)
         {
             return Energy.Base.Hex.IntegerToHex(value, size);
@@ -540,18 +882,34 @@ namespace Energy.Base
             return Energy.Base.Hex.IntegerToHex(value, upperCase);
         }
 
-        public static bool IsInteger(string value, bool negative)
+        /// <summary>
+        /// Convert hexadecimal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static int HexToInteger(string hex)
         {
-            if (negative)
+            return Energy.Base.Hex.HexToInteger(hex);
+        }
+
+        /// <summary>
+        /// Convert octal string to integer value (System.Int32).
+        /// </summary>
+        /// <param name="oct"></param>
+        /// <returns></returns>
+        public static int OctToInteger(string oct)
+        {
+            if (!Energy.Base.Text.HasDigitsOnly(oct))
+                return 0;
+            try
             {
-                int useless;
-                return int.TryParse(value, out useless);
+                return Convert.ToInt32(oct, 8);
             }
-            else
+            catch (Exception exception)
             {
-                uint useless;
-                return uint.TryParse(value, out useless);
+                Energy.Core.Bug.Catch(exception);
             }
+            return 0;
         }
 
         #endregion
@@ -560,10 +918,22 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to long integer value without exception.
+        /// Allows decimal numbers by default.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Long number</returns>
         public static long StringToLong(string value)
+        {
+            return StringToLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Long number</returns>
+        public static long StringToLong(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -571,33 +941,40 @@ namespace Energy.Base
             if (long.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
+            if (trim.Length != value.Length)
+                if (long.TryParse(value, out result))
+                    return result;
+            if (!allowDecimal)
                 return 0;
-            if (long.TryParse(value, out result))
-                return result;
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
-                try
-                {
-                    return (long)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < long.MinValue || number > long.MaxValue)
                     return 0;
-                }
-            }
+                else
+                    return (long)number;
             return 0;
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception.
+        /// Allows decimal numbers by default.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static ulong StringToUnsignedLong(string value)
+        {
+            return StringToUnsignedLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
         }
 
         /// <summary>
         /// Convert string to long integer value without exception.
         /// </summary>
         /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal number</param>
         /// <returns>Long number</returns>
-        public static UInt64 StringToUnsignedLong(string value)
+        public static ulong StringToUnsignedLong(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -605,33 +982,42 @@ namespace Energy.Base
             if (ulong.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
+            if (trim.Length != value.Length)
+                if (ulong.TryParse(value, out result))
+                    return result;
+            if (!allowDecimal)
                 return 0;
-            if (ulong.TryParse(value, out result))
-            {
-                return result;
-            }
-            else
-            {
-                long signed;
-                if (long.TryParse(value, out signed))
-                    return (ulong)(signed);
-            }
             if (value.IndexOf(',') >= 0)
                 value = value.Replace(',', '.');
             decimal number = 0;
             if (decimal.TryParse(value, out number))
-            {
-                try
-                {
-                    return (ulong)number;
-                }
-                catch (System.OverflowException)
-                {
+                if (number < 0 || number > ulong.MaxValue)
                     return 0;
-                }
-            }
+                else
+                    return (ulong)number;
             return 0;
+        }
+
+        /// <summary>
+        /// Convert string to long integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static long StringToLongSmart(string value)
+        {
+            return StringToLong(RemoveNumericalDifferences(value), true);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned long integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Long number</returns>
+        public static ulong StringToUsignedLongSmart(string value)
+        {
+            return StringToUnsignedLong(RemoveNumericalDifferences(value), true);
         }
 
         /// <summary>
@@ -644,23 +1030,18 @@ namespace Energy.Base
         {
             if (negative)
             {
-                long useless;
-                return long.TryParse(value, out useless);
+                long _;
+                return long.TryParse(value, out _);
             }
             else
             {
-                ulong useless;
-                return ulong.TryParse(value, out useless);
+                ulong _;
+                return ulong.TryParse(value, out _);
             }
         }
 
-        public static long StringToLongSmart(string value)
-        {
-            return StringToLong(RemoveNumericalDifferences(value));
-        }
-
         /// <summary>
-        /// Convert long to string.
+        /// Represent long number as text.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -669,32 +1050,501 @@ namespace Energy.Base
             return value.ToString();
         }
 
+        /// <summary>
+        /// Represent long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string LongToStringSign(long value)
+        {
+            return NumberToStringSign(value.ToString(), null);
+        }
+
+        /// <summary>
+        /// Represent long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string LongToStringSign(long value, string sign)
+        {
+            return NumberToStringSign(value.ToString(), sign);
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToString(ulong value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToStringSign(ulong value)
+        {
+            return NumberToStringSign(value.ToString(), null);
+        }
+
+        /// <summary>
+        /// Represent unsigned long number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string UnsignedLongToStringSign(ulong value, string sign)
+        {
+            return NumberToStringSign(value.ToString(), sign);
+        }
+
+        #endregion
+
+        #region Short
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <returns>Short number</returns>
+        public static short StringToShort(string value, bool point, bool exceed)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            short result = 0;
+            if (short.TryParse(value, out result))
+            {
+                return result;
+            }
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length != value.Length)
+            {
+                if (short.TryParse(value, out result))
+                {
+                    return result;
+                }
+            }
+            if (exceed)
+            {
+                long _;
+                if (long.TryParse(value, out _))
+                {
+                    return (short)(_ % (1 + short.MaxValue));
+                }
+            }
+            if (!point)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number;
+            if (decimal.TryParse(value, out number))
+            {
+                if (number < short.MinValue || number > short.MaxValue)
+                {
+                    if (exceed)
+                    {
+                        return (short)(number % (1 + short.MaxValue));
+                    }
+                    return 0;
+                }
+                else
+                {
+                    return (short)number;
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value, bool point, bool exceed)
+        {
+            if (value == null || value.Length == 0)
+            {
+                return 0;
+            }
+            ushort result = 0;
+            if (ushort.TryParse(value, out result))
+            {
+                return result;
+            }
+            string trim = Energy.Base.Text.Trim(value);
+            if (0 == trim.Length)
+            {
+                return 0;
+            }
+            if (trim.Length != value.Length)
+            {
+                if (ushort.TryParse(value, out result))
+                {
+                    return result;
+                }
+            }
+            if (exceed)
+            {
+                if (value.StartsWith("-"))
+                {
+                    long _;
+                    if (long.TryParse(value, out _))
+                    {
+                        return (ushort)(-_ % (1 + ushort.MaxValue));
+                    }
+                }
+                else
+                {
+                    ulong _;
+                    if (ulong.TryParse(value, out _))
+                    {
+                        return (ushort)(_ % (1 + ushort.MaxValue));
+                    }
+                }
+            }
+            if (!point)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number;
+            if (decimal.TryParse(value, out number))
+            {
+                if (false)
+                { }
+                else if (number < 0)
+                {
+                    if (exceed)
+                    {
+                        return (ushort)(-number % (1 + ushort.MaxValue));
+                    }
+                    return 0;
+                }
+                else if (number > ushort.MaxValue)
+                {
+                    if (exceed)
+                    {
+                        return (ushort)(number % (1 + ushort.MaxValue));
+                    }
+                    return 0;
+                }
+                else
+                {
+                    return (ushort)number;
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// Allows decimal numbers by default.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static short StringToShort(string value)
+        {
+            return StringToShort(value
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception.
+        /// Allows decimal numbers by default.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value)
+        {
+            return StringToUnsignedShort(value
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to short integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static short StringToShortSmart(string value)
+        {
+            return StringToShort(RemoveNumericalDifferences(value)
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Convert string to unsigned short integer value without exception 
+        /// removing numerical differences.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUsignedShortSmart(string value)
+        {
+            return StringToUnsignedShort(RemoveNumericalDifferences(value)
+                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
+                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
+                );
+        }
+
+        /// <summary>
+        /// Represent short number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ShortToString(short value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent unsigned number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UnsignedShortToString(ushort value)
+        {
+            return value.ToString();
+        }
+
+        #endregion
+
+        #region Stream
+
+        /// <summary>
+        /// Convert string to a stream.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Stream StringToStream(string value)
+        {
+            if (value == null)
+                value = string.Empty;
+            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(value));
+            return stream;
+        }
+
+        /// <summary>
+        /// Convert string to a stream using specified encoding.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static Stream StringToStream(string value, Encoding encoding)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            if (value == null)
+                value = string.Empty;
+            MemoryStream stream = new MemoryStream(encoding.GetBytes(value));
+            return stream;
+        }
+
+        /// <summary>
+        /// Read data from a stream until limit is reached.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream, int limit)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, limit <= 0 || limit > buffer.Length ? buffer.Length : limit)))
+                {
+                    ms.Write(buffer, 0, count);
+                    if (limit > 0)
+                    {
+                        limit -= count;
+                    }
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Read all data from stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static byte[] StreamRead(Stream stream)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int count;
+                while (0 < (count = stream.Read(buffer, 0, buffer.Length)))
+                {
+                    ms.Write(buffer, 0, count);
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using specified encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream, Encoding encoding)
+        {
+            if (null == encoding)
+            {
+                encoding = Encoding.UTF8;
+            }
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
+        /// <summary>
+        /// Return string from a stream using UTF-8 encoding.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToString(Stream stream)
+        {
+            Encoding encoding = System.Text.Encoding.UTF8;
+            byte[] data = StreamRead(stream);
+            if (null == data)
+            {
+                return null;
+            }
+            if (0 == data.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
         #endregion
 
         #region Decimal
 
         /// <summary>
         /// Convert string to decimal value without exception.
-        /// Treat comma character as dot
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>decimal</returns>
         public static decimal StringToDecimal(string value)
         {
-            if (string.IsNullOrEmpty(value))
+            return StringToDecimal(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
+        }
+
+        /// <summary>
+        /// Convert string to decimal value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>decimal</returns>
+        public static decimal StringToDecimal(string value, NumberStyles numberStyles)
+        {
+            if (null == value || 0 == value.Length)
                 return 0;
-            value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal result = 0;
-            if (decimal.TryParse(value, out result))
+            decimal result;
+            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
                 return result;
+            string trim = Energy.Base.Text.Trim(value);
+            bool hasComma = value.IndexOf(',') >= 0;
+            if (trim.Length == value.Length && !hasComma)
+                return 0;
+            if (hasComma)
+                value = value.Replace(',', '.');
+            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
+                return result;
+            double _double = 0;
+            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out _double))
+            {
+                if (_double < (double)decimal.MinValue)
+                    return decimal.MinValue;
+                if (_double > (double)decimal.MaxValue)
+                    return decimal.MaxValue;
+                else
+                    return 0;
+            }
             return 0;
         }
 
+        /// <summary>
+        /// Convert string to decimal value without exception.
+        /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static decimal StringToDecimalSmart(string value)
         {
             return StringToDecimal(RemoveNumericalDifferences(value));
+        }
+
+        /// <summary>
+        /// Represent decimal number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DecimalToString(decimal value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent decimal number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DecimalToStringSign(decimal value)
+        {
+            return NumberToStringSign(DecimalToString(value), null);
+        }
+
+        /// <summary>
+        /// Represent decimal number as text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string DecimalToStringSign(decimal value, string sign)
+        {
+            return NumberToStringSign(DecimalToString(value), sign);
         }
 
         #endregion
@@ -703,23 +1553,55 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to double value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
         /// </summary>
         /// <param name="value">string</param>
         /// <returns>double</returns>
         public static double StringToDouble(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-            value = Energy.Base.Text.Trim(value);
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            double result = 0;
-            double.TryParse(value, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture
-                , out result);
-            return result;
+            return StringToDouble(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
         }
 
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>double</returns>
+        public static double StringToDouble(string value, NumberStyles numberStyles)
+        {
+            value = Energy.Base.Text.Trim(value);
+            if (null == value || 0 == value.Length)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            double result;
+            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
+            {
+                return result;
+            }
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MIN_STRING, value, true))
+                return double.MinValue;
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING, value, true))
+                return double.MaxValue;
+            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING_PLUS, value, true))
+                return double.MaxValue;
+            return 0;
+        }
+
+        /// <summary>
+        /// Convert string to double value without exception.
+        /// Remove numerical differences from text representation of number.
+        /// Treat comma "," the same as dot "." as decimal point.
+        /// Ignore space, underscore and apostrophes between digits.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double StringToDoubleSmart(string value)
         {
             return StringToDouble(RemoveNumericalDifferences(value));
@@ -733,23 +1615,55 @@ namespace Energy.Base
         /// <param name="trim">Trim trailing zeros from fractional part</param>
         /// <param name="culture">InvariantCulture if null, that means 1234.56 instead of 1'234,56.</param>
         /// <returns>String</returns>
-        public static string DoubleToString(double value, int precision, bool trim, System.Globalization.CultureInfo culture)
+        public static string DoubleToString(double value, int precision, bool trim
+            , System.Globalization.CultureInfo culture)
         {
             // HACK: Missing "??=" operator :-)
             //culture ??= System.Globalization.CultureInfo.InvariantCulture;
             culture = culture ?? System.Globalization.CultureInfo.InvariantCulture;
-            if (precision < 1)
+            if (precision < 0)
             {
                 return value.ToString(culture);
             }
             else
             {
-                string result = value.ToString("0." + new String('0', precision), culture);
+                string result = value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, culture);
+                string decimalPoint = culture.NumberFormat.NumberDecimalSeparator;
+                int exponent = result.IndexOfAny(new char[] { 'E', 'e' });
+                string exponentString = null;
+                if (exponent > 0)
+                {
+                    exponentString = result.Substring(exponent);
+                    result = result.Substring(0, exponent);
+                    if (result.Length == 0 || result == "-")
+                        result = result + "0.0";
+                }
+                int point = result.IndexOf(decimalPoint);
+                if (point < 0)
+                {
+                    result += ".0";
+                    point = result.IndexOf(decimalPoint);
+                }
+                int length = 1 + point + precision;
                 if (trim)
                 {
-                    char point = Energy.Base.Cast.StringToChar(culture.NumberFormat.NumberDecimalSeparator);
-                    result = result.TrimEnd('0').TrimEnd(point);
+                    if (result.EndsWith("0"))
+                    {
+                        int original = result.Length;
+                        result = result.TrimEnd('0');
+                    }
                 }
+                else
+                {
+                    if (result.Length < length)
+                        result = result.PadRight(length, '0');
+                }
+                if (result.Length > length)
+                    result = result.Substring(0, length);
+                if (result.EndsWith(decimalPoint))
+                    result = result.Substring(0, result.Length - decimalPoint.Length);
+                if (exponentString != null)
+                    result = result + exponentString;
                 return result;
             }
         }
@@ -761,7 +1675,48 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            return value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT 
+                == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT_G17)
+            {
+                string s17 = value.ToString("G17", CultureInfo.InvariantCulture);
+                int dot = s17.IndexOf(".");
+                if (0 > dot)
+                {
+                    return s17;
+                }
+                if (s17.Length - dot > 10)
+                {
+                    string s16 = value.ToString("G16", CultureInfo.InvariantCulture);
+                    if (s17.Length - s16.Length > 10)
+                    {
+                        Energy.Core.Bug.Write("Energy.Base.Cast.DoubleToString"
+                            , delegate () {
+                                return string.Format("Choosing {0} over {1}", s16, s17);
+                            });
+                        return s16;
+                    }
+                }
+                return s17;
+            }
+            if (string.IsNullOrEmpty(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT))
+            {
+                return value.ToString(CultureInfo.InvariantCulture);
+            }
+            else if ("$" == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT)
+            {
+                decimal cast = (decimal)value;
+                return cast.ToString(CultureInfo.InvariantCulture);
+            }
+            else if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT.StartsWith("$"))
+            {
+                decimal cast = (decimal)value;
+                return cast.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT.Substring(1)
+                    , CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                return value.ToString(Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT, CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>
@@ -771,7 +1726,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(string value)
         {
-            return StringToDouble(value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return DoubleToString(StringToDouble(value));
         }
 
         /// <summary>
@@ -820,20 +1775,28 @@ namespace Energy.Base
         /// <returns>double</returns>
         public static float StringToFloat(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return 0;
-            float result = 0;
-            value = Energy.Base.Text.Trim(value);
-            if (!float.TryParse(value, System.Globalization.NumberStyles.Float
-                , System.Globalization.CultureInfo.InvariantCulture
-                , out result))
-            {
-                float.TryParse(value, System.Globalization.NumberStyles.Float
-                    , System.Globalization.CultureInfo.CurrentCulture
-                    , out result);
-            }
+            double number = StringToDouble(value);
+            if (number < float.MinValue)
+                return float.MinValue;
+            else if (number > float.MaxValue)
+                return float.MaxValue;
+            else
+                return (float)number;
+        }
 
-            return result;
+        /// <summary>
+        /// Convert string to float value without exception.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="numberStyles"></param>
+        /// <returns>double</returns>
+        public static float StringToFloat(string value, NumberStyles numberStyles)
+        {
+            double number = StringToDouble(value, numberStyles);
+            if (number < float.MinValue || number > float.MaxValue)
+                return 0;
+            else
+                return (float)number;
         }
 
         /// <summary>
@@ -905,10 +1868,22 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to byte value without exception.
+        /// Allows decimal numbers by default.
         /// </summary>
         /// <param name="value">String value</param>
         /// <returns>Integer number</returns>
         public static byte StringToByte(string value)
+        {
+            return StringToByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static byte StringToByte(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
                 return 0;
@@ -916,10 +1891,64 @@ namespace Energy.Base
             if (byte.TryParse(value, out result))
                 return result;
             string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length == value.Length)
+            if (trim.Length != value.Length)
+            {
+                if (byte.TryParse(value, out result))
+                    return result;
+            }
+            if (!allowDecimal)
                 return 0;
-            if (byte.TryParse(value, out result))
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            decimal number = 0;
+            if (decimal.TryParse(value, out number))
+            {
+                if (number < byte.MinValue || number > byte.MaxValue)
+                    return 0;
+                else
+                    return (byte)number;
+            }
+            return 0;
+        }
+
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns>Integer number</returns>
+        public static sbyte StringToSignedByte(string value)
+        {
+            return StringToSignedByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="allowDecimal">Allow decimal numbers</param>
+        /// <returns>Integer number</returns>
+        public static sbyte StringToSignedByte(string value, bool allowDecimal)
+        {
+            if (value == null || value.Length == 0)
+                return 0;
+            sbyte result = 0;
+            if (sbyte.TryParse(value, out result))
                 return result;
+            string trim = Energy.Base.Text.Trim(value);
+            if (trim.Length != value.Length)
+                if (sbyte.TryParse(value, out result))
+                    return result;
+            if (!allowDecimal)
+                return 0;
+            if (value.IndexOf(',') >= 0)
+                value = value.Replace(',', '.');
+            decimal number = 0;
+            if (decimal.TryParse(value, out number))
+                if (number < sbyte.MinValue || number > sbyte.MaxValue)
+                    return 0;
+                else
+                    return (sbyte)number;
             return 0;
         }
 
@@ -975,6 +2004,68 @@ namespace Energy.Base
             return StringToByte(value);
         }
 
+        /// <summary>
+        /// Represent byte as decimal text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ByteToString(byte value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ByteToStringSign(byte value)
+        {
+            return NumberToStringSign(value.ToString(), null);
+        }
+
+        /// <summary>
+        /// Represent byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string ByteToStringSign(byte value, string sign)
+        {
+            return NumberToStringSign(value.ToString(), sign);
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string SignedByteToString(sbyte value)
+        {
+            return value.ToString();
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string SignedByteToStringSign(sbyte value)
+        {
+            return NumberToStringSign(value.ToString(), null);
+        }
+
+        /// <summary>
+        /// Represent signed byte as decimal text with positive sign.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="sign"></param>
+        /// <returns></returns>
+        public static string SignedByteToStringSign(sbyte value, string sign)
+        {
+            return NumberToStringSign(value.ToString(), sign);
+        }
+
         #endregion
 
         #region Bcd
@@ -1024,7 +2115,7 @@ namespace Energy.Base
         #region Text
 
         /// <summary>
-        /// Join multiline text into single string
+        /// Join multiline text into single string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -1039,13 +2130,34 @@ namespace Energy.Base
         #region DateTime
 
         /// <summary>
-        /// Convert stamp text to DateTime.
+        /// Convert date and time text to DateTime value.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>DateTime</returns>
         public static DateTime StringToDateTime(string text)
         {
             return Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Convert date and time text to DateTime value within range.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns>DateTime</returns>
+        public static DateTime StringToDateTime(string text, DateTime minimum, DateTime maximum)
+        {
+            DateTime value = Clock.Parse(text);
+            if (minimum != DateTime.MinValue && value < minimum)
+            {
+                value = minimum;
+            }
+            else if (maximum != DateTime.MaxValue && value > maximum)
+            {
+                value = maximum;
+            }
+            return value;
         }
 
         /// <summary>
@@ -1071,6 +2183,78 @@ namespace Energy.Base
         public static string DateTimeToString(DateTime? stamp)
         {
             return stamp == null ? "" : DateTimeToString((DateTime)stamp);
+        }
+
+        /// <summary>
+        /// Return DateTime value as text with custom format and empty value. 
+        /// Optional list of "empty" DateTime values may be specified.
+        /// </summary>
+        /// <param name="stamp">Nullable DateTime</param>
+        /// <param name="customTimeFormat">Custom format text, like "yyyy-MM-dd HH:mm:ss.fff"</param>
+        /// <param name="customDateFormat">Custom format text for date, if time part is midnight, like "yyyy-MM-dd"</param>
+        /// <param name="emptyValue">Text representation for empty value, like " N/A "</param>
+        /// <param name="emptyList">Array of DateTime values considered to be empty, like new DateTime[] { DateTime.MinValue, new DateTime(1753, 1, 1) }</param>
+        /// <returns>Date and time string representation</returns>
+        //[Energy.Attribute.Code.Refactoring("Extract method for automatic selection of custom format string for DateTime", Progress = 10.5)]
+        public static string DateTimeToString(DateTime? stamp, string customTimeFormat, string customDateFormat, string emptyValue, DateTime[] emptyList)
+        {
+            if (stamp == null)
+            {
+                return emptyValue;
+            }
+
+            if (emptyList != null && emptyList.Length > 0)
+            {
+                for (int i = 0; i < emptyList.Length; i++)
+                {
+                    if (emptyList[i] == stamp)
+                    {
+                        return emptyValue;
+                    }
+                }
+            }
+            else if (stamp == DateTime.MinValue || stamp == DateTime.MaxValue)
+            {
+                return emptyValue;
+            }
+
+            string customFormat = customTimeFormat;
+
+            if (customDateFormat != null)
+            {
+                if (((DateTime)stamp).TimeOfDay.Ticks == 0)
+                {
+                    customFormat = customDateFormat;
+                }
+            }
+            else if (customFormat == null)
+            {
+                // TODO Refactoring
+                long microseconds = ((DateTime)stamp).TimeOfDay.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
+                if (microseconds % 1000 > 0)
+                {
+                    customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_MICROSECOND;
+                }
+                else if (((DateTime)stamp).Millisecond > 0)
+                {
+                    customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_MILLISECOND;
+                }
+                else
+                {
+                    if (((DateTime)stamp).TimeOfDay.Ticks > 0)
+                    {
+                        customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_SECOND;
+                    }
+                    else
+                    {
+                        customFormat = Energy.Base.Cast.Behaviour.DATETIME_FORMAT_DEFAULT_DATE;
+                    }
+                }
+            }
+
+            string text = "" == customFormat ? "" : ((DateTime)stamp).ToString(customFormat);
+
+            return text;
         }
 
         /// <summary>
@@ -1207,14 +2391,14 @@ namespace Energy.Base
         #region TimeSpan
 
         /// <summary>
-        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000"
+        /// Convert TimeSpan to short string with milliseconds, ie. "99:20:03.324" or "00:03:10.123" or "00:00.000".
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
         {
             int truncate = (int)seconds;
             double fractional = seconds - truncate;
@@ -1259,9 +2443,9 @@ namespace Energy.Base
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds, bool omitZeroHours)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
         }
 
         /// <summary>
@@ -1270,9 +2454,9 @@ namespace Energy.Base
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds, bool omitZeroMilliseconds)
+        public static string TimeSpanToStringMilliseconds(double seconds, bool omitZeroMilliseconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMilliseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMilliseconds, true, true);
         }
 
         /// <summary>
@@ -1280,9 +2464,9 @@ namespace Energy.Base
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(double seconds)
+        public static string TimeSpanToStringMilliseconds(double seconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, true, true, true);
         }
 
         /// <summary>
@@ -1293,10 +2477,10 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 ms if not exactly 0 ms</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours, bool roundUp)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, roundUp);
         }
 
         /// <summary>
@@ -1306,10 +2490,10 @@ namespace Energy.Base
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds, bool omitZeroHours)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, omitZeroHours, true);
         }
 
         /// <summary>
@@ -1318,10 +2502,10 @@ namespace Energy.Base
         /// <param name="timeSpan">TimeSpan object</param>
         /// <param name="omitZeroMilliseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan, bool omitZeroMilliseconds)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, omitZeroMilliseconds, true, true);
+            return TimeSpanToStringMilliseconds(seconds, omitZeroMilliseconds, true, true);
         }
 
         /// <summary>
@@ -1329,10 +2513,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="timeSpan">TimeSpan object</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMilliseconds(TimeSpan timeSpan)
+        public static string TimeSpanToStringMilliseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMilliseconds(seconds, true, true, true);
+            return TimeSpanToStringMilliseconds(seconds, false, false, true);
         }
 
         /// <summary>
@@ -1343,7 +2527,7 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
             int truncate = (int)seconds;
             double fractional = seconds - truncate;
@@ -1388,9 +2572,9 @@ namespace Energy.Base
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds, bool omitZeroHours)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
         }
 
         /// <summary>
@@ -1399,9 +2583,9 @@ namespace Energy.Base
         /// <param name="seconds">Time in seconds</param>
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds, bool omitZeroMicroseconds)
+        public static string TimeSpanToStringMicroseconds(double seconds, bool omitZeroMicroseconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, true, true);
         }
 
         /// <summary>
@@ -1409,9 +2593,9 @@ namespace Energy.Base
         /// </summary>
         /// <param name="seconds">Time in seconds</param>
         /// <returns>string</returns>
-        public static string TimeSpanToStringTimeMicroseconds(double seconds)
+        public static string TimeSpanToStringMicroseconds(double seconds)
         {
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, true, true, true);
         }
 
         /// <summary>
@@ -1422,10 +2606,10 @@ namespace Energy.Base
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <param name="roundUp">Round up to 1 μs if not exactly 0 μs</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
         }
 
         /// <summary>
@@ -1435,10 +2619,10 @@ namespace Energy.Base
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <param name="omitZeroHours">Omit hours part if zero</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
         }
 
         /// <summary>
@@ -1447,10 +2631,10 @@ namespace Energy.Base
         /// <param name="timeSpan">TimeSpan object</param>
         /// <param name="omitZeroMicroseconds">Omit milliseconds part if zero</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, omitZeroMicroseconds, true, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, true, true);
         }
 
         /// <summary>
@@ -1458,10 +2642,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="timeSpan">TimeSpan object</param>
         /// <returns></returns>
-        public static string TimeSpanToStringTimeMicroseconds(TimeSpan timeSpan)
+        public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringTimeMicroseconds(seconds, true, true, true);
+            return TimeSpanToStringMicroseconds(seconds, false, true, true);
         }
 
         #endregion
@@ -1527,6 +2711,100 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<string, object> StringArrayToObjectDictionary(params object[] array)
+        {
+            Dictionary<string, object> dictionary = new Dictionary<string, object>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                string key = Energy.Base.Cast.ObjectToString(array[i]);
+                if (key == null)
+                    continue;
+                object value = array[i + 1];
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                string key = Energy.Base.Cast.ObjectToString(array[array.Length - 1]);
+                if (key != null)
+                    dictionary[key] = null;
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Convert string array to dictionary containing key and value pairs
+        /// </summary>
+        /// <param name="array">string[]</param>
+        /// <returns></returns>
+        public static Dictionary<TKey, TValue> StringArrayToDictionary<TKey, TValue>(params object[] array)
+        {
+            Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
+            for (int i = 0; i + 1 < array.Length; i = i + 2)
+            {
+                TKey key = Energy.Base.Cast.As<TKey>(array[i]);
+                if (key == null)
+                    continue;
+                TValue value = Energy.Base.Cast.As<TValue>(array[1 + i]);
+                dictionary[key] = value;
+            }
+            if (array.Length % 2 != 0)
+            {
+                TKey key = Energy.Base.Cast.As<TKey>(array[array.Length - 1]);
+                if (key != null)
+                    dictionary[key] = default(TValue);
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringArrayToFirstCharArray(string[] array, bool onlyFirstCharacter)
+        {
+            List<char> charList = new List<char>();
+            foreach (string s in array)
+            {
+                if (string.IsNullOrEmpty(s))
+                    continue;
+                if (onlyFirstCharacter)
+                    charList.Add(s[0]);
+                else
+                {
+                    foreach (char c in s.ToCharArray())
+                    {
+                        if (!charList.Contains(c))
+                            charList.Add(c);
+                    }
+                }
+            }
+            return charList.ToArray();
+        }
+
+        /// <summary>
+        /// Convert list of strings to character array.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="onlyFirstCharacter">
+        /// Take at most the first letter of the text. 
+        /// Otherwise, add each possible character from the text.
+        /// </param>
+        /// <returns></returns>
+        public static char[] StringListToFirstCharArray(List<string> list, bool onlyFirstCharacter)
+        {
+            return StringArrayToFirstCharArray(list.ToArray(), onlyFirstCharacter);
+        }
+
+        /// <summary>
         /// Convert dictionary to array of objects of key value pairs.
         /// Convert generic dictionary to object array containing key and value pairs one by another in one dimensional array.
         /// </summary>
@@ -1548,7 +2826,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="dictionary">Dictionary</param>
         /// <returns></returns>
-        public static object[] DictionaryToObjectArrayKeyValuePAir<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
+        public static object[] DictionaryToObjectArrayKeyValuePair<TKey, TValue>(Dictionary<TKey, TValue> dictionary)
         {
             List<object> list = new List<object>();
             foreach (KeyValuePair<TKey, TValue> _ in dictionary)
@@ -1597,37 +2875,14 @@ namespace Energy.Base
 
         /// <summary>
         /// Represent object as string by using conversions or ToString() method.
-        /// Returns empty string ("") if object is null or represents nonexisting value.
         /// </summary>
         /// <param name="value">Object instance</param>
         /// <returns>String representation</returns>
         public static string ObjectToString(object value)
         {
-            return ObjectToString(value, "");
-        }
-
-        /// <summary>
-        /// Represent object as string by using conversions or ToString() method.
-        /// </summary>
-        /// <param name="value">Object instance</param>
-        /// <param name="emptyIfNull">Return empty string ("") if object is null or represents nonexisting value</param>
-        /// <returns>String representation</returns>
-        public static string ObjectToString(object value, bool emptyIfNull)
-        {
-            return ObjectToString(value, emptyIfNull ? "" : null);
-        }
-
-        /// <summary>
-        /// Represent object as string by using conversions or ToString() method.
-        /// </summary>
-        /// <param name="value">Object instance</param>
-        /// <param name="nullString">Value to be returned if object is null or represents nonexisting value</param>
-        /// <returns>String representation</returns>
-        public static string ObjectToString(object value, string nullString)
-        {
             // treat DBNull as empty string //
             if (value == null || value == System.DBNull.Value)
-                return nullString;
+                return null;
             // maybe it is already string? //
             if (value is string)
                 return (string)value;
@@ -1644,6 +2899,10 @@ namespace Energy.Base
             // works with nullable version DateTime? //
             if (value is DateTime)
             {
+                if ((DateTime)value == DateTime.MinValue)
+                {
+                    return null;
+                }
                 if (((DateTime)value).Date == DateTime.MinValue.Date)
                 {
                     return ((DateTime)value).ToString("HH:mm:ss");
@@ -1652,56 +2911,270 @@ namespace Energy.Base
                 {
                     return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.fff");
                 }
-                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                else
+                {
+                    return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                }
+            }
+            // works with nullable version TimeSpan? //
+            if (value is TimeSpan)
+            {
+                return TimeSpanToStringMilliseconds((TimeSpan)value, true, true, true);
             }
             // return default string representation //
             return value.ToString();
         }
 
-        /// <summary>
-        /// Convert object to integer number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public static int ObjectToInteger(object value)
         {
             if (value == null)
                 return 0;
 
-            if (value is long)
-                return (int)(long)value;
-            if (value is int)
-                return (int)(int)value;
-            if (value is double)
-                return (int)(double)value;
-            if (value is uint)
-                return (int)(uint)value;
-            if (value is ulong)
-                return (int)(ulong)value;
-            if (value is decimal)
-                return (int)(decimal)value;
+            if (value is Int32)
+                return (int)(Int32)value;
 
             if (value is Int16)
                 return (int)(Int16)value;
+            if (value is Int64)
+                return (int)(Int64)value;
             if (value is UInt16)
                 return (int)(UInt16)value;
 
-            if (value is short)
-                return (int)(short)value;
-            if (value is ushort)
-                return (int)(ushort)value;
+            try
+            {
+                if (value is UInt32)
+                    return (int)(UInt32)value;
+                if (value is UInt64)
+                    return (int)(UInt64)value;
+                if (value is double)
+                    return (int)(double)value;
+                if (value is float)
+                    return (int)(float)value;
+                if (value is decimal)
+                    return (int)(decimal)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
             if (value is byte)
                 return (int)(byte)value;
+            if (value is sbyte)
+                return (int)(sbyte)value;
             if (value is char)
                 return (int)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
+            string s = value is string ? (string)value : value.ToString();
 
             return StringToInteger(s);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned integer value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static uint ObjectToUnsignedInteger(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is UInt32)
+                return (uint)(UInt32)value;
+
+            if (value is Int16)
+                return (uint)(Int16)value;
+            if (value is Int32)
+                return (uint)(Int32)value;
+            if (value is UInt16)
+                return (uint)(UInt16)value;
+
+            try
+            {
+                if (value is Int64)
+                    return (uint)(Int64)value;
+                if (value is UInt64)
+                    return (uint)(UInt64)value;
+                if (value is double)
+                    return (uint)(double)value;
+                if (value is float)
+                    return (uint)(float)value;
+                if (value is decimal)
+                    return (uint)(decimal)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is byte)
+                return (uint)(byte)value;
+            if (value is sbyte)
+                return (uint)(sbyte)value;
+            if (value is char)
+                return (uint)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToUnsignedInteger(s);
+        }
+
+        /// <summary>
+        /// Convert string to byte value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static byte ObjectToByte(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is byte)
+                return (byte)(byte)value;
+            if (value is char)
+                return (byte)(char)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (byte)(Int16)value;
+                if (value is Int32)
+                    return (byte)(Int32)value;
+                if (value is Int64)
+                    return (byte)(Int64)value;
+                if (value is UInt16)
+                    return (byte)(UInt16)value;
+                if (value is UInt32)
+                    return (byte)(UInt32)value;
+                if (value is UInt64)
+                    return (byte)(UInt64)value;
+                if (value is double)
+                    return (byte)(double)value;
+                if (value is float)
+                    return (byte)(float)value;
+                if (value is decimal)
+                    return (byte)(decimal)value;
+                if (value is sbyte)
+                    return (byte)(sbyte)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToByte(s);
+        }
+
+        /// <summary>
+        /// Convert string to signed byte value without exception.
+        /// Allows to convert floating point values resulting in decimal part.
+        /// Treat comma "," the same as dot "." as decimal point.     
+        /// Returns zero on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static sbyte ObjectToSignedByte(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is sbyte)
+                return (sbyte)(sbyte)value;
+            if (value is char)
+                return (sbyte)(char)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (sbyte)(Int16)value;
+                if (value is Int32)
+                    return (sbyte)(Int32)value;
+                if (value is Int64)
+                    return (sbyte)(Int64)value;
+                if (value is UInt16)
+                    return (sbyte)(UInt16)value;
+                if (value is UInt32)
+                    return (sbyte)(UInt32)value;
+                if (value is UInt64)
+                    return (sbyte)(UInt64)value;
+                if (value is double)
+                    return (sbyte)(double)value;
+                if (value is float)
+                    return (sbyte)(float)value;
+                if (value is decimal)
+                    return (sbyte)(decimal)value;
+                if (value is byte)
+                    return (sbyte)(byte)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToSignedByte(s, Energy.Base.Cast.Behaviour.BYTE_COMMA);
+        }
+
+        /// <summary>
+        /// Convert string to char value without exception.
+        /// Allows to convert floating point values resulting in decimal part for character code.
+        /// For a string return first character.
+        /// Returns '\0' on overflow.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static char ObjectToChar(object value)
+        {
+            if (value == null)
+                return '\0';
+
+            if (value is char)
+                return (char)(char)value;
+            if (value is byte)
+                return (char)(byte)value;
+            if (value is sbyte)
+                return (char)(sbyte)value;
+
+            try
+            {
+                if (value is Int16)
+                    return (char)(Int16)value;
+                if (value is Int32)
+                    return (char)(Int32)value;
+                if (value is Int64)
+                    return (char)(Int64)value;
+                if (value is UInt16)
+                    return (char)(UInt16)value;
+                if (value is UInt32)
+                    return (char)(UInt32)value;
+                if (value is UInt64)
+                    return (char)(UInt64)value;
+
+                if (value is double)
+                    return (char)(double)value;
+                if (value is decimal)
+                    return (char)(decimal)value;
+                if (value is float)
+                    return (char)(float)value;
+            }
+            catch (OverflowException)
+            {
+                return '\0';
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToChar(s);
         }
 
         /// <summary>
@@ -1714,40 +3187,101 @@ namespace Energy.Base
             if (value == null)
                 return 0;
 
-            if (value is System.Int64)
-                return (long)(System.Int64)value;
-            if (value is System.Int32)
-                return (long)(System.Int32)value;
-            if (value is double)
-                return (long)(double)value;
-            if (value is float)
-                return (long)(float)value;
-            if (value is System.UInt32)
-                return (long)(System.UInt32)value;
-            if (value is System.UInt64)
-                return (long)(System.UInt64)value;
-            if (value is decimal)
-                return (long)(decimal)value;
+            if (value is Int64)
+                return (long)(long)value;
 
+            try
+            {
+                if (value is UInt64)
+                    return (long)(ulong)value;
+
+                if (value is double)
+                    return (long)(double)value;
+                if (value is decimal)
+                    return (long)(decimal)value;
+                if (value is float)
+                    return (long)(float)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is Int32)
+                return (long)(int)value;
+            if (value is UInt32)
+                return (long)(uint)value;
             if (value is Int16)
                 return (long)(Int16)value;
             if (value is UInt16)
                 return (long)(UInt16)value;
-
             if (value is byte)
                 return (long)(byte)value;
+            if (value is sbyte)
+                return (long)(sbyte)value;
             if (value is char)
                 return (long)(char)value;
 
-            string s = null;
-            if (value is string)
-                s = (string)value;
-            else
-                s = value.ToString();
+            string s = value is string ? (string)value : value.ToString();
 
             return StringToLong(s);
         }
 
+        /// <summary>
+        /// Convert object to long integer number.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ulong ObjectToUnsignedLong(object value)
+        {
+            if (value == null)
+                return 0;
+
+            if (value is UInt64)
+                return (ulong)(ulong)value;
+
+            try
+            {
+                if (value is Int64)
+                    return (ulong)(long)value;
+                if (value is Int32)
+                    return (ulong)(int)value;
+                if (value is Int16)
+                    return (ulong)(Int16)value;
+                if (value is sbyte)
+                    return (ulong)(sbyte)value;
+
+                if (value is double)
+                    return (double)value < 0 ? 0 : (ulong)(double)value;
+                if (value is decimal)
+                    return (decimal)value < 0 ? 0 : (ulong)(decimal)value;
+                if (value is float)
+                    return (float)value < 0 ? 0 : (ulong)(float)value;
+            }
+            catch (OverflowException)
+            {
+                return 0;
+            }
+
+            if (value is UInt32)
+                return (ulong)(uint)value;
+            if (value is UInt16)
+                return (ulong)(UInt16)value;
+            if (value is byte)
+                return (ulong)(byte)value;
+            if (value is char)
+                return (ulong)(char)value;
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToUnsignedLong(s);
+        }
+
+        /// <summary>
+        /// Convert object to boolean value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool ObjectToBool(object value)
         {
             if (value == null)
@@ -1795,25 +3329,27 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert object to double number.
+        /// Convert object to double value without exception.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static double ObjectToDouble(object value)
         {
-            if (value == null)
+            if (value == null || value == System.DBNull.Value)
                 return 0;
 
-            if (value is long)
-                return (double)(long)value;
-            if (value is int)
-                return (double)(int)value;
+            if (value is Int64)
+                return (double)(Int64)value;
+            if (value is Int32)
+                return (double)(Int32)value;
             if (value is double)
                 return (double)(double)value;
-            if (value is uint)
-                return (double)(uint)value;
-            if (value is ulong)
-                return (double)(ulong)value;
+            if (value is UInt32)
+                return (double)(UInt32)value;
+            if (value is UInt64)
+                return (double)(UInt64)value;
             if (value is decimal)
                 return (double)(decimal)value;
 
@@ -1822,35 +3358,40 @@ namespace Energy.Base
             if (value is UInt16)
                 return (double)(UInt16)value;
 
-            if (value is short)
-                return (double)(short)value;
-            if (value is ushort)
-                return (double)(ushort)value;
             if (value is byte)
                 return (double)(byte)value;
+            if (value is sbyte)
+                return (double)(sbyte)value;
             if (value is char)
                 return (long)(char)value;
 
             string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (s == null || s.Length == 0)
-                return 0;
 
-            long l = 0;
-            double d = 0;
-
-            if (long.TryParse(s, out l))
-                return (double)l;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (long)d;
-            else if (double.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (long)d;
-
-            return 0;
+            return StringToDouble(s);
         }
 
         /// <summary>
-        /// Convert object to double number.
+        /// Convert object to float value without exception.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static float ObjectToFloat(object value)
+        {
+            double x = ObjectToDouble(value);
+            if (x < float.MinValue)
+                return float.MinValue;
+            else if (x > float.MaxValue)
+                return float.MaxValue;
+            else
+                return (float)x;
+        }
+
+        /// <summary>
+        /// Convert object to decimal number.
+        /// Treat comma "," the same as dot "." as decimal point
+        /// when converting from string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -1887,47 +3428,83 @@ namespace Energy.Base
                 return (decimal)(char)value;
 
             string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (s == null || s.Length == 0)
+
+            return StringToDecimal(s);
+        }
+
+        public static Int16 ObjectToWord(object value)
+        {
+            int number = ObjectToInteger(value);
+            if (number < Int16.MinValue)
+                return Int16.MinValue;
+            else if (number > Int16.MaxValue)
+                return Int16.MaxValue;
+            else
+                return (Int16)number;
+        }
+
+        public static UInt16 ObjectToUnsignedWord(object value)
+        {
+            int number = ObjectToInteger(value);
+            if (number <= 0)
                 return 0;
-
-            long l = 0;
-            decimal d = 0;
-
-            if (long.TryParse(s, out l))
-                return (decimal)l;
-            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
-                return (decimal)d;
-            else if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.CurrentCulture, out d))
-                return (decimal)d;
-
-            return 0;
+            else if (number > UInt16.MaxValue)
+                return UInt16.MaxValue;
+            else
+                return (UInt16)number;
         }
 
         /// <summary>
-        /// Convert object to unsigned byte.
+        /// Convert object to DateTime value.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="o"></param>
         /// <returns></returns>
-        public static byte ObjectToByte(object value)
+        public static DateTime ObjectToDateTime(object o)
         {
-            if (value == null)
-                return (byte)0;
-            if (value is byte)
-                return (byte)value;
-            if (value is string)
-                return StringToByte((string)value);
-            return (byte)(ObjectToInteger(value) % 256);
+            if (null == o)
+            {
+                return DateTime.MinValue;
+            }
+            if (o is DateTime)
+            {
+                return (DateTime)o;
+            }
+            string text = o is string ? (string)o : o.ToString();
+            return Energy.Base.Clock.Parse(text);
         }
 
-        public static DateTime ObjectToDateTime(object value)
+        /// <summary>
+        /// Convert object to DateTime value within specified range.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="minimum"></param>
+        /// <param name="maximum"></param>
+        /// <returns>DateTime</returns>
+        public static DateTime ObjectToDateTime(object o, DateTime minimum, DateTime maximum)
         {
-            if (value == null)
-                return DateTime.MinValue;
-            if (value is DateTime)
-                return (DateTime)value;
-            string text = value is string ? (string)value : value.ToString();
-            return Energy.Base.Clock.Parse(text);
+            if (null == o)
+            {
+                return minimum;
+            }
+            DateTime value;
+            if (o is DateTime)
+            {
+                value = (DateTime)o;
+            }
+            else
+            {
+                string text = o is string ? (string)o : o.ToString();
+                value = Clock.Parse(text);
+            }
+            if (minimum != DateTime.MinValue && value < minimum)
+            {
+                value = minimum;
+            }
+            else if (maximum != DateTime.MaxValue && value > maximum)
+            {
+                value = maximum;
+            }
+            return value;
         }
 
         public static TStringToObject StringToObject<TStringToObject>(string input)
@@ -1995,7 +3572,7 @@ namespace Energy.Base
         #region Enum
 
         /// <summary>
-        /// Convert string to enum
+        /// Convert string to enumeration value.
         /// </summary>
         /// <param name="value">string</param>
         /// <param name="type">Type</param>
@@ -2003,7 +3580,9 @@ namespace Energy.Base
         public static object StringToEnum(string value, Type type)
         {
             if (String.IsNullOrEmpty(value))
+            {
                 return 0;
+            }
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
@@ -2015,7 +3594,9 @@ namespace Energy.Base
             int length = value.Length;
             value = Energy.Base.Text.Trim(value);
             if (value.Length == length)
+            {
                 return 0;
+            }
             for (int i = 0; i < names.Length; i++)
             {
                 if (String.Compare(value, names[i], true) == 0)
@@ -2177,6 +3758,11 @@ namespace Energy.Base
             return Energy.Base.Json.Escape(value);
         }
 
+        /// <summary>
+        /// Convert object to formal JSON value string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string ObjectToJsonValue(object value)
         {
             // treat DBNull as empty string //
@@ -2201,6 +3787,11 @@ namespace Energy.Base
             return StringToJsonString(value.ToString());
         }
 
+        /// <summary>
+        /// Convert JSON value string to an object.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static object JsonValueToObject(string text)
         {
             if (text == "null")
@@ -2235,6 +3826,14 @@ namespace Energy.Base
 
         private static readonly string[] _MemorySizeSuffix = new string[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
 
+        /// <summary>
+        /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
+        /// </summary>
+        /// <param name="sizeInBytes"></param>
+        /// <param name="decimalPlaces"></param>
+        /// <param name="numberCeiling"></param>
+        /// <returns></returns>
         public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
         {
             if (sizeInBytes <= 0)
@@ -2268,6 +3867,65 @@ namespace Energy.Base
             int count = data.Length;
             string result = Energy.Base.Text.Encoding(null).GetString(data, index, count);
             return result;
+        }
+
+        #endregion
+
+        #region Enumeration
+
+        /// <summary>
+        /// Enumeration conversions
+        /// </summary>
+        public static class Enumeration
+        {
+            public static Energy.Enumeration.TextPad TextAlignToTextPad(Energy.Enumeration.TextAlign align)
+            {
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextPad.None;
+
+                    case Energy.Enumeration.TextAlign.Center:
+                        return Energy.Enumeration.TextPad.Center;
+
+                    case Energy.Enumeration.TextAlign.Left:
+                        return Energy.Enumeration.TextPad.Right;
+
+                    case Energy.Enumeration.TextAlign.Right:
+                        return Energy.Enumeration.TextPad.Left;
+                }
+            }
+
+            public static Energy.Enumeration.TextAlign TextPadToTextAlign(Energy.Enumeration.TextPad pad)
+            {
+                bool beLeft = 0 < (pad & Energy.Enumeration.TextPad.Left);
+                bool beRight = 0 < (pad & Energy.Enumeration.TextPad.Right);
+                if (beLeft && beRight)
+                    return Energy.Enumeration.TextAlign.Center;
+                else if (beLeft)
+                    return Energy.Enumeration.TextAlign.Right;
+                else if (beRight)
+                    return Energy.Enumeration.TextAlign.Left;
+                else
+                    return Energy.Enumeration.TextAlign.None;
+            }
+
+            public static Energy.Enumeration.TextAlign CharToTextAlign(char align)
+            {
+                switch (align)
+                {
+                    default:
+                        return Energy.Enumeration.TextAlign.None;
+                    case '<':
+                        return Energy.Enumeration.TextAlign.Left;
+                    case '>':
+                        return Energy.Enumeration.TextAlign.Right;
+                    case '-':
+                        return Energy.Enumeration.TextAlign.Center;
+                    case '=':
+                        return Energy.Enumeration.TextAlign.Justify;
+                }
+            }
         }
 
         #endregion

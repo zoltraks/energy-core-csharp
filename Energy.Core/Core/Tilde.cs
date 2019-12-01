@@ -2,6 +2,9 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Diagnostics;
+using System.IO;
 
 namespace Energy.Core
 {
@@ -197,6 +200,11 @@ namespace Energy.Core
             _Colorless = value;
         }
 
+        /// <summary>
+        /// Process writing to console in separate thread.
+        /// </summary>
+        public static bool RunInThread { get; set; }
+
         public const string DefaultPauseText = "Enter ~w~anything~0~ to ~y~continue~0~...";
         private static string _PauseText = DefaultPauseText;
         public static string PauseText { get { return _PauseText; } set { _PauseText = value; } }
@@ -250,6 +258,63 @@ namespace Energy.Core
 
         #endregion
 
+        #region Default
+
+        public static class Default
+        {
+            public static int WindowWidth = 80;
+
+            public static int WindowHeight = 25;
+        }
+
+        #endregion
+
+        #region Example
+
+        public static class Example
+        {
+            public static string GetRainbowLine(string text, int limit, int offset)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+
+                string[] rainbow = new string[]
+                {
+                    Color.DarkBlue, Color.Blue, Color.Green, Color.Yellow, Color.Red, Color.DarkRed,
+                };
+
+                int n = offset;
+
+                if (limit < 1 || limit == text.Length)
+                {
+                    return rainbow[offset % rainbow.Length] + text;
+                }
+
+                StringBuilder s = new StringBuilder();
+                int l = 0;
+                int d = text.Length;
+                while (l < limit)
+                {
+                    s.Append(rainbow[n++ % rainbow.Length]);
+                    if (l + d <= limit)
+                    {
+                        s.Append(text);
+                    }
+                    else
+                    {
+                        s.Append(text.Substring(0, limit - l));
+                    }
+                    l += d;
+                }
+
+                return s.ToString();
+            }
+        }
+
+        #endregion
+
         #region Ask
 
         /// <summary>
@@ -266,7 +331,7 @@ namespace Energy.Core
                     value = "";
                 string message = value == "" ? AskSimpleText : AskChangeText;
                 message = string.Format(message, question, value);
-                Tilde.Write(message);
+                Energy.Core.Tilde.RealWrite(message);
             }
             int left = System.Console.CursorLeft;
             System.ConsoleColor foreground = System.Console.ForegroundColor;
@@ -499,44 +564,16 @@ namespace Energy.Core
         /// </code>
         /// </example>
         /// <param name="value"></param>
+        [Energy.Attribute.Code.Extend("Add support for non strings with optional color formating", Expected = "feature")]
         public static void Write(string value)
         {
-            if (string.IsNullOrEmpty(value))
-                return;
-            ColorTextList list = ColorTextList.Explode(value);
-            if (list.Count == 0)
-                return;
-            lock (_ConsoleLock)
+            if (!RunInThread)
             {
-                // TODO Fix new lines :)
-                // TODO Optionally wrap words?
-                // TODO Check security
-                System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
-                System.ConsoleColor defaultForegroundColor = _Foreground != null
-                    ? (ConsoleColor)_Foreground
-                    : previousForegroundColor;
-                for (int i = 0; i < list.Count; i++)
-                {
-                    if (!_Colorless)
-                    {
-                        System.ConsoleColor foregroundColor = list[i].Color != null
-                            ? (ConsoleColor)list[i].Color
-                            : defaultForegroundColor;
-                        try
-                        {
-                            System.Console.ForegroundColor = foregroundColor;
-                        }
-                        catch (System.Security.SecurityException)
-                        {
-                            _Colorless = true;
-                        }
-                    }
-                    System.Console.Write(list[i].Text);
-                }
-                if (!_Colorless)
-                {
-                    System.Console.ForegroundColor = previousForegroundColor;
-                }
+                RealWrite(value);
+            }
+            else
+            {
+                EnqueueWrite(value);
             }
         }
 
@@ -747,7 +784,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write text using specifed color and escaping any tilde characters in text
+        /// Write text using specifed color and escaping any tilde characters in text.
         /// </summary>
         /// <param name="color"></param>
         /// <param name="text"></param>
@@ -757,10 +794,245 @@ namespace Energy.Core
                 , Energy.Base.Text.NL));
         }
 
+        /// <summary>
+        /// Write empty line.
+        /// </summary>
+        public static void WriteLine()
+        {
+            Write(Energy.Base.Text.NL);
+        }
+
+        /// <summary>
+        /// Write plain text without formatting.
+        /// </summary>
+        /// <param name="value"></param>
+        public static void WritePlain(string value)
+        {
+            Write(Escape(value));
+        }
+
+        #endregion
+
+        #region Private
+
+        private static readonly object _ThreadLock = new object();
+
+        private static Energy.Base.Queue _Queue;
+
+        private static Energy.Base.Queue Queue
+        {
+            get
+            {
+                if (_Queue == null)
+                {
+                    lock (_ThreadLock)
+                    {
+                        if (_Queue == null)
+                        {
+                            _Queue = CreateQueue();
+                        }
+                    }
+                }
+                return _Queue;
+            }
+        }
+
+        private static Thread _Thread = null;
+
+        private static int _ThreadAlive = 500;
+
+        private static int ThreadAlive
+        {
+            get
+            {
+                lock (_ThreadLock)
+                {
+                    return _ThreadAlive;
+                }
+            }
+            set
+            {
+                lock (_ThreadLock)
+                {
+                    _ThreadAlive = value;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Processing
+
+        [Energy.Attribute.Code.Extend("Add support for non strings with optional color formating", Expected = "feature")]
+        private static void RealWrite(object value)
+        {
+            if (value == null)
+                return;
+
+            string text = null;
+
+            if (value is string)
+                text = value as string;
+
+            if (string.IsNullOrEmpty(text))
+                return;
+            ColorTextList list = ColorTextList.Explode(text);
+            if (list.Count == 0)
+                return;
+            lock (_ConsoleLock)
+            {
+                // TODO Fix new lines :)
+                // TODO Optionally wrap words?
+                // TODO Check security
+                System.ConsoleColor previousForegroundColor = System.Console.ForegroundColor;
+                System.ConsoleColor defaultForegroundColor = _Foreground != null
+                    ? (ConsoleColor)_Foreground
+                    : previousForegroundColor;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (!_Colorless)
+                    {
+                        System.ConsoleColor foregroundColor = list[i].Color != null
+                            ? (ConsoleColor)list[i].Color
+                            : defaultForegroundColor;
+                        try
+                        {
+                            System.Console.ForegroundColor = foregroundColor;
+                        }
+                        catch (System.Security.SecurityException)
+                        {
+                            _Colorless = true;
+                        }
+                    }
+                    System.Console.Write(list[i].Text);
+                }
+                if (!_Colorless)
+                {
+                    System.Console.ForegroundColor = previousForegroundColor;
+                }
+            }
+        }
+
+        private static void EnqueueWrite(object value)
+        {
+            Queue.Push(value);
+        }
+
+        private static int bugThreadOrphan;
+
+        private static void EnsureThread()
+        {
+            if (_Thread != null)
+            {
+                lock (_ThreadLock)
+                {
+                    if (_Thread != null)
+                    {
+                        if (!_Thread.IsAlive)
+                        {
+                            _Thread = null;
+                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " " 
+                                + "Energy.Core.Tilde Thread is not alive anymore ("
+                                + (bugThreadOrphan = Energy.Base.Number.Increment(bugThreadOrphan)).ToString()
+                                + ")"
+                                );
+                        }
+                    }
+                }
+            }
+            if (_Thread == null)
+            {
+                lock (_ThreadLock)
+                {
+                    if (_Thread == null)
+                    {
+                        _Thread = new Thread(ThreadWork)
+                        {
+                            IsBackground = false,
+                            CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                        };
+                        _Thread.Start();
+                    }
+                }
+            }
+        }
+
+        private static Energy.Base.Queue CreateQueue()
+        {
+            Energy.Base.Queue o = new Energy.Base.Queue();
+            o.OnPush += QueueOnPush;
+            return o;
+        }
+
+        private static ManualResetEvent QueuePush = new ManualResetEvent(false);
+
+        private static void QueueOnPush(object self)
+        {
+            QueuePush.Set();
+            EnsureThread();
+        }
+
+        private static void ThreadWork()
+        {
+            try
+            {
+                while (true)
+                {
+                    while (!Queue.Empty)
+                    {
+                        object value = Queue.Pull();
+                        RealWrite(value);
+                    }
+                    QueuePush.Reset();
+                    if (!QueuePush.WaitOne(ThreadAlive))
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (ThreadAbortException)
+            {
+                Debug.WriteLine(Energy.Base.Clock.CurrentTime + " "
+                    + "Energy.Core.Tilde Thread aborted"
+                    );
+            }
+        }
+
+        private static int GetWidth()
+        {
+            int width;
+            try
+            {
+                width = Console.WindowWidth;
+            }
+            catch
+            {
+                width = Default.WindowWidth;
+            }
+            return width;
+        }
+
+        private static int GetHeight()
+        {
+            int height;
+            try
+            {
+                height = Console.WindowHeight;
+            }
+            catch
+            {
+                height = Default.WindowHeight;
+            }
+            return height;
+        }
+
         #endregion
 
         #region Color
 
+        /// <summary>
+        /// Tilde coloring engine console color string table.
+        /// </summary>
         public class Color
         {
             public static string DarkBlue = "~1~";
@@ -895,7 +1167,7 @@ namespace Energy.Core
         #region Escape
 
         /// <summary>
-        /// Escape string which may contain tilde character
+        /// Escape string which may contain tilde characters.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -913,7 +1185,7 @@ namespace Energy.Core
         #region Strip
 
         /// <summary>
-        /// Strip tildes from text
+        /// Strip tildes from text.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -979,7 +1251,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Write out exception message
+        /// Write out exception message with optional stack trace.
         /// </summary>
         /// <param name="exception"></param>
         /// <param name="trace">Write also stack trace</param>
@@ -1110,7 +1382,11 @@ namespace Energy.Core
         #region Input
 
         /// <summary>
-        /// Write out prompt message and wait for input string. If user did not provide
+        /// Write out prompt message and wait for input string. 
+        /// If empty string is read from console, function will return 
+        /// defaultValue parameter value.
+        /// If message contains placeholder {0}, it will be
+        /// replaced with defaultValue parameter value.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="defaultValue"></param>
@@ -1125,7 +1401,7 @@ namespace Energy.Core
                 if (message.Contains("{0}"))
                     message = string.Format(message, defaultValue);
             }
-            Energy.Core.Tilde.Write(message);
+            Energy.Core.Tilde.RealWrite(message);
             string input = Console.ReadLine();
             if (string.IsNullOrEmpty(input))
                 input = defaultValue;
@@ -1140,17 +1416,43 @@ namespace Energy.Core
         }
 
         #endregion
-
+        
         #region Length
 
         /// <summary>
-        /// Return total length of tilde string
+        /// Return total length of tilde string.
+        /// Doesn't count tilde control strings.
         /// </summary>
         /// <param name="example"></param>
         /// <returns></returns>
         public static int Length(string example)
         {
             return ColorTextList.Explode(example).GetTotalLength();
+        }
+
+
+        #endregion
+
+        #region Width
+
+        public static int Width
+        {
+            get
+            {
+                return GetWidth();
+            }
+        }
+
+        #endregion
+
+        #region Height
+
+        public static int Height
+        {
+            get
+            {
+                return GetHeight();
+            }
         }
 
         #endregion

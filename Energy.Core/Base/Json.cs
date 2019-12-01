@@ -10,6 +10,42 @@ namespace Energy.Base
     /// </summary>
     public class Json
     {
+        #region Constant
+
+        public const string BEGIN_ARRAY = "[";
+        public const string BEGIN_OBJECT = "{";
+        public const string END_ARRAY = "]";
+        public const string END_OBJECT = "}";
+        public const string NAME_SEPARATOR = ":";
+        public const string VALUE_SEPARATOR = ",";
+
+        #endregion
+
+        #region Document
+
+        public class Document: JsonValue
+        {
+            JsonValue _Root;
+
+            public JsonValue Root { get { return _Root; } set { _Root = value; } }
+
+            public override string GetText(JsonLayout layout)
+            {
+                return _Root.GetText(layout);
+            }
+
+            public string Serialize(JsonLayout layout)
+            {
+                return _Root.GetText(layout);
+            }
+        }
+
+        #endregion
+
+        #region Type
+
+        #region JsonValue
+
         public abstract class JsonValue
         {
             public abstract string GetText(JsonLayout layout);
@@ -18,50 +54,26 @@ namespace Energy.Base
             {
                 return GetText(JsonLayout.Default);
             }
-        }
 
-        public class JsonLayout : Energy.Base.Pattern.DefaultProperty<JsonLayout>
-        {
-            public bool Indent;
-
-            public bool AllowCommaExtra;
-
-            public bool AllowCommaEmpty;
-
-            public bool InlineArray;
-
-            public bool InlineObject;
-
-            public int IndentLevel;
-
-            public string IndentString;
-
-            public JsonLayout()
+            public virtual string ToString(JsonLayout layout)
             {
-                Reset();
-            }
-
-            public void Reset()
-            {
-                this.IndentLevel = 0;
-                this.Indent = true;
-                this.IndentString = "\t";
-                this.AllowCommaExtra = false;
-                this.AllowCommaEmpty = false;
-                this.InlineArray = false;
-                this.InlineObject = false;
+                return GetText(layout);
             }
         }
+
+        #endregion
 
         public class JsonString : JsonValue
         {
             private string _Text;
 
+            private string _Value;
+
             public string Text
             {
                 get
                 {
-                    return GetText();
+                    return GetText(null);
                 }
                 set
                 {
@@ -69,8 +81,12 @@ namespace Energy.Base
                 }
             }
 
-            private string GetText()
+            public override string GetText(JsonLayout layout)
             {
+                if (_Text == null)
+                {
+                    _Text = Energy.Base.Json.Quote(_Value);
+                }
                 return _Text;
             }
 
@@ -80,9 +96,7 @@ namespace Energy.Base
                 _Value = null;
             }
 
-            private object _Value;
-
-            public object Value
+            public string Value
             {
                 get
                 {
@@ -94,26 +108,15 @@ namespace Energy.Base
                 }
             }
 
-            private void SetValue(object value)
+            private void SetValue(string value)
             {
                 _Value = value;
                 _Text = null;
             }
 
-            private object GetValue()
+            private string GetValue()
             {
-                if (!string.IsNullOrEmpty(_Text))
-                {
-                    return Energy.Base.Cast.JsonValueToObject(_Text);
-                }
                 return _Value;
-            }
-
-            public override string GetText(JsonLayout layout)
-            {
-                if (!string.IsNullOrEmpty(_Text))
-                    return _Text;
-                return Energy.Base.Cast.ObjectToJsonValue(_Value);
             }
         }
 
@@ -238,7 +241,9 @@ namespace Energy.Base
                 {
                     if (layout.InlineArray)
                     {
-                        s.Append("[ ");
+                        s.Append("[");
+                        if (!layout.Compact)
+                            s.Append(" ");
                         List<string> list = new List<string>();
                         for (int i = 0; i < Array.Count; i++)
                         {
@@ -281,15 +286,124 @@ namespace Energy.Base
             }
         }
 
-        public class JsonObject: JsonValue
+        public class JsonObject : JsonValue
         {
             public Energy.Base.Collection.StringDictionary<JsonValue> Dictionary = new Energy.Base.Collection.StringDictionary<JsonValue>();
 
             public override string GetText(JsonLayout layout)
             {
-                throw new NotImplementedException();
+                StringBuilder sb = new StringBuilder();
+                sb.Append(BEGIN_OBJECT);
+                if (layout.Indent)
+                {
+                    layout.IndentLevel++;
+                }
+                else
+                    sb.Append(layout.Compact ? "" : " ");
+                List<string> list = new List<string>();
+                foreach (KeyValuePair<string, JsonValue> e in Dictionary)
+                {
+                    string pair = Energy.Base.Json.Quote(e.Key);
+                    pair += NAME_SEPARATOR;
+                    if (!layout.Compact)
+                        pair += " ";
+                    pair += e.Value.GetText(layout);
+                    list.Add(pair);
+                }
+                string glue = VALUE_SEPARATOR;
+
+                if (layout.Indent)
+                {
+                    glue += "\n";
+                    glue += layout.IndentString ?? "";
+                }
+                else if (!layout.Compact)
+                    glue += " ";
+
+                if (list.Count > 0)
+                {
+                    if (layout.Indent)
+                    {
+                        sb.AppendLine();
+                        sb.Append(layout.IndentString ?? "");
+                    }
+                    sb.Append(string.Join(glue, list.ToArray()));
+                }
+                else
+                {
+                    if (!layout.Compact && !layout.Indent)
+                    {
+                        sb.Append(" ");
+                    }
+                }
+                sb.Append(END_OBJECT);
+                if (layout.Indent)
+                {
+                    layout.IndentLevel--;
+                }
+
+                return sb.ToString();
             }
         }
+
+        #endregion
+
+        #region JsonLayout
+
+        public class JsonLayout : Energy.Base.Pattern.DefaultProperty<JsonLayout>
+        {
+            /// <summary>
+            /// Use indent
+            /// </summary>
+            public bool Indent;
+
+            /// <summary>
+            /// Be compact
+            /// </summary>
+            public bool Compact;
+
+            public bool AllowCommaExtra;
+
+            public bool AllowCommaEmpty;
+
+            /// <summary>
+            /// Write array values in single line instead of each line for each element
+            /// </summary>
+            public bool InlineArray;
+
+            /// <summary>
+            /// Write object values in single line instead of each line for key value pair
+            /// </summary>
+            public bool InlineObject;
+
+            public int IndentLevel;
+
+            /// <summary>
+            /// Indent with
+            /// </summary>
+            public string IndentString;
+
+            public JsonLayout()
+            {
+                Reset();
+            }
+
+            public void Reset()
+            {
+                this.Compact = false;
+                this.IndentLevel = 0;
+                this.Indent = true;
+                this.IndentString = "\t";
+                this.AllowCommaExtra = false;
+                this.AllowCommaEmpty = false;
+                this.InlineArray = false;
+                this.InlineObject = false;
+            }
+        }
+
+        #endregion
+
+        #region Static utility functions
 
         private static readonly string[] characterReplacementArray = new string[]{
             "\b", "\\b",
@@ -304,13 +418,13 @@ namespace Energy.Base
         /// Escape JSON characters and include string in double quotes.
         /// Null strings will be represented as "null".
         /// 
-        /// Backspace is replaced with \b
-        /// Form feed is replaced with \f
-        /// Newline is replaced with \n
-        /// Carriage return is replaced with \r
-        /// Tab is replaced with \t
-        /// Double quote is replaced with \"
-        /// Backslash is replaced with \\
+        /// Backspace is replaced with '\b'.
+        /// Form feed is replaced with '\f'.
+        /// Newline is replaced with '\n'.
+        /// Carriage return is replaced with '\r'.
+        /// Tab is replaced with '\t'.
+        /// Double quote is replaced with '\"'.
+        /// Backslash is replaced with '\\'.
         /// 
         /// </summary>
         /// <param name="text">Text to be escaped for JSON string</param>
@@ -326,7 +440,7 @@ namespace Energy.Base
                 if (text.Contains(characterReplacementArray[i]))
                     text = text.Replace(characterReplacementArray[i], characterReplacementArray[i + 1]);
             }
-            return string.Concat("\"", text, "\"");
+            return text;
         }
 
         /// <summary>
@@ -357,5 +471,17 @@ namespace Energy.Base
                 return text;
             }
         }
+
+        /// <summary>
+        /// Quote
+        /// </summary>
+        /// <param name="jsonString"></param>
+        /// <returns></returns>
+        public static string Quote(string jsonString)
+        {
+            return "\"" + Escape(jsonString) + "\"";
+        }
+
+        #endregion
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -13,13 +12,13 @@ namespace Energy.Base
         #region Array
 
         /// <summary>
-        /// Thread safe array of objects
+        /// Thread safe array of objects.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         [Serializable]
         public class Array<T> : System.Collections.Generic.List<T>
         {
-            private readonly Energy.Base.Lock _Lock = new Energy.Base.Lock();
+            private readonly object _Lock = new object();
 
             /// <summary>
             /// Gets or sets the element at the specified index
@@ -113,6 +112,16 @@ namespace Energy.Base
                         return base.Count == 0 ? default(T) : base[0];
                     }
                 }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (base.Count == 0)
+                            base.Add(value);
+                        else
+                            base[0] = value;
+                    }
+                }
             }
 
             /// <summary>
@@ -125,6 +134,16 @@ namespace Energy.Base
                     lock (_Lock)
                     {
                         return base.Count == 0 ? default(T) : base[base.Count - 1];
+                    }
+                }
+                set
+                {
+                    lock (_Lock)
+                    {
+                        if (base.Count == 0)
+                            base.Add(value);
+                        else
+                            this[base.Count - 1] = value;
                     }
                 }
             }
@@ -267,6 +286,44 @@ namespace Energy.Base
                 Array.Copy(array, start, data, 0, count);
                 return data;
             }
+
+            /// <summary>
+            /// Exclude every element from source array.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="exclude"></param>
+            /// <returns></returns>
+            public static T[] Exclude(T[] array, T[] exclude)
+            {
+                if (null == array || null == exclude || 0 == array.Length || 0 == exclude.Length)
+                {
+                    return array;
+                }
+                int capacity = array.Length;
+                if (capacity > 100)
+                {
+                    capacity = 100;
+                }
+                List<T> list = capacity > 1 ? new List<T>(capacity) : new List<T>();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    bool found = false;
+                    for (int n = 0; n < exclude.Length; n++)
+                    {
+                        if (array[i].Equals(exclude[n]))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        continue;
+                    }
+                    list.Add(array[i]);
+                }
+                return list.ToArray();
+            }
         }
 
         #endregion
@@ -279,7 +336,7 @@ namespace Energy.Base
         /// <typeparam name="T">Value type</typeparam>
         [XmlRoot]
         [Serializable]
-        public class Associative<T> : Dictionary<string, T>, IXmlSerializable
+        public class Associative<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
         {
             #region IXmlSerializable Members
 
@@ -372,6 +429,14 @@ namespace Energy.Base
                 }
             }
 
+            public int Count
+            {
+                get
+                {
+                    return _Array.Length;
+                }
+            }
+
             public int TotalLength
             {
                 get
@@ -448,13 +513,175 @@ namespace Energy.Base
                 }
                 return false;
             }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right)
+            {
+                return Compare(left, right, false);
+            }
+
+            /// <summary>
+            /// Compare two string arrays.
+            /// </summary>
+            /// <param name="left"></param>
+            /// <param name="right"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static int Compare(string[] left, string[] right, bool ignoreCase)
+            {
+                if (left == null || right == null)
+                {
+                    if (left == null && right == null)
+                        return 0;
+                    if (left == null)
+                        return -1;
+                    else
+                        return 1;
+                }
+                if (left.Length < right.Length)
+                    return -1;
+                else if (left.Length > right.Length)
+                    return 1;
+                else
+                {
+                    for (int i = 0; i < left.Length; i++)
+                    {
+                        int result = string.Compare(left[i], right[i], ignoreCase);
+                        if (result != 0)
+                            return result;
+                    }
+                }
+                return 0;
+            }
+
+            /// <summary>
+            /// Remove from first array every element from second array by comparisation.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="exclude"></param>
+            /// <param name="ignoreCase"></param>
+            /// <returns></returns>
+            public static string[] Exclude(string[] array, string[] exclude, bool ignoreCase)
+            {
+                if (null == array || null == exclude || 0 == array.Length || 0 == exclude.Length)
+                {
+                    return array;
+                }
+                int capacity = array.Length;
+                if (capacity > 100)
+                {
+                    capacity = 100;
+                }
+                List<string> list = capacity > 1 ? new List<string>(capacity) : new List<string>();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    bool found = false;
+                    for (int n = 0; n < exclude.Length; n++)
+                    {
+                        if (0 == string.Compare(array[i], exclude[n], ignoreCase))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        continue;
+                    }
+                    list.Add(array[i]);
+                }
+                return list.ToArray();
+            }
+
+            #region IndexOf
+
+            public int IndexOf(string element)
+            {
+                return IndexOf(element, 0, false);
+            }
+
+            public int IndexOf(string element, int index)
+            {
+                return IndexOf(element, index, false);
+            }
+
+            public int IndexOf(string element, bool ignoreCase)
+            {
+                return IndexOf(element, 0, ignoreCase);
+            }
+
+            public int IndexOf(string element, bool ignoreCase, int index)
+            {
+                return IndexOf(element, index, ignoreCase);
+            }
+
+            public int IndexOf(string element, int index, bool ignoreCase)
+            {
+                int length;
+                if (null == _Array || 0 == (length = _Array.Length))
+                {
+                    return -1;
+                }
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, _Array[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            public static int IndexOf(string[] array, string element)
+            {
+                return IndexOf(array, element, 0, false);
+            }
+
+            public static int IndexOf(string[] array, string element, int index)
+            {
+                return IndexOf(array, element, index, false);
+            }
+
+            public static int IndexOf(string[] array, string element, bool ignoreCase)
+            {
+                return IndexOf(array, element, 0, ignoreCase);
+            }
+
+            public static int IndexOf(string[] array, string element, bool ignoreCase, int index)
+            {
+                return IndexOf(array, element, index, ignoreCase);
+            }
+
+            public static int IndexOf(string[] array, string element, int index, bool ignoreCase)
+            {
+                if (null == array || 0 == array.Length)
+                {
+                    return -1;
+                }
+                int length = array.Length;
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, array[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            #endregion
         }
 
         #endregion
 
         #region StringDictionary
 
-        public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
+        public class StringDictionary<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
         {
             #region Contructor
 
@@ -462,7 +689,7 @@ namespace Energy.Base
             {
             }
 
-            public StringDictionary(string[] keyValuePairArray)
+            public StringDictionary(params string[] keyValuePairArray)
             {
                 for (int i = 0; i < keyValuePairArray.Length - 1; i++)
                 {
@@ -472,12 +699,35 @@ namespace Energy.Base
                 }
             }
 
+            public StringDictionary(params object[] keyValuePairArray)
+            {
+                for (int i = 0; i < keyValuePairArray.Length - 1; i++)
+                {
+                    string key = Energy.Base.Cast.ObjectToString(keyValuePairArray[i++]);
+                    T value = Energy.Base.Cast.As<T>(keyValuePairArray[i]);
+                    this[key] = value;
+                }
+            }
+
+
             #endregion
 
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
             public Dictionary<string, string> Index = null;
+
+            private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.Last;
+
+            /// <summary>
+            /// Specifies behaviour for selecting one element from multiple duplicates
+            /// when case sensitive option is set to false.
+            /// </summary>
+            public Energy.Enumeration.MultipleBehaviour SelectionOfDuplicates
+            {
+                get { lock (_Lock) return _SelectionOfDuplicates; }
+                set { lock (_Lock) _SelectionOfDuplicates = value; }
+            }
 
             private bool _CaseSensitive = true;
 
@@ -529,7 +779,9 @@ namespace Energy.Base
                 foreach (string key in base.Keys)
                 {
                     string map = key.ToUpperInvariant();
-                    if (!Index.ContainsKey(map))
+                    if (_SelectionOfDuplicates == Energy.Enumeration.MultipleBehaviour.Last)
+                        Index[map] = key;
+                    else if (!Index.ContainsKey(map))
                         Index.Add(map, key);
                 }
             }
@@ -856,7 +1108,7 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public StringDictionary<T> Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            public StringDictionary<T> Filter(Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
                 lock (_Lock)
                 {
@@ -879,9 +1131,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public StringDictionary<T> Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            public StringDictionary<T> Filter(Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                return Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
             }
         }
 
@@ -897,9 +1149,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public new StringDictionary Filter(MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+            public new StringDictionary Filter(Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                StringDictionary<string> filteredDictionary = base.Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                StringDictionary<string> filteredDictionary = base.Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
                 StringDictionary dictionary = new StringDictionary();
                 foreach (KeyValuePair<string, string> pair in filteredDictionary)
                 {
@@ -916,9 +1168,9 @@ namespace Energy.Base
             /// <param name="ignoreCase"></param>
             /// <param name="filters"></param>
             /// <returns></returns>
-            public new StringDictionary Filter(MatchMode matchMode, bool ignoreCase, string[] filters)
+            public new StringDictionary Filter(Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
             {
-                return Filter(MatchStyle.Any, matchMode, ignoreCase, filters);
+                return Filter(Energy.Enumeration.MatchStyle.Any, matchMode, ignoreCase, filters);
             }
         }
 
@@ -1004,13 +1256,40 @@ namespace Energy.Base
                 }
                 return false;
             }
+
+            public int IndexOf(string element, bool ignoreCase)
+            {
+                return IndexOf(element, 0, ignoreCase);
+            }
+
+            public int IndexOf(string element, bool ignoreCase, int index)
+            {
+                return IndexOf(element, index, ignoreCase);
+            }
+
+            public int IndexOf(string element, int index, bool ignoreCase)
+            {
+                int length;
+                if (0 == (length = this.Count))
+                {
+                    return -1;
+                }
+                for (int i = index; i < length; i++)
+                {
+                    if (0 == string.Compare(element, this[i], ignoreCase))
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
         }
 
         #endregion
 
         #region SerializableDictionary
 
-        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, Energy.Interface.IXmlSerializable
         {
             public System.Xml.Schema.XmlSchema GetSchema()
             {
@@ -1066,6 +1345,308 @@ namespace Energy.Base
 
                     writer.WriteEndElement();
                 }
+            }
+        }
+
+        #endregion
+
+        #region Circular
+
+        public class Circular<T> : IList<T>, Energy.Interface.IArray<T>, Energy.Interface.IStack<T>
+        {
+            private List<T> _List = new List<T>();
+
+            public T this[int index]
+            {
+                get
+                {
+                    return _List[index];
+                }
+                set
+                {
+                    _List[index] = value;
+                }
+            }
+
+            public int Count { get { return _List.Count; } set { SetCount(value); } }
+
+            private void SetCount(int value)
+            {
+                if (value <= 0)
+                {
+                    _List.Clear();
+                }
+                else if (value < _List.Count)
+                {
+                    _List.RemoveRange(value, _List.Count - value);
+                }
+                else
+                {
+                    while (_List.Count < value)
+                    {
+                        _List.Add(default(T));
+                    }
+                }
+            }
+
+            public bool IsReadOnly { get { return false; } }
+
+            public T First
+            {
+                get
+                {
+                    return _List.Count > 0 ? _List[0] : default(T);
+                }
+                set
+                {
+                    if (_List.Count == 0)
+                        _List.Add(value);
+                    else
+                        _List[0] = value;
+                }
+            }
+
+            public T Last
+            {
+                get
+                {
+                    return _List.Count > 0 ? _List[_List.Count - 1] : default(T);
+                }
+                set
+                {
+                    if (_List.Count == 0)
+                        _List.Add(value);
+                    else
+                        _List[_List.Count - 1] = value;
+                }
+            }
+
+            private int _Limit = 0;
+
+            public int Limit { get { return GetLimit(); } set { SetLimit(value); } }
+
+            private int GetLimit()
+            {
+                return _Limit;
+            }
+
+            private void SetLimit(int value)
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("Limit must be a positive number");
+                _Limit = value;
+            }
+
+            public void Add(T item)
+            {
+                _List.Add(item);
+                Scroll();
+            }
+
+            public void Clear()
+            {
+                _List.Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                return _List.Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                _List.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return _List.GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return _List.IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                _List.Insert(index, item);
+                Scroll();
+            }
+
+            public bool Remove(T item)
+            {
+                return _List.Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                _List.RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _List.GetEnumerator();
+            }
+
+            private void Scroll()
+            {
+                if (_Limit == 0)
+                {
+                    return;
+                }
+                if (_List.Count > _Limit)
+                {
+                    _List.RemoveRange(0, _List.Count - Limit);
+                }
+            }
+
+            public T[] ToArray()
+            {
+                return _List.ToArray();
+            }
+
+            public void Push(T item)
+            {
+                Add(item);
+            }
+
+            public T Pull()
+            {
+                if (_List.Count == 0)
+                    return default(T);
+
+                T item = _List[0];
+                _List.RemoveAt(0);
+                return item;
+            }
+        }
+
+        #endregion
+
+        #region KeyValuePairList
+
+        public class KeyValuePairList<TKey, TValue> : List<KeyValuePair<TKey, TValue>>
+        {
+            public bool Empty { get { return IsEmpty(); } }
+
+            private bool IsEmpty()
+            {
+                return this.Count == 0;
+            }
+
+            public KeyValuePair<TKey, TValue> Take()
+            {
+                if (this.Count == 0)
+                {
+                    return default(KeyValuePair<TKey, TValue>);
+                }
+                KeyValuePair<TKey, TValue> result = this[0];
+                this.RemoveAt(0);
+                return result;
+            }
+        }
+
+        #endregion
+
+        #region Static utility functions
+
+        #region IsNullOrEmpty
+
+        /// <summary>
+        /// Returns true if array is null or empty.
+        /// </summary>
+        /// <typeparam name="T">Type of element</typeparam>
+        /// <param name="array">Array of elements</param>
+        /// <returns>True if array is null or empty</returns>
+        public static bool IsNullOrEmpty<T>(T[] array)
+        {
+            return null == array || 0 == array.Length;
+        }
+
+        #endregion
+
+        #region GetFirstOrDefault
+
+        public static T GetFirstOrDefault<T>(params T[][] array)
+        {
+            if (array == null || array.Length == 0)
+                return default(T);
+            for (int i = 0; i < array.Length; i++)
+            {
+                T[] sub = array[i];
+                if (sub == null || sub.Length == 0)
+                    continue;
+                return sub[0];
+            }
+            return default(T);
+        }
+
+        #endregion
+
+        #region Compare
+
+        public static int Compare(string[] left, string[] right, bool ignoreCase)
+        {
+            return StringArray.Compare(left, right, ignoreCase);
+        }
+
+        public static int Compare(string[] left, string[] right)
+        {
+            return StringArray.Compare(left, right, false);
+        }
+
+        #endregion
+
+        #region Same
+
+        public static bool Same(string[] left, string[] right, bool ignoreCase)
+        {
+            return 0 == StringArray.Compare(left, right, ignoreCase);
+        }
+
+        public static bool Same(string[] left, string[] right)
+        {
+            return 0 == StringArray.Compare(left, right, false);
+        }
+
+        #endregion
+
+        public static TValue GetDictionaryValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (dictionary.ContainsKey(key))
+                return dictionary[key];
+            else
+                return default(TValue);
+        }
+
+        public static TValue GetStringDictionaryValue<TValue>(Dictionary<string, TValue> dictionary, string key, bool ignoreCase)
+        {
+            if (key == null)
+                return default(TValue);
+            if (dictionary == null || dictionary.Count == 0)
+                return default(TValue);
+            if (ignoreCase)
+            {
+                string[] keys = new string[dictionary.Count];
+                dictionary.Keys.CopyTo(keys, 0);
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    if (0 == string.Compare(keys[i], key, true))
+                        return dictionary[keys[i]];
+                }
+                return default(TValue);
+            }
+            else
+            {
+                if (dictionary.ContainsKey(key))
+                    return dictionary[key];
+                else
+                    return default(TValue);
             }
         }
 

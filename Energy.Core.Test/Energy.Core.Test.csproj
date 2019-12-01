@@ -56,23 +56,37 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Base\ByteArrayBuilder.cs" />
+    <Compile Include="Base\Bit.cs" />
+    <Compile Include="Base\ConnectionString.cs" />
+    <Compile Include="Base\Clock.cs" />
+    <Compile Include="Base\Number.cs" />
+    <Compile Include="Base\Path.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\Class.cs" />
     <Compile Include="Base\Counter.cs" />
     <Compile Include="Base\File.cs" />
     <Compile Include="Base\Hash.cs" />
     <Compile Include="Base\Json.cs" />
+    <Compile Include="Base\Sheet.cs" />
     <Compile Include="Base\Syntax.cs" />
     <Compile Include="Base\Queue.cs" />
+    <Compile Include="Base\Csv.cs" />
     <Compile Include="Base\Url.cs" />
     <Compile Include="Base\Text.cs" />
     <Compile Include="Base\Cast.cs" />
     <Compile Include="Base\Color.cs" />
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Http.cs" />
+    <Compile Include="Base\Xml.cs" />
+    <Compile Include="Core\Worker.cs" />
+    <Compile Include="Core\Program.cs" />
     <Compile Include="Core\Bug.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\Parameter.cs" />
+    <Compile Include="Query\Format.cs" />
+    <Compile Include="Query\Text.cs" />
+    <Compile Include="Query\Type.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Energy.Core\Energy.Core.csproj">

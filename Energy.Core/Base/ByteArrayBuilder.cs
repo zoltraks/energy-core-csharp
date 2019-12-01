@@ -209,6 +209,37 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Append byte array to a stream.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public ByteArrayBuilder Append(byte[] data, int offset, int count)
+        {
+            Tail();
+            if (data == null || data.Length == 0)
+                return this;
+            if (data.Length - offset < count)
+                count = data.Length - offset;
+            if (count <= 0)
+                return this;
+            _Stream.Write(data, offset, count);
+            return this;
+        }
+
+        /// <summary>
+        /// Append byte array to a stream.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public ByteArrayBuilder Append(byte[] data, int count)
+        {
+            return Append(data, 0, count);
+        }
+
+        /// <summary>
         /// Append byte array initialized to value to a stream.
         /// </summary>
         /// <param name="value"></param>
@@ -1116,6 +1147,44 @@ namespace Energy.Base
         public static byte[] SubArray(byte[] array, int start, int count, bool pad)
         {
             return Energy.Base.Collection.Array<byte>.SubArray(array, start, count, pad);
+        }
+
+        #endregion
+
+        #region Concat
+
+        /// <summary>
+        /// Concatenate arrays of byte.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static byte[] Concat(params byte[][] array)
+        {
+            if (array == null)
+                return null;
+            if (array.Length == 0)
+                return new byte[] { };
+            int c = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null)
+                    continue;
+                else
+                    c += array[i].Length;
+            }
+            if (c == 0)
+                return new byte[] { };
+            int p = 0;
+            byte[] b = new byte[c];
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == null || array.Length == 0)
+                    continue;
+                int l = array.Length;
+                Array.Copy(array, 0, b, p, l);
+                p += l;
+            }
+            return b;
         }
 
         #endregion

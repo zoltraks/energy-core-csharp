@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Query
 {
     /// <summary>
-    /// Support for parametrized queries.
+    /// Support class for parametrized queries.
     /// </summary>
     public class Parameter
     {
         #region Bag
 
+        /// <summary>
+        /// Represents list of parameters and their values.
+        /// Use it to define parameters for parametrized query and to parse it.
+        /// </summary>
         public class Bag : List { }
 
         #endregion
@@ -18,7 +23,7 @@ namespace Energy.Query
         #region List
 
         /// <summary>
-        /// Parameter bag.
+        /// Represents list of parameters and their values.
         /// Use it to define parameters for parametrized query and to parse it.
         /// </summary>
         public class List : Energy.Base.Collection.StringDictionary<object>
@@ -27,10 +32,14 @@ namespace Energy.Query
             /// <summary>Format</summary>
             public Energy.Query.Format Format { get { return _Format; } set { _Format = value; } }
 
+            #region Constructor
+
             public List()
             {
                 this.CaseSensitive = false;
             }
+
+            #endregion
 
             /// <summary>
             /// Parameter format dictionary.
@@ -88,8 +97,8 @@ namespace Energy.Query
 
             /// <summary>
             /// Parameter names must be explicit.
-            /// If set to false, parameters with single at sign (@var)
-            /// can be defined in shorter form ("var").
+            /// If set to false, parameters can be added in shorter form 
+            /// without leading @.
             /// </summary>
             public bool Explicit
             {
@@ -125,6 +134,72 @@ namespace Energy.Query
             }
 
             /// <summary>
+            /// Use N prefix for all non empty texts (Unicode).
+            /// </summary>
+            public bool Unicode
+            {
+                get
+                {
+                    return (Option & Option.Unicode) > 0;
+                }
+                set
+                {
+                    if (value)
+                        _Option |= Option.Unicode;
+                    else
+                        _Option &= ~Option.Unicode;
+                }
+            }
+
+            /// <summary>
+            /// Parse unknown parameters as empty texts.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            public bool UnknownAsEmpty
+            {
+                get
+                {
+                    return (_Option & Option.UnknownAsEmpty) > 0;
+                }
+                set
+                {
+                    if (value)
+                    {
+                        _Option |= Option.UnknownAsEmpty;
+                        _Option &= ~Option.UnknownAsNull;
+                    }
+                    else
+                    {
+                        _Option &= ~Option.UnknownAsEmpty;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Parse unknown parameters as NULL.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            public bool UnknownAsNull
+            {
+                get
+                {
+                    return (_Option & Option.UnknownAsNull) > 0;
+                }
+                set
+                {
+                    if (value)
+                    {
+                        _Option |= Option.UnknownAsNull;
+                        _Option &= ~Option.UnknownAsEmpty;
+                    }
+                    else
+                    {
+                        _Option &= ~Option.UnknownAsNull;
+                    }
+                }
+            }
+
+            /// <summary>
             /// Parse parametrized query string.
             /// </summary>
             /// <param name="input"></param>
@@ -133,8 +208,14 @@ namespace Energy.Query
             {
                 if (string.IsNullOrEmpty(input))
                     return input;
-                //Energy.Source.Query.Script dialect = _Dialect ?? Energy.Srouce.Dialect.Default;
-                //Energy.Base.Format.Quote = dialect.Quote;
+
+                bool optionUnicode = this.Unicode;
+                bool optionUnknownAsEmpty = this.UnknownAsEmpty;
+                bool optionUnknownAsNull = this.UnknownAsNull;
+                bool optionNullAsZero = this.NullAsZero;
+
+                bool allowUnknow = optionUnknownAsEmpty || optionUnknownAsNull;
+
                 Energy.Query.Format format = _Format;
                 if (_Format == null)
                     format = Energy.Query.Format.Default;
@@ -142,31 +223,63 @@ namespace Energy.Query
                 foreach (Energy.Base.Bracket.SearchResult _ in Bracket.Search(input))
                 {
                     string variable = _.Value;
-                    if (!this.ContainsKey(variable))
+                    bool found = this.ContainsKey(variable);
+
+                    if (!found)
                     {
-                        if (!Explicit
+                        if (true
+                            && !Explicit
                             && variable.Length > 1
                             && variable.StartsWith("@")
-                            && variable[1] != '@')
+                            && variable[1] != '@'
+                        )
                         {
                             variable = variable.Substring(1);
-                            if (!this.ContainsKey(variable))
-                                continue;
+                            found = this.ContainsKey(variable);
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        if (!allowUnknow)
+                        {
+                            continue;
                         }
                         else
-                            continue;
+                        {
+                            if (variable.StartsWith("@@"))
+                            {
+                                continue;
+                            }
+                        }
                     }
-                    object value = this[variable];
+
+                    object value = null;
+                    Energy.Enumeration.FormatType type;
+                    if (found)
+                    {
+                        value = this[variable];
+                        type = Type[variable];
+                    }
+                    else
+                    {
+                        type = Energy.Enumeration.FormatType.Text;
+                        value = optionUnknownAsEmpty ? "" : null;
+                    }
+
                     string text = null;
-                    switch (Type[variable])
+                    switch (type)
                     {
                         default:
                         case Energy.Enumeration.FormatType.Text:
-                            text = format.Text(value);
+                            if (optionUnicode)
+                                text = format.Unicode(value);
+                            else
+                                text = format.Text(value);
                             break;
 
                         case Energy.Enumeration.FormatType.Number:
-                            text = format.Number(value, !NullAsZero);
+                            text = format.Number(value, !optionNullAsZero);
                             break;
 
                         case Energy.Enumeration.FormatType.Date:
@@ -180,6 +293,10 @@ namespace Energy.Query
                         case Energy.Enumeration.FormatType.Stamp:
                             text = format.Stamp(value);
                             break;
+
+                        case Enumeration.FormatType.Binary:
+                            text = format.Binary(value);
+                            break;
                     }
                     int n = δ + _.Position;
                     string s1 = input.Substring(0, n);
@@ -191,10 +308,15 @@ namespace Energy.Query
                 return input;
             }
 
-            public void Set(string key, string value, Enumeration.FormatType format)
+            public void Set(string key, object value, Enumeration.FormatType format)
             {
                 base.Set(key, value);
                 this.Type[key] = format;
+            }
+
+            public void Set(string key, object value, string format)
+            {
+                Set(key, value, (Enumeration.FormatType)Energy.Base.Cast.StringToEnum(format, typeof(Enumeration.FormatType)));
             }
         }
 
@@ -208,11 +330,93 @@ namespace Energy.Query
         [Flags]
         public enum Option
         {
+            /// <summary>
+            /// Parameters must be explicitly defined.
+            /// </summary>
             Explicit = 1,
 
+            /// <summary>
+            /// Parse null values as numeric zero.
+            /// </summary>
             NullAsZero = 2,
 
-            ZeroAsNull = 4,
+            /// <summary>
+            /// Use N prefix for all non empty texts (Unicode).
+            /// </summary>
+            Unicode = 8,
+
+            /// <summary>
+            /// Parse unknown parameters as empty texts.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            UnknownAsEmpty = 16,
+
+            /// <summary>
+            /// Parse unknown parameters as NULL.
+            /// Does not apply to parameters with names with leading @@ (double at sign).
+            /// </summary>
+            UnknownAsNull = 32,
+        }
+
+        #endregion
+
+        #region Template
+
+        /// <summary>
+        /// Support for query templates.
+        /// </summary>
+        public class Template
+        {
+            #region Static
+
+            /// <summary>
+            /// Convert SQL query template which uses angle brackets
+            /// to parameterized query which uses at sign to define parameters.
+            /// </summary>
+            /// <param name="template"></param>
+            /// <returns></returns>
+            public static string ConvertToParameterizedQuery(string template)
+            {
+                if (string.IsNullOrEmpty(template))
+                    return template;
+
+                StringBuilder sb = new StringBuilder();
+
+                string pattern = @"<([^\r\n,>]+)(?:\s*,\s*[^\r\n\s,>]*)*>";
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(template);
+
+                int p = 0;
+
+                while (match.Success)
+                {
+                    int index = match.Index;
+                    int length = match.Length;
+                    if (index > p)
+                    {
+                        sb.Append(template.Substring(p, index - p));
+                    }
+                    p = index + length;
+                    string variable = match.Groups[1].Value;
+                    if (variable.Length > 0)
+                    {
+                        variable = variable.Trim();
+                        variable = Energy.Base.Text.ReplaceWhitespace(variable, "_");
+                        sb.Append("@");
+                        sb.Append(variable);
+                    }
+                    match = match.NextMatch();
+                }
+
+                if (p < template.Length)
+                {
+                    sb.Append(template.Substring(p));
+                }
+
+                return sb.ToString();
+            }
+
+            #endregion
         }
 
         #endregion

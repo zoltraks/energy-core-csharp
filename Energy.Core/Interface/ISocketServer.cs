@@ -4,12 +4,10 @@ using System.Text;
 
 namespace Energy.Interface
 {
-    public interface ISocketServer: ISocketConnection
+    public interface ISocketServer
     {
-        int Port { get; set; }
+        event Energy.Base.Network.ListenDelegate OnListen;
 
-        bool Listen();
-
-        bool Send(byte[] data);
+        event Energy.Base.Network.AcceptDelegate OnAccept;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -49,6 +51,10 @@ namespace Energy.Core
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
+        private ICommandProgram _CommandProgram;
+
+        public string[] Arguments { get; private set; }
+
         #region Constructor
 
         /// <summary>
@@ -57,6 +63,23 @@ namespace Energy.Core
         public Application()
         {
             // create //
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Application(System.Type type)
+            : base()
+        {
+            // create //
+            if (type == null)
+                return;
+            if (null != Energy.Base.Class.GetClassInterface(type, typeof(Energy.Interface.ICommandProgram)))
+            {
+                Energy.Interface.ICommandProgram app = Activator.CreateInstance(type)
+                    as Energy.Interface.ICommandProgram;
+                this._CommandProgram = app;
+            }
         }
 
         /// <summary>
@@ -99,30 +122,94 @@ namespace Energy.Core
         /// <summary>
         /// Run
         /// </summary>
-        public void Run()
+        public bool Run()
         {
-            throw new NotImplementedException();
+            try
+            {
+                string[] args = this.Arguments;
+                if (_CommandProgram != null)
+                {
+                    return Run(_CommandProgram, args);
+                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write(exception);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Run
+        /// </summary>
+        public bool Run(ICommandProgram commandProgram, string[] args)
+        {
+            try
+            {
+                if (commandProgram != null)
+                {
+                    if (!commandProgram.Setup(args))
+                        return false;
+                    if (!commandProgram.Initialize(args))
+                        return false;
+                    if (!commandProgram.Run(args))
+                        return false;
+                }
+            }
+            catch (Exception fallBackException)
+            {
+                Energy.Core.Log.Default.Write(fallBackException);
+                throw;
+            }
+
+            return true;
         }
 
         #endregion
 
-        #region Static
+        #region Utility
 
-        public static void SetLanguage(string culture)
+        [Obsolete("Use Energy.Core.Program.SetLanguage instead")]
+        public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
             try
             {
-                System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+                System.Globalization.CultureInfo cultureInfo;
+                cultureInfo = new System.Globalization.CultureInfo(culture);
+                System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+                return cultureInfo;
             }
-            catch
-            { }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write(exception);
+                throw;
+            }
         }
 
-        public static void SetDefaultLanguage()
+        [Obsolete("Use Energy.Core.Program.SetLanguage without any parameters instead")]
+        public static System.Globalization.CultureInfo SetDefaultLanguage()
         {
-            SetLanguage("en-US");
+            return SetLanguage("en-US");
         }
 
+        [Obsolete("Use Energy.Core.Program.GetCultureInfo instead")]
+        public static System.Globalization.CultureInfo GetDefaultCultureInfo()
+        {
+            System.Globalization.CultureInfo cultureInfo;
+            try
+            {
+                cultureInfo = new System.Globalization.CultureInfo("en-US");
+                return cultureInfo;
+            }
+            catch (Exception exception)
+            {
+                Energy.Core.Bug.Write("E015", exception);
+                throw;
+            }
+        }
+
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
             try
@@ -138,14 +225,42 @@ namespace Energy.Core
             }
         }
 
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(string encoding)
         {
             SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
+        [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding()
         {
             SetConsoleEncoding(System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Get execution directory from assembly location.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        [Obsolete("Use Energy.Core.Program.GetExecutionDirectory instead")]
+        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        {
+            if (assembly == null)
+                return null;
+            return System.IO.Path.GetDirectoryName(assembly.Location);
+        }
+
+        /// <summary>
+        /// Get execution file directory from current working assembly (calling or executing).
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Use Energy.Core.Program.GetExecutionPath instead")]
+        public static string GetExecutionPath()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            if (null == assembly)
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return System.IO.Path.GetDirectoryName(assembly.Location);
         }
 
         #endregion

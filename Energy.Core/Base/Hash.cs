@@ -5,13 +5,14 @@ using System.Text;
 namespace Energy.Base
 {
     /// <summary>
-    /// Hashing functions for sequences of characters or bytes
+    /// Hashing functions for sequences of characters or bytes.
     /// </summary>
+    // TODO Implement PBKDF2, Bcrypt, HMAC/SHA1 and possibly legacy DES or AES 3
     public class Hash
     {
         /// <summary>
         /// For each characters do a 5-bit left circular shift
-        /// and XOR in character numeric value (CRC variant)
+        /// and XOR in character numeric value (CRC variant).
         /// </summary>
         /// <param name="value"></param>
         /// <returns>32-bit hash value for a string (uint)</returns>
@@ -27,7 +28,7 @@ namespace Energy.Base
 
         /// <summary>
         /// For each characters do a 5-bit left circular shift
-        /// and XOR in character numeric value (CRC variant)
+        /// and XOR in character numeric value (CRC variant).
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -55,7 +56,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// For each characters add character numeric value and left shift by 4 bits (PJW hash)
+        /// For each characters add character numeric value and left shift by 4 bits (PJW hash).
         /// </summary>
         /// <remarks>
         /// Aho, Sethi, and Ullman pp. 434-438
@@ -80,8 +81,10 @@ namespace Energy.Base
             return h;
         }
 
+        #region MD5
+
         /// <summary>
-        /// Return MD5 for a string.
+        /// Return MD5 hash for a string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <param name="encoding">Text encoding</param>
@@ -98,7 +101,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return MD5 for a string.
+        /// Return MD5 hash for UTF-8 string.
         /// </summary>
         /// <param name="text">string</param>
         /// <returns>string</returns>
@@ -107,8 +110,12 @@ namespace Energy.Base
             return MD5(text, Encoding.UTF8);
         }
 
+        #endregion
+
+        #region SHA1
+
         /// <summary>
-        /// Return SHA1 for a string.
+        /// Return SHA-1 hash for a string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <param name="encoding">Text encoding</param>
@@ -125,7 +132,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return SHA1 for a string.
+        /// Return SHA-1 for UTF-8 string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <returns>SHA1 hash in hex format</returns>
@@ -134,8 +141,12 @@ namespace Energy.Base
             return SHA1(text, Encoding.UTF8);
         }
 
+        #endregion
+
+        #region SHA256
+
         /// <summary>
-        /// Return SHA1 for a string.
+        /// Return SHA-256 (SHA-2) for a string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <param name="encoding">Text encoding</param>
@@ -144,15 +155,15 @@ namespace Energy.Base
         {
             if (text == null)
                 return null;
-            using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
+            using (System.Security.Cryptography.SHA256 cipher = System.Security.Cryptography.SHA256.Create())
             {
-                byte[] array = sha256.ComputeHash(encoding.GetBytes(text));
+                byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
                 return Energy.Base.Hex.ByteArrayToHex(array);
             }
         }
 
         /// <summary>
-        /// Return SHA1 for a string.
+        /// Return SHA-256 (SHA-2) for a UTF-8 string.
         /// </summary>
         /// <param name="text">Source text to calculate hash from</param>
         /// <returns>SHA1 hash in hex format</returns>
@@ -160,5 +171,70 @@ namespace Energy.Base
         {
             return SHA256(text, Encoding.UTF8);
         }
+
+        #endregion
+
+        #region SHA384
+
+        /// <summary>
+        /// Return SHA-384 (SHA-2) for a string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <param name="encoding">Text encoding</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA384(string text, Encoding encoding)
+        {
+            if (text == null)
+                return null;
+            using (System.Security.Cryptography.SHA384 cipher = System.Security.Cryptography.SHA384.Create())
+            {
+                byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
+                return Energy.Base.Hex.ByteArrayToHex(array);
+            }
+        }
+
+        /// <summary>
+        /// Return SHA-384 (SHA-2) for UTF-8 string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA384(string text)
+        {
+            return SHA384(text, Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region SHA512
+
+        /// <summary>
+        /// Return SHA-512 (SHA-2) for a string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <param name="encoding">Text encoding</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA512(string text, Encoding encoding)
+        {
+            if (text == null)
+                return null;
+            using (System.Security.Cryptography.SHA512 cipher = System.Security.Cryptography.SHA512.Create())
+            {
+                byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
+                return Energy.Base.Hex.ByteArrayToHex(array);
+            }
+        }
+
+        /// <summary>
+        /// Return SHA-512 (SHA-2) for UTF-8 string.
+        /// </summary>
+        /// <param name="text">Source text to calculate hash from</param>
+        /// <returns>SHA1 hash in hex format</returns>
+        public static string SHA512(string text)
+        {
+            return SHA512(text, Encoding.UTF8);
+        }
+
+        #endregion
+
     }
 }

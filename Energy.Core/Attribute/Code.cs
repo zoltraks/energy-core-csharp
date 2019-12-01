@@ -550,5 +550,139 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        /// <summary>
+        /// Code is just a draft and should yet to be written
+        /// </summary>
+        public class DraftAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public DraftAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code needs to be written
+        /// </summary>
+        public class ImplementAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImplementAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
+        /// Code was abandoned and should be removed
+        /// </summary>
+        public class AbandonedAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public AbandonedAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
+        /// Improve that thing
+        /// </summary>
+        public class ImproveAttribute : CodeAttribute
+        {
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public ImproveAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public ImproveAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public ImproveAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
     }
 }

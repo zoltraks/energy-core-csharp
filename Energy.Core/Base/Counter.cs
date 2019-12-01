@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Base
 {
@@ -9,26 +7,44 @@ namespace Energy.Base
     /// </summary>
     public class Counter
     {
+        #region Lock
+
         private readonly object _Lock = new object();
 
-        private long _Value;
-        /// <summary>Value</summary>
+        #endregion
+
+        #region Property
+
+        private long _Value = 0;
+        /// <summary>Current value</summary>
         public long Value { get { return GetValue(); } set { SetValue(value); } }
 
-        private long _Minimum;
-        /// <summary>Minimum</summary>
+        private long _Minimum = 0;
+        /// <summary>Minimum value</summary>
         public long Minimum { get { return GetMinimum(); } set { SetMinimum(value); } }
 
-        private long _Maximum;
-        /// <summary>Maximum</summary>
-        public long Maximum { get { return GetMaximum(); }  set { SetMaximum(value); } }
+        private long _Maximum = long.MaxValue;
+        /// <summary>Maximum value</summary>
+        public long Maximum { get { return GetMaximum(); } set { SetMaximum(value); } }
 
-        private bool _Overflow;
-        /// <summary>Overflow</summary>
+        private bool _Overflow = false;
+        /// <summary>Overflow flag which will be set if last operation caused overflow</summary>
         public bool Overflow { get { return GetOverflow(); } set { SetOverflow(value); } }
 
-        /// <summary>Value</summary>
+        private bool _Loop = false;
+        /// <summary>
+        /// Loop mode. When this option is set to true, 
+        /// value will be reset on overflow to minimum on increment or maximum on decrement.
+        /// If this option is set to false which is the default, value will stay on maximum or minimum value.
+        /// </summary>
+        public bool Loop { get { return GetLoop(); } set { SetLoop(value); } }
+
+        /// <summary>Absolute value</summary>
         public ulong Absolute { get { return GetAbsolute(); } set { SetAbsolute(value); } }
+
+        #endregion
+
+        #region Constructor
 
         public Counter()
         {
@@ -55,7 +71,11 @@ namespace Energy.Base
             _Value = value;
         }
 
-        public long GetValue()
+        #endregion
+
+        #region Private
+
+        private long GetValue()
         {
             lock (_Lock)
             {
@@ -63,7 +83,7 @@ namespace Energy.Base
             }
         }
 
-        public void SetValue(long value)
+        private void SetValue(long value)
         {
             lock (_Lock)
             {
@@ -71,7 +91,7 @@ namespace Energy.Base
             }
         }
 
-        public ulong GetAbsolute()
+        private ulong GetAbsolute()
         {
             lock (_Lock)
             {
@@ -79,7 +99,7 @@ namespace Energy.Base
             }
         }
 
-        public void SetAbsolute(ulong value)
+        private void SetAbsolute(ulong value)
         {
             lock (_Lock)
             {
@@ -87,7 +107,7 @@ namespace Energy.Base
             }
         }
 
-        public long GetMinimum()
+        private long GetMinimum()
         {
             lock (_Lock)
             {
@@ -95,7 +115,7 @@ namespace Energy.Base
             }
         }
 
-        public void SetMinimum(long value)
+        private void SetMinimum(long value)
         {
             lock (_Lock)
             {
@@ -103,7 +123,7 @@ namespace Energy.Base
             }
         }
 
-        public long GetMaximum()
+        private long GetMaximum()
         {
             lock (_Lock)
             {
@@ -111,7 +131,7 @@ namespace Energy.Base
             }
         }
 
-        public void SetMaximum(long value)
+        private void SetMaximum(long value)
         {
             lock (_Lock)
             {
@@ -119,7 +139,7 @@ namespace Energy.Base
             }
         }
 
-        public bool GetOverflow()
+        private bool GetOverflow()
         {
             lock (_Lock)
             {
@@ -127,7 +147,7 @@ namespace Energy.Base
             }
         }
 
-        public void SetOverflow(bool value)
+        private void SetOverflow(bool value)
         {
             lock (_Lock)
             {
@@ -135,18 +155,39 @@ namespace Energy.Base
             }
         }
 
+        private bool GetLoop()
+        {
+            lock (_Lock)
+            {
+                return _Loop;
+            }
+        }
+
+        private void SetLoop(bool value)
+        {
+            lock (_Lock)
+            {
+                _Loop = value;
+            }
+        }
+
+        #endregion
+
+        #region Reset
+
         /// <summary>
         /// Reset counter with specified value.
         /// </summary>
         /// <remarks>
         /// This is a copy of Reset() to avoid locking object twice.
         /// </remarks>
-        public void Reset(long value)
+        public long Reset(long value)
         {
             lock (_Lock)
             {
                 _Overflow = false;
                 _Value = value;
+                return _Value;
             }
         }
 
@@ -156,17 +197,19 @@ namespace Energy.Base
         /// <remarks>
         /// This is a copy of Reset(T value) to avoid locking object twice.
         /// </remarks>
-        public void Reset()
+        public long Reset()
         {
             lock (_Lock)
             {
                 _Overflow = false;
-                if (_Minimum == default(long))
-                    _Value = 0;
-                else
-                    _Value = (long)_Minimum;
+                _Value = (long)_Minimum;
+                return _Value;
             }
         }
+
+        #endregion
+
+        #region ToString
 
         public override string ToString()
         {
@@ -176,42 +219,126 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region Increment
+
+        /// <summary>
+        /// Increment value.
+        /// </summary>
+        /// <returns></returns>
+        public long Increment()
+        {
+            lock (_Lock)
+            {
+                try
+                {
+                    if (_Value >= _Maximum)
+                    {
+                        _Overflow = true;
+                        if (_Loop)
+                        {
+                            _Value = _Minimum;
+                        }
+                        else
+                        {
+                            _Value = _Maximum;
+                        }
+                        return _Value;
+                    }
+                    if (_Overflow)
+                    {
+                        _Overflow = false;
+                    }
+                    return ++_Value;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    _Value = _Minimum;
+                    return _Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Increment by specified value.
+        /// </summary>
+        /// <param name="by"></param>
+        /// <returns></returns>
+        public long Increment(long by)
+        {
+            if (0 > by)
+            {
+                return Decrement(by);
+            }
+            lock (_Lock)
+            {
+                if (0 == by)
+                {
+                    return _Value;
+                }
+                try
+                {
+                    if (_Maximum - by < _Value)
+                    {
+                        _Overflow = true;
+                        if (_Loop)
+                        {
+                            _Value = _Value- _Maximum + by;
+                        }
+                        else
+                        {
+                            _Value = _Maximum;
+                        }
+                        return _Value;
+                    }
+                    if (_Overflow)
+                    {
+                        _Overflow = false;
+                    }
+                    _Value += by;
+                    return _Value;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    _Value = _Minimum;
+                    return _Value;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Decrement
+
+        /// <summary>
+        /// Decrement value.
+        /// </summary>
+        /// <returns></returns>
         public long Decrement()
         {
             lock (_Lock)
             {
                 try
                 {
-                    if (_Minimum == default(long))
+                    if (_Value <= _Minimum)
                     {
-                        if (_Value == 0)
+                        _Overflow = true;
+                        if (_Loop)
                         {
-                            _Overflow = true;
-                            return _Value;
+                            _Value = _Maximum;
                         }
-                        if (_Value < 0)
+                        else
                         {
-                            _Overflow = true;
-                            _Value = 0;
-                            return _Value;
-                        }
-                    }
-                    else
-                    {
-                        if (_Value == _Minimum)
-                        {
-                            _Overflow = true;
-                            return _Value;
-                        }
-                        if (_Value < _Minimum)
-                        {
-                            _Overflow = true;
                             _Value = _Minimum;
-                            return _Value;
                         }
+                        return _Value;
                     }
-                    _Value--;
-                    return _Value;
+                    if (_Overflow)
+                    {
+                        _Overflow = false;
+                    }
+                    return --_Value;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
@@ -222,40 +349,58 @@ namespace Energy.Base
             }
         }
 
-        public long Increment()
+        /// <summary>
+        /// Decrement value.
+        /// </summary>
+        /// <param name="by"></param>
+        /// <returns></returns>
+        public long Decrement(long by)
         {
+            if (0 > by)
+            {
+                return Increment(by);
+            }
             lock (_Lock)
             {
+                if (0 == by)
+                {
+                    return _Value;
+                }
                 try
                 {
-                    if (_Maximum == 0)
+                    if (_Minimum + by <= _Minimum)
                     {
-                        if (_Value == long.MaxValue)
+                        _Overflow = true;
+                        if (_Loop)
                         {
-                            _Overflow = true;
-                            _Value = _Minimum;
-                            return _Value;
+                            _Value = _Maximum;
                         }
+                        else
+                        {
+                            _Value = _Minimum;
+                        }
+                        return _Value;
                     }
-                    else
+                    if (_Overflow)
                     {
-                        if (_Value == _Maximum)
-                        {
-                            _Overflow = true;
-                            _Value = _Minimum;
-                            return _Value;
-                        }
+                        _Overflow = false;
                     }
-                    _Value++;
-                    return _Value;
+                    return --_Value;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
+                    _Overflow = true;
                     _Value = _Minimum;
                     return _Value;
                 }
             }
         }
+
+        #endregion
+
+        #region Static
+
+        #region Increment
 
         public static long Increment(ref long value)
         {
@@ -281,6 +426,7 @@ namespace Energy.Base
         {
             value = (byte)(value == byte.MaxValue ? 0 : value + 1);
         }
+
         public static void Increment(ref sbyte value)
         {
             value = (sbyte)(value == sbyte.MaxValue ? 0 : value + 1);
@@ -300,5 +446,58 @@ namespace Energy.Base
         {
             return value = value > decimal.MaxValue - 1.0M ? 0 : value + 1.0M;
         }
+
+        #endregion
+
+        #region Decrement
+
+        public static long Decrement(ref long value)
+        {
+            return value = value == long.MinValue ? 0 : value - 1;
+        }
+
+        public static ulong Decrement(ref ulong value)
+        {
+            return value = value == ulong.MinValue ? 0 : value - 1;
+        }
+
+        public static int Decrement(ref int value)
+        {
+            return value = value == int.MinValue ? 0 : value - 1;
+        }
+
+        public static uint Decrement(ref uint value)
+        {
+            return value = value == uint.MinValue ? 0 : value - 1;
+        }
+
+        public static void Decrement(ref byte value)
+        {
+            value = (byte)(value == byte.MinValue ? 0 : value - 1);
+        }
+
+        public static void Decrement(ref sbyte value)
+        {
+            value = (sbyte)(value == sbyte.MinValue ? 0 : value - 1);
+        }
+
+        public static float Decrement(ref float value)
+        {
+            return value = value > float.MinValue + 1 ? 0 : value - 1.0F;
+        }
+
+        public static double Decrement(ref double value)
+        {
+            return value = value > double.MinValue + 1.0 ? 0 : value - 1.0;
+        }
+
+        public static decimal Decrement(ref decimal value)
+        {
+            return value = value > decimal.MinValue + 1.0M ? 0 : value - 1.0M;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

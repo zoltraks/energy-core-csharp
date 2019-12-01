@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -19,12 +18,64 @@ namespace Energy.Base
 
         #endregion
 
+        #region Class
+
+        public class Class
+        {
+            /// <summary>
+            /// Class representing XML TAG line
+            /// </summary>
+            public class XmlTagLine
+            {
+                /// <summary>
+                /// XML Tag Name
+                /// </summary>
+                public string Name { get; set; }
+
+                /// <summary>
+                /// XML Attribute Line (needs to be processed)
+                /// </summary>
+                public string Attribute { get; set; }
+
+                /// <summary>
+                /// XML Tag Index
+                /// </summary>
+                public int Index { get; set; }
+
+                /// <summary>
+                /// XML Tag Length
+                /// </summary>
+                public int Length { get; set; }
+
+                /// <summary>
+                /// XML Tag Ending
+                /// </summary>
+                public string End { get; set; }
+
+                /// <summary>
+                /// Returns true if tag is without any attributes.
+                /// </summary>
+                public bool IsSimple { get { return Energy.Base.Text.IsWhite(this.Attribute); } }
+            }
+        }
+
+        #endregion
+
+        #region Pattern
+
+        public class Pattern
+        {
+            public static string InformalXmlTagLine = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
+        }
+
+        #endregion
+
         #region Serialize
 
         /// <summary>
-        /// Serialize object to XML
+        /// Serialize object to XML.
         /// <para>
-        /// Object class must implement IXmlSerializable interface
+        /// Object class must implement IXmlSerializable interface.
         /// </para>
         /// <code>
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
@@ -41,13 +92,13 @@ namespace Energy.Base
             {
                 lock (_XmlLock)
                 {
-                    XmlRootAttribute xra = new XmlRootAttribute(root);
+                    System.Xml.Serialization.XmlRootAttribute xra = new System.Xml.Serialization.XmlRootAttribute(root);
                     xra.Namespace = space;
-                    XmlSerializer xs = new XmlSerializer(data.GetType(), xra);
+                    System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(data.GetType(), xra);
                     StringBuilder sb = new StringBuilder();
                     XmlWriterSettings xws = new XmlWriterSettings() { OmitXmlDeclaration = true };
                     xws.Indent = true;
-                    XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                    System.Xml.Serialization.XmlSerializerNamespaces ns = new System.Xml.Serialization.XmlSerializerNamespaces();
                     ns.Add("", space);
                     XmlWriter xw = XmlWriter.Create(sb, xws);
                     xs.Serialize(xw, data, ns);
@@ -62,9 +113,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Serialize object to XML
+        /// Serialize object to XML.
         /// <para>
-        /// Object class must implement IXmlSerializable interface
+        /// Object class must implement IXmlSerializable interface.
         /// </para>
         /// <code>
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
@@ -98,7 +149,6 @@ namespace Energy.Base
 
         #region Deserialize
 
-
         /// <summary>
         /// Deserialize object from XML, root alternatives allowed.
         /// </summary>
@@ -115,9 +165,9 @@ namespace Energy.Base
                 {
                     lock (_XmlLock)
                     {
-                        XmlRootAttribute attribute = new XmlRootAttribute(element);
+                        System.Xml.Serialization.XmlRootAttribute attribute = new System.Xml.Serialization.XmlRootAttribute(element);
                         attribute.Namespace = space;
-                        XmlSerializer serializer = new XmlSerializer(type, attribute);
+                        System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(type, attribute);
                         StringReader stream = new StringReader(content);
                         XmlReaderSettings settings = new XmlReaderSettings();
                         settings.CheckCharacters = false;
@@ -131,6 +181,20 @@ namespace Energy.Base
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Deserialize object from XML, root alternatives allowed.
+        /// Generic XML deserialization method.
+        /// </summary>
+        /// <param name="content">string</param>
+        /// <param name="type">System.Type</param>
+        /// <param name="root">string[]</param>
+        /// <param name="space">string</param>
+        /// <returns>object</returns>
+        public static TDeserialize Deserialize<TDeserialize>(string content, Type type, string[] root, string space)
+        {
+            return (TDeserialize)Deserialize(content, typeof(TDeserialize), root, space);
         }
 
         /// <summary>
@@ -159,7 +223,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Deserialize object from XML
+        /// Deserialize object from XML.
         /// </summary>
         /// <param name="content">string</param>
         /// <param name="type">System.Type</param>
@@ -197,8 +261,10 @@ namespace Energy.Base
 
         #endregion
 
+        #region Helper
+
         /// <summary>
-        /// Read XML string element
+        /// Read XML string element.
         /// </summary>
         /// <param name="reader">XmlReader</param>
         public static string ReadXmlString(XmlReader reader)
@@ -207,7 +273,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -221,7 +287,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -237,7 +303,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML string element
+        /// Write XML string element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -256,7 +322,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Write XML element
+        /// Write XML element.
         /// </summary>
         /// <param name="writer">XmlWriter</param>
         /// <param name="key">string</param>
@@ -270,6 +336,10 @@ namespace Energy.Base
             writer.WriteValue(value);
             writer.WriteEndElement();
         }
+
+        #endregion
+
+        #region GetXmlRoot
 
         public static string GetXmlRoot(object _)
         {
@@ -286,8 +356,8 @@ namespace Energy.Base
 
         public static string GetXmlRoot(Type type)
         {
-            XmlRootAttribute xmlRootAttribute = (XmlRootAttribute)
-                Energy.Base.Class.GetClassAttribute(type, typeof(XmlRootAttribute));
+            System.Xml.Serialization.XmlRootAttribute xmlRootAttribute = (System.Xml.Serialization.XmlRootAttribute)
+                Energy.Base.Class.GetClassAttribute(type, typeof(System.Xml.Serialization.XmlRootAttribute));
             if (xmlRootAttribute != null)
                 return xmlRootAttribute.ElementName;
             Energy.Attribute.Data.ElementAttribute attributeElement = (Energy.Attribute.Data.ElementAttribute)
@@ -296,6 +366,38 @@ namespace Energy.Base
                 return attributeElement.Name;
 
             return "";
+        }
+
+        #endregion
+
+        #region Extract
+
+        /// <summary>
+        /// Extract root tag information from XML content.
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static Class.XmlTagLine ExtractRootNodeLine(string xml)
+        {
+            Match m = Regex.Match(xml, Pattern.InformalXmlTagLine, RegexOptions.IgnorePatternWhitespace);
+            while (true)
+            {
+                if (!m.Success)
+                    return null;
+                if (m.Groups["name"].Value.StartsWith("?") || m.Groups["name"].Value.StartsWith("!"))
+                {
+                    m = m.NextMatch();
+                    continue;
+                }
+                return new Class.XmlTagLine()
+                {
+                    Name = m.Groups["name"].Value,
+                    Attribute = m.Groups["attribute"].Value,
+                    Index = m.Index,
+                    Length = m.Length,
+                    End = m.Groups["end"].Value,
+                };
+            }
         }
 
         /// <summary>
@@ -324,5 +426,7 @@ namespace Energy.Base
                 return root;
             return root.Substring(root.LastIndexOf(":") + 1);
         }
+
+        #endregion
     }
 }
