@@ -621,24 +621,49 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(Energy.Base.Collection.Same(expect, result));
         }
 
-//        [TestMethod]
-//        public void TextCut()
-//        {
-//            string text;
-//            string line;
-//            text = @"
-//A + B
-//'
-//This will be multilne,
-//with \'Hello world\'
-//'
-//""
-//Another
-//""
-//";
-//            line = Energy.Base.Text.Cut(text, new string[] { "\r\n", "$" }, new string[] { @"""""", @"'\''" });
-//            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, true, new string[] { @"""""", @"'\''" });
-//        }
+        [TestMethod]
+        public void TextCut()
+        {
+            string text;
+            string line;
+            text = Energy.Base.Text.Cut("|", new string[] { "|" }, null);
+            Assert.AreEqual("|", text);
+            text = Energy.Base.Text.Cut("||", new string[] { "||" }, null);
+            Assert.AreEqual("||", text);
+            text = Energy.Base.Text.Cut("'|'|x", new string[] { "|" }, new string[] { "'" });
+            Assert.AreEqual("'|'|", text);
+            text = Energy.Base.Text.Cut("'''!'''", null, new string[] { "'" });
+            Assert.AreEqual("'''!'''", text);
+            text = Energy.Base.Text.Cut("a|b", new string[] { "|" }, null);
+            Assert.AreEqual("a|", text);
+            text = @"
+A + B
+'
+This will be multilne,
+with \'Hello world\'
+'
+""
+Another
+"" ""x""""y""
+";
+            line = Energy.Base.Text.Cut(text, new string[] { "\r\n", "$" }, new string[] { @"""", @"'\'" });
+            Assert.AreEqual("\r\n", line);
+            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, new string[] { @"""", @"'\'" });
+            Assert.AreEqual("\r\n", line);
+            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, new string[] { @"""", @"'\'" });
+            Assert.AreEqual("A + B\r\n", line);
+            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, new string[] { @"""", @"'\'" });
+            Assert.AreEqual(@"'
+This will be multilne,
+with \'Hello world\'
+'
+", line);
+            line = Energy.Base.Text.Cut(ref text, new string[] { "\r\n", "$" }, new string[] { @"""", @"'\'" });
+            Assert.AreEqual(@"""
+Another
+"" ""x""""y""
+", line);
+        }
 
         [TestMethod]
         public void TextEmptyIfNull()
@@ -646,6 +671,101 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("", Energy.Base.Text.EmptyIfNull(null));
             Assert.AreEqual("", Energy.Base.Text.EmptyIfNull(""));
             Assert.AreEqual("A", Energy.Base.Text.EmptyIfNull("A"));
+        }
+
+        [TestMethod]
+        public void TextQuotation()
+        {
+            Energy.Base.Text.Quotation q;
+            q = Energy.Base.Text.Quotation.From("");
+            Assert.IsNull(q);
+            q = Energy.Base.Text.Quotation.From(null);
+            Assert.IsNull(q);
+            q = Energy.Base.Text.Quotation.From("%");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("%%");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("%%%");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("%+%");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("+%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("<<>>");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("<<", q.Prefix);
+            Assert.AreEqual(">>", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual(">>>>", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("<<->>");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("<<", q.Prefix);
+            Assert.AreEqual(">>", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("->>", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("% %% %");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From(@"% %% \% %");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(2, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            Assert.AreEqual(@"\%", q.Escape[1]);
+            q = Energy.Base.Text.Quotation.From("% %");
+            Assert.IsNotNull(q);
+            Assert.AreEqual("%", q.Prefix);
+            Assert.AreEqual("%", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("%%", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From(" ");
+            Assert.IsNotNull(q);
+            Assert.AreEqual(" ", q.Prefix);
+            Assert.AreEqual(" ", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("  ", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From("  ");
+            Assert.IsNotNull(q);
+            Assert.AreEqual(" ", q.Prefix);
+            Assert.AreEqual(" ", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual("  ", q.Escape[0]);
+            q = Energy.Base.Text.Quotation.From(@" \ ");
+            Assert.IsNotNull(q);
+            Assert.AreEqual(" ", q.Prefix);
+            Assert.AreEqual(" ", q.Suffix);
+            Assert.IsNotNull(q.Escape);
+            Assert.AreEqual(1, q.Escape.Length);
+            Assert.AreEqual(@"\ ", q.Escape[0]);
         }
     }
 }

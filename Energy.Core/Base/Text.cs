@@ -15,7 +15,7 @@ namespace Energy.Base
     /// It was decided to keep it as it is while recommending using full class names 
     /// in *using* list and synonyms as well.
     /// </remarks>
-    public class Text
+    public static class Text
     {
         #region Constants
 
@@ -74,6 +74,12 @@ namespace Energy.Base
 
         #endregion
 
+        #region Private
+
+        private static Dictionary<Class.ControlStringOptions, string> _ControlStringExpressionCache;
+
+        #endregion
+
         #region Class
 
         public class Class
@@ -108,6 +114,140 @@ namespace Energy.Base
                 /// Include not recognised sequences in resulting text (not likely useful).
                 /// </summary>
                 public bool IncludeUnknown;
+            }
+        }
+
+        #endregion
+
+        #region Quotation
+
+        /// <summary>
+        /// Quotation definition
+        /// </summary>
+        public class Quotation
+        {
+            /// <summary>
+            /// Quotation prefix
+            /// </summary>
+            public string Prefix;
+
+            /// <summary>
+            /// Quotation suffix
+            /// </summary>
+            public string Suffix;
+
+            /// <summary>
+            /// Possible special character sequences that 
+            /// allows to use suffix or other characters inside quoted text
+            /// </summary>
+            public string[] Escape;
+
+            /// <summary>
+            /// Create quotation definition object from a string. If string is null or empty, null will be returned.
+            /// <br/><br/>
+            /// If string contains only 1 character, it would be treated as prefix and suffix character,
+            /// double suffix character will be used as escape sequence.
+            /// If definition contains spaces but not starts with, it will be splited by it. 
+            /// First element of such array will be used as prefix, last one as suffix,
+            /// and all elements between them will be treated as escape sequences.
+            /// If the number of characters is even, first half will be treated as prefix, second as suffix,
+            /// double suffix will be treated as escape sequence.
+            /// If the number of characters is odd, middle character will be treated as escape character for
+            /// suffix sequence of characters. It's common to use backslash there.
+            /// <br/><br/>
+            /// Examples: 
+            /// <br/>
+            /// "'" (apostrophe will be used as prefix and suffix, double apostrophes are allowed),
+            /// <br/>
+            /// "$%" (dollar will be used as prefix and percentage as suffix, double percentages are allowed),
+            /// <br/>
+            /// "[[]]" ([[ will be used as prefix and ]] as suffix, ]]]] will be treated as ]]),
+            /// <br/>
+            /// "%/%" (percentage will be used as prefix and suffix, / will be treated as escape character, so /% sequence is allowed).
+            /// </summary>
+            /// <param name="definition"></param>
+            /// <returns></returns>
+            public static Quotation From(string definition)
+            {
+                if (string.IsNullOrEmpty(definition))
+                {
+                    return null;
+                }
+                Quotation o = new Quotation();
+                if (1 == definition.Length)
+                {
+                    o.Prefix = definition;
+                    o.Suffix = definition;
+                    o.Escape = new string[] { definition + definition };
+                }
+                else if (0 < definition.IndexOf(' '))
+                {
+                    string[] a = definition.Split(' ');
+                    switch (a.Length)
+                    {
+                        case 1:                            
+                            o.Prefix = a[0];
+                            o.Suffix = a[0];
+                            o.Escape = new string[] { a[0] + a[0] };
+                            break;
+                        case 2:
+                            o.Prefix = a[0];
+                            o.Suffix = a[1];
+                            o.Escape = new string[] { a[1] + a[1] };
+                            break;
+                        default:
+                            o.Prefix = a[0];
+                            o.Suffix = a[a.Length - 1];
+                            List<string> l = new List<string>();
+                            for (int i = 1; i < a.Length - 1; i++)
+                            {
+                                l.Add(a[i]);
+                            }
+                            o.Escape = l.ToArray();
+                            break;
+                    }
+                }
+                else if (0 == definition.Length % 2)
+                {
+                    int h = definition.Length / 2;
+                    string suffix = definition.Substring(h, h);
+                    o.Prefix = definition.Substring(0, h);
+                    o.Suffix = suffix;
+                    o.Escape = new string[] { suffix + suffix };
+                }
+                else
+                {
+                    int h = definition.Length / 2;
+                    string suffix = definition.Substring(h + 1, h);
+                    o.Prefix = definition.Substring(0, h);
+                    o.Suffix = suffix;
+                    o.Escape = new string[] { definition.Substring(h, 1) + suffix };
+                }
+                return o;
+            }
+
+            public override string ToString()
+            {
+                List<string> l = new List<string>();
+                if (null != Prefix)
+                {
+                    l.Add(Prefix);
+                }
+                if (null != Escape)
+                {
+                    for (int i = 0; i < Escape.Length; i++)
+                    {
+                        if (!string.IsNullOrEmpty(Escape[i]))
+                        {
+                            l.Add(Escape[i]);
+                        }
+                    }
+                }
+                if (null != Suffix)
+                {
+                    l.Add(Suffix);
+                }
+                return string.Join(" ", l.ToArray());
             }
         }
 
@@ -274,7 +414,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region
+        #region Trim
 
         /// <summary>
         /// Remove leading and trailing whitespace.
@@ -1915,6 +2055,10 @@ namespace Energy.Base
             return Chop<object>(ref array);
         }
 
+        #endregion
+
+        #region GetElementOrEmpty
+
         /// <summary>
         /// Get element from array if exists or empty if not.
         /// </summary>
@@ -1958,9 +2102,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region DecodeControlString
-
-        private static Dictionary<Class.ControlStringOptions, string> _ControlStringExpressionCache;
+        #region GetControlStringPattern
 
         public static string GetControlStringPattern(Class.ControlStringOptions options)
         {
@@ -2102,6 +2244,10 @@ namespace Energy.Base
 
             return expression;
         }
+
+        #endregion
+
+        #region DecodeControlString
 
         /// <summary>
         /// Decode control string, like "'Hello'#13#10".
@@ -3655,6 +3801,165 @@ namespace Energy.Base
         public static string EmptyIfNull(string value)
         {
             return value == null ? "" : value;
+        }
+
+        #endregion
+
+        #region Cut
+
+        /// <summary>
+        /// Return part of text which ends with one of ending sequences, supporting optional quotations.
+        /// <br/><br/>
+        /// If text contains part in quotes, it will be included as is, together with quotation characters until ending sequence is found.
+        /// <br/><br/>
+        /// When cutting text "a$b$Hello '$'$d" by dollar sign ($) as ending and apostrophes (') as quotations
+        /// text will be cutted in following pieces: "a", "b", "Hello '$'", "d".
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="terminator">
+        /// Array of possible ending sequences.
+        /// </param>
+        /// <param name="quotation">
+        /// Array of possible quotations, written in the form used by Energy.Base.Text.Quotation.From (see documentation for more information).
+        /// <br/><br/>
+        /// Examples: "'", "''", @"'\'", @"' '' \' '", "[]", "%". 
+        /// </param>
+        /// <returns></returns>
+        public static string Cut(string text, string[] terminator, string[] quotation)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (null == terminator || 0 == terminator.Length)
+            {
+                return text;
+            }
+            List<Quotation> list = new List<Quotation>();
+            if (null != quotation)
+            {
+                for (int i = 0; i < quotation.Length; i++)
+                {
+                    Quotation e = Quotation.From(quotation[i]);
+                    if (null != e)
+                    {
+                        list.Add(e);
+                    }
+                }
+            }
+            int q = -1;
+            int l = text.Length;
+            for (int i = 0; i < l; i++)
+            {
+                // check for quotation
+                if (0 > q)
+                {
+                    if (0 < list.Count)
+                    {
+                        for (int n = 0; n < list.Count; n++)
+                        {
+                            string e = list[n].Prefix;
+                            if (e.Length >= l - i)
+                            {
+                                continue;
+                            }
+                            if (0 == string.Compare(e, text.Substring(i, e.Length)))
+                            {
+                                q = n; // in quotes => set q to quotation
+                                i += -1 + e.Length;
+                                break;
+                            }
+                        }
+                    }
+                    if (0 <= q)
+                    {
+                        continue;
+                    }
+                }
+
+                // check for escape in quotation
+                if (0 <= q)
+                {
+                    bool b = false;
+                    string[] x = list[q].Escape;
+                    if (null != x || 0 < x.Length)
+                    {
+                        for (int n = 0; n < x.Length; n++)
+                        {
+                            string e = list[q].Escape[n];
+                            if (string.IsNullOrEmpty(e))
+                            {
+                                continue;
+                            }
+                            if (e.Length < l - i && 0 == string.Compare(e, text.Substring(i, e.Length)))
+                            {
+                                i += -1 + e.Length;
+                                b = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (b)
+                    {
+                        continue;
+                    }
+                }
+
+                // check for end of quotation
+                if (0 <= q)
+                {
+                    string e = list[q].Suffix;
+                    if (!string.IsNullOrEmpty(e))
+                    {
+                        if (e.Length < l - i && 0 == string.Compare(e, text.Substring(i, e.Length)))
+                        {
+                            q = -1;
+                            i += -1 + e.Length;
+                            //b = true;
+                            //break;
+                        }
+                    }
+                    continue;
+                }
+
+                // check for ending mark
+                for (int m = 0; m < terminator.Length; m++)
+                {
+                    string e = terminator[m];
+                    if (e.Length < l - i && 0 == string.Compare(e, text.Substring(i, e.Length)))
+                    {
+                        string r = text.Substring(0, i + e.Length);
+                        return r;
+                    }
+                }
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Cut part of text which ends with one of ending sequences, supporting optional quotations.
+        /// <br/><br/>
+        /// If text contains part in quotes, it will be included as is, together with quotation characters until ending sequence is found.
+        /// <br/><br/>
+        /// When cutting text "a$b$Hello '$'$d" by dollar sign ($) as ending and apostrophes (') as quotations
+        /// text will be cutted in following pieces: "a", "b", "Hello '$'", "d".
+        /// <br/><br/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="terminator">
+        /// Array of possible ending sequences.
+        /// </param>
+        /// <param name="quotation">
+        /// Array of possible quotations, written in the form used by Energy.Base.Text.Quotation.From (see documentation for more information).
+        /// <br/><br/>
+        /// Examples: "'", "''", @"'\'", @"' '' \' '", "[]", "%". 
+        /// </param>
+        /// <returns></returns>
+        public static string Cut(ref string text, string[] terminator, string[] quotation)
+        {
+            string cut = Cut(text, terminator, quotation);
+            text = text.Substring(cut.Length);
+            return cut;
         }
 
         #endregion
