@@ -3800,7 +3800,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string EmptyIfNull(string value)
         {
-            return value == null ? "" : value;
+            return value != null ? value : "";
         }
 
         #endregion
