@@ -131,12 +131,12 @@ namespace Energy.Source
         /// </summary>
         public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
 
-        private Energy.Core.Log.Logger _Logger;
+        private Energy.Interface.ILogger _Logger;
 
         /// <summary>
         /// Log
         /// </summary>
-        public Energy.Core.Log.Logger Logger { get { lock (_Lock) return _Logger; } set { lock (_Lock) _Logger = value; } }
+        public Energy.Interface.ILogger Logger { get { lock (_Lock) return _Logger; } set { lock (_Lock) _Logger = value; } }
 
         private Energy.Interface.IDialect _Dialect;
 
@@ -226,13 +226,19 @@ namespace Energy.Source
         private void SetVendor(Type vendor)
         {
             if (vendor == null)
+            {
                 throw new ArgumentNullException();
+            }
             if (!typeof(IDbConnection).IsAssignableFrom(vendor))
+            {
                 throw new Exception("Vendor must implement IDbConnection interface");
+            }
             lock (_Lock)
             {
                 if (vendor == _Vendor)
+                {
                     return;
+                }
                 Close();
                 _Vendor = vendor;
             }
@@ -406,7 +412,9 @@ namespace Energy.Source
         {
             int number = ErrorNumber;
             if (number == 0)
+            {
                 return -1;
+            }
             return number > 0 ? -number : number;
         }
 
@@ -417,10 +425,17 @@ namespace Energy.Source
         public string GetErrorText()
         {
             List<string> list = new List<string>();
-            if (ErrorNumber != 0)
-                list.Add(ErrorNumber.ToString());
-            if (!string.IsNullOrEmpty(ErrorMessage))
-                list.Add(Regex.Replace(ErrorMessage, @"(\r\n|\n|\r)+", " "));
+            lock (_Lock)
+            {
+                if (_ErrorNumber != 0)
+                {
+                    list.Add(_ErrorNumber.ToString());
+                }
+                if (!string.IsNullOrEmpty(_ErrorMessage))
+                {
+                    list.Add(Regex.Replace(_ErrorMessage, @"(\r\n|\n|\r)+", " "));
+                }
+            }
             return string.Join(" ", list.ToArray());
         }
 
@@ -575,7 +590,9 @@ namespace Energy.Source
             lock (_Lock)
             {
                 if (_Connection == null)
+                {
                     return;
+                }
                 try
                 {
                     _Connection.Close();
@@ -584,13 +601,6 @@ namespace Energy.Source
                 {
                     SetError(x);
                     (Logger ?? Energy.Core.Log.Default).Write(x);
-                }
-                try
-                {
-                    _Connection.Close();
-                }
-                catch
-                {
                     Energy.Core.Bug.Write("Exception during connection Close...");
                 }
                 try
@@ -697,7 +707,7 @@ namespace Energy.Source
 
             string message = exception.Message;
 
-            (Logger ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
+            (Logger ?? Core.Log.Default).Add(result.ToString(), (int)Energy.Enumeration.LogLevel.Trace);
 
             // Reaction
 
@@ -860,7 +870,9 @@ namespace Energy.Source
                 if (Persistent)
                 {
                     if (!Active && Open() == null)
+                    {
                         return null;
+                    }
                     try
                     {
                         lock (_Lock)
@@ -872,7 +884,9 @@ namespace Energy.Source
                     {
                         SetError(x);
                         if (!Catch(x))
+                        {
                             return null;
+                        }
                     }
                 }
                 else
@@ -880,7 +894,9 @@ namespace Energy.Source
                     using (IDbConnection connection = Open())
                     {
                         if (connection == null)
+                        {
                             return null;
+                        }
                         try
                         {
                             return Load(connection, query);
@@ -889,7 +905,9 @@ namespace Energy.Source
                         {
                             SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                 }
@@ -914,15 +932,17 @@ namespace Energy.Source
 
                 try
                 {
-                    reader.GetSchemaTable();
+                    schema = reader.GetSchemaTable();
                 }
-                catch (Exception eSchema)
+                catch (Exception x)
                 {
-                    Energy.Core.Bug.Write(eSchema);
+                    Energy.Core.Bug.Write(x);
                 }
 
                 if (schema == null)
+                {
                     return null;
+                }
 
                 DataTable table = new DataTable();
 
@@ -951,6 +971,7 @@ namespace Energy.Source
                 }
 
                 command.Cancel();
+
                 reader.Close();
 
                 return table;
@@ -988,7 +1009,9 @@ namespace Energy.Source
                     if (Persistent)
                     {
                         if (!Active && Open() == null)
+                        {
                             return null;
+                        }
                         try
                         {
                             lock (_Lock)
@@ -1000,7 +1023,9 @@ namespace Energy.Source
                         {
                             SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                     else
@@ -1008,7 +1033,9 @@ namespace Energy.Source
                         using (IDbConnection connection = Open())
                         {
                             if (connection == null)
+                            {
                                 return null;
+                            }
                             try
                             {
                                 return Read(connection, query);
@@ -1017,18 +1044,26 @@ namespace Energy.Source
                             {
                                 SetError(x);
                                 if (!Catch(x))
+                                {
                                     return null;
+                                }
                             }
                         }
                     }
                     repeat++;
                 }
             }
+            catch (Exception x)
+            {
+                SetError(x);
+            }
             finally
             {
                 if (repeat > 0)
                 {
-                    Energy.Core.Bug.Write("C084", "Command repeated in Read");
+                    Energy.Core.Bug.Write("Energy.Source.Connection.Read"
+                        , string.Format("Command repeat ({0})", repeat)
+                        );
                 }
             }
             return null;
@@ -1038,6 +1073,7 @@ namespace Energy.Source
 
         #region Prepare
 
+        // TODO Add exception handling and guardian checks
         public IDbCommand Prepare(IDbConnection connection, string query)
         {
             IDbCommand command = connection.CreateCommand();
@@ -1129,6 +1165,18 @@ namespace Energy.Source
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
             Close();
         }
 

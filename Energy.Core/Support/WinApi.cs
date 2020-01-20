@@ -9,9 +9,10 @@ namespace Energy.Support
     public class WinApi
     {
         [DllImport("kernel32.dll")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
         public static extern IntPtr OpenProcess(uint processAccess, bool bInheritHandle, int processId);
 
-        [DllImport("psapi.dll")]
+        [DllImport("psapi.dll", CharSet = CharSet.Unicode)]
         static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, [Out] StringBuilder lpBaseName, [In] [MarshalAs(UnmanagedType.U4)] int nSize);
 
         [DllImport("kernel32.dll", SetLastError = true)]

@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Energy.Source
 {
-    public class Context
+    [Energy.Attribute.Code.Rename("Name Energy.Source.Context should represent context class for database operations")]
+    [Energy.Attribute.Code.Misplaced("Move to Energy.Source package or rename it")]
+    internal class Context
     {
         public Energy.Source.Connection Connection { get; set; }
 

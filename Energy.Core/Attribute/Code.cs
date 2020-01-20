@@ -534,6 +534,15 @@ namespace Energy.Attribute
             /// <summary>
             /// Constructor
             /// </summary>
+            public RenameAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
             public RenameAttribute(string target, string description)
                 : this()
             {

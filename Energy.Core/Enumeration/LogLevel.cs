@@ -8,10 +8,10 @@ namespace Energy.Enumeration
     /// Style of representing severity level of log messages
     /// </summary>
     /// <remarks>
-    /// Log level is also a number 0-9 which represents severity of messages.
-    /// Lower numbers are more important and higher less and default is 5.
+    /// Severity is also a number between 0 and 90 which represents level of messages.
+    /// Lower numbers are more important and higher less and default is 50.
     /// 
-    /// Three levels may be found useful oftenly:
+    /// Three basic levels are:
     /// 
     /// Energy.Enumeration.LogLevel.Message which is default
     /// Energy.Enumeration.LogLevel.Error for normal errors
@@ -31,83 +31,93 @@ namespace Energy.Enumeration
         None = 0,
 
         /// <summary>
-        /// Stop / Critical
+        /// Critical error, can't continue
         /// </summary>
-        Stop = 1,
+        Critical = 10,
+
+        /// <summary>
+        /// Execution stopped
+        /// </summary>
+        Stop = 15,
+
+        /// <summary>
+        /// Very serious error
+        /// </summary>
+        Fatal = 20,
 
         /// <summary>
         /// Alert / Fatal
         /// </summary>
-        Alert = 2,
+        Alert = 25,
 
         /// <summary>
         /// Error
         /// </summary>
-        Error = 3,
+        Error = 30,
 
         /// <summary>
         /// Warning
         /// </summary>
-        Warning = 4,
+        Warning = 40,
 
         /// <summary>
-        /// Message / Default
+        /// Normal message
         /// </summary>
-        Message = 5,
+        Message = 50,
 
         /// <summary>
-        /// Information
+        /// Information message
         /// </summary>
-        Information = 6,
+        Information = 60,
 
         /// <summary>
-        /// Verbose
+        /// Be more verbose.
         /// </summary>
         /// <remarks>
-        /// Be more verbose.
         /// This level may include program execution details for advanced monitoring.
         /// </remarks>
-        Verbose = 7,
+        Verbose = 70,
 
         /// <summary>
-        /// Trace
+        /// Debugging information
         /// </summary>
         /// <remarks>
-        /// Additional messages for tracing program execution.
+        /// For debugging purposes.
         /// </remarks>
-        Trace = 8,
+        Bug = 80,
 
         /// <summary>
-        /// Bug
+        /// Very detailed information
         /// </summary>
         /// <remarks>
         /// Maximum possible level intended for diagnostic messages.
-        /// For debugging purposes.
+        /// Additional messages for tracing program execution.
+        /// For development purposes.
         /// </remarks>
-        Bug = 9,
+        Trace = 90,
 
         /// <summary>
-        /// Critical / Stop
+        /// Alias for Information
         /// </summary>
-        Critical = Stop,
+        Info = Information,
 
         /// <summary>
-        /// Fatal / Alert
+        /// Alias for Warning
         /// </summary>
-        Fatal = Alert,
+        Warn = Warning,
 
         /// <summary>
-        /// Very important severity
+        /// OMG
         /// </summary>
         OMG = Alert,
 
         /// <summary>
-        /// Less important message severity
+        /// LOL
         /// </summary>
         LOL = Verbose,
 
         /// <summary>
-        /// Warning about something should not happened
+        /// WTF
         /// </summary>
         WTF = Error,
 
@@ -119,6 +129,6 @@ namespace Energy.Enumeration
         /// <summary>
         /// Additional commentary
         /// </summary>
-        NVM = Trace,        
+        NVM = Trace,
     }
 }

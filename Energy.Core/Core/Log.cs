@@ -57,7 +57,7 @@ namespace Energy.Core
         /// <summary>
         /// Logger
         /// </summary>
-        public class Logger
+        public class Logger: Energy.Interface.ILogger
         {
             #region Destination
 
@@ -188,7 +188,9 @@ namespace Energy.Core
                 lock (FlushLock)
                 {
                     if (OnFlush != null)
+                    {
                         OnFlush(this, null);
+                    }
                     Save();
                     Clean();
                 }
@@ -263,26 +265,31 @@ namespace Energy.Core
                 return Add(new Energy.Base.Log.Entry(exception));
             }
 
+            /// <summary>
+            /// Add message to log
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
             public Energy.Base.Log.Entry Add(string message, Energy.Enumeration.LogLevel level)
             {
-                Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry(message, level);
-                this.Add(entry);
-                return entry;
+                return Add(new Energy.Base.Log.Entry(message, level));
+            }
+
+            /// <summary>
+            /// Add message to log
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Add(string message, int level)
+            {
+                return Add(new Energy.Base.Log.Entry(message, level));
             }
 
             #endregion
 
             #region Write
-
-            /// <summary>
-            /// Write exception
-            /// </summary>
-            /// <param name="exception"></param>
-            /// <returns></returns>
-            public Energy.Base.Log.Entry Write(Exception exception)
-            {
-                return Write(Add(exception));
-            }
 
             public Energy.Base.Log.Entry Write(Energy.Base.Log.Entry entry)
             {
@@ -291,11 +298,17 @@ namespace Energy.Core
                 {
                     Energy.Base.Log.Target target = Destination[i];
                     if (!target.Enable)
+                    {
                         continue;
+                    }
                     if (!target.Immediate)
+                    {
                         continue;
+                    }
                     if (entry.Store.Contains(target))
+                    {
                         continue;
+                    }
                     if (target.Accept(entry))
                     {
                         target.Write(entry);
@@ -308,31 +321,119 @@ namespace Energy.Core
                 return entry;
             }
 
+            /// <summary>
+            /// Write exception
+            /// </summary>
+            /// <param name="exception"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(Exception exception)
+            {
+                return Write(new Energy.Base.Log.Entry(exception, Energy.Enumeration.LogLevel.Error));
+            }
+
+            /// <summary>
+            /// Write exception with source or category name
+            /// </summary>
+            /// <param name="exception"></param>
+            /// <param name="source"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(Exception exception, string source)
+            {
+                return Write(new Energy.Base.Log.Entry(exception, source, Enumeration.LogLevel.Error));
+            }
+
+            /// <summary>
+            /// Write message with severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
             public Energy.Base.Log.Entry Write(string message, Energy.Enumeration.LogLevel level)
             {
-                return Write(Add(message, level));
+                return Write(new Energy.Base.Log.Entry(message, level));
             }
 
+            /// <summary>
+            /// Write message with severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, int level)
+            {
+                return Write(new Energy.Base.Log.Entry(message, level));
+            }
+
+            /// <summary>
+            /// Write message with source or category name and severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="source"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, string source, Energy.Enumeration.LogLevel level)
+            {
+                return Write(new Energy.Base.Log.Entry(message, source, level));
+            }
+
+            /// <summary>
+            /// Write message with source or category name and severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="source"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, string source, int level)
+            {
+                return Write(new Energy.Base.Log.Entry(message, source, level));
+            }
+
+            /// <summary>
+            /// Write message
+            /// </summary>
+            /// <param name="message"></param>
+            /// <returns></returns>
             public Energy.Base.Log.Entry Write(string message)
             {
-                return Write(Add(message, Energy.Enumeration.LogLevel.Default));
+                return Write(new Energy.Base.Log.Entry(message));
             }
 
-            public Energy.Base.Log.Entry Write(string message, string source, long code)
+            /// <summary>
+            /// Write message with source or category name and optional code
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="source"></param>
+            /// <param name="code"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, string source, string code)
             {
-                return Write(message, source, code, Energy.Enumeration.LogLevel.Default);
+                return Write(new Energy.Base.Log.Entry(message, source, code, Energy.Enumeration.LogLevel.Default));
             }
 
-            public Energy.Base.Log.Entry Write(string message, string source, long code, Energy.Enumeration.LogLevel level)
+            /// <summary>
+            /// Write message with source or category name and optional code and severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="source"></param>
+            /// <param name="code"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, string source, string code, Energy.Enumeration.LogLevel level)
             {
-                Energy.Base.Log.Entry entry = new Energy.Base.Log.Entry()
-                {
-                    Message = message,
-                    Source = source,
-                    Code = code,
-                    Level = level,
-                };
-                return Write(entry);
+                return Write(new Energy.Base.Log.Entry(message, source, code, (int)level));
+            }
+
+            /// <summary>
+            /// Write message with source or category name and optional code and severity level
+            /// </summary>
+            /// <param name="message"></param>
+            /// <param name="source"></param>
+            /// <param name="code"></param>
+            /// <param name="level"></param>
+            /// <returns></returns>
+            public Energy.Base.Log.Entry Write(string message, string source, string code, int level)
+            {
+                return Write(new Energy.Base.Log.Entry(message, source, code, level));
             }
 
             #endregion
@@ -755,7 +856,9 @@ namespace Energy.Core
                             {
                                 if (DateTime.Now - GetLastWriteStamp() > _InactivityLimit)
                                 {
-                                    Energy.Core.Bug.Write("E8003", "Console Log Inactivity");
+                                    Energy.Core.Bug.Write("Energy.Core.Log.Target.Console.WriteThread"
+                                        , "Console Log Inactivity"
+                                        );
                                     break;
                                 }
                             }
