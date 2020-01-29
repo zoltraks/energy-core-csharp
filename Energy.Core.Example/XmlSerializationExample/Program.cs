@@ -31,7 +31,9 @@ namespace XmlSerializationExample
             Console.WriteLine(Energy.Base.Xml.Serialize(s));
             Console.WriteLine();
 
+            Test test = new Test();
 
+            test.SerializeDataTable();
 
             Console.ReadLine();
         }
