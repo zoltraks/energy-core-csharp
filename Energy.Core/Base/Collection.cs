@@ -1662,40 +1662,27 @@ namespace Energy.Base
             {
             }
 
-            public class Row<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Row
-            {
-            }
-        }
 
-        public class Table<TValue> : Table<object, TValue>
-        {
+            #region Row
 
-        }
+            //public class Row<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Row
+            //{
+            //}
 
-        public class Table<TKey, TValue> : Energy.Interface.ITable<TKey, TValue>
-            , IList<Energy.Interface.IRow<TKey, TValue>>
-        {
-            public class Column : Energy.Interface.IColumn<TKey, TValue>
-            {
-                public string Name { get; set; }
-
-                public int Index { get; set; }
-            }
-
-            public class Row : Energy.Interface.IRow<TKey, TValue>
+            public class Row<TKey, TValue> : Energy.Interface.IRow<TKey, TValue>
             {
                 private IList<TValue> _List = new List<TValue>();
 
                 private IDictionary<TKey, int> _Index = new Dictionary<TKey, int>();
 
                 public TValue this[TKey key]
-                { 
-                    get => Get(key); 
-                    set => Set(key, value); 
+                {
+                    get => Get(key);
+                    set => Set(key, value);
                 }
 
                 public TValue this[int index]
-                { 
+                {
                     get => Get(index);
                     set => Set(index, value);
                 }
@@ -1735,7 +1722,7 @@ namespace Energy.Base
                 {
                     int index = _List.Count;
                     _List.Add(value);
-                    _Index.Add(key, index);
+                    _Index[key] = index;
                     return this;
                 }
 
@@ -1764,6 +1751,38 @@ namespace Energy.Base
                     }
                     return this;
                 }
+
+                public override string ToString()
+                {
+                    List<string> l = new List<string>();
+                    foreach (TKey key in _Index.Keys)
+                    {
+                        TValue value = _List[_Index[key]];
+                        string k = Energy.Base.Text.AddSlashes(Energy.Base.Cast.ObjectToString(key));
+                        string v = Energy.Base.Text.AddSlashes(Energy.Base.Cast.ObjectToString(value));
+                        l.Add("\"" + k + "\": \"" + v + "\"");
+                    }
+                    string r = string.Join(", ", l.ToArray());
+                    return r;
+                }
+            }
+
+            #endregion
+        }
+
+        public class Table<TValue> : Table<object, TValue>
+        {
+
+        }
+
+        public class Table<TKey, TValue> : Energy.Interface.ITable<TKey, TValue>
+            , IList<Energy.Interface.IRow<TKey, TValue>>
+        {
+            public class Column : Energy.Interface.IColumn<TKey, TValue>
+            {
+                public string Name { get; set; }
+
+                public int Index { get; set; }
             }
 
             private IList<Energy.Interface.IRow<TKey, TValue>> _Rows = new List<Energy.Interface.IRow<TKey, TValue>>();
@@ -1850,7 +1869,8 @@ namespace Energy.Base
 
             public Energy.Interface.IRow<TKey, TValue> New()
             {
-                Energy.Interface.IRow<TKey, TValue> o = new Row();
+                Energy.Interface.IRow<TKey, TValue> o;
+                o = new Energy.Base.Collection.Table.Row<TKey, TValue>();
                 _Rows.Add(o);
                 return o;
             }

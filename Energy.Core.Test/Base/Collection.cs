@@ -225,6 +225,9 @@ namespace Energy.Core.Test.Base
             var r1 = t.New();
             r1["a"] = "b";
             r1[0] = "x";
+            r1["b"] = "c";
+            r1.Append("", "X");
+            r1.Append("", "Y");
             //r1.Add("x");
             //var v1 = r1.New();
             //v1 = "A";
