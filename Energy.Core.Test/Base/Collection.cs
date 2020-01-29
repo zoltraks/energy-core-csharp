@@ -217,5 +217,27 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Collection.StringArray.Exclude(array, exclude, true);
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
         }
+
+        [TestMethod]
+        public void TableCreation()
+        {
+            Energy.Base.Collection.Table<string, object> t = new Energy.Base.Collection.Table<string, object>();
+            var r1 = t.New();
+            r1["a"] = "b";
+            r1[0] = "x";
+            //r1.Add("x");
+            //var v1 = r1.New();
+            //v1 = "A";
+            var v2 = r1[0];
+            r1[0] = "B";
+            var v3 = r1[0];
+            bool eq1 = //v1 == v2 && 
+                v2 == v3;
+            Assert.IsTrue(eq1);
+            var r2 = t.New();
+            Assert.IsNotNull(t);
+            Assert.IsNotNull(r1);
+            Assert.IsNotNull(r2);
+        }
     }
 }

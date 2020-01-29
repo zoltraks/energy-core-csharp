@@ -23,6 +23,7 @@ namespace NLogFileUsage
             l.Clean();
             Energy.Core.Log.Target.Console.Default.Immediate = true;
             l.Write((Energy.Base.Log.Entry)"Next message");
+
             l.Flush();
             Console.ReadLine();
         }

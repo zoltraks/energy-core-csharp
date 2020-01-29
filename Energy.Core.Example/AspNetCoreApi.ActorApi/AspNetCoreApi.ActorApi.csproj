@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energy.Core" Version="18.12.14" />
+    <PackageReference Include="Energy.Core" Version="18.12.15" />
   </ItemGroup>
 
 </Project>
