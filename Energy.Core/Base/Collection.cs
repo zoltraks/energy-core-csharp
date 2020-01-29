@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Energy.Interface;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
@@ -1647,6 +1648,210 @@ namespace Energy.Base
                     return dictionary[key];
                 else
                     return default(TValue);
+            }
+        }
+
+        #endregion
+
+        #region
+
+        public class Table
+        {
+            public class Column<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Column
+            {
+            }
+
+            public class Row<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Row
+            {
+            }
+        }
+
+        public class Table<TValue> : Table<object, TValue>
+        {
+
+        }
+
+        public class Table<TKey, TValue> : Energy.Interface.ITable<TKey, TValue>
+            , IList<Energy.Interface.IRow<TKey, TValue>>
+        {
+            public class Column : Energy.Interface.IColumn<TKey, TValue>
+            {
+                public string Name { get; set; }
+
+                public int Index { get; set; }
+            }
+
+            public class Row : Energy.Interface.IRow<TKey, TValue>
+            {
+                private IList<TValue> _List = new List<TValue>();
+
+                private IDictionary<TKey, int> _Index = new Dictionary<TKey, int>();
+
+                public TValue this[TKey key]
+                { 
+                    get => Get(key); 
+                    set => Set(key, value); 
+                }
+
+                public TValue this[int index]
+                { 
+                    get => Get(index);
+                    set => Set(index, value);
+                }
+
+                public TValue New()
+                {
+                    TValue o = default;
+                    _List.Add(o);
+                    return o;
+                }
+
+                public TValue Get(int index)
+                {
+                    if (index < 0 || index < _List.Count)
+                    {
+                        return default;
+                    }
+                    else
+                    {
+                        return _List[index];
+                    }
+                }
+
+                public TValue Get(TKey key)
+                {
+                    if (!_Index.ContainsKey(key))
+                    {
+                        return default;
+                    }
+                    else
+                    {
+                        return _List[_Index[key]];
+                    }
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Append(TKey key, TValue value)
+                {
+                    int index = _List.Count;
+                    _List.Add(value);
+                    _Index.Add(key, index);
+                    return this;
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Set(TKey key, TValue value)
+                {
+                    if (_Index.ContainsKey(key))
+                    {
+                        _List[_Index[key]] = value;
+                    }
+                    else
+                    {
+                        Append(key, value);
+                    }
+                    return this;
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Set(int index, TValue value)
+                {
+                    if (index < 0 || index < _List.Count)
+                    {
+                        return this;
+                    }
+                    else
+                    {
+                        _List[index] = value;
+                    }
+                    return this;
+                }
+            }
+
+            private IList<Energy.Interface.IRow<TKey, TValue>> _Rows = new List<Energy.Interface.IRow<TKey, TValue>>();
+
+            private IList<Energy.Interface.IColumn<TKey, TValue>> _Columns = new List<Energy.Interface.IColumn<TKey, TValue>>();
+
+            //public IRow<TKey, TValue> this[int index]
+            //{
+            //    get => throw new NotImplementedException();
+            //    set => throw new NotImplementedException();
+            //}
+
+            //public IRow<TKey, TValue> this[TKey key]
+            //{
+            //    get => throw new NotImplementedException();
+            //    set => throw new NotImplementedException();
+            //}
+
+            public IRow<TKey, TValue> this[int index]
+            {
+                get => GetByIndex(index);
+                set => SetByIndex(index, value);
+            }
+
+            public IList<Energy.Interface.IRow<TKey, TValue>> Rows
+            {
+                get => _Rows;
+            }
+
+            public IList<Energy.Interface.IColumn<TKey, TValue>> Columns
+            {
+                get => _Columns;
+            }
+
+            public int Count => _Rows.Count;
+
+            public bool IsReadOnly => false;
+
+            public void Add(IRow<TKey, TValue> item) => _Rows.Add(item);
+
+            public void Clear() => _Rows.Clear();
+
+            public bool Contains(IRow<TKey, TValue> item) => _Rows.Contains(item);
+
+            public void CopyTo(IRow<TKey, TValue>[] array, int arrayIndex) => _Rows.CopyTo(array, arrayIndex);
+
+            public IEnumerator<IRow<TKey, TValue>> GetEnumerator() => _Rows.GetEnumerator();
+
+            public int IndexOf(IRow<TKey, TValue> item) => _Rows.IndexOf(item);
+
+            public void Insert(int index, IRow<TKey, TValue> item) => Insert(index, item);
+
+            public bool Remove(IRow<TKey, TValue> item) => _Rows.Remove(item);
+
+            public void RemoveAt(int index) => _Rows.RemoveAt(index);
+
+            IEnumerator IEnumerable.GetEnumerator() => _Rows.GetEnumerator();
+
+            //public IRow<TKey, TValue> this[TKey key]
+            //{
+            //    get => GetByKey(key);
+            //    set => SetByKey(key, value);
+            //}
+
+            //private IRow<TKey, TValue> GetByKey(TKey key)
+            //{
+            //    throw new NotImplementedException();
+            //}
+
+            //private void SetByKey(TKey key, IRow<TKey, TValue> value)
+            //{
+            //    throw new NotImplementedException();
+            //}
+
+            private IRow<TKey, TValue> GetByIndex(int index)
+            {
+                return _Rows[index];
+            }
+
+            private void SetByIndex(int index, IRow<TKey, TValue> value)
+            {
+                _Rows[index] = value;
+            }
+
+            public Energy.Interface.IRow<TKey, TValue> New()
+            {
+                Energy.Interface.IRow<TKey, TValue> o = new Row();
+                _Rows.Add(o);
+                return o;
             }
         }
 

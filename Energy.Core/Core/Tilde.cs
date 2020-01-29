@@ -1456,5 +1456,33 @@ namespace Energy.Core
         }
 
         #endregion
+
+        #region IsConsolePresent
+
+        /// <summary>
+        /// Is "real" console present?
+        /// Important when you want to perform some operations that requires "real" console.
+        /// </summary>
+        public static bool IsConsolePresent { get { return GetConsolePresent(); } }
+
+        private static bool? _ConsolePresent;
+
+        private static bool GetConsolePresent()
+        {
+            if (_ConsolePresent == null)
+            {
+                _ConsolePresent = true;
+                try 
+                {
+                    int windowHeight = Console.WindowHeight; }
+                catch 
+                { 
+                    _ConsolePresent = false; 
+                }
+            }
+            return _ConsolePresent.Value;
+        }
+
+        #endregion
     }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace Energy.Base
@@ -1065,6 +1068,57 @@ namespace Energy.Base
         {
             return Mangle<T>(subject, false, true, function);
         }
+
+        #endregion
+
+        #region Size
+
+        #region Get object size
+
+        /// <summary>
+        /// Get size of object in bytes
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static int GetObjectSize(object o)
+        {
+            if (null == o)
+            {
+                return 0;
+            }
+            if (o is int)
+            {
+                return sizeof(int);
+            }
+            if (o is bool)
+            {
+                return sizeof(bool);
+            }
+            if (o is string)
+            {
+                return sizeof(bool);
+            }
+            try
+            {
+                return Marshal.SizeOf(o);
+            }
+            catch (ArgumentException)
+            { }
+            try
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                MemoryStream ms = new MemoryStream();
+                byte[] Array;
+                bf.Serialize(ms, o);
+                Array = ms.ToArray();
+                return Array.Length;
+            }
+            catch
+            { }
+            return 0;
+        }
+
+        #endregion
 
         #endregion
 
