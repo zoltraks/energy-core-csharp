@@ -337,7 +337,7 @@ namespace Energy.Base
         /// <typeparam name="T">Value type</typeparam>
         [XmlRoot]
         [Serializable]
-        public class Associative<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
+        public class Associative<T> : Dictionary<string, T>, IXmlSerializable
         {
             #region IXmlSerializable Members
 
@@ -682,7 +682,7 @@ namespace Energy.Base
 
         #region StringDictionary
 
-        public class StringDictionary<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
+        public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
             #region Contructor
 
@@ -1290,7 +1290,8 @@ namespace Energy.Base
 
         #region SerializableDictionary
 
-        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, Energy.Interface.IXmlSerializable
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+            , System.Xml.Serialization.IXmlSerializable
         {
             public System.Xml.Schema.XmlSchema GetSchema()
             {
