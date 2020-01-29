@@ -56,6 +56,10 @@ namespace XmlSerializationExample
             dt.TableName = "Table1";
             xml = Energy.Base.Xml.Serialize(dt);
             Console.WriteLine(xml);
+
+            DataTable dt1;
+            dt1 = Energy.Base.Xml.Deserialize<DataTable>(xml);
+            Console.WriteLine(dt1.Rows.Count);
         }
     }
 }
