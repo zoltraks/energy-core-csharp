@@ -3963,5 +3963,97 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region AddSlashes
+
+        /// <summary>
+        /// Quote string with slashes in a C style.
+        /// Returns a string with backslashes before special characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string AddSlashes(string text)
+        {
+            return AddSlashes(text, GetSlashesDictionary());
+        }
+
+        /// <summary>
+        /// Quote string with slashes in a C style.
+        /// Returns a string with backslashes before special characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string AddSlashes(string text, Dictionary<char, string> dictionary)
+        {
+            if (string.IsNullOrEmpty(text) || dictionary == null || dictionary.Count == 0)
+            {
+                return text;
+            }
+            int length = text.Length;
+            StringBuilder s = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                if (dictionary.ContainsKey(text[i]))
+                {
+                    s.Append(dictionary[text[i]]);
+                    continue;
+                }
+                s.Append(text[i]);
+            }
+            return s.ToString();
+        }
+
+        private static Dictionary<char, string> _SlashesDictionary;
+
+        private static Dictionary<char, string> GetSlashesDictionary()
+        {
+            if (null == _SlashesDictionary)
+            {
+                Dictionary<char, string> d = new Dictionary<char, string>();
+                d['\0'] = @"\0";
+                d['\x07'] = @"\a";
+                d['\x08'] = @"\b";
+                d['\x1b'] = @"\e";
+                d['\x0c'] = @"\f";
+                d['\x0a'] = @"\n";
+                d['\x0d'] = @"\r";
+                d['\x09'] = @"\t";
+                d['\x0b'] = @"\v";
+                d['\\'] = @"\";
+                d['\''] = @"\'";
+                d['"'] = @"\""";
+                d['?'] = @"\?";
+                d['\x01'] = @"\x01";
+                d['\x02'] = @"\x02";
+                d['\x03'] = @"\x03";
+                d['\x04'] = @"\x04";
+                d['\x05'] = @"\x05";
+                d['\x0e'] = @"\x0e";
+                d['\x0f'] = @"\x0f";
+                d['\x10'] = @"\x10";
+                d['\x11'] = @"\x11";
+                d['\x12'] = @"\x12";
+                d['\x13'] = @"\x13";
+                d['\x14'] = @"\x14";
+                d['\x15'] = @"\x15";
+                d['\x16'] = @"\x16";
+                d['\x17'] = @"\x17";
+                d['\x18'] = @"\x18";
+                d['\x19'] = @"\x19";
+                d['\x1a'] = @"\x1a";
+                d['\x1c'] = @"\x1c";
+                d['\x1d'] = @"\x1d";
+                d['\x1e'] = @"\x1e";
+                d['\x1f'] = @"\x1f";
+                if (null == _SlashesDictionary)
+                {
+                    _SlashesDictionary = d;
+                }
+            }
+            return _SlashesDictionary;
+        }
+
+        #endregion
     }
 }
