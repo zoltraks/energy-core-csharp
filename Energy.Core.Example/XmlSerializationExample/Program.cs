@@ -33,6 +33,8 @@ namespace XmlSerializationExample
 
             Test test = new Test();
 
+            test.SerializeBaseTable();
+
             test.SerializeDataTable();
 
             Console.ReadLine();

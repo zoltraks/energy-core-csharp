@@ -81,12 +81,14 @@ namespace Energy.Base
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
         /// </code>
         /// </summary>
-        /// <param name="data">Object</param>
-        /// <param name="root">XML root</param>
-        /// <param name="space">XML namespace</param>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="space">Namespace</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
         /// <returns>XML string</returns>
-        public static string Serialize(object data, string root, string space)
+        public static string Serialize(object data, string root, string space, out string error)
         {
+            error = "";
             string xml = null;
             try
             {
@@ -107,6 +109,14 @@ namespace Energy.Base
             }
             catch (Exception x)
             {
+                if (null != x.InnerException)
+                {
+                    error = x.InnerException.Message;
+                }
+                else
+                {
+                    error = x.Message;
+                }
                 Energy.Core.Bug.Catch(x);
             }
             return xml;
@@ -121,11 +131,46 @@ namespace Energy.Base
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
         /// </code>
         /// </summary>
-        /// <param name="data">Object</param>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="space">Namespace</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root, string space)
+        {
+            return Serialize(data, root, space, out string error);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, out string error)
+        {
+            return Serialize(data, "", "", out error);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
         /// <returns>XML string</returns>
         public static string Serialize(object data)
         {
-            return Serialize(data, "", "");
+            return Serialize(data, "", "", out string error);
         }
 
         /// <summary>
@@ -142,7 +187,25 @@ namespace Energy.Base
         /// <returns>XML string</returns>
         public static string Serialize(object data, string root)
         {
-            return Serialize(data, root, "");
+            return Serialize(data, root, "", out string error);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root, out string error)
+        {
+            return Serialize(data, root, "", out error);
         }
 
         #endregion
