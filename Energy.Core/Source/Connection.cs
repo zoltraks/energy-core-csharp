@@ -944,7 +944,7 @@ namespace Energy.Source
                     return null;
                 }
 
-                DataTable table = new DataTable();
+                DataTable table = new DataTable("Table");
 
                 List<DataColumn> list = new List<DataColumn>();
                 foreach (DataRow row in schema.Rows)
