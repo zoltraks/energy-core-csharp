@@ -420,6 +420,7 @@ namespace Energy.Base
         /// Remove leading and trailing whitespace.
         /// Includes space, tabulation (horizontal and vertical), new line and null characters.
         /// </summary>
+        /// <remarks>EBS-0</remarks>
         /// <param name="value">String value</param>
         /// <returns>Trimmed string</returns>
         public static string Trim(string value)
@@ -4052,6 +4053,66 @@ namespace Energy.Base
                 }
             }
             return _SlashesDictionary;
+        }
+
+        #endregion
+
+        #region IfEmpty
+
+        /// <summary>
+        /// Returns first non empty string from a parameter list.
+        /// Strings are considered to be empty if they are null.
+        /// Function will return empty string ("") if parameter list is empty.
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string IfEmpty(params string[] input)
+        {
+            if (null != input && 0 < input.Length)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(input[i]))
+                    {
+                        return input[i];
+                    }
+                }
+            }
+            return "";
+        }
+
+        #endregion
+
+        #region IfWhite
+
+        /// <summary>
+        /// Returns first non white string from a parameter list. 
+        /// White string is considered to be null, zero length or string containing only whitespace characters.
+        /// Function will return empty string ("") if parameter list is empty.
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string IfWhite(params string[] input)
+        {
+            if (null != input && 0 < input.Length)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (string.IsNullOrEmpty(input[i]))
+                    {
+                        continue;
+                    }
+                    string t = Energy.Base.Text.Trim(input[i]);
+                    if (0 == t.Length)
+                    {
+                        continue;
+                    }
+                    return input[i];
+                }
+            }
+            return "";
         }
 
         #endregion

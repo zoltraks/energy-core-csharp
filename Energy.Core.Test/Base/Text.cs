@@ -767,5 +767,29 @@ Another
             Assert.AreEqual(1, q.Escape.Length);
             Assert.AreEqual(@"\ ", q.Escape[0]);
         }
+
+        [TestMethod]
+        public void TextIfEmpty()
+        {
+            string s;
+            s = Energy.Base.Text.IfEmpty(null, "", " ", "X");
+            Assert.AreEqual(" ", s);
+            s = Energy.Base.Text.IfEmpty(null);
+            Assert.AreEqual("", s);
+            s = Energy.Base.Text.IfEmpty();
+            Assert.AreEqual("", s);
+        }
+
+        [TestMethod]
+        public void TextIfWhite()
+        {
+            string s;
+            s = Energy.Base.Text.IfWhite(null, "", " ", "\t", "\t\r\n\v", ".", "!");
+            Assert.AreEqual(".", s);
+            s = Energy.Base.Text.IfWhite(null);
+            Assert.AreEqual("", s);
+            s = Energy.Base.Text.IfWhite();
+            Assert.AreEqual("", s);
+        }
     }
 }
