@@ -14,7 +14,8 @@ namespace MySqlConnection
 
             Energy.Core.Log.Default.Destination.Add(new Energy.Core.Log.Target.Console());
 
-            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>();
+            Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection> db;
+            db = new Energy.Source.Connection<MySql.Data.MySqlClient.MySqlConnection>();
             db.ConnectionString = @"Server=127.0.0.1;Database=test;Uid=test;Pwd=test;";
 
             db.OnCreate += Db_OnCreate;
