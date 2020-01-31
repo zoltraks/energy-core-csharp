@@ -316,8 +316,14 @@ namespace Energy.Source
         /// </summary>
         public event EventHandler OnCreate;
 
+        /// <summary>
+        /// Event fired when vendor connection is open.
+        /// </summary>
         public event EventHandler OnOpen;
 
+        /// <summary>
+        /// Event fired when vendor connection was closed.
+        /// </summary>
         public event EventHandler OnClose;
 
         #endregion
@@ -1436,6 +1442,10 @@ namespace Energy.Source
 
         #region Clone
 
+        /// <summary>
+        /// Return copy of object.
+        /// </summary>
+        /// <returns></returns>
         public object Clone()
         {
             return Copy();

@@ -29,14 +29,14 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned int (32-bit)</param>
         /// <returns>Reversed numeric value</returns>
-        public static ulong Reverse(uint value)
+        public static uint Reverse(uint value)
         {
             byte b1 = (byte)((value >> 0) & 0xff);
             byte b2 = (byte)((value >> 8) & 0xff);
             byte b3 = (byte)((value >> 16) & 0xff);
             byte b4 = (byte)((value >> 24) & 0xff);
 
-            return (ulong)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
+            return (uint)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
         }
 
         #endregion
@@ -44,7 +44,7 @@ namespace Energy.Base
         #region Compare
 
         /// <summary>
-        /// Compare byte arrays
+        /// Compare byte arrays.
         /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
@@ -225,8 +225,10 @@ namespace Energy.Base
         /// <returns></returns>
         public static UInt32 GetUInt32MSB(params UInt16[] array)
         {
-            if (array == null || array.Length == 0)
+            if (null == array || 0 == array.Length)
+            {
                 return 0;
+            }
             UInt32 result = 0;
             switch (array.Length)
             {
@@ -236,6 +238,32 @@ namespace Energy.Base
                 default:
                 case 2:
                     result = (uint)((array[0] << 16) + array[1]);
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Take up to two 16-bit unsigned words and return them as 32-bit unsigned word.
+        /// LSB / Little-Endian
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static UInt32 GetUInt32LSB(params UInt16[] array)
+        {
+            if (null == array || 0 == array.Length)
+            {
+                return 0;
+            }
+            UInt32 result = 0;
+            switch (array.Length)
+            {
+                case 1:
+                    result = array[0];
+                    break;
+                default:
+                case 2:
+                    result = (uint)(array[0] + (array[1] << 16));
                     break;
             }
             return result;
