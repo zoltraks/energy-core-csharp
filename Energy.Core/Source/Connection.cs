@@ -1108,7 +1108,9 @@ namespace Energy.Source
                 if (Persistent)
                 {
                     if (!Active && Open() == null)
+                    {
                         return -1;
+                    }
                     try
                     {
                         lock (_Lock)
@@ -1120,7 +1122,9 @@ namespace Energy.Source
                     {
                         SetError(x);
                         if (!Catch(x))
+                        {
                             return -1;
+                        }
                     }
                 }
                 else
@@ -1128,7 +1132,9 @@ namespace Energy.Source
                     using (IDbConnection connection = Open())
                     {
                         if (connection == null)
+                        {
                             return -1;
+                        }
                         try
                         {
                             return Execute(connection, query);
@@ -1137,7 +1143,9 @@ namespace Energy.Source
                         {
                             SetError(x);
                             if (!Catch(x))
+                            {
                                 return -1;
+                            }
                         }
                     }
                 }

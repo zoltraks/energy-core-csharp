@@ -716,7 +716,7 @@ namespace Energy.Base
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
-            public Dictionary<string, string> Index = null;
+            private Dictionary<string, string> Index = null;
 
             private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.Last;
 
@@ -750,12 +750,18 @@ namespace Energy.Base
                     lock (_Lock)
                     {
                         if (_CaseSensitive == value)
+                        {
                             return;
+                        }
                         _CaseSensitive = value;
                         if (value)
+                        {
                             Index = null;
+                        }
                         else
+                        {
                             RebuildIndex();
+                        }
                     }
                 }
             }
@@ -781,9 +787,13 @@ namespace Energy.Base
                 {
                     string map = key.ToUpperInvariant();
                     if (_SelectionOfDuplicates == Energy.Enumeration.MultipleBehaviour.Last)
+                    {
                         Index[map] = key;
+                    }
                     else if (!Index.ContainsKey(map))
+                    {
                         Index.Add(map, key);
+                    }
                 }
             }
 
@@ -804,20 +814,43 @@ namespace Energy.Base
             public T Get(string key)
             {
                 if (string.IsNullOrEmpty(key))
+                {
                     return default(T);
+                }
 
                 lock (_Lock)
                 {
                     if (CaseSensitive)
                     {
-                        if (!base.ContainsKey(key))
+                        if (base.ContainsKey(key))
+                        {
+                            return base[key];
+                        }
+                        else
+                        {
                             return default(T);
-                        return base[key];
+                        }
                     }
-                    string map = key.ToUpperInvariant();
-                    if (Index == null || !Index.ContainsKey(map))
-                        return default(T);
-                    return base[Index[map]];
+                    else
+                    {
+                        string map = key.ToUpperInvariant();
+                        if (Index != null && Index.Count == 0 && base.Count > 0)
+                        {
+                            Index = null;
+                        }
+                        if (Index == null)
+                        {
+                            RebuildIndex();
+                        }
+                        if (Index != null && Index.ContainsKey(map))
+                        {
+                            return base[Index[map]];
+                        }
+                        else
+                        {
+                            return default(T);
+                        }
+                    }
                 }
             }
 

@@ -331,7 +331,9 @@ namespace Energy.Query
         public string Text(object value)
         {
             if (value == null)
+            {
                 return "NULL";
+            }
             return Text(Energy.Base.Cast.ObjectToString(value));
         }
 

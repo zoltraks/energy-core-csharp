@@ -469,7 +469,7 @@ namespace Energy.Core
 
         #endregion
 
-            #region Static
+        #region Static
 
         private static Class.SuppressCodeList SuppressCodeList
         {

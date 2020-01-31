@@ -207,7 +207,9 @@ namespace Energy.Query
             public string Parse(string input)
             {
                 if (string.IsNullOrEmpty(input))
+                {
                     return input;
+                }
 
                 bool optionUnicode = this.Unicode;
                 bool optionUnknownAsEmpty = this.UnknownAsEmpty;
@@ -218,7 +220,9 @@ namespace Energy.Query
 
                 Energy.Query.Format format = _Format;
                 if (_Format == null)
+                {
                     format = Energy.Query.Format.Default;
+                }
                 int δ = 0;
                 foreach (Energy.Base.Bracket.SearchResult _ in Bracket.Search(input))
                 {
@@ -273,9 +277,13 @@ namespace Energy.Query
                         default:
                         case Energy.Enumeration.FormatType.Text:
                             if (optionUnicode)
+                            {
                                 text = format.Unicode(value);
+                            }
                             else
+                            {
                                 text = format.Text(value);
+                            }
                             break;
 
                         case Energy.Enumeration.FormatType.Number:

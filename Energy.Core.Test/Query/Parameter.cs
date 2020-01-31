@@ -39,6 +39,23 @@ namespace Energy.Core.Test.Query
             expect = "0x01020304";
             result = bag.Parse(query);
             Assert.AreEqual(expect, result);
+
+            query = @"INSERT INTO [dic_place] (
+  [location]
+ ,[code]
+ ,[count]
+)
+ VALUES 
+ ( 'loc'
+  , @EditCode
+  ,@EditCount
+)
+ SELECT SCOPE_IDENTITY()";
+            bag.Clear();
+            bag.Set("@EditCode", "ww", Enumeration.FormatType.Text);
+            bag.Set("@EditCount", "12", Enumeration.FormatType.Number);
+            result = bag.Parse(query);
+            Assert.IsNotNull(result);
         }
 
         [TestMethod]
@@ -162,6 +179,34 @@ GO
             must = "'0' @a";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
+        }
+
+        public class Class
+        {
+            public class C1
+            {
+                public Energy.Query.Parameter.Bag Bag { get; set; }
+            }
+        }
+
+        [TestMethod]
+        public void Serialize()
+        {
+            var o1 = new Class.C1();
+            o1.Bag = new Energy.Query.Parameter.Bag();
+            o1.Bag.Set("a", "b");
+            o1.Bag.Set("c", 1);
+            string j;
+            j = System.Text.Json.JsonSerializer.Serialize(o1);
+            Assert.IsNotNull(j);
+            var opt = new System.Text.Json.JsonSerializerOptions()
+            {
+            };
+            var o2 = System.Text.Json.JsonSerializer.Deserialize<Class.C1>(j, opt);
+            Assert.IsNotNull(o2);
+            string s;
+            s = o2.Bag.Get("a").ToString();
+            Assert.IsNotNull(s);
         }
     }
 }
