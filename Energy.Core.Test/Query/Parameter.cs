@@ -207,6 +207,11 @@ GO
             string s;
             s = o2.Bag.Get("a").ToString();
             Assert.IsNotNull(s);
+            string xml;
+            xml = Energy.Base.Xml.Serialize(o1);
+            Assert.IsNotNull(xml);
+            xml = Energy.Base.Xml.Serialize(o2);
+            Assert.IsNotNull(xml);
         }
     }
 }
