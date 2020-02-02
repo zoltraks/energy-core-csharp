@@ -39,6 +39,8 @@ namespace Energy.Base
 
             #endregion
 
+            #region Private
+
             private List<string> _List = new List<string>();
 
             private Option.Array _Option = new Option.Array();
@@ -50,6 +52,12 @@ namespace Energy.Base
             private bool _Slashes = false;
 
             private bool _Strict = false;
+
+            private bool _UnknownAsParameter = false;
+
+            #endregion
+
+            #region Accessor
 
             public string this[int index]
             {
@@ -80,6 +88,8 @@ namespace Energy.Base
                     }
                 }
             }
+
+            #endregion
 
             /// <summary>
             /// Add command line parameter that will consume one
@@ -113,6 +123,16 @@ namespace Energy.Base
             }
 
             /// <summary>
+            /// Treat all unknown options as parametered.
+            /// </summary>
+            /// <returns></returns>
+            public Arguments Parameter()
+            {
+                _UnknownAsParameter = true;
+                return this;
+            }
+
+            /// <summary>
             /// Add single command line switch option, known also as flag.
             /// Like "-v", or "--version".
             /// </summary>
@@ -121,6 +141,16 @@ namespace Energy.Base
             public Arguments Switch(string name)
             {
                 return Parameter(name, 0);
+            }
+
+            /// <summary>
+            /// Treat all unknown options as simple switches.
+            /// </summary>
+            /// <returns></returns>
+            public Arguments Switch()
+            {
+                _UnknownAsParameter = false;
+                return this;
             }
 
             /// <summary>

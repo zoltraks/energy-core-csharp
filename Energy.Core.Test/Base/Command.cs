@@ -14,7 +14,7 @@ namespace Energy.Core.Test.Base
             string args;
             Energy.Base.Command.Arguments argv;
             args = "/help";
-            argv = new Energy.Base.Command.Arguments()
+            argv = new Energy.Base.Command.Arguments(args)
                 .Switch("help")
                 .Slashes(true)
                 .Parse();
@@ -23,7 +23,8 @@ namespace Energy.Core.Test.Base
             argv.Alias("?", "help").Parse("");
             Assert.IsNotNull(argv);
             Assert.IsTrue(argv["help"].Empty);
-            argv.Alias("?", "help").Parse("/?");
+            argv.Alias("?", "help");
+            argv.Parse("/?");
             Assert.IsNotNull(argv);
             Assert.IsFalse(argv["help"].Empty);
 

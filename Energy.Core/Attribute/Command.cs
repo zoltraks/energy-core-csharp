@@ -141,30 +141,30 @@ namespace Energy.Attribute
             }
         }
 
-        ///// <summary>
-        ///// Welcome attribute
-        ///// </summary>
-        //[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-        //public class WelcomeAttribute : System.Attribute
-        //{
-        //    public string Text;
+        /// <summary>
+        /// Welcome attribute
+        /// </summary>
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
+        public class WelcomeAttribute : System.Attribute
+        {
+            public string Text;
 
-        //    /// <summary>
-        //    /// Constructor
-        //    /// </summary>
-        //    public WelcomeAttribute()
-        //    {
-        //    }
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public WelcomeAttribute()
+            {
+            }
 
-        //    /// <summary>
-        //    /// Constructor
-        //    /// </summary>
-        //    /// <param name="text"></param>
-        //    public WelcomeAttribute(string text)
-        //    {
-        //        this.Text = text;
-        //    }
-        //}
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="text"></param>
+            public WelcomeAttribute(string text)
+            {
+                this.Text = text;
+            }
+        }
 
         ///// <summary>
         ///// Help attribute
