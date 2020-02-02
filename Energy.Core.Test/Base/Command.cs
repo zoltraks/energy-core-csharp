@@ -11,8 +11,24 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void Arguments()
         {
-            var args = @"-q --b -abc /? param1 ""param -x 2"" -- param3 /opt1/opt2";
-            var argv = new Energy.Base.Command.Arguments(args)
+            string args;
+            Energy.Base.Command.Arguments argv;
+            args = "/help";
+            argv = new Energy.Base.Command.Arguments()
+                .Switch("help")
+                .Slashes(true)
+                .Parse();
+            Assert.IsNotNull(argv);
+            Assert.IsFalse(argv["help"].Empty);
+            argv.Alias("?", "help").Parse("");
+            Assert.IsNotNull(argv);
+            Assert.IsTrue(argv["help"].Empty);
+            argv.Alias("?", "help").Parse("/?");
+            Assert.IsNotNull(argv);
+            Assert.IsFalse(argv["help"].Empty);
+
+            args = @"-q --b -abc /? param1 ""param -x 2"" -- param3 /opt1/opt2";
+            argv = new Energy.Base.Command.Arguments(args)
                 .Alias("q", "quiet")
                 .Alias("?", "help")
                 .Switch("help")

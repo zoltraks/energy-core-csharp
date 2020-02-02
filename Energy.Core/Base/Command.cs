@@ -137,6 +137,24 @@ namespace Energy.Base
             /// <returns></returns>
             public Arguments Line(string line)
             {
+                _List.AddRange(Explode(line));
+                return this;
+            }
+
+            /// <summary>
+            /// Explode arguments from single line.
+            ///
+            /// Arguments are divided by any whitespace character.
+            /// Arguments may use double quote (") character to include whitespace,
+            /// and multiple quoting is allowed within one argument.
+            ///
+            /// For example: C:\"Documents and settings"\"Program Files"\
+            /// will be considered as one argument.
+            /// </summary>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public static string[] Explode(string line)
+            {
                 List<string> l = new List<string>();
                 if (!string.IsNullOrEmpty(line))
                 {
@@ -151,46 +169,8 @@ namespace Energy.Base
                     {
                         l.Add(m.Groups[1].Value);
                     }
-                    //Match m;
-                    //m = re.Match(line);
-                    //while (m.Success)
-                    //{
-                    //    l.Add(m.Groups[1].Value);
-                    //    m = m.NextMatch();
-                    //}
                 }
-
-                //{
-                //    char q = '\0';
-                //    int p = -1;
-                //    for (int i = 0; i < line.Length; i++)
-                //    {
-                //        bool last = i == line.Length - 1;
-                //        char c = line[i];
-                //        if ('\0' == q && '"' == c)
-                //        {
-                //            q = '"';
-                //            p = i;
-                //            continue;
-                //        }
-                //        if ('\0' != q && '"' == c)
-                //        {
-                //            if (!last)
-                //            {
-                //                char f = line[i + 1];
-                //                if ('"' == f)
-                //                {
-                //                    i++;
-                //                    continue;
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
-
-                _List.AddRange(l);
-
-                return this;
+                return l.ToArray();
             }
 
             /// <summary>
@@ -262,6 +242,15 @@ namespace Energy.Base
             public Arguments Parse()
             {
                 return Parse(_List.ToArray());
+            }
+
+            /// <summary>
+            /// Parse arguments and set values for options.
+            /// </summary>
+            /// <returns></returns>
+            public Arguments Parse(string line)
+            {
+                return Parse(Explode(line));
             }
 
             /// <summary>
