@@ -86,6 +86,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\Command.cs" />
     <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Bit.cs" />
     <Compile Include="Base\ConnectionString.cs" />

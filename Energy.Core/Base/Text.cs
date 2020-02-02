@@ -851,6 +851,20 @@ namespace Energy.Base
 
         #region Split
 
+        public static string[] Split(string input)
+        {
+            System.Collections.Generic.List<string> list = new List<string>();
+            foreach (string line in Each(input))
+            {
+                list.Add(line);
+            }
+            return list.ToArray();
+        }
+
+        #endregion
+
+        #region SplitLine
+
         /// <summary>
         /// Split string to array by new line characters.
         /// Elements will not include new line itself.
@@ -877,13 +891,7 @@ namespace Energy.Base
             return split;
         }
 
-        public static string[] Split(string input)
-        {
-            System.Collections.Generic.List<string> list = new List<string>();
-            foreach (string line in Each(input))
-                list.Add(line);
-            return list.ToArray();
-        }
+        #endregion
 
         #region SplitArray
 
@@ -948,17 +956,23 @@ namespace Energy.Base
                 next = match.NextMatch();
                 string value = match.Groups[1].Value;
                 if (value == null)
+                {
                     continue;
+                }
                 value = value.Trim();
                 if (value.Length == 0)
+                {
                     continue;
+                }
                 if (!string.IsNullOrEmpty(quotes))
                 {
                     foreach (char c in quotes.ToCharArray())
                     {
                         string quote = c.ToString();
                         if (!value.StartsWith(quote) || !value.EndsWith(quote))
+                        {
                             continue;
+                        }
                         string escape = new string(c, 2);
                         value = value.Substring(1, value.Length - 2).Replace(escape, quote);
                     }
@@ -972,20 +986,18 @@ namespace Energy.Base
 
         #region SplitDictionary
 
-        /// <summary>
-        /// Split string by new line
-        /// </summary>
-        /// <returns></returns>
-        // TODO Implement
-        [Energy.Attribute.Code.Draft]
-        [Energy.Attribute.Code.Implement]
-        private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
-        {
-            //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
-            return null;
-        }
-
-        #endregion
+        ///// <summary>
+        ///// Split string by new line
+        ///// </summary>
+        ///// <returns></returns>
+        //// TODO Implement
+        //[Energy.Attribute.Code.Draft]
+        //[Energy.Attribute.Code.Implement]
+        //private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
+        //{
+        //    //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+        //    return null;
+        //}
 
         #endregion
 
