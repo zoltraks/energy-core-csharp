@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -49,7 +50,11 @@ namespace Energy.Base
 
             private int _Skip = 0;
 
-            private bool _Slashes = false;
+            private bool _Slash = false;
+
+            private bool _Short = true;
+
+            private bool _Long = true;
 
             private bool _Strict = false;
 
@@ -88,6 +93,25 @@ namespace Energy.Base
                     }
                 }
             }
+
+            #endregion
+
+            #region Property
+
+            ///// <summary>
+            ///// Represents array of parameters (not options) taken from command line.
+            ///// </summary>
+            //public List<string> Items { get => _List; }
+
+            /// <summary>
+            /// Represents state of command line options.
+            /// </summary>
+            public Option.Array Options { get => _Option; }
+
+            /// <summary>
+            /// Number of non option elements from command line argument list.
+            /// </summary>
+            public int Count { get => _Heap.Count; }
 
             #endregion
 
@@ -154,7 +178,7 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Take arguments from single line.
+            /// Add arguments from text line.
             /// 
             /// Arguments are divided by any whitespace character.
             /// Arguments may use double quote (") character to include whitespace,
@@ -227,17 +251,42 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Set option to allow use of slash in option names.
+            /// Allow usage of slash options (starting with "/").
             /// Allows to use DOS style options like "/?".
             /// <br/><br/>
             /// It's RSX-11 (and other similar DEC systems), through CP/M to MS-DOS legacy.
-            /// Probably it should be avoided.
+            /// <br/><br/>
+            /// Should be avoided probably.
             /// </summary>
-            /// <param name="slashes"></param>
+            /// <param name="slash"></param>
             /// <returns></returns>
-            public Arguments Slashes(bool slashes)
+            public Arguments Slash(bool slash)
             {
-                _Slashes = slashes;
+                _Slash = slash;
+                return this;
+            }
+
+            /// <summary>
+            /// Allow usage of short options (starting with "-").
+            /// Turned on as default.
+            /// </summary>
+            /// <param name="enable">Enable short options</param>
+            /// <returns></returns>
+            public Arguments Short(bool enable)
+            {
+                _Short = enable;
+                return this;
+            }
+
+            /// <summary>
+            /// Allow usage of long options (starting with "--").
+            /// Turned on as default.
+            /// </summary>
+            /// <param name="enable">Enable short options</param>
+            /// <returns></returns>
+            public Arguments Long(bool enable)
+            {
+                _Long = enable;
                 return this;
             }
 
@@ -249,7 +298,7 @@ namespace Energy.Base
             /// <returns></returns>
             public Arguments Alias(string alias, string name)
             {
-                _Option.Alias["name"] = alias;
+                _Option.Alias[alias] = name;
                 return this;
             }
 
@@ -284,19 +333,27 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Parse arguments
+            /// Parse arguments and set values for options.
             /// </summary>
             /// <returns></returns>
             public Arguments Parse(string[] args)
             {
-                bool slashes = _Slashes;
-                bool strict = _Strict;
+                bool enableSlash = _Slash;
+                bool enableShort = _Short;
+                bool enableLong = _Long;
+                bool strictMode = _Strict;
+                int skipCount = _Skip;
+
                 _Heap.Clear();
                 _Option.Zero();
 
                 int length = args.Length;
                 for (int i = 0; i < length; i++)
                 {
+                    if (i < skipCount)
+                    {
+                        continue;
+                    }
                     bool last = i < length - 1;
                     string arg = args[i];
                     if (string.IsNullOrEmpty(arg))
@@ -309,8 +366,8 @@ namespace Energy.Base
                         continue;
                     }
                     string key = "";
-                    bool singleDash = false;
-                    if (slashes && '/' == arg[0])
+                    //bool isShort = false;
+                    if (enableSlash && '/' == arg[0])
                     {
                         if (1 == arg.Length)
                         {
@@ -319,26 +376,32 @@ namespace Energy.Base
                         }
                         key = arg.Substring(1);
                     }
-                    else if (arg.StartsWith("--"))
+                    else if (enableLong && arg.StartsWith("--"))
                     {
                         key = arg.Substring(2);
                     }
-                    else if (arg.StartsWith("-"))
+                    else if (enableShort && arg.StartsWith("-"))
                     {
-                        singleDash = true;
+                        //isShort = true;
                         key = arg.Substring(1);
                     }
                     if (0 == key.Length)
                     {
+                        _Heap.Add(arg);
                         continue;
                     }
                     string target = _Option.Target(key);
                     Option opt = _Option.Find(target);
                     if (null == opt)
                     {
-                        if (strict)
+                        if (strictMode)
                         {
-                            throw new Exception($"Unrecognized command line option: {key}");
+                            string m = $"Unrecognized command line option: {key}";
+                            if (Debugger.IsAttached)
+                            {
+                                Debug.WriteLine($"Strict mode error: $m");
+                            }
+                            throw new Exception(m);
                         }
                         else
                         {
@@ -474,6 +537,8 @@ namespace Energy.Base
 
             public bool Empty { get => IsEmpty(); }
 
+            public bool Null { get => IsNull(); }
+
             public string GetValue()
             {
                 return GetValue(" ");
@@ -522,6 +587,7 @@ namespace Energy.Base
                     + "("
                     + (this.Count == 0 ? "switch" : "parameter")
                     + ")"
+                    + (null == this.Values ? "" : " = " + GetValue())
                     ;
             }
 
@@ -547,6 +613,15 @@ namespace Energy.Base
                     }
                 }
                 return true;
+            }
+
+            public bool IsNull()
+            {
+                if (null == Values)
+                {
+                    return true;
+                }
+                return false;
             }
         }
 

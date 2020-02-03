@@ -16,7 +16,7 @@ namespace Energy.Core.Test.Base
             args = "/help";
             argv = new Energy.Base.Command.Arguments(args)
                 .Switch("help")
-                .Slashes(true)
+                .Slash(true)
                 .Parse();
             Assert.IsNotNull(argv);
             Assert.IsFalse(argv["help"].Empty);
@@ -40,9 +40,28 @@ namespace Energy.Core.Test.Base
                 .Alias("i", "input")
                 .Help("input", "Input file")
                 //.Strict(true)
-                //.Slashes(true)
+                //.Slash(true)
                 .Parse();
             Assert.IsNotNull(argv);
+
+            argv.Long(false).Short(false).Slash(false);
+            argv.Parse();
+
+            Assert.AreEqual(9, argv.Count);
+
+            int n;
+            n = 0;
+            argv.Options.ForEach((x) =>
+            {
+                if (!x.Null)
+                {
+                    n++;
+                }
+            });
+            Assert.AreEqual(0, n);
+
+            argv.Skip(1).Parse();
+            Assert.AreEqual(8, argv.Count);
         }
     }
 }
