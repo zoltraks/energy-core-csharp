@@ -791,5 +791,36 @@ Another
             s = Energy.Base.Text.IfWhite();
             Assert.AreEqual("", s);
         }
+
+        [TestMethod]
+        public void TextFindAnyWord()
+        {
+            string[] a;
+            a = new string[] { };
+            string x;
+            x = Energy.Base.Text.FindAnyWord(null, a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            a = null;
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            a = new string[] { "a|b" , "[]" };
+            x = Energy.Base.Text.FindAnyWord(null, a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("a|b", a);
+            Assert.AreEqual("a|b", x);
+            x = Energy.Base.Text.FindAnyWord("[]", a);
+            Assert.AreEqual("[]", x);
+            a = new string[] { "." };
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("a", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord(".", a);
+            Assert.AreEqual(".", x);
+        }
     }
 }

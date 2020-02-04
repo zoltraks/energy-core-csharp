@@ -1477,7 +1477,7 @@ namespace Energy.Base
                     _EscapeExpressionStringDictionary.Add("*", @"\*");
                     _EscapeExpressionStringDictionary.Add("?", @"\?");
                     _EscapeExpressionStringDictionary.Add("+", @"\+");
-                    _EscapeExpressionStringDictionary.Add("|", @"\+");
+                    _EscapeExpressionStringDictionary.Add("|", @"\|");
                     _EscapeExpressionStringDictionary.Add("{", @"\{");
                     _EscapeExpressionStringDictionary.Add("[", @"\[");
                     _EscapeExpressionStringDictionary.Add("(", @"\(");
@@ -4128,5 +4128,45 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region FindAnyWord
+
+        /// <summary>
+        /// Find any word from word list using regular expression match.
+        /// <br/><br/>
+        /// Return null if no word could be found.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string FindAnyWord(string input, string[] words)
+        {
+            if (null == input || null == words || 0 == input.Length ||0 == words.Length)
+            {
+                return null;
+            }
+            List<string> list = new List<string>();
+            foreach (string word in words)
+            {
+                list.Add("(?:" + EscapeExpression(word) + ")");
+            }
+            string pattern = ""
+                + @"("
+                + string.Join("|", list.ToArray())
+                + @")"
+                ;
+            Match m = Regex.Match(input, pattern);
+            if (m.Success)
+            {
+                return m.Groups[1].Value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        #endregion
+
     }
 }
