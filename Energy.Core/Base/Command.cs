@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
     /// <summary>
-    /// Command line helper.
+    /// Command line helper class
     /// </summary>
-    public class Command
+    public static class Command
     {
         #region Arguments
 
         /// <summary>
         /// Command line arguments utility class.
         /// </summary>
-        public class Arguments
+        public class Arguments: Energy.Base.Pattern.Builder<Arguments>
         {
             #region Constructor
 
@@ -115,6 +114,8 @@ namespace Energy.Base
 
             #endregion
 
+            #region Parameter
+
             /// <summary>
             /// Add command line parameter that will consume one
             /// or more trailing arguments and provide them as values.
@@ -156,6 +157,10 @@ namespace Energy.Base
                 return this;
             }
 
+            #endregion
+
+            #region Switch
+
             /// <summary>
             /// Add single command line switch option, known also as flag.
             /// Like "-v", or "--version".
@@ -177,13 +182,50 @@ namespace Energy.Base
                 return this;
             }
 
+            #endregion
+
+            #region Add
+
+            /// <summary>
+            /// Add arguments from string array.
+            /// </summary>
+            /// <param name="args"></param>
+            /// <returns></returns>
+            public Arguments Add(string[] args)
+            {
+                _List.AddRange(args);
+                return this;
+            }
+
             /// <summary>
             /// Add arguments from text line.
-            /// 
+            /// <br/><br/>
             /// Arguments are divided by any whitespace character.
             /// Arguments may use double quote (") character to include whitespace,
             /// and multiple quoting is allowed within one argument.
-            /// 
+            /// <br/><br/>
+            /// For example: C:\"Documents and settings"\"Program Files"\
+            /// will be considered as one argument.
+            /// </summary>
+            /// <param name="line"></param>
+            /// <returns></returns>
+            public Arguments Add(string line)
+            {
+                _List.AddRange(Explode(line));
+                return this;
+            }
+
+            #endregion
+
+            #region Line
+
+            /// <summary>
+            /// Add arguments from text line.
+            /// <br/><br/>
+            /// Arguments are divided by any whitespace character.
+            /// Arguments may use double quote (") character to include whitespace,
+            /// and multiple quoting is allowed within one argument.
+            /// <br/><br/>
             /// For example: C:\"Documents and settings"\"Program Files"\
             /// will be considered as one argument.
             /// </summary>
@@ -194,6 +236,10 @@ namespace Energy.Base
                 _List.AddRange(Explode(line));
                 return this;
             }
+
+            #endregion
+
+            #region Explode
 
             /// <summary>
             /// Explode arguments from single line.
@@ -227,6 +273,10 @@ namespace Energy.Base
                 return l.ToArray();
             }
 
+            #endregion
+
+            #region Skip
+
             /// <summary>
             /// Skip first n entries when parsing arguments.
             /// </summary>
@@ -237,6 +287,10 @@ namespace Energy.Base
                 _Skip = skip;
                 return this;
             }
+
+            #endregion
+
+            #region Strict
 
             /// <summary>
             /// Set strict mode.
@@ -249,6 +303,10 @@ namespace Energy.Base
                 _Strict = strict;
                 return this;
             }
+
+            #endregion
+
+            #region Slash
 
             /// <summary>
             /// Allow usage of slash options (starting with "/").
@@ -266,6 +324,10 @@ namespace Energy.Base
                 return this;
             }
 
+            #endregion
+
+            #region Short
+
             /// <summary>
             /// Allow usage of short options (starting with "-").
             /// Turned on as default.
@@ -277,6 +339,10 @@ namespace Energy.Base
                 _Short = enable;
                 return this;
             }
+
+            #endregion
+
+            #region Long
 
             /// <summary>
             /// Allow usage of long options (starting with "--").
@@ -290,6 +356,10 @@ namespace Energy.Base
                 return this;
             }
 
+            #endregion
+
+            #region Alias
+
             /// <summary>
             /// Add alias to parameter key.
             /// </summary>
@@ -302,6 +372,10 @@ namespace Energy.Base
                 return this;
             }
 
+            #endregion
+
+            #region Help
+
             /// <summary>
             /// Add help description for parameter key.
             /// </summary>
@@ -313,6 +387,10 @@ namespace Energy.Base
                 _Option.Help["name"] = description;
                 return this;
             }
+
+            #endregion
+
+            #region Parse
 
             /// <summary>
             /// Parse arguments and set values for options.
@@ -445,6 +523,8 @@ namespace Energy.Base
                 }
                 return this;
             }
+
+            #endregion
         }
 
         #endregion
