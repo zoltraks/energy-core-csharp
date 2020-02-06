@@ -4138,8 +4138,9 @@ namespace Energy.Base
         /// </summary>
         /// <param name="input"></param>
         /// <param name="words"></param>
+        /// <param name="ignoreCase"></param>
         /// <returns></returns>
-        public static string FindAnyWord(string input, string[] words)
+        public static string FindAnyWord(string input, string[] words, bool ignoreCase)
         {
             if (null == input || null == words || 0 == input.Length ||0 == words.Length)
             {
@@ -4155,7 +4156,8 @@ namespace Energy.Base
                 + string.Join("|", list.ToArray())
                 + @")"
                 ;
-            Match m = Regex.Match(input, pattern);
+            RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+            Match m = Regex.Match(input, pattern, options);
             if (m.Success)
             {
                 return m.Groups[1].Value;
@@ -4166,7 +4168,19 @@ namespace Energy.Base
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Find any word from word list using regular expression match.
+        /// <br/><br/>
+        /// Return null if no word could be found.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string FindAnyWord(string input, string[] words)
+        {
+            return FindAnyWord(input, words, false);
+        }
 
+        #endregion
     }
 }
