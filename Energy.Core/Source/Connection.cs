@@ -1174,7 +1174,9 @@ namespace Energy.Source
 
         /// <summary>
         /// Execute SQL query.
-        /// Returns amount of rows affected and negative number on error.
+        /// For UPDATE, INSERT, and DELETE statements, the return value is the number of rows affected by the command. 
+        /// For all other types of statements, the return value is -1.
+        /// On error, return value is -2.
         /// </summary>
         /// <param name="query">Query text</param>
         /// <param name="error">Error text</param>
@@ -1190,7 +1192,7 @@ namespace Energy.Source
                     if (!Active && null == Open())
                     {
                         error = GetErrorText("Connection error");
-                        return -1;
+                        return -2;
                     }
                     try
                     {
@@ -1204,7 +1206,7 @@ namespace Energy.Source
                         error = SetError(x);
                         if (!Catch(x))
                         {
-                            return -1;
+                            return -2;
                         }
                     }
                 }
@@ -1215,7 +1217,7 @@ namespace Energy.Source
                         if (connection == null)
                         {
                             error = GetErrorText("Connection error");
-                            return -1;
+                            return -2;
                         }
                         try
                         {
@@ -1226,18 +1228,20 @@ namespace Energy.Source
                             error = SetError(x);
                             if (!Catch(x))
                             {
-                                return -1;
+                                return -2;
                             }
                         }
                     }
                 }
             }
-            return -1;
+            return -2;
         }
 
         /// <summary>
         /// Execute SQL query.
-        /// Returns amount of rows affected and negative number on error.
+        /// For UPDATE, INSERT, and DELETE statements, the return value is the number of rows affected by the command. 
+        /// For all other types of statements, the return value is -1.
+        /// On error, return value is -2.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
