@@ -20,7 +20,7 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("fragment", url.Fragment);
             output = url.ToString();
             Assert.AreEqual(input, output);
-            url = url.Combine(new Energy.Base.Url() { Host = "127.0.0.1" }, true);
+            url = url.Overwrite(new Energy.Base.Url() { Host = "127.0.0.1" }, true);
             output = url.ToString();
             Assert.AreEqual("http://127.0.0.1:80/path?query#fragment", output);
             input = "host:1";
@@ -33,7 +33,7 @@ namespace Energy.Core.Test.Base
             url = input;
             Assert.AreEqual("localhost", url.Host);
             Assert.AreEqual("/path", url.Path);
-            url = url.Combine(new Energy.Base.Url() { Scheme = "http", Host = "127.0.0.1" }, false);
+            url = url.Overwrite(new Energy.Base.Url() { Scheme = "http", Host = "127.0.0.1" }, false);
             Assert.AreEqual("localhost", url.Host);
             Assert.AreEqual("http", url.Scheme);
             input = ".";
@@ -82,6 +82,39 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("80", url.Port);
             url = Energy.Base.Url.SetPort(url.ToString(), null);
             Assert.AreEqual("", url.Port);
+            url = "http://localhost:1234/path";
+            url = Energy.Base.Url.SetPort(url.ToString(), 0);
+            Assert.AreEqual("http://localhost/path", url.ToString());
+            url = Energy.Base.Url.SetPort(url.ToString(), 12345);
+            Assert.AreEqual("http://localhost:12345/path", url.ToString());
+            url = Energy.Base.Url.SetPort(url.ToString(), 99);
+            Assert.AreEqual("http://localhost:99/path", url.ToString());
+            url = Energy.Base.Url.SetPort(url.ToString(), 99999);
+            Assert.AreEqual("http://localhost/path", url.ToString());
+            url = url.Overwrite(new Energy.Base.Url() { Port = "1" }, false);
+            Assert.AreEqual("http://localhost:1/path", url.ToString());
+            url = url.Overwrite(new Energy.Base.Url() { Port = "2" }, false);
+            Assert.AreEqual("http://localhost:1/path", url.ToString());
+            url = url.Overwrite(new Energy.Base.Url() { Port = "2" }, true);
+            Assert.AreEqual("http://localhost:2/path", url.ToString());
+        }
+
+        [TestMethod]
+        public void UrlCombine()
+        {
+            //string url;
+            //url = Energy.Base.Url.Combine("http://localhost:123", "path1", "path2");
+            Assert.IsNull(null);
+        }
+
+        [TestMethod]
+        public void UrlMake()
+        {
+            string url;
+            url = Energy.Base.Url.Make("localhost:1234", "ftp", null, "33", "path", null, null, null, null, null);
+            Assert.AreEqual("ftp://localhost:33/path", url);
+            url = Energy.Base.Url.Make("a@b", "mailto:", null, null, null, null, null, null, null, null);
+            Assert.AreEqual("mailto:a@b", url);
         }
     }
 }
