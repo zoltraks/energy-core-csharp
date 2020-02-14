@@ -679,6 +679,69 @@ namespace Energy.Base
 
         #endregion
 
+        #region Combine
+
+        /// <summary>
+        /// Combine parts of URL together.
+        /// </summary>
+        /// <param name="parts"></param>
+        /// <returns></returns>
+        public static string Combine(params string[] parts)
+        {
+            if (null == parts)
+            {
+                return null;
+            }
+            if (0 == parts.Length)
+            {
+                return "";
+            }
+            List<string> list = new List<string>();
+            string q = "/";
+            int l = parts.Length;
+            string p = null;
+            for (int i = 0; i < l; i++)
+            {
+                if (string.IsNullOrEmpty(parts[i]))
+                {
+                    continue;
+                }
+                if (null != p)
+                {
+                    if ("" != q)
+                    {
+                        if (!p.EndsWith(q) && !parts[i].StartsWith(q))
+                        {
+                            list.Add(q);
+                        }
+                    }
+                }
+                p = parts[i];
+                list.Add(p);
+                if ("/" == q)
+                {
+                    if (0 <= p.IndexOf('#'))
+                    {
+                        q = "";
+                    }
+                    else if (0 <= p.IndexOf('?'))
+                    {
+                        q = "&";
+                    }
+                }
+                else if ("&" == q)
+                {
+                    if (0 <= p.IndexOf('#'))
+                    {
+                        q = "";
+                    }
+                }
+            }
+            return string.Join("", list.ToArray());
+        }
+
+        #endregion
+
         #endregion
     }
 }

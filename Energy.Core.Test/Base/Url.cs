@@ -102,9 +102,21 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void UrlCombine()
         {
-            //string url;
-            //url = Energy.Base.Url.Combine("http://localhost:123", "path1", "path2");
-            Assert.IsNull(null);
+            string url;
+            url = Energy.Base.Url.Combine(null);
+            Assert.IsNull(url);
+            url = Energy.Base.Url.Combine(new string[] { });
+            Assert.AreEqual("", url);
+            url = Energy.Base.Url.Combine("http://localhost:123", "path1", "path2");
+            Assert.AreEqual("http://localhost:123/path1/path2", url);
+            url = Energy.Base.Url.Combine("http://localhost:123/", "/path1/", "/path2");
+            Assert.AreEqual("http://localhost:123//path1//path2", url);
+            url = Energy.Base.Url.Combine("http://localhost:123", "/path1", "/path2");
+            Assert.AreEqual("http://localhost:123/path1/path2", url);
+            url = Energy.Base.Url.Combine("http://localhost:123", "/path1", "/path2?a", "b=c");
+            Assert.AreEqual("http://localhost:123/path1/path2?a&b=c", url);
+            url = Energy.Base.Url.Combine("http://localhost:123", "/path1", "/path2?", "a", "b");
+            Assert.AreEqual("http://localhost:123/path1/path2?&a&b", url);
         }
 
         [TestMethod]
