@@ -25,7 +25,9 @@ namespace Energy.Base
         public static T As<T>(object value)
         {
             if (value == null)
+            {
                 return default(T);
+            }
             Type type = typeof(T);
             return (T)As(type, value);
         }
@@ -39,7 +41,9 @@ namespace Energy.Base
         public static object As(System.Type type, object value)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             Type r = type;
             Type t = value.GetType();
@@ -78,6 +82,8 @@ namespace Energy.Base
                 return ObjectToUnsignedLong(value);
             if (r == typeof(bool))
                 return ObjectToBool(value);
+            if (r == typeof(Stream))
+                return ObjectToStream(value);
 
             return Energy.Base.Class.GetDefault(type);
         }
@@ -3565,6 +3571,22 @@ namespace Energy.Base
                 dictionary[(string)array[i]] = (T)array[i + 1];
             }
             return dictionary;
+        }
+
+        public static Stream ObjectToStream(object o)
+        {
+            string s = ObjectToString(o);
+            return StringToStream(s);
+        }
+
+        public static TStream ObjectToStream<TStream>(object o) where TStream : Stream
+        {
+            string s = ObjectToString(o);
+            if (null == s)
+            {
+                return default(TStream);
+            }
+            return StringToStream(s) as TStream;
         }
 
         #endregion
