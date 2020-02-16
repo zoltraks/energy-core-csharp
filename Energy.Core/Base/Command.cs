@@ -157,6 +157,16 @@ namespace Energy.Base
                 return this;
             }
 
+            /// <summary>
+            /// Treat all unknown options as parametered or not.
+            /// </summary>
+            /// <returns></returns>
+            public Arguments Parameter(bool parameter)
+            {
+                _UnknownAsParameter = parameter;
+                return this;
+            }
+
             #endregion
 
             #region Switch
