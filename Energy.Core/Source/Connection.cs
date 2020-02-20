@@ -411,6 +411,17 @@ namespace Energy.Source
             }
         }
 
+        private string SetError(string error)
+        {
+            lock (_Lock)
+            {
+                _ErrorNumber = 0;
+                _ErrorMessage = error;
+                _ErrorException = null;
+            }
+            return error;
+        }
+
         private string ClearError()
         {
             lock (_Lock)
@@ -815,12 +826,18 @@ namespace Energy.Source
 
         /// <summary>
         /// Fetch query results into Energy.Base.Table.
+        /// Return null on error.
         /// </summary>
         /// <param name="query">Query text</param>
         /// <param name="error">Error text</param>
         /// <returns></returns>
         public Energy.Base.Table Fetch(string query, out string error)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
             error = ClearError();
             int repeat = Repeat;
             while (repeat-- >= 0)
@@ -877,6 +894,7 @@ namespace Energy.Source
 
         /// <summary>
         /// Fetch query results into Energy.Base.Table.
+        /// Return null on error.
         /// </summary>
         /// <param name="query">Query text</param>
         /// <returns></returns>
@@ -910,12 +928,18 @@ namespace Energy.Source
 
         /// <summary>
         /// Load data from query into DataTable.
+        /// Return null on error.
         /// </summary>
         /// <param name="query">Query text</param>
         /// <param name="error">Error text</param>
         /// <returns></returns>
         public DataTable Load(string query, out string error)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
             error = ClearError();
             int attempt = Repeat;
             while (attempt-- >= 0)
@@ -971,6 +995,7 @@ namespace Energy.Source
 
         /// <summary>
         /// Load data from query into DataTable.
+        /// Return null on error.
         /// </summary>
         /// <param name="query">Query text</param>
         /// <returns></returns>
@@ -1047,6 +1072,7 @@ namespace Energy.Source
 
         /// <summary>
         /// Read query results into DataTable.
+        /// Return null on error.
         /// This function will populate values in a loop using IDataReader. 
         /// </summary>
         /// <param name="query">Query text</param>
@@ -1054,6 +1080,11 @@ namespace Energy.Source
         /// <returns></returns>
         public DataTable Read(string query, out string error)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
             error = ClearError();
             int attempt = Repeat;
             int repeat = 0;
@@ -1128,6 +1159,7 @@ namespace Energy.Source
 
         /// <summary>
         /// Read query results into DataTable.
+        /// Return null on error.
         /// This function will populate values in a loop using IDataReader. 
         /// </summary>
         /// <param name="query">Query string</param>
@@ -1183,6 +1215,11 @@ namespace Energy.Source
         /// <returns></returns>
         public int Execute(string query, out string error)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return -2;
+            }
             error = ClearError();
             int repeat = Repeat;
             while (repeat-- >= 0)
@@ -1311,6 +1348,11 @@ namespace Energy.Source
         /// <returns></returns>
         public object Scalar(string query, out string error)
         {
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
             error = ClearError();
             int attempt = Repeat;
             if (attempt < 0)
