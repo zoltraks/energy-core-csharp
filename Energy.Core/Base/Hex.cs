@@ -18,184 +18,97 @@ namespace Energy.Base
         internal const string HEX_STRING_LOWER = "0123456789abcdef";
         internal const string HEX_STRING_32 = "0123456789ABCDEF0123456789abcdef";
         internal const string HEX_STRING_24_REVERSE = "FEDCBA9876543210fedcba";
-
-        #endregion
-
-        #region ByteArray
-
-        /// <summary>
-        /// Byte array which can be serialized and deserialized with hexadecimal string
-        /// </summary>
-        public class ByteArray
+        internal static readonly IList<string> HEX_BIN_16 = new List<string>(new string[]
         {
-            private byte[] _Data;
-            /// <summary>Data</summary>
-            [XmlIgnore]
-            public byte[] Data
-            {
-                get
-                {
-                    lock (Sync)
-                    {
-                        return _Data;
-                    }
-                }
-                set
-                {
-                    lock (Sync)
-                    {
-                        _Data = value;
-                        UpdateHex = true;
-                    }
-                }
-            }
-
-            public int Length
-            {
-                get
-                {
-                    lock (Sync)
-                    {
-                        if (_Data == null) return 0;
-                        return _Data.Length;
-                    }
-                }
-            }
-
-            private static readonly object Sync = new object();
-
-            private bool UpdateHex;
-
-            private string _Hex;
-            /// <summary>Hex</summary>
-            public string Hex
-            {
-                get
-                {
-                    lock (Sync)
-                    {
-                        if (UpdateHex)
-                        {
-                            _Hex = ByteArrayToHex(_Data);
-                            UpdateHex = false;
-                        }
-                        return _Hex;
-                    }
-                }
-                set
-                {
-                    lock (Sync)
-                    {
-                        _Hex = value;
-                        _Data = HexToByteArray(_Hex);
-                        UpdateHex = false;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Array of byte accessor
-            /// </summary>
-            /// <param name="offset"></param>
-            /// <returns></returns>
-            public byte this[int offset]
-            {
-                get
-                {
-                    return _Data[offset];
-                }
-                set
-                {
-                    _Data[offset] = value;
-                    // which one is better?
-                    UpdateHex = true;
-                    // or this?
-                    if (!UpdateHex) UpdateHex = true;
-                }
-            }
-
-            public static implicit operator ByteArray(string hex)
-            {
-                ByteArray o = new ByteArray();
-                o.Hex = hex;
-                return o;
-            }
-
-            public static implicit operator ByteArray(byte[] data)
-            {
-                ByteArray o = new ByteArray();
-                o.Data = data;
-                return o;
-            }
-        }
+            "0000", "0001", "0010", "0011",
+            "0100", "0101", "0110", "0111",
+            "1000", "1001", "1010", "1011",
+            "1100", "1101", "1110", "1111",
+        });
 
         #endregion
 
-        #region ASCII
+        #region HexToArray
 
         /// <summary>
-        /// Convert byte to ASCII character
-        /// </summary>
-        /// <param name="b">Byte</param>
-        /// <returns>Character</returns>
-        public static char ByteToASCII(byte b)
-        {
-            if (b == 0 || b == 128 || b == 255) return ' ';
-            if (b < 32) return '.';
-            if (b > 126) return '.';
-            return (char)b;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Convert hexadecimal string to byte array
+        /// Convert hexadecimal string to byte array.
         /// </summary>
         /// <param name="hex">Hexadecimal string</param>
         /// <returns>Byte array</returns>
         public static byte[] HexToArray(string hex)
         {
-            byte[] array = new byte[hex.Length / 2];
+            int l = hex.Length;
+            if (0 != l % 2)
+            {
+                l++;
+                hex = '0' + hex;
+            }
+            byte[] array = new byte[l / 2];
             int p = 0;
-            for (int i = 0; i < hex.Length; i++)
+            for (int i = 0; i < l; i++)
             {
                 byte b = 0;
                 if (hex[i] >= '0' && hex[i] <= '9')
-                    b = (byte)(hex[i] - '0' << 4);
+                {
+                    b = (byte)(hex[i] - '0');
+                }
                 else if (hex[i] >= 'A' && hex[i] <= 'F')
-                    b = (byte)(10 + hex[i] - 'A' << 4);
+                {
+                    b = (byte)(10 + hex[i] - 'A');
+                }
                 else if (hex[i] >= 'a' && hex[i] <= 'f')
-                    b = (byte)(10 + hex[i] - 'a' << 4);
+                {
+                    b = (byte)(10 + hex[i] - 'a');
+                }
                 i++;
+                b = (byte)(b << 4);
                 if (hex[i] >= '0' && hex[i] <= '9')
+                {
                     b += (byte)(hex[i] - '0');
+                }
                 else if (hex[i] >= 'A' && hex[i] <= 'F')
+                {
                     b += (byte)(10 + hex[i] - 'A');
+                }
                 else if (hex[i] >= 'a' && hex[i] <= 'f')
+                {
                     b += (byte)(10 + hex[i] - 'a');
+                }
                 array[p++] = b;
             }
             return array;
         }
 
+        #endregion
+
+        #region ArrayToHex
+
         /// <summary>
-        /// Convert byte array to hexadecimal string
+        /// Convert byte array to hexadecimal string.
         /// </summary>
         /// <param name="array">Byte array</param>
-        /// <param name="space">Optional hexadecimal separator</param>
+        /// <param name="space">Optional separator</param>
         /// <returns>string</returns>
         public static string ArrayToHex(byte[] array, string space)
         {
-            if (array == null)
+            if (null == array)
+            {
                 return null;
-            if (array.Length == 0)
+            }
+            if (0 == array.Length)
+            {
                 return "";
+            }
+            if (null == space)
+            {
+                space = "";
+            }
             string hex = BitConverter.ToString(array);
             return hex.Replace("-", space);
         }
 
         /// <summary>
-        /// Convert byte array to hexadecimal string
+        /// Convert byte array to hexadecimal string.
         /// </summary>
         /// <param name="array">Byte array</param>
         /// <returns>string</returns>
@@ -203,6 +116,10 @@ namespace Energy.Base
         {
             return ArrayToHex(array, "");
         }
+
+        #endregion
+
+        #region ByteToHex
 
         /// <summary>
         /// Represent byte as two-digit hexadecimal value.
@@ -214,89 +131,27 @@ namespace Energy.Base
             return value.ToString("X2");
         }
 
-        /// <summary>
-        /// Represent bytes as hexadecimal string
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        public static string ByteArrayToHex(byte[] array)
-        {
-            if (array == null) return null;
-            if (array.Length == 0) return "";
-            return BitConverter.ToString(array).Replace("-", "").ToLower();
-        }
+        #endregion
+
+        #region ByteToPrintable
 
         /// <summary>
-        /// Convert hex to byte array
+        /// Convert byte to printable character.
+        /// <br/><br/>
+        /// All non-ASCII characters will be represented as dot character.
+        /// Bytes 0, 128 and 255 will be represented as space.
         /// </summary>
-        /// <param name="hex"></param>
-        /// <returns></returns>
-        public static byte[] HexToByteArray(string hex)
+        /// <param name="b">Byte</param>
+        /// <returns>Character</returns>
+        public static char ByteToPrintable(byte b)
         {
-            return HexToByteArray(hex, null);
+            if (b == 0 || b == 128 || b == 255) return ' ';
+            if (b < 32) return '.';
+            if (b > 126) return '.';
+            return (char)b;
         }
 
-        /// <summary>
-        /// Convert hex to byte array
-        /// </summary>
-        /// <param name="hex"></param>
-        /// <param name="prefix">Optional prefix list of hexadecimal number</param>
-        /// <returns></returns>
-        public static byte[] HexToByteArray(string hex, string[] prefix)
-        {
-            if (null == hex)
-                return null;
-
-            // TODO Compare performance with hex = Regex.Replace(hex, @"\s", "");
-            hex = Energy.Base.Text.RemoveWhitespace(hex);
-
-            if (0 == hex.Length)
-            {
-                return new byte[] { };
-            }
-
-            if (prefix != null && prefix.Length > 0)
-            {
-                bool found = false;
-                for (int i = 0; i < prefix.Length; i++)
-                {
-                    if (hex.StartsWith(prefix[i]))
-                    {
-                        hex = hex.Substring(prefix[i].Length);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    return null;
-                }
-            }
-
-            if (hex.Length % 2 != 0)
-            {
-                hex = "0" + hex;
-            }
-
-            int count = hex.Length / 2;
-            byte[] data = new byte[count];
-            char[] charArray = hex.ToCharArray();
-
-            for (int i = 0, n = 0; i < hex.Length; i += 2)
-            {
-                int hi = HEX_STRING_24_REVERSE.IndexOf(charArray[i]);
-                int lo = HEX_STRING_24_REVERSE.IndexOf(charArray[i + 1]);
-                if (hi < 0)
-                    hi = 0;
-                if (lo < 0)
-                    lo = 0;
-                hi = (15 - (hi % 16)) * 16;
-                lo = 15 - (lo % 16);
-                data[n++] = (byte)(hi + lo);
-            }
-
-            return data;
-        }
+        #endregion
 
         #region IntegerToHex
 
@@ -309,11 +164,11 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <param name="size"></param>
-        /// <param name="uppperCase"></param>
+        /// <param name="capitalize"></param>
         /// <returns></returns>
-        public static string IntegerToHex(int value, int size, bool uppperCase)
+        public static string IntegerToHex(int value, int size, bool capitalize)
         {
-            string hex = value.ToString(uppperCase ? "X" : "x");
+            string hex = value.ToString(capitalize ? "X" : "x");
             if (hex.Length < size)
                 hex = hex.PadLeft(size, '0');
             else if (hex.Length > size)
@@ -379,6 +234,79 @@ namespace Energy.Base
                 return value;
             }
             return value;
+        }
+
+        #endregion
+
+        #region BinToHex
+
+        /// <summary>
+        /// Convert binary string to hexadecimal string.
+        /// </summary>
+        /// <param name="bin"></param>
+        /// <returns></returns>
+        public static string BinToHex(string bin)
+        {
+            if (string.IsNullOrEmpty(bin))
+            {
+                return bin;
+            }
+            if (0 < bin.Length % 4)
+            {
+                bin = bin.PadLeft(4 * (1 + (int)bin.Length / 4), '0');
+            }
+            int length = bin.Length;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < length; i += 4)
+            {
+                string s = bin.Substring(i, 4);
+                int n = HEX_BIN_16.IndexOf(s);
+                if (n < 0)
+                {
+                    continue;
+                }
+                sb.Append(HEX_STRING_UPPER[n]);
+            }
+            return sb.ToString();
+        }
+
+        #endregion
+
+        #region HexToBin
+
+        /// <summary>
+        /// Convert hexadecimal string to binary string.
+        /// <br/><br/>
+        /// Note that hexadecimal "0" will be represented with leading zeroes as "0000" in binary.
+        /// Resulting binary string will always have a length divisible by 4.
+        /// <br/><br/>
+        /// Works also when hexadecimal string starts with "0x" or "$".
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static string HexToBin(string hex)
+        {
+            if (null == hex)
+            {
+                return null;
+            }
+            hex = RemovePrefix(hex);
+            if (0 == hex.Length)
+            {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            int length = hex.Length;
+            for (int i = 0; i < length; i++)
+            {
+                int o = HEX_STRING_32.IndexOf(hex[i]);
+                if (o < 0)
+                {
+                    continue;
+                }
+                sb.Append(HEX_BIN_16[o % 16]);
+            }
+            return sb.ToString();
         }
 
         #endregion
@@ -592,7 +520,7 @@ namespace Energy.Base
                         int a = o + i;
                         if (a >= arrayLength)
                             break;
-                        b.Append(ByteToASCII(array[a]));
+                        b.Append(ByteToPrintable(array[a]));
                     }
                 }
                 o += lineSize;
@@ -714,7 +642,7 @@ namespace Energy.Base
         {
             if (removeWhite)
             {
-                value = Energy.Base.Text.RemoveWhitespace(value);
+                value = Energy.Base.Text.RemoveWhite(value);
             }
             if (null == prefixArray || 0 == prefixArray.Length)
             {
@@ -773,6 +701,35 @@ namespace Energy.Base
                 }
             }
             return true;
+        }
+
+        #endregion
+
+        #region RemovePrefix
+
+        /// <summary>
+        /// Remove leading prefix "0x", "0X" or "$" from hexadecimal string.
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static string RemovePrefix(string hex)
+        {
+            if (string.IsNullOrEmpty(hex))
+            {
+                return hex;
+            }
+            else if (hex.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                return hex.Substring(2);
+            }
+            else if (hex.StartsWith("$"))
+            {
+                return hex.Substring(1);
+            }
+            else
+            {
+                return hex;
+            }
         }
 
         #endregion

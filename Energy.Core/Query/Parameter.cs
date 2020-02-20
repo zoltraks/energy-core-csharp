@@ -409,7 +409,7 @@ namespace Energy.Query
                     if (variable.Length > 0)
                     {
                         variable = variable.Trim();
-                        variable = Energy.Base.Text.ReplaceWhitespace(variable, "_");
+                        variable = Energy.Base.Text.ReplaceWhite(variable, "_");
                         sb.Append("@");
                         sb.Append(variable);
                     }

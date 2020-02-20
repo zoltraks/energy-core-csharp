@@ -1129,20 +1129,22 @@ namespace Energy.Base
 
         #endregion
 
-        #region RemoveWhitespace
+        #region RemoveWhite
 
         /// <summary>
         /// Remove whitespace characters from entire string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string RemoveWhitespace(string value)
+        public static string RemoveWhite(string value)
         {
             if (value == null || value.Length == 0)
+            {
                 return value;
+            }
             string white = Energy.Base.Text.WS;
             char[] charArray = value.ToCharArray();
-            if (!Energy.Base.Text.ContainsWhitespace(charArray))
+            if (!Energy.Base.Text.ContainsWhite(charArray))
             {
                 return value;
             }
@@ -1150,40 +1152,60 @@ namespace Energy.Base
             for (int i = 0; i < charArray.Length; i++)
             {
                 if (white.IndexOf(charArray[i]) >= 0)
+                {
                     continue;
+                }
                 else
+                {
                     sb.Append(charArray[i]);
+                }
             }
             return sb.ToString();
         }
 
         #endregion
 
-        #region ContainsWhitespace
+        #region ContainsWhite
 
         /// <summary>
-        /// Check if array contains any of whitespace character.
+        /// Check if array contains any of whitespace characters.
         /// </summary>
-        /// <param name="charArray"></param>
+        /// <param name="array"></param>
         /// <returns></returns>
-        public static bool ContainsWhitespace(char[] charArray)
+        public static bool ContainsWhite(char[] array)
         {
-            if (null == charArray)
-                return false;
-            if (0 == charArray.Length)
-                return false;
-            string white = Energy.Base.Text.WS;
-            for (int i = 0; i < charArray.Length; i++)
+            if (null == array)
             {
-                if (0 <= white.IndexOf(charArray[i]))
+                return false;
+            }
+            if (0 == array.Length)
+            {
+                return false;
+            }
+            string white = Energy.Base.Text.WS;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (0 <= white.IndexOf(array[i]))
+                {
                     return true;
+                }
             }
             return false;
         }
 
+        /// <summary>
+        /// Check if text contains whitespace character.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool ContainsWhite(string text)
+        {
+            return ContainsWhite(text.ToCharArray());
+        }
+
         #endregion
 
-        #region ReplaceWhitespace
+        #region ReplaceWhite
 
         /// <summary>
         /// Replace whitespace characters with replacement string in entire string.
@@ -1191,10 +1213,12 @@ namespace Energy.Base
         /// <param name="text"></param>
         /// <param name="replacement"></param>
         /// <returns></returns>
-        public static string ReplaceWhitespace(string text, string replacement)
+        public static string ReplaceWhite(string text, string replacement)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return text;
+            }
             text = Regex.Replace(text, @"\s+", replacement);
             return text;
         }
@@ -2038,7 +2062,9 @@ namespace Energy.Base
         public static T Chop<T>(ref T[] array)
         {
             if (array == null || array.Length == 0)
-                return default(T);
+            {
+                return default;
+            }
             T first = array[0];
             List<T> list = new List<T>(array.Length);
             list.AddRange(array);

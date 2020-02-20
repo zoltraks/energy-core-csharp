@@ -26,7 +26,7 @@ namespace Energy.Base
         {
             if (value == null)
             {
-                return default(T);
+                return default;
             }
             Type type = typeof(T);
             return (T)As(type, value);
@@ -1959,58 +1959,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value)
-        {
-            return StringToByteSmart(value, new string[] { "0x", "0X", "$" }, true);
-        }
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="hexPrefix">List of possible hexadecimal prefixes if you want to decode byte from a hexadecimal string</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value, string[] hexPrefix)
-        {
-            return StringToByteSmart(value, hexPrefix, true);
-        }
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="hexPrefix">List of possible hexadecimal prefixes if you want to decode byte from a hexadecimal string</param>
-        /// <param name="takeFirst">Little Endian (true) or Big Endian (false) style</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value, string[] hexPrefix, bool takeFirst)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            if (hexPrefix != null)
-            {
-                if (Energy.Base.Hex.IsHex(value, hexPrefix))
-                {
-                    byte[] byteArray = Energy.Base.Hex.HexToByteArray(value, hexPrefix);
-                    if (byteArray != null && byteArray.Length > 0)
-                    {
-                        if (takeFirst)
-                            return byteArray[0];
-                        else
-                            return byteArray[byteArray.Length - 1];
-                    }
-                }
-            }
-            return StringToByte(value);
-        }
-
-        /// <summary>
         /// Represent byte as decimal text.
         /// </summary>
         /// <param name="value"></param>
@@ -2761,7 +2709,9 @@ namespace Energy.Base
             {
                 TKey key = Energy.Base.Cast.As<TKey>(array[array.Length - 1]);
                 if (key != null)
-                    dictionary[key] = default(TValue);
+                {
+                    dictionary[key] = default;
+                }
             }
             return dictionary;
         }
@@ -3584,7 +3534,7 @@ namespace Energy.Base
             string s = ObjectToString(o);
             if (null == s)
             {
-                return default(TStream);
+                return default;
             }
             return StringToStream(s) as TStream;
         }
@@ -3735,9 +3685,13 @@ namespace Energy.Base
         public static byte[] Base64ToByteArray(string input)
         {
             if (input == null)
+            {
                 return null;
+            }
             if (input.Length == 0)
+            {
                 return new byte[] { };
+            }
             byte[] data;
             try
             {

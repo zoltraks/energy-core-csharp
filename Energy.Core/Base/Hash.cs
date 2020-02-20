@@ -112,7 +112,7 @@ namespace Energy.Base
             using (System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider())
             {
                 byte[] array = md5.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -145,7 +145,7 @@ namespace Energy.Base
             using (System.Security.Cryptography.SHA1 sha = new System.Security.Cryptography.SHA1CryptoServiceProvider())
             {
                 byte[] array = sha.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -178,7 +178,7 @@ namespace Energy.Base
             using (System.Security.Cryptography.SHA256 cipher = System.Security.Cryptography.SHA256.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -211,7 +211,7 @@ namespace Energy.Base
             using (System.Security.Cryptography.SHA384 cipher = System.Security.Cryptography.SHA384.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -244,7 +244,7 @@ namespace Energy.Base
             using (System.Security.Cryptography.SHA512 cipher = System.Security.Cryptography.SHA512.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 

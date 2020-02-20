@@ -175,7 +175,7 @@ namespace Energy.Query
         {
             if (string.IsNullOrEmpty(type))
                 return type;
-            string simple = Energy.Base.Text.ReplaceWhitespace(type, " ").Trim();
+            string simple = Energy.Base.Text.ReplaceWhite(type, " ").Trim();
             if (string.IsNullOrEmpty(simple))
                 return type;
             switch (simple.ToUpper())
@@ -293,9 +293,9 @@ namespace Energy.Query
             {
                 result = new Definition()
                 {
-                    Type = Energy.Base.Text.ReplaceWhitespace(Energy.Base.Text.Upper(match.Groups["type"].Value), " "),
+                    Type = Energy.Base.Text.ReplaceWhite(Energy.Base.Text.Upper(match.Groups["type"].Value), " "),
                     Simple = Simplify(match.Groups["type"].Value, Energy.Base.Cast.AsInteger(match.Groups["size"].Value)),
-                    Null = Energy.Base.Text.Upper(Energy.Base.Text.ReplaceWhitespace(match.Groups["null"].Value, " ")),
+                    Null = Energy.Base.Text.Upper(Energy.Base.Text.ReplaceWhite(match.Groups["null"].Value, " ")),
                     Default = match.Groups["default"].Value,
                     Size = match.Groups["size"].Value,
                     Extra = match.Groups["extra"].Value,
