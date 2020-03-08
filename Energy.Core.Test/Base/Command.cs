@@ -19,14 +19,14 @@ namespace Energy.Core.Test.Base
                 .Slash(true)
                 .Parse();
             Assert.IsNotNull(argv);
-            Assert.IsFalse(argv["help"].Empty);
+            Assert.IsFalse(argv["help"].IsEmpty);
             argv.Alias("?", "help").Parse("");
             Assert.IsNotNull(argv);
-            Assert.IsTrue(argv["help"].Empty);
+            Assert.IsTrue(argv["help"].IsEmpty);
             argv.Alias("?", "help");
             argv.Parse("/?");
             Assert.IsNotNull(argv);
-            Assert.IsFalse(argv["help"].Empty);
+            Assert.IsFalse(argv["help"].IsEmpty);
 
             args = @"-q --b -abc /? param1 ""param -x 2"" -- param3 /opt1/opt2";
             argv = new Energy.Base.Command.Arguments(args)
@@ -53,7 +53,7 @@ namespace Energy.Core.Test.Base
             n = 0;
             argv.Options.ForEach((x) =>
             {
-                if (!x.Null)
+                if (!x.IsNull)
                 {
                     n++;
                 }

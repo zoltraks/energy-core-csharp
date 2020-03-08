@@ -498,7 +498,7 @@ namespace Energy.Base
                                 Name = target,
                                 Count = 0,
                                 Value = key,
-                                Temporary = true,
+                                IsTemporary = true,
                             };
                             _Option.Add(opt);
                             continue;
@@ -564,7 +564,7 @@ namespace Energy.Base
                     int i = this.Count;
                     while (0 <= --i)
                     {
-                        if (this[i].Temporary)
+                        if (this[i].IsTemporary)
                         {
                             this.RemoveAt(i);
                             continue;
@@ -615,19 +615,22 @@ namespace Energy.Base
 
             #endregion
 
+            /// <summary>
+            /// Option name
+            /// </summary>
             public string Name;
 
             public int Count;
 
-            public bool Temporary;
-
-            public string[] Values;
-
             public string Value { get => GetValue(); set => SetValue(value); }
 
-            public bool Empty { get => IsEmpty(); }
+            public string[] Values { get; internal set; }
 
-            public bool Null { get => IsNull(); }
+            public bool IsTemporary { get; internal set; }
+
+            public bool IsEmpty { get => GetIsEmpty(); }
+
+            public bool IsNull { get => GetIsNull(); }
 
             public string GetValue()
             {
@@ -681,7 +684,7 @@ namespace Energy.Base
                     ;
             }
 
-            public bool IsEmpty()
+            private bool GetIsEmpty()
             {
                 if (null == Values)
                 {
@@ -705,7 +708,7 @@ namespace Energy.Base
                 return true;
             }
 
-            public bool IsNull()
+            private bool GetIsNull()
             {
                 if (null == Values)
                 {

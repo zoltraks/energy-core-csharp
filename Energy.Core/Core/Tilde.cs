@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -365,7 +366,8 @@ namespace Energy.Core
         #region Ask
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="value">Default value</param>
@@ -375,34 +377,66 @@ namespace Energy.Core
             if (!string.IsNullOrEmpty(question))
             {
                 if (value == null)
+                {
                     value = "";
+                }
                 string message = value == "" ? AskSimpleText : AskChangeText;
                 message = string.Format(message, question, value);
                 Energy.Core.Tilde.RealWrite(message);
             }
-            int left = System.Console.CursorLeft;
-            System.ConsoleColor foreground = System.Console.ForegroundColor;
-            System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+
+            int left = 0;
+            try
+            {
+                left = System.Console.CursorLeft;
+            }
+            catch (ArgumentOutOfRangeException) { }
+            catch (SecurityException) { }
+            catch (IOException) { }
+            
+            ConsoleColor foreground = ConsoleColor.Gray;
+            try
+            {
+                foreground = System.Console.ForegroundColor;
+                if (!_Colorless)
+                {
+                    System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+                }
+            }
+            catch (ArgumentException) { }
+            catch (IOException) { }
+            catch (SecurityException)
+            {
+                _Colorless = true;
+            }
+
             string answer = System.Console.ReadLine().Trim();
-            int top = System.Console.CursorTop;
-            System.Console.ForegroundColor = foreground;
+            
+            if (!_Colorless)
+            {
+                System.Console.ForegroundColor = foreground;
+            }
+
             if (answer.Length == 0)
             {
                 answer = value;
                 try
                 {
+                    int top = System.Console.CursorTop;
                     System.Console.SetCursorPosition(left, top - 1);
+                    System.Console.WriteLine(answer);
                 }
-                catch (ArgumentOutOfRangeException)
-                {
-                }
-                System.Console.WriteLine(answer);
+                catch (ArgumentOutOfRangeException) { }
+                catch (SecurityException) { }
+                catch (IOException) { }
             }
+
             return answer;
         }
 
         /// <summary>
-        /// Ask question with prompt. Empty string will be returned if no data were provided.
+        /// Ask question with prompt.
+        /// Empty string will be returned if no data were provided.
         /// </summary>
         /// <param name="question">Question string</param>
         /// <returns>Value entered or empty string if skipped</returns>
@@ -412,7 +446,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -423,7 +458,9 @@ namespace Energy.Core
         {
             string answer = Ask(question, value);
             if (String.IsNullOrEmpty(answer))
+            {
                 return value;
+            }
             switch (casing)
             {
                 default:
@@ -436,7 +473,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -449,7 +487,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -461,7 +500,9 @@ namespace Energy.Core
         }
 
         /// <summary>
-        ///
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to desired type.
         /// </summary>
         /// <param name="question"></param>
         /// <param name="value"></param>
@@ -488,12 +529,29 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to the type of value parameter.
+        /// </summary>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static object Ask(string question, object value)
         {
             Type type = value != null ? value.GetType() : typeof(string);
             return Ask(question, value, type);
         }
 
+        /// <summary>
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to desired type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T Ask<T>(string question, T value)
         {
             T result;
@@ -929,11 +987,14 @@ namespace Energy.Core
             {
                 return;
             }
+
             ColorTextList list = ColorTextList.Explode(text);
+            
             if (list.Count == 0)
             {
                 return;
             }
+            
             lock (_ConsoleLock)
             {
                 // TODO Fix new lines :)
@@ -961,6 +1022,7 @@ namespace Energy.Core
                     }
                     System.Console.Write(list[i].Text);
                 }
+
                 if (!_Colorless)
                 {
                     System.Console.ForegroundColor = previousForegroundColor;
@@ -986,7 +1048,7 @@ namespace Energy.Core
                         if (!_Thread.IsAlive)
                         {
                             _Thread = null;
-                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " " 
+                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " "
                                 + "Energy.Core.Tilde Thread is not alive anymore ("
                                 + (bugThreadOrphan = Energy.Base.Number.Increment(bugThreadOrphan)).ToString()
                                 + ")"
@@ -1438,10 +1500,8 @@ namespace Energy.Core
 
         /// <summary>
         /// Write out prompt message and wait for input string. 
-        /// If empty string is read from console, function will return 
-        /// defaultValue parameter value.
-        /// If message contains placeholder {0}, it will be
-        /// replaced with defaultValue parameter value.
+        /// If empty string is read from console, function will return defaultValue parameter value.
+        /// If input message contains placeholder {0}, it will be replaced with defaultValue parameter value.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="defaultValue"></param>
@@ -1454,15 +1514,29 @@ namespace Energy.Core
             else
             {
                 if (message.Contains("{0}"))
+                {
                     message = string.Format(message, defaultValue);
+                }
             }
             Energy.Core.Tilde.RealWrite(message);
             string input = Console.ReadLine();
             if (string.IsNullOrEmpty(input))
+            {
                 input = defaultValue;
+            }
             return input;
         }
 
+        /// <summary>
+        /// Write out prompt message and wait for input string.
+        /// If empty string is read from console, function will return defaultValue parameter value.
+        /// If input message contains placeholder {0}, it will be replaced with defaultValue parameter value.
+        /// Input value will be converted to desired type.
+        /// </summary>
+        /// <typeparam name="TInput"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static TInput Input<TInput>(string message, object defaultValue)
         {
             string defaultString = Energy.Base.Cast.ObjectToString(defaultValue);
@@ -1471,7 +1545,7 @@ namespace Energy.Core
         }
 
         #endregion
-        
+
         #region Length
 
         /// <summary>
@@ -1533,12 +1607,13 @@ namespace Energy.Core
             if (_ConsolePresent == null)
             {
                 _ConsolePresent = true;
-                try 
+                try
                 {
-                    int windowHeight = Console.WindowHeight; }
-                catch 
-                { 
-                    _ConsolePresent = false; 
+                    int windowHeight = Console.WindowHeight;
+                }
+                catch
+                {
+                    _ConsolePresent = false;
                 }
             }
             return _ConsolePresent.Value;
