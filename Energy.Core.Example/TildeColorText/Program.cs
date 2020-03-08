@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TildeColorText
 {
@@ -16,19 +14,20 @@ namespace TildeColorText
             Console.WriteLine();
             ConsoleColor backgroundColor = Console.BackgroundColor;
             Console.BackgroundColor = ConsoleColor.DarkGray;
-            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.ExampleColorPalleteTildeString);
+            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.ColorPalleteTildeString);
             Console.BackgroundColor = backgroundColor;
-            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.ExampleColorPalleteTildeString);
-            string example = "Text ~green~green ~9~blue~0~ ~~~ ~#escaped ## ~green~#~...";
-            Console.WriteLine("Example text (raw):");
-            Console.WriteLine(example);
-            Console.WriteLine("Example text (tilde):");
+            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.ColorPalleteTildeString);
+            string example = "~green~Green or ~9~blue~0~? Two tildes: ~~. ~`escaped `` ~green~`~. One tilde ~`~`~.";
+            Energy.Core.Tilde.WriteLine("Example text (~lc~tilde~0~):");
             Energy.Core.Tilde.WriteLine(example);
-            Console.WriteLine("Example text (strip):");
-            Console.WriteLine(Energy.Core.Tilde.Strip(example));
-            Console.WriteLine("Example text length = {0} (raw), length = {1} (tilde)"
+            Energy.Core.Tilde.WriteLine("Example text (~lc~escape~0~):");
+            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Escape(example));
+            Energy.Core.Tilde.WriteLine("Example text (~lc~strip~0~):");
+            Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Strip(example));
+            Energy.Core.Tilde.WriteLine("Example text length = {0} (raw), length = {1} (tilde)"
                 , example.Length, (int)Energy.Core.Tilde.Length(example));
             Energy.Core.Tilde.WriteLine(ConsoleColor.Yellow, example);
+            Energy.Core.Tilde.WriteLine("~`~`~ ~`~0~``~0~`~ ~`~`~");
 
             TryException();
 
@@ -48,7 +47,7 @@ namespace TildeColorText
             Energy.Core.Tilde.RunInThread = true;
             for (int i = 0; i < n; i++)
             {
-                Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Example.GetRainbowLine("-=-", Energy.Core.Tilde.Width - 1, i));
+                Energy.Core.Tilde.WriteLine(Energy.Core.Tilde.Utility.RainbowLine("-=-", Energy.Core.Tilde.Width - 1, i));
                 System.Threading.Thread.Sleep(d);
             }
 

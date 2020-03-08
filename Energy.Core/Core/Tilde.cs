@@ -128,7 +128,9 @@ namespace Energy.Core
             public static ColorTextList Explode(string message)
             {
                 if (message == null)
+                {
                     return null;
+                }
                 ColorTextList list = new ColorTextList();
                 Match m = Regex.Match(message, Energy.Base.Expression.TildeText);
                 System.ConsoleColor? current = null;
@@ -217,45 +219,6 @@ namespace Energy.Core
         private static string _AskChangeText = DefaultAskChangeText;
         public static string AskChangeText { get { return _AskChangeText; } set { _AskChangeText = value; } }
 
-        private static string _ExampleColorPalleteTildeString = ""
-            + "~darkblue~~#~1~#~\t~#~darkblue~#~"
-            + Energy.Base.Text.NL
-            + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
-            + Energy.Base.Text.NL
-            + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
-            + Energy.Base.Text.NL
-            + "~darkred~~#~4~#~\t~#~darkred~#~"
-            + Energy.Base.Text.NL
-            + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
-            + Energy.Base.Text.NL
-            + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
-            + Energy.Base.Text.NL
-            + "~gray~~#~7~#~\t~#~gray~#~"
-            + Energy.Base.Text.NL
-            + "~darkgray~~#~8~#~\t~#~darkgray~#~"
-            + Energy.Base.Text.NL
-            + "~blue~~#~9~#~\t~#~blue~#~"
-            + Energy.Base.Text.NL
-            + "~green~~#~10~#~\t~#~green~#~"
-            + Energy.Base.Text.NL
-            + "~cyan~~#~11~#~\t~#~cyan~#~"
-            + Energy.Base.Text.NL
-            + "~red~~#~12~#~\t~#~red~#~"
-            + Energy.Base.Text.NL
-            + "~magenta~~#~13~#~\t~#~magenta~#~"
-            + Energy.Base.Text.NL
-            + "~yellow~~#~14~#~\t~#~yellow~#~"
-            + Energy.Base.Text.NL
-            + "~white~~#~15~#~\t~#~white~#~"
-            + Energy.Base.Text.NL
-            + "~black~~#~16~#~\t~#~black~#~"
-            ;
-
-        /// <summary>
-        /// Cheat sheet for all colors defined by default
-        /// </summary>
-        public static string ExampleColorPalleteTildeString { get { return _ExampleColorPalleteTildeString; } set { _ExampleColorPalleteTildeString = value; } }
-
         #endregion
 
         #region Default
@@ -269,48 +232,132 @@ namespace Energy.Core
 
         #endregion
 
-        #region Example
+        #region Utility
 
-        public static class Example
+        /// <summary>
+        /// Utility
+        /// </summary>
+        public static class Utility
         {
-            public static string GetRainbowLine(string text, int limit, int offset)
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <param name="offset">Starting color offset</param>
+            /// <param name="colors">Color table</param>
+            /// <returns></returns>
+            public static string RainbowLine(string pattern, int width, int offset, string[] colors)
             {
-                if (string.IsNullOrEmpty(text))
+                if (string.IsNullOrEmpty(pattern))
                 {
-                    return text;
+                    return pattern;
                 }
-
-                string[] rainbow = new string[]
+                if (null == colors || 0 == colors.Length)
                 {
-                    Color.DarkBlue, Color.Blue, Color.Green, Color.Yellow, Color.Red, Color.DarkRed,
-                };
-
-                int n = offset;
-
-                if (limit < 1 || limit == text.Length)
-                {
-                    return rainbow[offset % rainbow.Length] + text;
+                    colors = new string[] { "" };
                 }
-
+                if (width < 1 || width == pattern.Length)
+                {
+                    return colors[offset % colors.Length] + pattern;
+                }
                 StringBuilder s = new StringBuilder();
                 int l = 0;
-                int d = text.Length;
-                while (l < limit)
+                int d = pattern.Length;
+                int n = offset;
+                while (l < width)
                 {
-                    s.Append(rainbow[n++ % rainbow.Length]);
-                    if (l + d <= limit)
+                    s.Append(colors[n++ % colors.Length]);
+                    if (l + d <= width)
                     {
-                        s.Append(text);
+                        s.Append(pattern);
                     }
                     else
                     {
-                        s.Append(text.Substring(0, limit - l));
+                        s.Append(pattern.Substring(0, width - l));
                     }
                     l += d;
                 }
 
                 return s.ToString();
             }
+
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <param name="offset">Starting color offset</param>
+            /// <returns></returns>
+            public static string RainbowLine(string pattern, int width, int offset)
+            {
+                string[] rainbow = new string[]
+                {
+                    Color.Magenta, Color.Blue, Color.Green, Color.Yellow, Color.DarkYellow, Color.Red,
+                };
+                return RainbowLine(pattern, width, offset, rainbow);
+            }
+
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <returns></returns>
+
+            public static string RainbowLine(string pattern, int width)
+            {
+                return RainbowLine(pattern, width, 0);
+            }
+        }
+
+        #endregion
+
+        #region Example
+
+        /// <summary>
+        /// Example
+        /// </summary>
+        public static class Example
+        {
+            private static string _ColorPalleteTildeString = ""
+                + "~darkblue~~`~1~`~\t~`~darkblue~`~"
+                + Energy.Base.Text.NL
+                + "~darkgreen~~`~2~`~\t~`~darkgreen~`~"
+                + Energy.Base.Text.NL
+                + "~darkcyan~~`~3~`~\t~`~darkcyan~`~"
+                + Energy.Base.Text.NL
+                + "~darkred~~`~4~`~\t~`~darkred~`~"
+                + Energy.Base.Text.NL
+                + "~darkmagenta~~`~5~`~\t~`~darkmagenta~`~"
+                + Energy.Base.Text.NL
+                + "~darkyellow~~`~6~`~\t~`~darkyellow~`~"
+                + Energy.Base.Text.NL
+                + "~gray~~`~7~`~\t~`~gray~`~"
+                + Energy.Base.Text.NL
+                + "~darkgray~~`~8~`~\t~`~darkgray~`~"
+                + Energy.Base.Text.NL
+                + "~blue~~`~9~`~\t~`~blue~`~"
+                + Energy.Base.Text.NL
+                + "~green~~`~10~`~\t~`~green~`~"
+                + Energy.Base.Text.NL
+                + "~cyan~~`~11~`~\t~`~cyan~`~"
+                + Energy.Base.Text.NL
+                + "~red~~`~12~`~\t~`~red~`~"
+                + Energy.Base.Text.NL
+                + "~magenta~~`~13~`~\t~`~magenta~`~"
+                + Energy.Base.Text.NL
+                + "~yellow~~`~14~`~\t~`~yellow~`~"
+                + Energy.Base.Text.NL
+                + "~white~~`~15~`~\t~`~white~`~"
+                + Energy.Base.Text.NL
+                + "~black~~`~16~`~\t~`~black~`~"
+                ;
+
+            /// <summary>
+            /// Cheat sheet for all colors defined by default
+            /// </summary>
+            public static string ColorPalleteTildeString { get { return _ColorPalleteTildeString; } }
         }
 
         #endregion
@@ -867,18 +914,26 @@ namespace Energy.Core
         private static void RealWrite(object value)
         {
             if (value == null)
+            {
                 return;
+            }
 
             string text = null;
 
             if (value is string)
+            {
                 text = value as string;
+            }
 
             if (string.IsNullOrEmpty(text))
+            {
                 return;
+            }
             ColorTextList list = ColorTextList.Explode(text);
             if (list.Count == 0)
+            {
                 return;
+            }
             lock (_ConsoleLock)
             {
                 // TODO Fix new lines :)
@@ -1435,6 +1490,9 @@ namespace Energy.Core
 
         #region Width
 
+        /// <summary>
+        /// Console window width in characters
+        /// </summary>
         public static int Width
         {
             get
@@ -1447,6 +1505,9 @@ namespace Energy.Core
 
         #region Height
 
+        /// <summary>
+        /// Console window height in lines
+        /// </summary>
         public static int Height
         {
             get
