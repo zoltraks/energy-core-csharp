@@ -32,16 +32,27 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert hexadecimal string to byte array.
+        /// This is strict version of conversion function.
+        /// Hexadecimal string should contain only digits and small or upper letters A-F.
+        /// Any other character is treated as zero.
         /// </summary>
         /// <param name="hex">Hexadecimal string</param>
         /// <returns>Byte array</returns>
         public static byte[] HexToArray(string hex)
         {
+            if (null == hex)
+            {
+                return null;
+            }
+            if (0 == hex.Length)
+            {
+                return new byte[] { };
+            }
             int l = hex.Length;
             if (0 != l % 2)
             {
                 l++;
-                hex = '0' + hex;
+                hex = "0" + hex;
             }
             byte[] array = new byte[l / 2];
             int p = 0;
@@ -77,6 +88,56 @@ namespace Energy.Base
                 array[p++] = b;
             }
             return array;
+        }
+
+        /// <summary>
+        /// Convert hexadecimal string to byte array.
+        /// This version of conversion function allows to use
+        /// prefixes (like "0x" or "$") and whitespace characters.
+        /// Hexadecimal string should contain only digits and small or upper letters A-F.
+        /// Any other character is treated as zero.
+        /// </summary>
+        /// <param name="hex">Hexadecimal string</param>
+        /// <param name="ignoreWhite">Ignore whitespace</param>
+        /// <param name="prefix">Array of possible prefixes</param>
+        /// <returns>Byte array</returns>
+        public static byte[] HexToArray(string hex, bool ignoreWhite, string[] prefix)
+        {
+            if (null == hex)
+            {
+                return null;
+            }
+            if (ignoreWhite)
+            {
+                hex = Regex.Replace(hex, "\\s", "");
+            }
+            if (null != prefix)
+            {
+                for (int i = 0; i < prefix.Length; i++)
+                {
+                    if (hex.StartsWith(prefix[i]))
+                    {
+                        hex = hex.Substring(prefix[i].Length);
+                        break;
+                    }
+                }
+            }
+            return HexToArray(hex);
+        }
+
+
+        /// <summary>
+        /// Convert hexadecimal string to byte array.
+        /// This version of conversion function allows to use whitespace characters.
+        /// Hexadecimal string should contain only digits and small or upper letters A-F.
+        /// Any other character is treated as zero.
+        /// </summary>
+        /// <param name="hex">Hexadecimal string</param>
+        /// <param name="ignoreWhite">Ignore whitespace</param>
+        /// <returns>Byte array</returns>
+        public static byte[] HexToArray(string hex, bool ignoreWhite)
+        {
+            return HexToArray(hex, ignoreWhite, null);
         }
 
         #endregion

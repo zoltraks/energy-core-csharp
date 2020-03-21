@@ -14,17 +14,30 @@ namespace Energy.Core.Test.Base
         public void HexToArray()
         {
             string hex1 = "a";
+            string hex3 = "abc";
             string hex8 = "01234567";
             string hex8a = "89abcdef";
             string hex8A = "89ABCDEF";
             string hex16 = "0123456789abcdef";
             string hex15 = "123456789abcdef";
+            string hexBad = "z 1az";
 
             byte[] except, result;
             string value;
 
+            result = Energy.Base.Hex.HexToArray(null);
+            Assert.IsNull(result);
+
+            result = Energy.Base.Hex.HexToArray("");
+            Assert.AreEqual(0, result.Length);
+
             value = hex1;
             except = new byte[] { 0xa };
+            result = Energy.Base.Hex.HexToArray(value);
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
+
+            value = hex3;
+            except = new byte[] { 0xa, 0xbc };
             result = Energy.Base.Hex.HexToArray(value);
             Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
 
@@ -51,6 +64,16 @@ namespace Energy.Core.Test.Base
             value = hex15;
             except = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
             result = Energy.Base.Hex.HexToArray(value);
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
+
+            value = hexBad;
+            except = new byte[] { 0x0, 0x1, 0xa0 };
+            result = Energy.Base.Hex.HexToArray(value);
+            Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
+
+            value = hexBad;
+            except = new byte[] { 0x1, 0xa0 };
+            result = Energy.Base.Hex.HexToArray(value, true);
             Assert.IsTrue(Energy.Base.ByteArrayBuilder.AreEqual(except, result), value);
         }
 
