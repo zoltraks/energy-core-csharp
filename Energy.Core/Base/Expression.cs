@@ -140,6 +140,22 @@ namespace Energy.Base
 +
 ";
 
+        public static readonly string PathSplitCaptureUniversal = @"
+(?<white>[\r\n]+)
+|
+(?<slash>[\\/]+)
+|
+(?<item>
+[^\\/""'`\r\n]+
+|
+""(?:\\""|""""|[^""])*""
+|
+'(?:\\'|''|[^'])*'
+|
+`(?:\\`|``|[^`])*`
+)+
+";
+
         /// <summary>
         /// Expression for finding root element in XML
         /// </summary>
@@ -180,6 +196,21 @@ namespace Energy.Base
         public static string Escape(char? character)
         {
             return Escape(character, SPECIAL_CHARACTERS_STRING);
+        }
+
+        public static string Escape(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            StringBuilder b = new StringBuilder();
+            foreach (char c in text.ToCharArray())
+            {
+                b.Append(Escape(c));
+            }
+            string s = b.ToString();
+            return s;
         }
 
         public static string EscapeJoin(string glue, char[] array)

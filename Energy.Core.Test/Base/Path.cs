@@ -16,5 +16,28 @@ namespace Energy.Core.Test.Base
             array = Energy.Base.Path.Environment.AsArray;
             Assert.IsNotNull(array);
         }
+
+        [TestMethod]
+        public void PathSplit()
+        {
+            string[] array;
+            string path;
+
+            path = "/c/folder/sub/file.txt";
+            array = Energy.Base.Path.Split(path, new string[] { "/" }, new string[] { }, false, false, false, false);
+            Assert.IsNotNull(array);
+
+            path = "C:\\Folder\\\\sub\\\\file.txt";
+            array = Energy.Base.Path.Split(path);
+            Assert.IsNotNull(array);
+
+            path = "C:\\\\\"Program Files\"\\\\sub\\\\\"Stupid \\ \"\"My File\".txt";
+            array = Energy.Base.Path.Split(path);
+            Assert.IsNotNull(array);
+
+            path = "/c/'my folder'/'sub / slash'/file.txt";
+            array = Energy.Base.Path.Split(path);
+            Assert.IsNotNull(array);
+        }
     }
 }

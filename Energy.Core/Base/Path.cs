@@ -35,6 +35,244 @@ namespace Energy.Base
             return l.ToArray();
         }
 
+        public static string[] Split(string path, SplitFormat format, SplitOptions options)
+        {
+            if (null == path)
+            {
+                return null;
+            }
+            if (0 == path.Length)
+            {
+#pragma warning disable CA1825 // Avoid zero-length array allocations.
+                return new string[] { };
+#pragma warning restore CA1825 // Avoid zero-length array allocations.
+            }
+            if (format == null)
+            {
+                format = SplitFormat.Default;
+            }
+            if (options == null)
+            {
+                options = new SplitOptions();
+            }
+
+            string[] slashes = format.Slashes ?? new string[] { };
+            string[] quotes = format.Quotes ?? new string[] { };
+            bool optionDoublets = (bool)(format.Doublets ?? false);
+            bool optionCStyle = (bool)(format.CStyle ?? false);
+            bool optionIncludeSeparator = (bool)(options.IncludeSeparator ?? false);
+            bool optionIcludeWhitespace = (bool)(options.IncludeWhitespace ?? false);
+
+            List<string> list = new List<string>();
+
+            string pattern = BuildSplitPattern(slashes, quotes, optionDoublets, optionCStyle);
+
+            Match match = Regex.Match(path, pattern);
+
+            while (match.Success)
+            {
+                if (false)
+                { }
+                else if (0 < match.Groups["white"].Length)
+                {
+                    if (optionIcludeWhitespace)
+                    {
+                        list.Add(match.Groups["white"].Value);
+                    }
+                }
+                else if (0 < match.Groups["slash"].Length)
+                {
+                    if (optionIncludeSeparator)
+                    {
+                        list.Add(match.Groups["slash"].Value);
+                    }
+                }
+                else if (0 < match.Groups["item"].Length)
+                {
+                    list.Add(match.Groups["item"].Value);
+                }
+                match = match.NextMatch();
+            }
+
+            return list.ToArray();
+        }
+
+        public static string[] Split(string path
+            , string[] slashes, string[] quotes
+            , bool? doublets, bool? cstyle
+            , bool? includeSeparator, bool? includeWhitespace)
+        {
+            return Split(path, new SplitFormat()
+            {
+                Slashes = slashes,
+                Quotes = quotes,
+                Doublets = doublets,
+                CStyle = cstyle
+            }, new SplitOptions()
+            {
+                IncludeSeparator = includeSeparator,
+                IncludeWhitespace = includeWhitespace
+            });
+        }
+
+        #endregion
+
+        #region SplitFormat
+
+        public class SplitFormat
+        {
+            /// <summary>
+            /// Array of supported slash separators withing path.
+            /// </summary>
+            public string[] Slashes;
+
+            /// <summary>
+            /// Array of supported quotation mark characters.
+            /// </summary>
+            public string[] Quotes;
+
+            /// <summary>
+            /// Allow to use double quotes to escape quotation mark characters.
+            /// </summary>
+            public bool? Doublets;
+
+            /// <summary>
+            /// Allow to use C style slashes in names for escaping quotation mark characters.
+            /// </summary>
+            public bool? CStyle;
+
+            private static SplitFormat _Default;
+
+            public static SplitFormat Default
+            {
+                get
+                {
+                    if (null == _Default)
+                    {
+                        _Default = new SplitFormat()
+                        {
+                            Slashes = new string[] { "\\", "/" },
+                            Quotes = new string[] { "\"", "'", "`" },
+                            Doublets = true,
+                            CStyle = true,
+                        };
+                    }
+                    return _Default;
+                }
+            }
+        }
+
+        #endregion
+
+        #region SplitOptions
+
+        public class SplitOptions
+        {
+            /// <summary>
+            /// Include path separator strings in results.
+            /// </summary>
+            public bool? IncludeSeparator;
+
+            /// <summary>
+            /// Include whitespace between paths in results.
+            /// </summary>
+            public bool? IncludeWhitespace;
+        }
+
+        #endregion
+
+        #region BuildSplitPattern
+
+        /// <summary>
+        /// Build regular expression pattern for splitting path.
+        /// </summary>
+        /// <param name="slashes"></param>
+        /// <param name="quotes"></param>
+        /// <param name="doublets"></param>
+        /// <param name="cstyle"></param>
+        /// <returns></returns>
+        public static string BuildSplitPattern(string[] slashes, string[] quotes, bool doublets, bool cstyle)
+        {
+            List<string> t = new List<string>();
+            t.Add("(?<white>[\\r\\n]+)");
+            string escape = ".+*?()[{|\\^$";
+        
+            string _slash = "";
+            if (0 < slashes.Length)
+            {
+                var b = new StringBuilder();
+                int n = slashes.Length;
+                for (int i = 0; i < n; i++)
+                {
+                    foreach (char c in slashes[i].ToCharArray())
+                    {
+                        if (0 <= escape.IndexOf(c))
+                        {
+                            b.Append('\\');
+                        }
+                        b.Append(c);
+                    }
+                }
+                _slash = b.ToString();
+            }
+            t.Add("(?<slash>[" + _slash + "]+)");
+   
+            string _quote = "";
+            if (0 < quotes.Length)
+            {
+                var b = new StringBuilder();
+                int n = quotes.Length;
+                for (int i = 0; i < n; i++)
+                {
+                    foreach (char c in quotes[i].ToCharArray())
+                    {
+                        if (0 <= escape.IndexOf(c))
+                        {
+                            b.Append('\\');
+                        }
+                        b.Append(c);
+                    }
+                }
+                _quote = b.ToString();
+            }
+
+            var v = new List<string>();
+            v.Add("[^" + _slash + _quote + "\\r\\n" + "]");
+            if (0 < quotes.Length)
+            {
+                int n = quotes.Length;
+                for (int i = 0; i < n; i++)
+                {
+                    var b = new StringBuilder();
+                    foreach (char c in quotes[i].ToCharArray())
+                    {
+                        if (0 <= escape.IndexOf(c))
+                        {
+                            b.Append('\\');
+                        }
+                        b.Append(c);
+                    }
+                    var q = b.ToString();
+                    var x = new List<string>();
+                    if (doublets)
+                    {
+                        x.Add(q + q);
+                    }
+                    if (cstyle)
+                    {
+                        x.Add("\\" + q);
+                    }
+                    x.Add("[^" + q + "]");
+                    var s = q + "(?:" + string.Join("|", x.ToArray()) + ")" + q;
+                    v.Add(s);
+                }
+            }
+            t.Add("(?<item>(" + string.Join("", v.ToArray()) + ")+)");
+
+            var r = string.Join("|", t.ToArray());
+            return r;
+        }
+
         #endregion
 
         #region Short
@@ -217,7 +455,7 @@ namespace Energy.Base
         #region Strip
 
         /// <summary>
-        /// Strip quotation from file path.
+        /// Strip quotation marks from file path.
         /// Converts C:\"Program Files"\"Dir" into C:\Program Files\Dir.
         /// </summary>
         /// <param name="path"></param>
@@ -317,13 +555,28 @@ namespace Energy.Base
 
         #region Walk
 
+        /// <summary>
+        /// Walk through relative path and return without any dot folders.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="currentDirectory">Optional current directory for dot folder</param>
+        /// <returns></returns>
+        public static string Walk(string path, string currentDirectory)
+        {
+            return path;
+        }
+
         #endregion
 
         #region Element
 
+        // do wywalenia
+
         #endregion
 
         #region Each
+
+        // enumerator do split
 
         #endregion
     }
