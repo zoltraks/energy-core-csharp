@@ -16,24 +16,29 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] Split(string path)
         {
-            if (path == null)
-                return null;
-            if (path.Length == 0)
-                return new string[] { };
-            Regex r = new Regex(Energy.Base.Expression.PathSplitCapture, RegexOptions.IgnorePatternWhitespace);
-            Match m = r.Match(path);
-            if (!m.Success)
-                return new string[] { };
-            List<string> l = new List<string>();
-            for (int n = 1; n < m.Groups.Count; n++)
-            {
-                for (int i = 0; i < m.Groups[n].Captures.Count; i++)
-                {
-                    l.Add(m.Groups[n].Captures[i].Value);
-                }
-            }
-            return l.ToArray();
+            return Split(path, null, null);
         }
+
+        //public static string[] Split(string path)
+        //{
+        //    if (path == null)
+        //        return null;
+        //    if (path.Length == 0)
+        //        return new string[] { };
+        //    Regex r = new Regex(Energy.Base.Expression.PathSplitCapture, RegexOptions.IgnorePatternWhitespace);
+        //    Match m = r.Match(path);
+        //    if (!m.Success)
+        //        return new string[] { };
+        //    List<string> l = new List<string>();
+        //    for (int n = 1; n < m.Groups.Count; n++)
+        //    {
+        //        for (int i = 0; i < m.Groups[n].Captures.Count; i++)
+        //        {
+        //            l.Add(m.Groups[n].Captures[i].Value);
+        //        }
+        //    }
+        //    return l.ToArray();
+        //}
 
         public static string[] Split(string path, SplitFormat format, SplitOptions options)
         {
@@ -95,6 +100,13 @@ namespace Energy.Base
             }
 
             return list.ToArray();
+        }
+
+
+        public static string[] Split(string path, SplitFormat format
+            , bool? includeSeparator, bool? includeWhitespace)
+        {
+            return Split(path, format, null);
         }
 
         public static string[] Split(string path

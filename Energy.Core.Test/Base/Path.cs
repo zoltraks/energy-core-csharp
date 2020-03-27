@@ -27,9 +27,19 @@ namespace Energy.Core.Test.Base
             array = Energy.Base.Path.Split(path, new string[] { "/" }, new string[] { }, false, false, false, false);
             Assert.IsNotNull(array);
 
-            path = "C:\\Folder\\\\sub\\\\file.txt";
-            array = Energy.Base.Path.Split(path);
+            path = "C:\\Folder\\\\sub\\/\\file.txt";
+            array = Energy.Base.Path.Split(path, null, true, false);
             Assert.IsNotNull(array);
+            Assert.AreEqual(7, array.Length);
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(array, new string[] {
+                "C:",
+                "\\",
+                "Folder",
+                "\\\\",
+                "sub",
+                "\\/\\",
+                "file.txt"
+            }, false));
 
             path = "C:\\\\\"Program Files\"\\\\sub\\\\\"Stupid \\ \"\"My File\".txt";
             array = Energy.Base.Path.Split(path);
