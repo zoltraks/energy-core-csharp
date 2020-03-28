@@ -106,7 +106,11 @@ namespace Energy.Base
         public static string[] Split(string path, SplitFormat format
             , bool? includeSeparator, bool? includeWhitespace)
         {
-            return Split(path, format, null);
+            return Split(path, format, new SplitOptions() 
+            { 
+                IncludeSeparator = includeSeparator,
+                IncludeWhitespace = includeWhitespace 
+            });
         }
 
         public static string[] Split(string path
@@ -249,7 +253,7 @@ namespace Energy.Base
             }
 
             var v = new List<string>();
-            v.Add("[^" + _slash + _quote + "\\r\\n" + "]");
+            v.Add("[^" + _slash + _quote + "\\r\\n" + "]+");
             if (0 < quotes.Length)
             {
                 int n = quotes.Length;
@@ -272,14 +276,14 @@ namespace Energy.Base
                     }
                     if (cstyle)
                     {
-                        x.Add("\\" + q);
+                        x.Add("\\\\" + q);
                     }
                     x.Add("[^" + q + "]");
-                    var s = q + "(?:" + string.Join("|", x.ToArray()) + ")" + q;
+                    var s = q + "(?:(?:" + string.Join("|", x.ToArray()) + ")*)" + q;
                     v.Add(s);
                 }
             }
-            t.Add("(?<item>(" + string.Join("", v.ToArray()) + ")+)");
+            t.Add("(?<item>(" + string.Join("|", v.ToArray()) + ")+)");
 
             var r = string.Join("|", t.ToArray());
             return r;
