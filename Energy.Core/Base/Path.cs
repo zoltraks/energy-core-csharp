@@ -628,15 +628,25 @@ namespace Energy.Base
 
         #endregion
 
-        #region Element
-
-        // do wywalenia
-
-        #endregion
-
         #region Each
 
-        // enumerator do split
+        public static IEnumerable<string> Each(string path, SplitFormat format, SplitOptions options)
+        {
+            if (null == path)
+            {
+                yield break;
+            }
+            string[] array = Energy.Base.Path.Split(path, format, options);
+            for (int i = 0, length = array.Length; i < length; i++)
+            {
+                yield return array[i];
+            }
+        }
+
+        public static IEnumerable<string> Each(string path)
+        {
+            return Each(path, null, null);
+        }
 
         #endregion
 
