@@ -106,10 +106,10 @@ namespace Energy.Base
         public static string[] Split(string path, SplitFormat format
             , bool? includeSeparator, bool? includeWhitespace)
         {
-            return Split(path, format, new SplitOptions() 
-            { 
+            return Split(path, format, new SplitOptions()
+            {
                 IncludeSeparator = includeSeparator,
-                IncludeWhitespace = includeWhitespace 
+                IncludeWhitespace = includeWhitespace
             });
         }
 
@@ -176,6 +176,48 @@ namespace Energy.Base
                     return _Default;
                 }
             }
+
+            public static SplitFormat Create(string[] slashes, string[] quotes, bool? doublets, bool? cstyle)
+            {
+                SplitFormat o = new SplitFormat()
+                {
+                    Slashes = slashes,
+                    Quotes = quotes,
+                    Doublets = doublets,
+                    CStyle = cstyle
+                };
+                return o;
+            }
+
+            public static SplitFormat Create(string[] slashes, string[] quotes)
+            {
+                return Create(slashes, quotes, null, null);
+            }
+
+            public static SplitFormat Create(string slashes, string quotes, bool? doublets, bool? cstyle)
+            {
+                char[] charsSlashes = slashes.ToCharArray();
+                string[] arraySlashes = new List<char>(charsSlashes)
+                    .ConvertAll<string>(delegate (char c) { return new string(c, 1); })
+                    .ToArray();
+                char[] charsQuotes = quotes.ToCharArray();
+                string[] arrayQuotes = new List<char>(charsQuotes)
+                    .ConvertAll<string>(delegate (char c) { return new string(c, 1); })
+                    .ToArray();
+                SplitFormat o = new SplitFormat()
+                {
+                    Slashes = arraySlashes,
+                    Quotes = arrayQuotes,
+                    Doublets = doublets,
+                    CStyle = cstyle
+                };
+                return o;
+            }
+
+            public static SplitFormat Create(string slashes, string quotes)
+            {
+                return Create(slashes, quotes, null, null);
+            }
         }
 
         #endregion
@@ -211,8 +253,10 @@ namespace Energy.Base
         {
             List<string> t = new List<string>();
             t.Add("(?<white>[\\r\\n]+)");
-            string escape = ".+*?()[{|\\^$";
-        
+            // tabs and special characters need to be changed to regular expression pattern equivalents too.
+            // that's why whe should cover this with external function.
+            string escape = ".+*?()[{|\\^$#";
+
             string _slash = "";
             if (0 < slashes.Length)
             {
@@ -232,7 +276,7 @@ namespace Energy.Base
                 _slash = b.ToString();
             }
             t.Add("(?<slash>[" + _slash + "]+)");
-   
+
             string _quote = "";
             if (0 < quotes.Length)
             {
@@ -593,6 +637,99 @@ namespace Energy.Base
         #region Each
 
         // enumerator do split
+
+        #endregion
+
+        #region BuildSeparatorPattern
+
+        public static string BuildSeparatorPattern(string[] slashes)
+        {
+            if (null == slashes)
+            {
+                return null;
+            }
+            if (0 == slashes.Length)
+            {
+                return "";
+            }
+            List<string> b = new List<string>(), c = new List<string>();
+            for (int i = 0, length = slashes.Length; i < length; i++)
+            {
+                string s = slashes[i];
+                if (string.IsNullOrEmpty(s))
+                {
+                    continue;
+                }
+                if (1 == s.Length)
+                {
+                    c.Add(Energy.Base.Text.EscapeExpression(s[0]));
+                }
+                else
+                {
+                    b.Add(Energy.Base.Text.EscapeExpression(s));
+                }
+            }
+            string p = "";
+            if (0 < c.Count)
+            {
+                if (1 == c.Count)
+                {
+                    p = c[0];
+                }
+                else
+                {
+                    p = "[" + string.Concat(c.ToArray()) + "]";
+                }
+                if (0 == b.Count)
+                {
+                    p += "+";
+                }
+                else
+                {
+                    b.Add(p);
+                }
+            }
+            string pattern = 0 == b.Count ? p : "(?:" + string.Join("|", b.ToArray()) + ")+";
+            return pattern;
+        }
+
+        #endregion
+
+        #region IsSeparator
+
+        /// <summary>
+        /// Check if file path part is directory separator or not.
+        /// Multiple separator characters are allowed.
+        /// </summary>
+        /// <param name="part"></param>
+        /// <param name="slashes">
+        /// Array of strings  
+        /// </param>
+        /// <returns></returns>
+        public static bool IsSeparator(string part, string[] slashes)
+        {
+            string pattern = BuildSeparatorPattern(slashes);
+            Match match = Regex.Match(part, pattern);
+            bool success = match.Success;
+            if (success)
+            {
+                success = part.Length == match.Length;
+            }
+            return success;
+        }
+        public static bool IsSeparator(string part, string slashes)
+        {
+            char[] charsSlashes = slashes.ToCharArray();
+            string[] arraySlashes = new List<char>(charsSlashes)
+                .ConvertAll<string>(delegate (char c) { return new string(c, 1); })
+                .ToArray();
+            return IsSeparator(part, arraySlashes);
+        }
+
+        public static bool IsSeparator(string part)
+        {
+            return IsSeparator(part, "\\/");
+        }
 
         #endregion
     }
