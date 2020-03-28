@@ -406,6 +406,37 @@ namespace Energy.Attribute
         }
 
         /// <summary>
+        /// Benchmark should be done with this code
+        /// </summary>
+        public class BenchmarkAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
         /// Code safety warning
         /// </summary>
         public class SafetyAttribute : CodeAttribute
