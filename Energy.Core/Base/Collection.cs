@@ -676,6 +676,41 @@ namespace Energy.Base
             }
 
             #endregion
+
+            #region ToCSharpObject
+
+            public static string ToCSharpObject(string[] array, string name)
+            {
+                if (null == name)
+                {
+                    name = "string[] stringArray";
+                }
+                string code = "";
+                if (0 < name.Length)
+                {
+                    code += name + " = ";
+                }
+                code += "new string[] { ";
+                var t1 = new List<string>();
+                for (int i = 0, l = array.Length; i < l; i++)
+                {
+                    string s = array[i];
+                    if (0 < s.Length)
+                    {
+                        s = s
+                            .Replace("\\", "\\\\")
+                            .Replace("\"", "\\\"")
+                            ;
+                    }
+                    s = "\"" + s + "\"";
+                    t1.Add(s);
+                }
+                code += string.Join(", ", t1.ToArray());
+                code += " };";
+                return code;
+            }
+
+            #endregion
         }
 
         #endregion
