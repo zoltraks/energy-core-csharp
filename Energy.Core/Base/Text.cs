@@ -1496,42 +1496,64 @@ namespace Energy.Base
                     _EscapeExpressionStringDictionary.Add("\t", @"\t");
                     _EscapeExpressionStringDictionary.Add("\r", @"\r");
                     _EscapeExpressionStringDictionary.Add("\n", @"\n");
+                    _EscapeExpressionStringDictionary.Add("\v", @"\v");
                     _EscapeExpressionStringDictionary.Add("$", @"\$");
                     _EscapeExpressionStringDictionary.Add("^", @"\^");
                     _EscapeExpressionStringDictionary.Add("*", @"\*");
                     _EscapeExpressionStringDictionary.Add("?", @"\?");
                     _EscapeExpressionStringDictionary.Add("+", @"\+");
                     _EscapeExpressionStringDictionary.Add("|", @"\|");
-                    _EscapeExpressionStringDictionary.Add("{", @"\{");
                     _EscapeExpressionStringDictionary.Add("[", @"\[");
-                    _EscapeExpressionStringDictionary.Add("(", @"\(");
-                    _EscapeExpressionStringDictionary.Add("}", @"\}");
                     _EscapeExpressionStringDictionary.Add("]", @"\]");
+                    _EscapeExpressionStringDictionary.Add("(", @"\(");
                     _EscapeExpressionStringDictionary.Add(")", @"\)");
+                    _EscapeExpressionStringDictionary.Add("{", @"\{");
+                    _EscapeExpressionStringDictionary.Add("}", @"\}");
                 }
                 return _EscapeExpressionStringDictionary;
             }
         }
 
         /// <summary>
-        /// Escape text for regular expression.
+        /// Escape text array for regular expression pattern.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="array"></param>
         /// <returns></returns>
-        public static string EscapeExpression(string text)
+        public static string[] EscapeExpression(string[] array)
         {
+            List<string> list = new List<string>();
+            for (int i = 0, length = array.Length; i < length; i++)
+            {
+                list.Add(EscapeExpression(array[i]));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Escape text for regular expression pattern.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Benchmark("Check versus building string from characters one by one replacing specials with equivalents.")]
+        public static string EscapeExpression(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
             System.Text.StringBuilder s = null;
             foreach (KeyValuePair<string, string> _ in EscapeExpressionStringDictionary)
             {
-                if (text.Contains(_.Key))
+                if (input.Contains(_.Key))
                 {
                     if (s == null)
-                        s = new System.Text.StringBuilder(text);
+                    {
+                        s = new System.Text.StringBuilder(input);
+                    }
                     s.Replace(_.Key, _.Value);
-
                 }
             }
-            return s == null ? text : s.ToString();
+            return s == null ? input : s.ToString();
         }
 
         /// <summary>
