@@ -742,5 +742,80 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region TrimLeft
+
+        public static string TrimLeft(string path, string[] slashes)
+        {
+            if (null == slashes)
+            {
+                return null;
+            }
+            string s = Energy.Base.Path.BuildSeparatorPattern(slashes);
+            if (string.IsNullOrEmpty(s))
+            {
+                return path;
+            }
+            string p = "^" + s;
+            path = Regex.Replace(path, p, "");
+            return path;
+        }
+
+        public static string TrimLeft(string path)
+        {
+            return TrimLeft(path, new string[] { "\\", "/" });
+        }
+
+        #endregion
+
+        #region TrimRight
+
+        public static string TrimRight(string path, string[] slashes)
+        {
+            if (null == slashes)
+            {
+                return null;
+            }
+            string s = Energy.Base.Path.BuildSeparatorPattern(slashes);
+            if (string.IsNullOrEmpty(s))
+            {
+                return path;
+            }
+            string p = s + "$";
+            path = Regex.Replace(path, p, "");
+            return path;
+        }
+
+        public static string TrimRight(string path)
+        {
+            return TrimRight(path, new string[] { "\\", "/" });
+        }
+
+        #endregion
+
+        #region Trim
+
+        public static string Trim(string path, string[] slashes)
+        {
+            if (null == slashes)
+            {
+                return null;
+            }
+            string s = Energy.Base.Path.BuildSeparatorPattern(slashes);
+            if (string.IsNullOrEmpty(s))
+            {
+                return path;
+            }
+            string p = "^" + s + "|" + s + "$";
+            path = Regex.Replace(path, p, "");
+            return path;
+        }
+
+        public static string Trim(string path)
+        {
+            return Trim(path, new string[] { "\\", "/" });
+        }
+
+        #endregion
     }
 }

@@ -120,5 +120,33 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "<<", "><", ">>" });
             Assert.AreEqual("(?:<<|><|>>)+", result);
         }
+
+        [TestMethod]
+        public void PathTrimLeft()
+        {
+            Assert.AreEqual("abc/", Energy.Base.Path.TrimLeft("/abc/"));
+            Assert.AreEqual("abc", Energy.Base.Path.TrimLeft("abc"));
+            Assert.AreEqual("abc\\//", Energy.Base.Path.TrimLeft("\\//abc\\//"));
+            Assert.AreEqual("abc\\//", Energy.Base.Path.TrimLeft("abc\\//"));
+        }
+
+        [TestMethod]
+        public void PathTrimRight()
+        {
+            Assert.AreEqual("/abc", Energy.Base.Path.TrimRight("/abc/"));
+            Assert.AreEqual("abc", Energy.Base.Path.TrimRight("abc"));
+            Assert.AreEqual("\\//abc", Energy.Base.Path.TrimRight("\\//abc\\//"));
+            Assert.AreEqual("\\//abc", Energy.Base.Path.TrimRight("\\//abc"));
+        }
+
+        [TestMethod]
+        public void PathTrim()
+        {
+            Assert.AreEqual("abc", Energy.Base.Path.Trim("/abc/"));
+            Assert.AreEqual("abc", Energy.Base.Path.Trim("abc"));
+            Assert.AreEqual("abc", Energy.Base.Path.Trim("\\//abc\\//"));
+            Assert.AreEqual("abc", Energy.Base.Path.Trim("\\//abc"));
+            Assert.AreEqual("abc", Energy.Base.Path.Trim("abc\\//"));
+        }
     }
 }
