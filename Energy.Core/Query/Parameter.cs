@@ -286,6 +286,10 @@ namespace Energy.Query
                             }
                             break;
 
+                        case Enumeration.FormatType.Plain:
+                            text = Energy.Base.Cast.ObjectToString(value);
+                            break;
+
                         case Energy.Enumeration.FormatType.Number:
                             text = format.Number(value, !optionNullAsZero);
                             break;

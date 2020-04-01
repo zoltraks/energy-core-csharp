@@ -56,6 +56,16 @@ namespace Energy.Core.Test.Query
             bag.Set("@EditCount", "12", Enumeration.FormatType.Number);
             result = bag.Parse(query);
             Assert.IsNotNull(result);
+
+            bag.Clear();
+            bag.Set("where", "1=1", Enumeration.FormatType.Plain);
+            result = bag.Parse("@WHERE");
+            Assert.AreEqual("1=1", result);
+
+            bag.Clear();
+            bag.Set("where", "1=1", "PlAiN");
+            result = bag.Parse("@WHERE");
+            Assert.AreEqual("1=1", result);
         }
 
         [TestMethod]
