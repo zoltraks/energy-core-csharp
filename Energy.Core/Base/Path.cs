@@ -16,7 +16,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] Split(string path)
         {
-            return Split(path, null, null);
+            return Split(path, null);
         }
 
         //public static string[] Split(string path)
@@ -40,7 +40,7 @@ namespace Energy.Base
         //    return l.ToArray();
         //}
 
-        public static string[] Split(string path, SplitFormat format, SplitOptions options)
+        public static string[] Split(string path, SplitFormat format)
         {
             if (null == path)
             {
@@ -56,17 +56,17 @@ namespace Energy.Base
             {
                 format = SplitFormat.Default;
             }
-            if (options == null)
-            {
-                options = new SplitOptions();
-            }
+            //if (options == null)
+            //{
+            //    options = new SplitOptions();
+            //}
 
             string[] slashes = format.Slashes ?? new string[] { };
             string[] quotes = format.Quotes ?? new string[] { };
             bool optionDoublets = (bool)(format.Doublets ?? false);
             bool optionCStyle = (bool)(format.CStyle ?? false);
-            bool optionIncludeSeparator = (bool)(options.IncludeSeparator ?? false);
-            bool optionIcludeWhitespace = (bool)(options.IncludeWhitespace ?? false);
+            //bool optionIncludeSeparator = (bool)(options.IncludeSeparator ?? false);
+            //bool optionIcludeWhitespace = (bool)(options.IncludeWhitespace ?? false);
 
             List<string> list = new List<string>();
 
@@ -80,16 +80,24 @@ namespace Energy.Base
                 { }
                 else if (0 < match.Groups["white"].Length)
                 {
-                    if (optionIcludeWhitespace)
-                    {
-                        list.Add(match.Groups["white"].Value);
-                    }
+                    //if (optionIcludeWhitespace)
+                    //{
+                    //    list.Add(match.Groups["white"].Value);
+                    //}
                 }
                 else if (0 < match.Groups["slash"].Length)
                 {
-                    if (optionIncludeSeparator)
+                    //if (optionIncludeSeparator)
+                    //{
+                    //    list.Add(match.Groups["slash"].Value);
+                    //}
+                    if (0 == list.Count)
                     {
                         list.Add(match.Groups["slash"].Value);
+                    }
+                    else
+                    {
+                        list[-1 + list.Count] += match.Groups["slash"].Value;
                     }
                 }
                 else if (0 < match.Groups["item"].Length)
@@ -102,21 +110,8 @@ namespace Energy.Base
             return list.ToArray();
         }
 
-
-        public static string[] Split(string path, SplitFormat format
-            , bool? includeSeparator, bool? includeWhitespace)
-        {
-            return Split(path, format, new SplitOptions()
-            {
-                IncludeSeparator = includeSeparator,
-                IncludeWhitespace = includeWhitespace
-            });
-        }
-
-        public static string[] Split(string path
-            , string[] slashes, string[] quotes
-            , bool? doublets, bool? cstyle
-            , bool? includeSeparator, bool? includeWhitespace)
+        public static string[] Split(string path, string[] slashes, string[] quotes
+            , bool? doublets, bool? cstyle)
         {
             return Split(path, new SplitFormat()
             {
@@ -124,10 +119,15 @@ namespace Energy.Base
                 Quotes = quotes,
                 Doublets = doublets,
                 CStyle = cstyle
-            }, new SplitOptions()
+            });
+        }
+
+        public static string[] Split(string path, string[] slashes, string[] quotes)
+        {
+            return Split(path, new SplitFormat()
             {
-                IncludeSeparator = includeSeparator,
-                IncludeWhitespace = includeWhitespace
+                Slashes = slashes,
+                Quotes = quotes
             });
         }
 
@@ -275,7 +275,10 @@ namespace Energy.Base
                 }
                 _slash = b.ToString();
             }
-            t.Add("(?<slash>[" + _slash + "]+)");
+            if (0 < _slash.Length)
+            {
+                t.Add("(?<slash>[" + _slash + "]+)");
+            }
 
             string _quote = "";
             if (0 < quotes.Length)
@@ -630,13 +633,13 @@ namespace Energy.Base
 
         #region Each
 
-        public static IEnumerable<string> Each(string path, SplitFormat format, SplitOptions options)
+        public static IEnumerable<string> Each(string path, SplitFormat format)
         {
             if (null == path)
             {
                 yield break;
             }
-            string[] array = Energy.Base.Path.Split(path, format, options);
+            string[] array = Energy.Base.Path.Split(path, format);
             for (int i = 0, length = array.Length; i < length; i++)
             {
                 yield return array[i];
@@ -645,7 +648,7 @@ namespace Energy.Base
 
         public static IEnumerable<string> Each(string path)
         {
-            return Each(path, null, null);
+            return Each(path, null);
         }
 
         #endregion

@@ -26,51 +26,58 @@ namespace Energy.Core.Test.Base
             path = "C:\\A \"\"\\B \"\"\\";
             array = Energy.Base.Path.Split(path);
             Assert.IsNotNull(array);
-            check = new string[] { "C:", "A \"\"", "B \"\"" };
+            check = new string[] { "C:\\", "A \"\"\\", "B \"\"\\" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
-            path = "C:\\A \"Program Files\"\\B \". .\"\\";
+            path = "C:\\A \"Program Files\"/B \". .\"\\";
             array = Energy.Base.Path.Split(path);
             Assert.IsNotNull(array);
-            check = new string[] { "C:", "A \"Program Files\"", "B \". .\"" };
+            check = new string[] { "C:\\", "A \"Program Files\"/", "B \". .\"\\" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             path = "/c/folder/sub/file.txt";
-            array = Energy.Base.Path.Split(path, new string[] { "/" }, new string[] { }, false, false, false, false);
+            array = Energy.Base.Path.Split(path, new string[] { "/" }, new string[] { }, false, false);
             Assert.IsNotNull(array);
-            check = new string[] { "c", "folder", "sub", "file.txt" };
+            check = new string[] { "/", "c/", "folder/", "sub/", "file.txt" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             path = "C:\\Folder\\\\sub\\/\\file.txt";
-            array = Energy.Base.Path.Split(path, null, true, false);
+            array = Energy.Base.Path.Split(path, null);
             Assert.IsNotNull(array);
-            Assert.AreEqual(7, array.Length);
+            Assert.AreEqual(4, array.Length);
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(array, new string[] {
-                "C:",
-                "\\",
-                "Folder",
-                "\\\\",
-                "sub",
-                "\\/\\",
+                "C:\\",
+                "Folder\\\\",
+                "sub\\/\\",
                 "file.txt"
             }, false));
 
             path = "C:\\\"Program Files\"\\\\/\\C \"abc\" D\\";
             array = Energy.Base.Path.Split(path);
             Assert.IsNotNull(array);
-            check = new string[] { "C:", "\"Program Files\"", "C \"abc\" D" };
+            check = new string[] { "C:\\", "\"Program Files\"\\\\/\\", "C \"abc\" D\\" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             path = "C:\\\\\"Program Files\"\\\\sub\\\\\"Stupid \\ \"\"My File\".txt";
-            array = Energy.Base.Path.Split(path, null, true, true);
+            array = Energy.Base.Path.Split(path, null);
             Assert.IsNotNull(array);
-            check = new string[] { "C:", "\\\\", "\"Program Files\"", "\\\\", "sub", "\\\\", "\"Stupid \\ \"\"My File\".txt" };
+            check = new string[] { "C:\\\\", "\"Program Files\"\\\\", "sub\\\\", "\"Stupid \\ \"\"My File\".txt" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             path = "/c/'my folder'/'sub / slash'/file.txt";
             array = Energy.Base.Path.Split(path);
             Assert.IsNotNull(array);
-            check = new string[] { "c", "'my folder'", "'sub / slash'", "file.txt" };
+            check = new string[] { "/", "c/", "'my folder'/", "'sub / slash'/", "file.txt" };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
+
+            path = "";
+            array = Energy.Base.Path.Split(path, new string[] { }, new string[] { });
+            check = new string[] { };
+            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
+
+            path = "a/b";
+            array = Energy.Base.Path.Split(path, new string[] { }, new string[] { });
+            check = new string[] { "a/b" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
         }
 
@@ -89,9 +96,9 @@ namespace Energy.Core.Test.Base
             Assert.IsFalse(Energy.Base.Path.IsSeparator("\\/home"));
 
             path = "C:\\Folder\\File.txt";
-            array = Energy.Base.Path.Split(path, Energy.Base.Path.SplitFormat.Create("\\/", ""), true, false);
+            array = Energy.Base.Path.Split(path, Energy.Base.Path.SplitFormat.Create("\\/", ""));
             Assert.IsNotNull(array);
-            check = new string[] { "C:", "\\", "Folder", "\\", "File.txt" };
+            check = new string[] { "C:\\", "Folder\\", "File.txt" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             Assert.IsFalse(Energy.Base.Path.IsSeparator(array[0], "\\/"));
