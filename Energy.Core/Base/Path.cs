@@ -10,7 +10,8 @@ namespace Energy.Base
         #region Split
 
         /// <summary>
-        /// Split path into segments.
+        /// Split path into parts.
+        /// Each part will contain trailing directory separator characters.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -40,6 +41,13 @@ namespace Energy.Base
         //    return l.ToArray();
         //}
 
+        /// <summary>
+        /// Split path into parts.
+        /// Each part will contain trailing directory separator characters.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
         public static string[] Split(string path, SplitFormat format)
         {
             if (null == path)
@@ -56,17 +64,11 @@ namespace Energy.Base
             {
                 format = SplitFormat.Default;
             }
-            //if (options == null)
-            //{
-            //    options = new SplitOptions();
-            //}
 
             string[] slashes = format.Slashes ?? new string[] { };
             string[] quotes = format.Quotes ?? new string[] { };
             bool optionDoublets = (bool)(format.Doublets ?? false);
             bool optionCStyle = (bool)(format.CStyle ?? false);
-            //bool optionIncludeSeparator = (bool)(options.IncludeSeparator ?? false);
-            //bool optionIcludeWhitespace = (bool)(options.IncludeWhitespace ?? false);
 
             List<string> list = new List<string>();
 
@@ -80,17 +82,10 @@ namespace Energy.Base
                 { }
                 else if (0 < match.Groups["white"].Length)
                 {
-                    //if (optionIcludeWhitespace)
-                    //{
-                    //    list.Add(match.Groups["white"].Value);
-                    //}
+                    // ignore whitespace //
                 }
                 else if (0 < match.Groups["slash"].Length)
                 {
-                    //if (optionIncludeSeparator)
-                    //{
-                    //    list.Add(match.Groups["slash"].Value);
-                    //}
                     if (0 == list.Count)
                     {
                         list.Add(match.Groups["slash"].Value);
@@ -110,6 +105,16 @@ namespace Energy.Base
             return list.ToArray();
         }
 
+        /// <summary>
+        /// Split path into parts.
+        /// Each part will contain trailing directory separator characters.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="slashes"></param>
+        /// <param name="quotes"></param>
+        /// <param name="doublets">Allow to use double quotes to include quotation character itself</param>
+        /// <param name="cstyle">Allow to use C style backslash to escape quotation character</param>
+        /// <returns></returns>
         public static string[] Split(string path, string[] slashes, string[] quotes
             , bool? doublets, bool? cstyle)
         {
@@ -122,6 +127,14 @@ namespace Energy.Base
             });
         }
 
+        /// <summary>
+        /// Split path into parts.
+        /// Each part will contain trailing directory separator characters.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="slashes"></param>
+        /// <param name="quotes"></param>
+        /// <returns></returns>
         public static string[] Split(string path, string[] slashes, string[] quotes)
         {
             return Split(path, new SplitFormat()
@@ -218,23 +231,6 @@ namespace Energy.Base
             {
                 return Create(slashes, quotes, null, null);
             }
-        }
-
-        #endregion
-
-        #region SplitOptions
-
-        public class SplitOptions
-        {
-            /// <summary>
-            /// Include path separator strings in results.
-            /// </summary>
-            public bool? IncludeSeparator;
-
-            /// <summary>
-            /// Include whitespace between paths in results.
-            /// </summary>
-            public bool? IncludeWhitespace;
         }
 
         #endregion
