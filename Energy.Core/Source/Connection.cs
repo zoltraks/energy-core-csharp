@@ -286,7 +286,9 @@ namespace Energy.Source
             lock (_Lock)
             {
                 if (_Connection == null)
+                {
                     return false;
+                }
                 return IsActive(_Connection);
             }
         }
@@ -452,10 +454,10 @@ namespace Energy.Source
             List<string> list = new List<string>();
             lock (_Lock)
             {
-                if (_ErrorNumber != 0)
-                {
-                    list.Add(_ErrorNumber.ToString());
-                }
+                //if (_ErrorNumber != 0)
+                //{
+                //    list.Add(_ErrorNumber.ToString());
+                //}
                 if (!string.IsNullOrEmpty(_ErrorMessage))
                 {
                     list.Add(Regex.Replace(_ErrorMessage, @"(\r\n|\n|\r)+", " "));
@@ -522,14 +524,28 @@ namespace Energy.Source
 
         public IDbConnection Open(IDbConnection connection)
         {
+            string _;
+            return Open(connection, out _);
+        }
+
+        public IDbConnection Open(IDbConnection connection, out string error)
+        {
+            error = ClearError();
+
             if (connection == null)
+            {
                 return null;
+            }
 
             int timeout = Timeout;
             if (timeout < 1 && connection.ConnectionTimeout > 0)
+            {
                 timeout = connection.ConnectionTimeout;
+            }
             if (timeout < 1)
+            {
                 timeout = 5;
+            }
 
             bool success = false;
 
@@ -582,12 +598,14 @@ namespace Energy.Source
                 }
                 catch (Exception x)
                 {
-                    SetError(x);
+                    error = SetError(x);
                 }
             }
 
             if (!success)
+            {
                 connection = null;
+            }
 
             FireOnOpen();
 
@@ -596,25 +614,26 @@ namespace Energy.Source
 
         public IDbConnection Open()
         {
-            lock (_Lock)
+            if (_Persistent)
             {
-                if (_Persistent)
+                lock (_Lock)
                 {
                     if (Active)
+                    {
                         Close();
+                    }
                     else
+                    {
                         Clear();
+                    }
                     _Connection = Open(Create());
                     return _Connection;
                 }
             }
-
-            return Open(Create());
-        }
-
-        private void Clear()
-        {
-            throw new NotImplementedException();
+            else
+            {
+                return Open(Create());
+            }
         }
 
         #endregion
@@ -626,6 +645,7 @@ namespace Energy.Source
         /// </summary>
         public void Close()
         {
+            ClearError();
             lock (_Lock)
             {
                 if (_Connection == null)
@@ -660,6 +680,23 @@ namespace Energy.Source
 
         #endregion
 
+        #region Clear
+
+        public void Clear()
+        {
+            if (Active)
+            {
+                Close();
+            }
+            else
+            {
+                ClearError();
+                this._Connection = null;
+            }
+        }
+
+        #endregion
+
         #region Test
 
         /// <summary>
@@ -673,7 +710,7 @@ namespace Energy.Source
 
         #endregion
 
-        #region Active
+        #region IsActive
 
         /// <summary>
         /// Check if database connection is active
@@ -683,7 +720,9 @@ namespace Energy.Source
         public static bool IsActive(IDbConnection connection)
         {
             if (connection == null)
+            {
                 return false;
+            }
 
             switch (connection.State)
             {
@@ -700,6 +739,10 @@ namespace Energy.Source
             }
         }
 
+        #endregion
+
+        #region IsRunning
+
         /// <summary>
         /// Check if database connection is actually working
         /// </summary>
@@ -708,8 +751,9 @@ namespace Energy.Source
         public static bool IsRunning(IDbConnection connection)
         {
             if (connection == null)
+            {
                 return false;
-
+            }
             switch (connection.State)
             {
                 case ConnectionState.Executing:
@@ -960,7 +1004,7 @@ namespace Energy.Source
                     }
                     catch (Exception x)
                     {
-                        SetError(x);
+                        error = SetError(x);
                         if (!Catch(x))
                         {
                             return null;
@@ -981,7 +1025,7 @@ namespace Energy.Source
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
                             {
                                 return null;
@@ -1318,7 +1362,6 @@ namespace Energy.Source
             {
                 return;
             }
-
             Close();
         }
 
@@ -1380,7 +1423,7 @@ namespace Energy.Source
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
                             {
                                 return null;
@@ -1402,7 +1445,7 @@ namespace Energy.Source
                             }
                             catch (Exception x)
                             {
-                                SetError(x);
+                                error = SetError(x);
                                 if (!Catch(x))
                                 {
                                     return null;

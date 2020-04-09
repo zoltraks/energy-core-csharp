@@ -102,10 +102,10 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(check, array));
 
             Assert.IsFalse(Energy.Base.Path.IsSeparator(array[0], "\\/"));
-            Assert.IsTrue(Energy.Base.Path.IsSeparator(array[1], "\\/"));
+            Assert.IsFalse(Energy.Base.Path.IsSeparator(array[1], "\\/"));
 
-            Assert.IsFalse(Energy.Base.Path.IsSeparator(array[0]));
-            Assert.IsTrue(Energy.Base.Path.IsSeparator(array[1]));
+            Assert.IsTrue(Energy.Base.Path.IsSeparator(array[0].Substring(array[0].Length - 1)));
+            Assert.IsTrue(Energy.Base.Path.IsSeparator(array[1].Substring(array[1].Length - 1)));
         }
 
         [TestMethod]

@@ -12,6 +12,7 @@ namespace Energy.Base
         /// <summary>
         /// Split path into parts.
         /// Each part will contain trailing directory separator characters.
+        /// Allows to use both Unix-style slash characters or Windows-style backslash character to be used as path separator.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
