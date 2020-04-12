@@ -8,6 +8,18 @@ namespace Energy.Core.Test.Base
     public class Text
     {
         [TestMethod]
+        public void TextTrim()
+        {
+            Assert.AreEqual("", Energy.Base.Text.Trim(" "));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\t"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\v"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\r"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\n"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\f"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\0"));
+        }
+
+        [TestMethod]
         public void TextFormatWithNull()
         {
             string value = string.Format("{0} {1}", null, null).Trim();

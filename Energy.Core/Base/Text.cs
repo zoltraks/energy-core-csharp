@@ -416,24 +416,31 @@ namespace Energy.Base
 
         #region Trim
 
+        private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
+
         /// <summary>
-        /// Remove leading and trailing whitespace.
-        /// Includes space, tabulation (horizontal and vertical), new line and null characters.
+        /// Remove all leading and trailing whitespace characters from text.
+        /// <br/><br/>
+        /// Following characters are treated as whitespace: space character " " (code 32),
+        /// horizontal tab "\t" (code 09), line feed "\n" (code 10),
+        /// carriage return "\r" (code 13), vertical tab "\v" (code 11),
+        /// form feed "\f" (code 12), null character "\0" (code 0).
         /// </summary>
         /// <remarks>EBS-0</remarks>
-        /// <param name="value">String value</param>
+        /// <param name="text">String value</param>
         /// <returns>Trimmed string</returns>
-        public static string Trim(string value)
+        public static string Trim(string text)
         {
-            if (value == null || value.Length == 0)
+            if (null == text || 0 == text.Length)
             {
-                return value;
+                return text;
             }
-            else
+            if (0 <= text.IndexOfAny(whiteCharacters))
             {
-                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-                return value;
+                //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f', '\0');
+                text = text.Trim(whiteCharacters);
             }
+            return text;
         }
 
         #endregion

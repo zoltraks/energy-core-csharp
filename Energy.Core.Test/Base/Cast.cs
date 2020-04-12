@@ -576,5 +576,39 @@ namespace Energy.Core.Test.Base
             expect = 67;
             Assert.AreEqual(expect, result);
         }
+        
+        [TestMethod]
+        public void StringToInteger()
+        {
+            string s;
+            int i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToInteger(s);
+            Assert.AreEqual(1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToInteger(s);
+            Assert.AreEqual(1000, i);
+        }
+
+        [TestMethod]
+        public void StringToInt()
+        {
+            string s;
+            int i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToInt(s);
+            Assert.AreEqual(1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToInt(s);
+            Assert.AreEqual(1000, i);
+
+            int n = Energy.Core.Benchmark.Loop(() => i = Energy.Base.Cast.StringToInt(s), 1);
+            Debug.WriteLine(n);
+            Assert.AreNotEqual(0, n);
+        }
     }
 }
