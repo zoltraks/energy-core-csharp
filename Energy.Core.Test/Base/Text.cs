@@ -834,5 +834,59 @@ Another
             x = Energy.Base.Text.FindAnyWord(".", a);
             Assert.AreEqual(".", x);
         }
+
+        [TestMethod]
+        public void TextIsInteger()
+        {
+            Assert.IsFalse(Energy.Base.Text.IsInteger(null));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(""));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(" "));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("-"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("+"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(" +1"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(" -1"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("+ 1"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("- 1"));
+
+            Assert.IsTrue(Energy.Base.Text.IsInteger("+0"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("-0"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("-1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("+1234567890123456789012345678901234567890"));
+        }
+
+        [TestMethod]
+        public void TextIsNumber()
+        {
+            Assert.IsFalse(Energy.Base.Text.IsNumber(null));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(""));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" "));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("-"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("+"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" +1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" -1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("+ 1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("- 1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("12e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("12. e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("e0"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(".e0"));
+
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("0e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("0.e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e3"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e+3"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-12.e-3"));
+        }
     }
 }

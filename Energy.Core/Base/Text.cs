@@ -3750,15 +3750,33 @@ namespace Energy.Base
             }
         }
 
+        ///// <summary>
+        ///// Checks if string is an integer number.
+        ///// </summary>
+        ///// <param name="value"></param>
+        ///// <returns></returns>
+        //public static bool IsInteger(string value)
+        //{
+        //    return IsInteger(value, true);
+        //}
+
         /// <summary>
-        /// Checks if string is an integer number.
+        /// Check if value represents integer number.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        public static bool IsInteger(string value)
-        {
-            return IsInteger(value, true);
-        }
+        public static bool IsInteger(string input) => Regex.Match(input ?? "", @"^[+\-]?[0-9]+$").Success;
+
+        #endregion
+
+        #region IsNumber
+
+        /// <summary>
+        /// Check if value represents number.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsNumber(string input) => Regex.Match(input ?? "", @"^[+\-]?[0-9]+([.,][0-9]*)?([eE][+\-]?[0-9]+)?$").Success;
 
         #endregion
 
