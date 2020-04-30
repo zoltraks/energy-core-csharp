@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Energy.Enumeration;
 
@@ -3570,38 +3571,99 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to enumeration value.
+        /// Ignore case and surrounding whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
         /// </summary>
         /// <param name="value">string</param>
         /// <param name="type">Type</param>
         /// <returns>object</returns>
         public static object StringToEnum(string value, Type type)
         {
-            if (String.IsNullOrEmpty(value))
+            return StringToEnum(value, type, true);
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore leading and trailing whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="type">Type</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns>object</returns>
+        public static object StringToEnum(string value, Type type, bool ignoreCase)
+        {
+            if (type == null)
+            {
+                return 0;
+            }
+            if (value == null)
+            {
+                return 0;
+            }
+            value = Energy.Base.Text.Trim(value);
+            if (value.Length == 0)
             {
                 return 0;
             }
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
-                if (String.Compare(value, names[i], true) == 0)
+                if (string.Compare(value, names[i], ignoreCase) == 0)
                 {
-                    return Enum.Parse(type, value, true);
-                }
-            }
-            int length = value.Length;
-            value = Energy.Base.Text.Trim(value);
-            if (value.Length == length)
-            {
-                return 0;
-            }
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (String.Compare(value, names[i], true) == 0)
-                {
-                    return Enum.Parse(type, value, true);
+                    return Enum.Parse(type, value, ignoreCase);
                 }
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore case and surrounding whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T StringToEnum<T>(string value)
+        {
+            return (T)StringToEnum(value, typeof(T), true);
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore leading and trailing whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static T StringToEnum<T>(string value, bool ignoreCase)
+        {
+            return (T)StringToEnum(value, typeof(T), ignoreCase);
+        }
+
+        /// <summary>
+        /// Convert integer number to enumeration value.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="type">Type</param>
+        /// <returns>object</returns>
+        public static object IntToEnum(int value, Type type)
+        {
+            return Enum.ToObject(type, value);
+        }
+
+        /// <summary>
+        /// Convert integer number to enumeration value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T IntToEnum<T>(int value)
+        {
+            return (T)IntToEnum(value, typeof(T));
         }
 
         #endregion

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Security.Policy;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -459,7 +460,106 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void StreamToString()
         {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                var bb = Encoding.UTF8.GetBytes("Test String");
+                ms.Write(bb, 0, bb.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                var ss = Energy.Base.Cast.StreamToString(ms);
+                Assert.AreEqual("Test String", ss);
+            }
+        }
 
+        public enum OptionsEnum
+        {
+            None,
+            One,
+            Two,
+            Three,
+            three,
+        }
+
+        public enum NegativeEnum
+        {
+            M1 = -1,
+            M2 = -2,
+        }
+
+        public enum DummyEnum
+        {
+        }
+
+        [TestMethod]
+        public void StringToEnum()
+        {
+            string s;
+            OptionsEnum o;
+            s = null;
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.None, o);
+            s = "";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.None, o);
+            s = "One";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.One, o);
+            s = "one";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.One, o);
+            s = " three ";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum), false);
+            Assert.AreEqual(OptionsEnum.three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s);
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s, true);
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s, false);
+            Assert.AreEqual(OptionsEnum.three, o);
+        }
+
+        [Flags]
+        public enum BitsEnum
+        {
+            B0 = 0,
+            B1 = 1,
+            B2 = 2,
+            B3 = 4,
+        }
+
+        [TestMethod]
+        public void IntToEnum()
+        {
+            int i;
+            BitsEnum b;
+
+            i = 0;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B0, b);
+            i = 1;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1, b);
+            i = 2;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B2, b);
+            i = 3;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1 | BitsEnum.B2, b);
+            i = 4;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B3, b);
+            i = 5;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1 | BitsEnum.B3, b);
+
+            i = -1;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(-1, (int)b);
         }
 
         [TestMethod]
