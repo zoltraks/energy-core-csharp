@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Energy.Base
@@ -382,19 +383,101 @@ namespace Energy.Base
                 return this;
             }
 
+            /// <summary>
+            /// Get array of aliases for name.
+            /// </summary>
+            /// <param name="name"></param>
+            /// <returns></returns>
+            private string[] GetAliases(string name)
+            {
+                List<string> list = new List<string>();
+                foreach (string key in _Option.Alias.Keys)
+                {
+                    if (0 == string.Compare(_Option.Alias[key], name))
+                    {
+                        list.Add(key);
+                    }
+                }
+                return list.ToArray();
+            }
+
             #endregion
 
             #region Help
 
             /// <summary>
-            /// Add help description for parameter key.
+            /// Add help short description for parameter key.
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="help"></param>
+            /// <returns></returns>
+            public Arguments Help(string name, string help)
+            {
+                _Option.Help[name] = help;
+                return this;
+            }
+
+            #endregion
+
+            #region Description
+
+            /// <summary>
+            /// Add long description for parameter key.
+            /// May be used more than once.
+            /// Use null to remove existing description.
             /// </summary>
             /// <param name="name"></param>
             /// <param name="description"></param>
             /// <returns></returns>
-            public Arguments Help(string name, string description)
+            public Arguments Description(string name, string description)
             {
-                _Option.Help["name"] = description;
+                if (null == description)
+                {
+                    if (_Option.Description.ContainsKey(name))
+                    {
+                        _Option.Description.Remove(name);
+                    }
+                }
+                else
+                {
+                    if (!_Option.Description.ContainsKey(name))
+                    {
+                        _Option.Description[name] = new List<string>();
+                    }
+                    _Option.Description[name].Add(description);
+                }
+                return this;
+            }
+
+            #endregion
+
+            #region Example
+
+            /// <summary>
+            /// Add example value for parameter key.
+            /// May be used more than once.
+            /// Use null to remove existing description.
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="example"></param>
+            /// <returns></returns>
+            public Arguments Example(string name, string example)
+            {
+                if (null == example)
+                {
+                    if (_Option.Example.ContainsKey(name))
+                    {
+                        _Option.Example.Remove(name);
+                    }
+                }
+                else
+                {
+                    if (!_Option.Example.ContainsKey(name))
+                    {
+                        _Option.Example[name] = new List<string>();
+                    }
+                    _Option.Example[name].Add(example);
+                }
                 return this;
             }
 
@@ -535,6 +618,100 @@ namespace Energy.Base
             }
 
             #endregion
+
+            #region Print
+
+            /// <summary>
+            /// Pretty format help text for parameters.
+            /// </summary>
+            /// <returns></returns>
+            public string Print()
+            {
+                if (0 == _Option.Count)
+                {
+                    return "";
+                }
+                List<string> text = new List<string>();
+                string indent = "    ";
+                foreach (Option option in _Option)
+                {
+                    List<string> aliases = new List<string>();
+                    aliases.Add(option.Name);
+                    aliases.AddRange(GetAliases(option.Name));
+                    for (int i = 0; i < aliases.Count; i++)
+                    {
+                        if (1 < aliases[i].Length)
+                        {
+                            aliases[i] = "--" + aliases[i];
+                        }
+                        else
+                        {
+                            aliases[i] = "-" + aliases[i];
+                        }
+                    }
+                    string p = "";
+                    if (0 < option.Count)
+                    {
+                        for (int i = 0; i < option.Count; i++)
+                        {
+                            p += " <?>";
+                        }
+                    }
+                    foreach (string alias in aliases)
+                    {
+                        string line = indent + alias + p;
+                        text.Add(line);
+                    }
+                    if (_Option.Help.ContainsKey(option.Name))
+                    {
+                        if (!string.IsNullOrEmpty(_Option.Help[option.Name]))
+                        {
+                            text.Add("");
+                            text.Add(indent + _Option.Help[option.Name]);
+                        }
+                    }
+                    if (_Option.Description.ContainsKey(option.Name) && 0 < _Option.Description[option.Name].Count)
+                    {
+                        bool b = false;
+                        foreach (string e in _Option.Description[option.Name])
+                        {
+                            if (string.IsNullOrEmpty(e))
+                            {
+                                continue;
+                            }
+                            if (!b)
+                            {
+                                b = true;
+                                text.Add("");
+                            }
+                            text.Add(indent + e);
+                        }
+                    }
+                    if (_Option.Example.ContainsKey(option.Name) && 0 < _Option.Example[option.Name].Count)
+                    {
+                        bool b = false;
+                        foreach (string e in _Option.Example[option.Name])
+                        {
+                            if (string.IsNullOrEmpty(e))
+                            {
+                                continue;
+                            }
+                            if (!b)
+                            {
+                                b = true;
+                                text.Add("");
+                            }
+                            text.Add(indent + "--" + option.Name + " " + e);
+                        }
+                    }
+                    text.Add("");
+                    text.Add("");
+                }
+                
+                return string.Join(Environment.NewLine, text.ToArray());
+            }
+
+            #endregion
         }
 
         #endregion
@@ -549,11 +726,19 @@ namespace Energy.Base
             {
                 private Dictionary<string, string> _Alias = new Dictionary<string, string>();
 
-                private Dictionary<string, string> _Help = new Dictionary<string, string>();
-
                 public Dictionary<string, string> Alias { get => _Alias; }
 
+                private Dictionary<string, string> _Help = new Dictionary<string, string>();
+
                 public Dictionary<string, string> Help { get => _Help; }
+
+                private Dictionary<string, List<string>> _Description = new Dictionary<string, List<string>>();
+
+                public Dictionary<string, List<string>> Description { get => _Description; }
+
+                private Dictionary<string, List<string>> _Example = new Dictionary<string, List<string>>();
+
+                public Dictionary<string, List<string>> Example { get => _Example; }
 
                 /// <summary>
                 /// Nullify all existing values.
