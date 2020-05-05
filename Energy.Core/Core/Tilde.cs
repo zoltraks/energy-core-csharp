@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -168,6 +169,12 @@ namespace Energy.Core
 
         #endregion
 
+        #region Private
+
+        private static ConsoleColor? _Cancel_Foreground_ConsoleColor = null;
+
+        #endregion
+
         #region Global
 
         private static readonly object _ConsoleLock = new object();
@@ -189,7 +196,9 @@ namespace Energy.Core
             set
             {
                 if (value == _Colorless)
+                {
                     return;
+                }
                 SetColorless(value);
             }
         }
@@ -410,12 +419,25 @@ namespace Energy.Core
                 _Colorless = true;
             }
 
+            try
+            {
+                Console.CancelKeyPress += Console_CancelKeyPress;
+                _Cancel_Foreground_ConsoleColor = foreground;
+            }
+            catch { }
+
             string answer = System.Console.ReadLine().Trim();
             
             if (!_Colorless)
             {
                 System.Console.ForegroundColor = foreground;
             }
+
+            try
+            {
+                Console.CancelKeyPress -= Console_CancelKeyPress;
+            }
+            catch { }
 
             if (answer.Length == 0)
             {
@@ -1601,7 +1623,7 @@ namespace Energy.Core
         public static bool IsConsolePresent { get { return GetConsolePresent(); } }
 
         private static bool? _ConsolePresent;
-
+        
         private static bool GetConsolePresent()
         {
             if (_ConsolePresent == null)
@@ -1617,6 +1639,22 @@ namespace Energy.Core
                 }
             }
             return _ConsolePresent.Value;
+        }
+
+        #endregion
+
+        #region Event
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            if (_Cancel_Foreground_ConsoleColor != null)
+            {
+                if (!_Colorless)
+                {
+                    Console.ForegroundColor = (ConsoleColor)_Cancel_Foreground_ConsoleColor;
+                }
+                _Cancel_Foreground_ConsoleColor = null;
+            }
         }
 
         #endregion
