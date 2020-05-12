@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -444,27 +443,37 @@ namespace Energy.Base
         /// <summary>
         /// Change any directory separator to native one for compatibility.
         /// </summary>
-        /// <param name="filePath"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static string ChangeSeparator(string filePath)
+        public static string ChangeSeparator(string path)
         {
-            if (string.IsNullOrEmpty(filePath))
-                return filePath;
+            if (string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
             if (System.IO.Path.DirectorySeparatorChar == '\\')
             {
-                if (filePath.IndexOf('/') < 0)
-                    return filePath;
+                if (path.IndexOf('/') < 0)
+                {
+                    return path;
+                }
                 else
-                    return filePath.Replace('/', '\\');
+                {
+                    return path.Replace('/', '\\');
+                }
             }
             if (System.IO.Path.DirectorySeparatorChar == '/')
             {
-                if (filePath.IndexOf('\\') < 0)
-                    return filePath;
+                if (path.IndexOf('\\') < 0)
+                {
+                    return path;
+                }
                 else
-                    return filePath.Replace('\\', '/');
+                {
+                    return path.Replace('\\', '/');
+                }
             }
-            return filePath;
+            return path;
         }
 
         /// <summary>
@@ -475,10 +484,17 @@ namespace Energy.Base
         public static string ToDos(string path)
         {
             if (path == null || path.Length == 0)
+            {
                 return path;
-            if (!path.Contains("/"))
+            }
+            else if (!path.Contains("/"))
+            {
                 return path;
-            return path.Replace("/", "\\");
+            }
+            else
+            {
+                return path.Replace("/", "\\");
+            }
         }
 
         /// <summary>
@@ -489,10 +505,17 @@ namespace Energy.Base
         public static string ToUnix(string path)
         {
             if (path == null || path.Length == 0)
+            {
                 return path;
-            if (!path.Contains("\\"))
+            }
+            else if (!path.Contains("\\"))
+            {
                 return path;
-            return path.Replace("\\", "/");
+            }
+            else
+            {
+                return path.Replace("\\", "/");
+            }
         }
 
         /// <summary>
@@ -503,9 +526,13 @@ namespace Energy.Base
         public static string IncludeTrailingSeparator(string path)
         {
             if (string.IsNullOrEmpty(path))
+            {
                 return path;
+            }
             if (path.EndsWith("\\") || path.EndsWith("/"))
+            {
                 return path;
+            }
             path = string.Concat(path, System.IO.Path.DirectorySeparatorChar);
             return path;
         }
@@ -523,10 +550,17 @@ namespace Energy.Base
         public static string StripQuotation(string path)
         {
             if (path == null || path.Length == 0)
+            {
                 return path;
-            if (!path.Contains("\""))
+            }
+            else if (!path.Contains("\""))
+            {
                 return path;
-            return path.Replace("\"", null);
+            }
+            else
+            {
+                return path.Replace("\"", null);
+            }
         }
 
         #endregion
@@ -616,14 +650,73 @@ namespace Energy.Base
         #region Walk
 
         /// <summary>
-        /// Walk through relative path and return without any dot folders.
+        /// Walk through relative path and return absolute path without any dot folders.
+        /// Function will also strip repeated path separators.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="currentDirectory">Optional current directory for dot folder</param>
+        /// <param name="directory">Directory for relative paths</param>
         /// <returns></returns>
-        public static string Walk(string path, string currentDirectory)
+        public static string Walk(string path, string directory)
         {
+            if (null == path || 0 == path.Trim().Length)
+            {
+                return path;
+            }
+            bool absolute = false
+                || path.StartsWith("\\")
+                || path.StartsWith("/")
+                || Regex.Match(path, @"^[a-zA-Z][a-zA-Z0-9]*:([/\\]+|$)").Success
+                ;
+            if (!absolute)
+            {
+                path = Energy.Base.Path.IncludeTrailingSeparator(directory) + path;
+            }
+            List<string> list = new List<string>(Energy.Base.Path.Split(path));
+            if (0 == list.Count)
+            {
+                return path;
+            }
+            Regex regex = new Regex(@"([/\\])[/\\]+$");
+            for (int i = 0, n = list.Count; i < n; i++)
+            {
+                list[i] = regex.Replace(list[i], "$1");
+            }
+            string first = list[0];
+            bool relative = first != "\\" && first != "/" && !Regex.Match(first, @"^[a-zA-Z][a-zA-Z0-9]*:[/\\]*$").Success;
+            int a = 0;
+            Regex dot1 = new Regex(@"^\.[/\\]*$");
+            Regex dot2 = new Regex(@"^\.\.[/\\]*$");
+            while (a < list.Count)
+            {
+                if (dot1.Match(list[a]).Success)
+                {
+                    list.RemoveAt(a);
+                    continue;
+                }
+                if (dot2.Match(list[a]).Success)
+                {
+                    list.RemoveAt(a);
+                    if (a > (relative ? 0 : 1))
+                    {
+                        list.RemoveAt(--a);
+                    }
+                    continue;
+                }
+                a++;
+            }
+            path = string.Join("", list.ToArray());
             return path;
+        }
+
+        /// <summary>
+        /// Walk through relative path and return absolute path without any dot folders.
+        /// Function will also strip repeated path separators.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string Walk(string path)
+        {
+            return Walk(path, System.IO.Directory.GetCurrentDirectory());
         }
 
         #endregion
@@ -727,6 +820,14 @@ namespace Energy.Base
             }
             return success;
         }
+
+        /// <summary>
+        /// Check if file path part is directory separator or not.
+        /// Multiple separator characters are allowed.
+        /// </summary>
+        /// <param name="part"></param>
+        /// <param name="slashes"></param>
+        /// <returns></returns>
         public static bool IsSeparator(string part, string slashes)
         {
             char[] charsSlashes = slashes.ToCharArray();
@@ -736,6 +837,12 @@ namespace Energy.Base
             return IsSeparator(part, arraySlashes);
         }
 
+        /// <summary>
+        /// Check if file path part is directory separator or not.
+        /// Multiple separator characters are allowed.
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns></returns>
         public static bool IsSeparator(string part)
         {
             return IsSeparator(part, "\\/");

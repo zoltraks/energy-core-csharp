@@ -155,5 +155,27 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("abc", Energy.Base.Path.Trim("\\//abc"));
             Assert.AreEqual("abc", Energy.Base.Path.Trim("abc\\//"));
         }
+
+        [TestMethod]
+        public void PathWalk()
+        {
+            Assert.IsNull(Energy.Base.Path.Walk(null));
+            Assert.AreEqual("", Energy.Base.Path.Walk(""));
+            Assert.AreNotEqual(".", Energy.Base.Path.Walk("."));
+            Assert.AreEqual("c:", Energy.Base.Path.Walk("c:"));
+            Assert.AreEqual("c:/", Energy.Base.Path.Walk("c://"));
+            Assert.AreEqual("c:\\", Energy.Base.Path.Walk("c:\\/\\/"));
+            Assert.AreEqual("c:/", Energy.Base.Path.Walk("c:/\\/\\/"));
+            Assert.AreEqual("c:/", Energy.Base.Path.Walk("c:/a/.."));
+            Assert.AreEqual("c:/", Energy.Base.Path.Walk("c:/a/../"));
+            Assert.AreEqual("c:/a/", Energy.Base.Path.Walk("c:/a/b/.."));
+            Assert.AreEqual("c:/a/", Energy.Base.Path.Walk("c:/a/b/../"));
+            Assert.AreEqual("c:/a/x", Energy.Base.Path.Walk("c:/a/b/../x"));
+            Assert.AreEqual("c:/x", Energy.Base.Path.Walk("c:/a/../x"));
+            Assert.AreEqual("c:/x", Energy.Base.Path.Walk("c:/a/../../x"));
+            Assert.AreEqual("c:/x", Energy.Base.Path.Walk("c:/./a/./../b/./../x"));
+            Assert.AreEqual("c:/x/", Energy.Base.Path.Walk("c:/./a/./../b/./../x/."));
+            Assert.AreEqual("c:/", Energy.Base.Path.Walk("c:/./a/./../b/./../x/.."));
+        }
     }
 }

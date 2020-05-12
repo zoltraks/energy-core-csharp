@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Core
 {
@@ -10,6 +8,8 @@ namespace Energy.Core
     public class Program
     {
         #region Utility
+
+        #region GetAssembly
 
         /// <summary>
         /// Get current assembly from GetExecutingAssembly or GetCallingAssembly.
@@ -24,7 +24,9 @@ namespace Energy.Core
             {
                 assembly = System.Reflection.Assembly.GetCallingAssembly();
                 if (null != assembly)
+                {
                     return assembly;
+                }
             }
             catch
             { }
@@ -33,7 +35,9 @@ namespace Energy.Core
             {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 if (null != assembly)
+                {
                     return assembly;
+                }
             }
             catch
             { }
@@ -41,41 +45,103 @@ namespace Energy.Core
             return null;
         }
 
+        #endregion
+
+        #region GetExecutionFile
+
         /// <summary>
-        /// Get execution file from current working assembly (calling or executing).
+        /// Get execution file location from current working assembly (calling or executing).
         /// </summary>
         /// <returns></returns>
         public static string GetExecutionFile()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
-            if (null == assembly)
+            System.Reflection.Assembly assembly;
+
+            try
+            {
+                assembly = System.Reflection.Assembly.GetCallingAssembly();
+                if (null != assembly)
+                {
+                    return assembly.Location;
+                }
+            }
+            catch
+            { }
+
+            try
+            {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            return assembly.Location;
+                if (null != assembly)
+                {
+                    return assembly.Location;
+                }
+            }
+            catch
+            { }
+
+            return null;
         }
 
+        #endregion
+
+        #region GetExecutionDirectory
+
         /// <summary>
-        /// Get execution directory name from the assembly location.
+        /// Get execution directory from the assembly location.
+        /// Resulting directory will contain trailing path separator.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
         public static string GetExecutionDirectory(System.Reflection.Assembly assembly)
         {
-            if (assembly == null)
+            if (null == assembly)
+            {
                 return null;
-            return System.IO.Path.GetDirectoryName(assembly.Location);
+            }
+            else
+            {
+                string directory = System.IO.Path.GetDirectoryName(assembly.Location);
+                return Energy.Base.Path.IncludeTrailingSeparator(directory);
+            }
         }
 
         /// <summary>
-        /// Get execution directory name from executing assembly location.
+        /// Get execution directory from current executing assembly location.
+        /// Resulting directory will contain trailing path separator.
         /// </summary>
         /// <returns></returns>
         public static string GetExecutionDirectory()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
-            if (null == assembly)
+            System.Reflection.Assembly assembly;
+
+            try
+            {
+                assembly = System.Reflection.Assembly.GetCallingAssembly();
+                if (null != assembly)
+                {
+                    return GetExecutionDirectory(assembly);
+                }
+            }
+            catch
+            { }
+
+            try
+            {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            return System.IO.Path.GetDirectoryName(assembly.Location);
+                if (null != assembly)
+                {
+                    return GetExecutionDirectory(assembly);
+                }
+            }
+            catch
+            { }
+
+            return null;
         }
+
+        #endregion
+
+        #region GetCommandName
 
         /// <summary>
         /// Get short command name from assembly location.
@@ -101,12 +167,42 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
-            if (null == assembly)
+            System.Reflection.Assembly assembly;
+
+            try
+            {
+                assembly = System.Reflection.Assembly.GetCallingAssembly();
+                if (null != assembly)
+                {
+                    return GetCommandName(assembly);
+                }
+            }
+            catch
+            { }
+
+            try
+            {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            return GetCommandName(assembly);
+                if (null != assembly)
+                {
+                    return GetCommandName(assembly);
+                }
+            }
+            catch
+            { }
+
+            return null;
         }
 
+        #endregion
+
+        #region SetLanguage
+
+        /// <summary>
+        /// Set specified language for program.
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
             try
@@ -123,10 +219,16 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Set default language for program (en-US).
+        /// </summary>
+        /// <returns></returns>
         public static System.Globalization.CultureInfo SetLanguage()
         {
             return SetLanguage("en-US");
         }
+
+        #endregion
 
         public static System.Globalization.CultureInfo GetCultureInfo()
         {
@@ -143,7 +245,13 @@ namespace Energy.Core
             }
         }
 
-        public static void SetConsoleEncoding(System.Text.Encoding encoding)
+        #region SetConsoleEncoding
+
+        /// <summary>
+        /// Set specified encoding for console.
+        /// </summary>
+        /// <param name="encoding"></param>
+        public static System.Text.Encoding SetConsoleEncoding(System.Text.Encoding encoding)
         {
             try
             {
@@ -156,19 +264,28 @@ namespace Energy.Core
             {
                 Energy.Core.Bug.Catch(x);
             }
+            return encoding;
         }
 
-        public static void SetConsoleEncoding(string encoding)
+        /// <summary>
+        /// Set specified encoding for console.
+        /// </summary>
+        /// <param name="encoding"></param>
+        public static System.Text.Encoding SetConsoleEncoding(string encoding)
         {
-            SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
+            return SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
-        public static void SetConsoleEncoding()
+        /// <summary>
+        /// Set encoding for console to UTF-8.
+        /// </summary>
+        public static System.Text.Encoding SetConsoleEncoding()
         {
-            SetConsoleEncoding(System.Text.Encoding.UTF8);
+            return SetConsoleEncoding(System.Text.Encoding.UTF8);
         }
 
         #endregion
 
+        #endregion
     }
 }

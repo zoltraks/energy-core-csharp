@@ -1862,7 +1862,6 @@ namespace Energy.Base
         /// Find System.Text.Encoding for specified name.
         /// Get System.Text.Encoding.UTF8 by default or if encoding not exists.
         /// Treats UCS-2 the same as UTF-16 besides differences.
-        /// could not be found.
         /// </summary>
         /// <param name="encoding">UTF-8, UTF, UTF8, UNICODE, UCS-2 LE, UCS-2 BE, 1250, 1252, ...</param>
         /// <returns>System.Text.Encoding</returns>
@@ -1890,9 +1889,13 @@ namespace Energy.Base
             try
             {
                 if (number > 0)
+                {
                     return System.Text.Encoding.GetEncoding(number);
+                }
                 else
+                {
                     return System.Text.Encoding.GetEncoding(encoding);
+                }
             }
             catch (ArgumentException)
             {
