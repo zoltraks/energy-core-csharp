@@ -814,17 +814,17 @@ namespace Energy.Base
         #region Locate
 
         /// <summary>
-        /// Locate executable file.
+        /// Locate file or executable in directories from PATH environment variable.
         /// </summary>
         /// <param name="command">string</param>
         /// <returns>string</returns>
         public static string Locate(string command)
         {
-            return Locate(command, System.Environment.GetEnvironmentVariable("PATH").Split(';'));
+            return Locate(command, Energy.Base.Path.Environment());
         }
 
         /// <summary>
-        /// Locate command file.
+        /// Locate file or executable in search directories.
         /// </summary>
         /// <param name="command">string</param>
         /// <param name="search">string[]</param>
@@ -837,7 +837,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file with one of possible extensions in any directory and return full path to it.
+        /// Locate file with one of possible extensions in search directories.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -849,7 +849,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file or comand with one of possible extensions in any directory and return full path to it.
+        /// Locate file with one of possible extensions in search directories.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -859,7 +859,9 @@ namespace Energy.Base
         public static string Locate(string file, string[] search, string[] extension, Energy.Enumeration.LocateBehaviour behaviour)
         {
             if (string.IsNullOrEmpty(file))
+            {
                 return "";
+            }
 
             file = Energy.Base.Path.ChangeSeparator(file);
 
@@ -867,25 +869,25 @@ namespace Energy.Base
             {
                 search = new string[] { "" };
             }
-            else
-            {
-                bool parse = false;
-                char[] separators = new char[] { ';', ':' };
-                for (int i = 0; i < search.Length; i++)
-                {
-                    if (search[i].IndexOfAny(separators) >= 0)
-                        parse = true;
-                }
-                if (parse)
-                {
-                    List<string> list = new List<string>();
-                    for (int i = 0; i < search.Length; i++)
-                    {
-                        list.AddRange(search[i].Split(separators));
-                    }
-                    search = list.ToArray();
-                }
-            }
+            //else
+            //{
+            //    bool parse = false;
+            //    char[] separators = new char[] { ';', ':' };
+            //    for (int i = 0; i < search.Length; i++)
+            //    {
+            //        if (search[i].IndexOfAny(separators) >= 0)
+            //            parse = true;
+            //    }
+            //    if (parse)
+            //    {
+            //        List<string> list = new List<string>();
+            //        for (int i = 0; i < search.Length; i++)
+            //        {
+            //            list.AddRange(search[i].Split(separators));
+            //        }
+            //        search = list.ToArray();
+            //    }
+            //}
 
             if (search.Length > 0)
             {
@@ -894,8 +896,11 @@ namespace Energy.Base
                     search[i] = Energy.Base.Path.ChangeSeparator(search[i]);
                 }
             }
+
             if (extension == null || extension.Length == 0)
+            {
                 extension = new string[] { "" };
+            }
 
             string fileExtension = System.IO.Path.GetExtension(file);
 
@@ -911,7 +916,9 @@ namespace Energy.Base
             {
                 file = file.Substring(0, file.Length - 1);
                 if (file.Length == 0)
+                {
                     return "";
+                }
             }
 
             switch (behaviour)
@@ -924,7 +931,9 @@ namespace Energy.Base
                         string directory = search[i];
 
                         if (string.IsNullOrEmpty(directory))
+                        {
                             directory = System.IO.Directory.GetCurrentDirectory();
+                        }
 
                         try
                         {
@@ -933,10 +942,14 @@ namespace Energy.Base
                                 string candidate = System.IO.Path.Combine(directory, file);
 
                                 if (!string.IsNullOrEmpty(ext) && 0 != string.Compare(".", ext, false))
+                                {
                                     candidate = System.IO.Path.ChangeExtension(candidate, ext);
+                                }
 
                                 if (System.IO.File.Exists(candidate))
+                                {
                                     return candidate;
+                                }
                             }
                         }
                         catch (Exception x)
@@ -978,7 +991,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Locate file or command with one of possible extensions in any directory and return full path to it.
+        /// Locate file with one of possible extensions in search directory.
         /// </summary>
         /// <param name="list">Array of file names with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>

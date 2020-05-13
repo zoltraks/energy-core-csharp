@@ -10,7 +10,7 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void Locate()
         {
-            string file1 = Energy.Base.File.Locate("Base/Cast", new string[] { ".;..;../.." }, new string[] { ".cs" });
+            string file1 = Energy.Base.File.Locate("Base/Cast", new string[] { ".", "..", "../.." }, new string[] { ".cs" });
             Debug.WriteLine(file1);
             bool empty = string.IsNullOrEmpty(file1);
             Assert.AreEqual(false, empty);
@@ -24,16 +24,17 @@ namespace Energy.Core.Test.Base
             Assert.IsFalse(string.IsNullOrEmpty(file7));
             string file8 = Energy.Base.File.Locate("Energy.Core.Test.csproj", new string[] { "..\\.." }, null);
             Assert.IsFalse(string.IsNullOrEmpty(file8));
-            string[] fileArray;
-            fileArray = new string[]
-            {
-                "SQLServerManager14.msc",
-                "SQLServerManager12.msc",
-                "SQLServerManager10.msc",
-                "SQLServerManager.msc",
-            };
-            string file9 = Energy.Base.File.Locate(fileArray, null, null, Enumeration.LocateBehaviour.Default);
-            Assert.IsNotNull(file9);
+            Assert.IsNotNull(Energy.Base.File.Locate("BIS.instance", new string[] { @"C:\SWR\BIS" }));
+            //string[] fileArray;
+            //fileArray = new string[]
+            //{
+            //    "SQLServerManager14.msc",
+            //    "SQLServerManager12.msc",
+            //    "SQLServerManager10.msc",
+            //    "SQLServerManager.msc",
+            //};
+            //string file9 = Energy.Base.File.Locate(fileArray, null, null, Enumeration.LocateBehaviour.Default);
+            //Assert.IsNotNull(file9);
         }
 
         [TestMethod]

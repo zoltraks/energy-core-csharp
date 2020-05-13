@@ -7,15 +7,15 @@ namespace Energy.Core.Test.Base
     [TestClass]
     public class Path
     {
-        [TestMethod]
-        public void PathVariableSplit()
-        {
-            string[] array;
-            array = Energy.Base.Path.Environment.Split(System.Environment.GetEnvironmentVariable("path"), null);
-            Assert.IsNotNull(array);
-            array = Energy.Base.Path.Environment.AsArray;
-            Assert.IsNotNull(array);
-        }
+        //[TestMethod]
+        //public void PathVariableSplit()
+        //{
+        //    string[] array;
+        //    array = Energy.Base.Path.Environment.Split(System.Environment.GetEnvironmentVariable("path"), null);
+        //    Assert.IsNotNull(array);
+        //    array = Energy.Base.Path.Environment.AsArray;
+        //    Assert.IsNotNull(array);
+        //}
 
         [TestMethod]
         public void PathSplit()
@@ -108,25 +108,25 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(Energy.Base.Path.IsSeparator(array[1].Substring(array[1].Length - 1)));
         }
 
-        [TestMethod]
-        public void PathBuildSeparatorPattern()
-        {
-            string result;
-            result = Energy.Base.Path.BuildSeparatorPattern(null);
-            Assert.IsNull(result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { });
-            Assert.AreEqual("", result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { null });
-            Assert.AreEqual("", result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { null, null });
-            Assert.AreEqual("", result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "", "A", "B", "C" });
-            Assert.AreEqual("[ABC]+", result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "\\" });
-            Assert.AreEqual("\\\\+", result);
-            result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "<<", "><", ">>" });
-            Assert.AreEqual("(?:<<|><|>>)+", result);
-        }
+        //[TestMethod]
+        //public void PathBuildSeparatorPattern()
+        //{
+        //    string result;
+        //    result = Energy.Base.Path.BuildSeparatorPattern(null);
+        //    Assert.IsNull(result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { });
+        //    Assert.AreEqual("", result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { null });
+        //    Assert.AreEqual("", result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { null, null });
+        //    Assert.AreEqual("", result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "", "A", "B", "C" });
+        //    Assert.AreEqual("[ABC]+", result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "\\" });
+        //    Assert.AreEqual("\\\\+", result);
+        //    result = Energy.Base.Path.BuildSeparatorPattern(new string[] { "<<", "><", ">>" });
+        //    Assert.AreEqual("(?:<<|><|>>)+", result);
+        //}
 
         [TestMethod]
         public void PathTrimLeft()
@@ -176,6 +176,22 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("c:/x", Energy.Base.Path.Walk("c:/./a/./../b/./../x"));
             Assert.AreEqual("c:/x/", Energy.Base.Path.Walk("c:/./a/./../b/./../x/."));
             Assert.AreEqual("c:/", Energy.Base.Path.Walk("c:/./a/./../b/./../x/.."));
+        }
+
+        [TestMethod]
+        public void PathEnvironment()
+        {
+            string[] expect, result;
+            result = Energy.Base.Path.Environment("XXXYYYZZZ");
+            expect = new string[] { };
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+            System.Environment.SetEnvironmentVariable("XXX-TEST", "A:B:C");
+            result = Energy.Base.Path.Environment("XXX-TEST", ':');
+            expect = new string[] { "A", "B", "C"};
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
+            System.Environment.SetEnvironmentVariable("XXX-TEST", null);
+            //System.Environment.SetEnvironmentVariable
+            //Energy.Base.Path.Environment("PATH")
         }
     }
 }
