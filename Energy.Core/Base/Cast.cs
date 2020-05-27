@@ -86,6 +86,9 @@ namespace Energy.Base
             if (r == typeof(Stream))
                 return ObjectToStream(value);
 
+            if (r.IsEnum)
+                return StringToEnum(ObjectToString(value), r);
+
             return Energy.Base.Class.GetDefault(type);
         }
 

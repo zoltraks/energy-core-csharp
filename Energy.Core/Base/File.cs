@@ -815,6 +815,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Locate file or executable in directories from PATH environment variable.
+        /// <br/><br/>
+        /// If file can't be found, empty string will be returned.
         /// </summary>
         /// <param name="command">string</param>
         /// <returns>string</returns>
@@ -825,6 +827,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Locate file or executable in search directories.
+        /// <br/><br/>
+        /// If file can't be found, empty string will be returned.
         /// </summary>
         /// <param name="command">string</param>
         /// <param name="search">string[]</param>
@@ -838,6 +842,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Locate file with one of possible extensions in search directories.
+        /// <br/><br/>
+        /// If file can't be found, empty string will be returned.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -850,6 +856,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Locate file with one of possible extensions in search directories.
+        /// <br/><br/>
+        /// If file can't be found, empty string will be returned.
         /// </summary>
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -869,25 +877,6 @@ namespace Energy.Base
             {
                 search = new string[] { "" };
             }
-            //else
-            //{
-            //    bool parse = false;
-            //    char[] separators = new char[] { ';', ':' };
-            //    for (int i = 0; i < search.Length; i++)
-            //    {
-            //        if (search[i].IndexOfAny(separators) >= 0)
-            //            parse = true;
-            //    }
-            //    if (parse)
-            //    {
-            //        List<string> list = new List<string>();
-            //        for (int i = 0; i < search.Length; i++)
-            //        {
-            //            list.AddRange(search[i].Split(separators));
-            //        }
-            //        search = list.ToArray();
-            //    }
-            //}
 
             if (search.Length > 0)
             {
@@ -971,10 +960,14 @@ namespace Energy.Base
                                 string candidate = System.IO.Path.Combine(directory, file);
 
                                 if (!string.IsNullOrEmpty(ext) && 0 == string.Compare(".", ext, false))
+                                {
                                     candidate = System.IO.Path.ChangeExtension(candidate, ext);
+                                }
 
                                 if (System.IO.File.Exists(candidate))
+                                {
                                     return candidate;
+                                }
                             }
                             catch (Exception x)
                             {
@@ -992,6 +985,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Locate file with one of possible extensions in search directory.
+        /// <br/><br/>
+        /// If file can't be found, empty string will be returned.
         /// </summary>
         /// <param name="list">Array of file names with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>

@@ -12,8 +12,8 @@ namespace QueryParameterList
             bag["@x"] = "1";
             bag["x"] = "2";
             bag["y"] = null;
-            bag.Type["y"] = Energy.Enumeration.FormatType.Number;
-            Console.WriteLine(bag.ToString("="));
+            bag.SetType("y", Energy.Enumeration.FormatType.Number);
+            Console.WriteLine(bag.ToString(": "));
             Console.WriteLine();
             string query = "PRINT @y , @x";
             Console.WriteLine(bag.Parse(query));

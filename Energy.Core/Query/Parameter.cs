@@ -13,80 +13,317 @@ namespace Energy.Query
         #region Bag
 
         /// <summary>
-        /// Represents list of parameters and their values.
+        /// Represents bag of parameters and their values.
         /// Use it to define parameters for parametrized query and to parse it.
         /// </summary>
-        public class Bag : List { }
-
-        #endregion
-
-        #region List
-
-        /// <summary>
-        /// Represents list of parameters and their values.
-        /// Use it to define parameters for parametrized query and to parse it.
-        /// </summary>
-        public class List : Energy.Base.Collection.StringDictionary<object>
+        public class Bag
         {
+            private Energy.Base.Collection.StringDictionary<object> _Values;
+
+            private Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType> _Types;
+
+            private readonly string patternVariable = @"
+--[^\n]*\r?\n?
+|
+\[(?:\]\]|[^\]])*\]
+|
+'(?:''|[^'])*'
+|
+""(?:""""|[^""])*""
+|
+`(?:``|[^`])*`
+|
+(?<![\w0-9_])(?<name>@[\w@_][\w@_0-9]*)
+";
+
             private Energy.Query.Format _Format;
             /// <summary>Format</summary>
             public Energy.Query.Format Format { get { return _Format; } set { _Format = value; } }
 
             #region Constructor
 
-            public List()
+            public Bag()
             {
-                this.CaseSensitive = false;
+                _Values = new Energy.Base.Collection.StringDictionary<object>()
+                {
+                    CaseSensitive = false,
+                };
+                _Types = new Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType>()
+                {
+                    CaseSensitive = false,
+                };
             }
 
             #endregion
 
-            /// <summary>
-            /// Parameter format dictionary.
-            /// </summary>
-            public class TypeDictionary: Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType>
-            {
-                public TypeDictionary()
-                {
-                    this.CaseSensitive = false;
-                }
+            #region Clear
 
-                /// <summary>
-                /// Value representation format indexer.
-                /// </summary>
-                /// <param name="index"></param>
-                /// <returns></returns>
-                public new Energy.Enumeration.FormatType this[string index]
-                {
-                    get
-                    {
-                        if (!base.ContainsKey(index))
-                            return Enumeration.FormatType.Text;
-                        return base[index];
-                    }
-                    set
-                    {
-                        base[index] = value;
-                    }
-                }
+            public Energy.Query.Parameter.Bag Clear()
+            {
+                _Values.Clear();
+                _Types.Clear();
+                return this;
             }
 
-            private Energy.Base.Bracket _Bracket;
+            #endregion
 
-            /// <summary>Bracket</summary>
-            public Energy.Base.Bracket Bracket
+            #region Indexer
+
+            public object this[string name]
             {
                 get
                 {
-                    if (_Bracket == null)
-                    {
-                        _Bracket = new Energy.Base.Bracket("@", "", @"\d\w_@");
-                    }
-                    return _Bracket;
+                    return GetValue(name);
+                }
+                set
+                {
+                    SetValue(name, value);
                 }
             }
 
-            public TypeDictionary Type = new TypeDictionary();
+            #endregion
+
+            #region Value
+
+            public object GetValue(string name)
+            {
+                if (null == name)
+                {
+                    return null;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                return _Values[name];
+            }
+
+            public Energy.Query.Parameter.Bag SetValue(string name, object value)
+            {
+                if (null == name)
+                {
+                    return this;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                _Values[name] = value;
+                return this;
+            }
+
+            #endregion
+
+            #region Type
+
+            public Energy.Enumeration.FormatType GetType(string name)
+            {
+                if (null == name)
+                {
+                    return Enumeration.FormatType.Text;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                if (!_Types.ContainsKey(name))
+                {
+                    return Enumeration.FormatType.Text;
+                }
+                return _Types[name];
+            }
+
+            public Energy.Query.Parameter.Bag SetType(string name, Energy.Enumeration.FormatType type)
+            {
+                if (null == name)
+                {
+                    return this;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                _Types[name] = type;
+                return this;
+            }
+
+            #endregion
+
+            #region Contains
+
+            public bool Contains(string name)
+            {
+                if (null == name)
+                {
+                    return false;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                return _Values.ContainsKey(name);
+            }
+
+            #endregion
+
+            #region Get
+
+            public object Get(string name)
+            {
+                return GetValue(name);
+            }
+
+            #endregion
+
+            #region Set
+
+            public Energy.Query.Parameter.Bag Set(string name, object value, Enumeration.FormatType type)
+            {
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            public Energy.Query.Parameter.Bag Set(string name, object value, string format)
+            {
+                Energy.Enumeration.FormatType type = Energy.Base.Cast.StringToEnum<Energy.Enumeration.FormatType>(format);
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            public Energy.Query.Parameter.Bag Set(string name, object value)
+            {
+                Energy.Enumeration.FormatType type = Energy.Enumeration.FormatType.Text;
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            #endregion
+
+            #region Add
+
+            public Energy.Query.Parameter.Bag Add(string name, object value, Enumeration.FormatType type)
+            {
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            public Energy.Query.Parameter.Bag Add(string name, object value, string format)
+            {
+                Energy.Enumeration.FormatType type = Energy.Base.Cast.StringToEnum<Energy.Enumeration.FormatType>(format);
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            public Energy.Query.Parameter.Bag Add(string name, object value)
+            {
+                Energy.Enumeration.FormatType type = Energy.Enumeration.FormatType.Text;
+                SetValue(name, value);
+                SetType(name, type);
+                return this;
+            }
+
+            #endregion
+
+            #region Remove
+
+            public Energy.Query.Parameter.Bag Remove(string name)
+            {
+                if (name == null)
+                {
+                    return this;
+                }
+                if (!name.StartsWith("@"))
+                {
+                    name = "@" + name;
+                }
+                _Values.Remove(name);
+                _Types.Remove(name);
+                return this;
+            }
+
+            #endregion
+
+            #region Count
+
+            public int Count
+            {
+                get
+                {
+                    return _Values.Count;
+                }
+            }
+
+            #endregion
+
+            ///// <summary>
+            ///// Parameter format dictionary.
+            ///// </summary>
+            //public class TypeDictionary: Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType>
+            //{
+            //    public TypeDictionary()
+            //    {
+            //        this.CaseSensitive = false;
+            //    }
+
+            //    /// <summary>
+            //    /// Value representation format indexer.
+            //    /// </summary>
+            //    /// <param name="index"></param>
+            //    /// <returns></returns>
+            //    public new Energy.Enumeration.FormatType this[string index]
+            //    {
+            //        get
+            //        {
+            //            if (null == index)
+            //            {
+            //                return Enumeration.FormatType.Text;
+            //            }
+            //            if (!index.StartsWith("@"))
+            //            {
+            //                index = "@" + index;
+            //            }
+            //            if (!base.ContainsKey(index))
+            //            {
+            //                return Enumeration.FormatType.Text;
+            //            }
+            //            return base[index];
+            //        }
+            //        set
+            //        {
+            //            if (null == index)
+            //            {
+            //                return;
+            //            }
+            //            if (!index.StartsWith("@"))
+            //            {
+            //                index = "@" + index;
+            //            }
+            //            base[index] = value;
+            //        }
+            //    }
+            //}
+
+            //private Energy.Base.Bracket _Bracket;
+
+            ///// <summary>Bracket</summary>
+            //public Energy.Base.Bracket Bracket
+            //{
+            //    get
+            //    {
+            //        if (_Bracket == null)
+            //        {
+            //            _Bracket = new Energy.Base.Bracket("@", "", @"\d\w_@");
+            //        }
+            //        return _Bracket;
+            //    }
+            //}
+
+            //public TypeDictionary Type = new TypeDictionary();
 
             private Option _Option;
 
@@ -95,25 +332,29 @@ namespace Energy.Query
             /// </summary>
             public Option Option { get { return _Option; } set { _Option = value; } }
 
-            /// <summary>
-            /// Parameter names must be explicit.
-            /// If set to false, parameters can be added in shorter form 
-            /// without leading @.
-            /// </summary>
-            public bool Explicit
-            {
-                get
-                {
-                    return (_Option & Option.Explicit) > 0;
-                }
-                set
-                {
-                    if (value)
-                        _Option |= Option.Explicit;
-                    else
-                        _Option &= ~Option.Explicit;
-                }
-            }
+            ///// <summary>
+            ///// Parameter names must be explicit.
+            ///// If set to false, parameters can be added in shorter form 
+            ///// without leading @.
+            ///// </summary>
+            //public bool Explicit
+            //{
+            //    get
+            //    {
+            //        return (_Option & Option.Explicit) > 0;
+            //    }
+            //    set
+            //    {
+            //        if (value)
+            //        {
+            //            _Option |= Option.Explicit;
+            //        }
+            //        else
+            //        {
+            //            _Option &= ~Option.Explicit;
+            //        }
+            //    }
+            //}
 
             /// <summary>
             /// Parse null values as zero when converting to number type.
@@ -127,9 +368,13 @@ namespace Energy.Query
                 set
                 {
                     if (value)
+                    {
                         _Option |= Option.NullAsZero;
+                    }
                     else
+                    {
                         _Option &= ~Option.NullAsZero;
+                    }
                 }
             }
 
@@ -145,9 +390,13 @@ namespace Energy.Query
                 set
                 {
                     if (value)
+                    {
                         _Option |= Option.Unicode;
+                    }
                     else
+                    {
                         _Option &= ~Option.Unicode;
+                    }
                 }
             }
 
@@ -199,16 +448,18 @@ namespace Energy.Query
                 }
             }
 
+            #region Parse
+
             /// <summary>
             /// Parse parametrized query string.
             /// </summary>
-            /// <param name="input"></param>
+            /// <param name="query"></param>
             /// <returns></returns>
-            public string Parse(string input)
+            public string Parse(string query)
             {
-                if (string.IsNullOrEmpty(input))
+                if (string.IsNullOrEmpty(query))
                 {
-                    return input;
+                    return query;
                 }
 
                 bool optionUnicode = this.Unicode;
@@ -218,119 +469,94 @@ namespace Energy.Query
 
                 bool allowUnknow = optionUnknownAsEmpty || optionUnknownAsNull;
 
-                Energy.Query.Format format = _Format;
-                if (_Format == null)
-                {
-                    format = Energy.Query.Format.Default;
-                }
-                int δ = 0;
-                foreach (Energy.Base.Bracket.SearchResult _ in Bracket.Search(input))
-                {
-                    string variable = _.Value;
-                    bool found = this.ContainsKey(variable);
+                Energy.Query.Format format = _Format ?? Energy.Query.Format.Default;
 
-                    if (!found)
+                RegexOptions regexOptions = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace;
+                Regex regexVariable = new Regex(patternVariable, regexOptions);
+                int Δ = 0;
+                foreach (Match matchVariable in regexVariable.Matches(query))
+                {
+                    string name = matchVariable.Groups["name"].Value;
+                    if (string.IsNullOrEmpty(name))
                     {
-                        if (true
-                            && !Explicit
-                            && variable.Length > 1
-                            && variable.StartsWith("@")
-                            && variable[1] != '@'
-                        )
-                        {
-                            variable = variable.Substring(1);
-                            found = this.ContainsKey(variable);
-                        }
+                        continue;
                     }
 
-                    if (!found)
-                    {
-                        if (!allowUnknow)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            if (variable.StartsWith("@@"))
-                            {
-                                continue;
-                            }
-                        }
-                    }
+                    string value;
 
-                    object value = null;
-                    Energy.Enumeration.FormatType type;
-                    if (found)
+                    if (Contains(name))
                     {
-                        value = this[variable];
-                        type = Type[variable];
+                        object o = GetValue(name);
+                        Energy.Enumeration.FormatType f = GetType(name);
+                        if (optionNullAsZero && o == null)
+                        {
+                            o = 0;
+                        }
+                        value = format.Value(o, f, optionUnicode);
+                    }
+                    else if (!allowUnknow)
+                    {
+                        continue;
+                    }
+                    else if (optionUnknownAsEmpty)
+                    {
+                        value = format.Text("");
+                    }
+                    else if (optionNullAsZero)
+                    {
+                        value = "0";
                     }
                     else
                     {
-                        type = Energy.Enumeration.FormatType.Text;
-                        value = optionUnknownAsEmpty ? "" : null;
+                        value = "NULL";
                     }
 
-                    string text = null;
-                    switch (type)
-                    {
-                        default:
-                        case Energy.Enumeration.FormatType.Text:
-                            if (optionUnicode)
-                            {
-                                text = format.Unicode(value);
-                            }
-                            else
-                            {
-                                text = format.Text(value);
-                            }
-                            break;
-
-                        case Enumeration.FormatType.Plain:
-                            text = Energy.Base.Cast.ObjectToString(value);
-                            break;
-
-                        case Energy.Enumeration.FormatType.Number:
-                            text = format.Number(value, !optionNullAsZero);
-                            break;
-
-                        case Energy.Enumeration.FormatType.Date:
-                            text = format.Date(value);
-                            break;
-
-                        case Energy.Enumeration.FormatType.Time:
-                            text = format.Time(value);
-                            break;
-
-                        case Energy.Enumeration.FormatType.Stamp:
-                            text = format.Stamp(value);
-                            break;
-
-                        case Enumeration.FormatType.Binary:
-                            text = format.Binary(value);
-                            break;
-                    }
-                    int n = δ + _.Position;
-                    string s1 = input.Substring(0, n);
-                    n+= _.Length;
-                    string s2 = input.Substring(n);
-                    input = string.Concat(s1, text, s2);
-                    δ += text.Length - _.Length;
+                    int p = matchVariable.Index;
+                    int l = matchVariable.Length;
+                    query = ""
+                        + (p + Δ > 0 ? query.Substring(0, p + Δ) : "")
+                        + value
+                        + query.Substring(p + l + Δ)
+                        ;
+                    Δ += value.Length - l;
                 }
-                return input;
+                return query;
             }
 
-            public void Set(string key, object value, Enumeration.FormatType format)
+            #endregion
+
+            #region ToString
+
+            public override string ToString()
             {
-                base.Set(key, value);
-                this.Type[key] = format;
+                return this.ToString("=");
             }
 
-            public void Set(string key, object value, string format)
+            public string ToString(string glue)
             {
-                Set(key, value, (Enumeration.FormatType)Energy.Base.Cast.StringToEnum(format, typeof(Enumeration.FormatType)));
+                Energy.Query.Format format = _Format ?? Energy.Query.Format.Default;
+                bool unicode = this.Unicode;
+                List<string> l = new List<string>();
+                foreach (KeyValuePair<string, object> o in _Values)
+                {
+                    l.Add(o.Key + glue + format.Value(o.Value, GetType(o.Key), unicode));
+                }
+                return string.Join(Environment.NewLine, l.ToArray());
             }
+
+            #endregion
         }
+
+        #endregion
+
+        #region List
+
+        /// <summary>
+        /// Represents list of parameters and their values.
+        /// Use it to define parameters for parametrized query and to parse it.
+        /// Alias for Energy.Query.Parameter.Bag class.
+        /// </summary>
+        public class List : Bag { }
 
         #endregion
 
@@ -390,7 +616,9 @@ namespace Energy.Query
             public static string ConvertToParameterizedQuery(string template)
             {
                 if (string.IsNullOrEmpty(template))
+                {
                     return template;
+                }
 
                 StringBuilder sb = new StringBuilder();
 

@@ -745,7 +745,6 @@ namespace Energy.Base
                 }
             }
 
-
             #endregion
 
             /// <summary>
@@ -902,7 +901,9 @@ namespace Energy.Base
             public Energy.Base.Collection.StringDictionary<T> Set(string key, T value)
             {
                 if (string.IsNullOrEmpty(key))
+                {
                     return null;
+                }
 
                 lock (_Lock)
                 {
@@ -921,7 +922,9 @@ namespace Energy.Base
                     {
                         base[key] = value;
                         if (Index == null)
+                        {
                             Index = new Dictionary<string, string>();
+                        }
                         Index.Add(map, key);
                     }
                 }
@@ -1116,9 +1119,13 @@ namespace Energy.Base
                 lock (_Lock)
                 {
                     if (CaseSensitive)
+                    {
                         return base.ContainsKey(key);
+                    }
                     if (Index == null)
+                    {
                         return false;
+                    }
                     string map = key.ToUpperInvariant();
                     return Index.ContainsKey(map);
                 }

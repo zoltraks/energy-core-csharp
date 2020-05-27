@@ -586,15 +586,17 @@ namespace Energy.Core
         #region Break
 
         /// <summary>
-        /// Break with new lines and set default text color.
+        /// Write out empty lines and set default text color.
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="count">Number of empty lines to write</param>
         public static void Break(int count)
         {
             lock (_ConsoleLock)
             {
                 if (_Foreground != null)
+                {
                     System.Console.ForegroundColor = (ConsoleColor)_Foreground;
+                }
                 for (int i = 0; i < count; i++)
                 {
                     System.Console.WriteLine();
@@ -603,7 +605,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break one line and set default text color.
+        /// Write out one break line and set default text color.
         /// </summary>
         public static void Break()
         {
@@ -611,7 +613,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break with one or more padding lines and ruler line.
+        /// Write out ruler line surrounded by empty lines.
         /// </summary>
         /// <param name="padding"></param>
         /// <param name="line"></param>
@@ -619,7 +621,9 @@ namespace Energy.Core
         {
             StringBuilder s = new StringBuilder();
             for (int i = 0; i < padding; i++)
+            {
                 s.AppendLine();
+            }
             string x = s.ToString();
             string t = string.Concat(x, line, x, Energy.Base.Text.NL);
             Write(t);
@@ -936,6 +940,38 @@ namespace Energy.Core
         public static void WritePlain(string value)
         {
             Write(Escape(value));
+        }
+
+        #endregion
+
+        #region Line
+
+        /// <summary>
+        /// Write color text line.
+        /// </summary>
+        /// <param name="value"></param>
+        public static void Line(string value)
+        {
+            Write(string.Concat(value, Energy.Base.Text.NL));
+        }
+
+        /// <summary>
+        /// Write text line using specifed color and escaping any tilde characters in text.
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="text"></param>
+        public static void Line(ConsoleColor color, string text)
+        {
+            text = string.Concat(ConsoleColorToTildeColor(color), Escape(text), Energy.Base.Text.NL);
+            Write(text);
+        }
+
+        /// <summary>
+        /// Write empty line.
+        /// </summary>
+        public static void Line()
+        {
+            Write(Energy.Base.Text.NL);
         }
 
         #endregion
@@ -1397,10 +1433,7 @@ namespace Energy.Core
         public static void Exception(Exception exception, bool trace)
         {
             string message = GetExceptionMessage(exception, trace);
-            if (trace)
-                Tilde.WriteLine(message);
-            else
-                Tilde.Write(message);
+            WriteLine(message);
         }
 
         /// <summary>
@@ -1413,6 +1446,20 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Alias for Exception method.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="trace"></param>
+        public static void WriteException(Exception exception, bool trace)
+        {
+            Exception(exception, trace);
+        }
+
+        #endregion
+
+        #region Pause
+
+        /// <summary>
         /// Pause execution
         /// </summary>
         /// <returns></returns>
@@ -1421,16 +1468,6 @@ namespace Energy.Core
             WriteLine(_PauseText);
             string input = System.Console.ReadLine();
             return input;
-        }
-
-        /// <summary>
-        /// Alias for Exception method.
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <param name="trace"></param>
-        public static void WriteException(Exception exception, bool trace)
-        {
-            Exception(exception, trace);
         }
 
         #endregion
@@ -1453,7 +1490,9 @@ namespace Energy.Core
                 while (System.Console.KeyAvailable)
                 {
                     if (_ReadLineStringBuilder == null)
+                    {
                         _ReadLineStringBuilder = new StringBuilder();
+                    }
                     System.ConsoleKeyInfo key = System.Console.ReadKey();
                     if (key.Key == System.ConsoleKey.Enter)
                     {
@@ -1507,9 +1546,13 @@ namespace Energy.Core
                 {
                     stringBuilder.Append(key.KeyChar);
                     if (mask != null)
+                    {
                         Console.Write(mask);
+                    }
                     else
+                    {
                         Console.Write(key.KeyChar);
+                    }
                 }
             }
             while (key.Key != ConsoleKey.Escape);

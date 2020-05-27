@@ -66,6 +66,14 @@ namespace Energy.Core.Test.Query
             bag.Set("where", "1=1", "PlAiN");
             result = bag.Parse("@WHERE");
             Assert.AreEqual("1=1", result);
+
+            bag.Clear();
+            bag.Set("a", "1");
+            bag.Set("@a", "2");
+            bag.Set("a", "3");
+            Assert.AreEqual(1, bag.Count);
+            result = bag.Parse("SELECT '@a' + @a");
+            Assert.AreEqual("SELECT '@a' + '3'", result);
         }
 
         [TestMethod]
@@ -147,8 +155,8 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            bag.Type["b"] = Energy.Enumeration.FormatType.Number;
-            bag.Type["c"] = Energy.Enumeration.FormatType.Number;
+            bag.SetType("b", Energy.Enumeration.FormatType.Number);
+            bag.SetType("c", Energy.Enumeration.FormatType.Number);
 
             text = "@a @b @c";
             must = "'''X''' 1 3.1415";
@@ -174,7 +182,7 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            bag.Type["zero"] = Energy.Enumeration.FormatType.Number;
+            bag.SetType("zero", Energy.Enumeration.FormatType.Number);
 
             text = "@zero @a";
             bag.Unicode = false;
@@ -183,7 +191,6 @@ GO
             Assert.AreEqual(must, have);
 
             text = "@zero @a";
-            bag.Explicit = true;
             bag.UnknownAsEmpty = false;
             bag.UnknownAsNull = false;
             must = "'0' @a";

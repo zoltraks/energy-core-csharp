@@ -18,29 +18,39 @@ namespace Energy.Enumeration
         /// </summary>
         Text = 1,
 
+        ///// <summary>
+        ///// Format as boolean value
+        ///// </summary>
+        //Bool = 2,
+
         /// <summary>
         /// Format as number
         /// </summary>
-        Number = 2,
+        Number = 4,
+
+        /// <summary>
+        /// Format as integer number
+        /// </summary>
+        Integer = 8,
 
         /// <summary>
         /// Format as date
         /// </summary>
-        Date = 4,
+        Date = 16,
 
         /// <summary>
         /// Format as time
         /// </summary>
-        Time = 8,
+        Time = 32,
 
         /// <summary>
         /// Format as timestamp
         /// </summary>
-        Stamp = 16,
+        Stamp = 64,
 
         /// <summary>
         /// Format as binary
         /// </summary>
-        Binary = 32,
+        Binary = 128,
     }
 }

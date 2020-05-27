@@ -241,6 +241,14 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, c1);
         }
 
+        [Flags]
+        private enum SomeEnum
+        {
+            A,
+            B,
+            AB=A|B,
+        }
+
         [TestMethod]
         public void As()
         {
@@ -378,6 +386,14 @@ namespace Energy.Core.Test.Base
             expectDateTime = new DateTime(2000, 01, 01);
             resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, DateTime.MinValue, expectDateTime);
             Assert.AreEqual(expectDateTime, resultDateTime);
+
+            // enum
+
+            var enumA = Energy.Base.Cast.As<SomeEnum>("A");
+            Assert.AreEqual(SomeEnum.A, enumA);
+
+            var enumAB = Energy.Base.Cast.As<SomeEnum>("AB");
+            Assert.AreEqual(SomeEnum.AB, enumAB);
         }
 
 
