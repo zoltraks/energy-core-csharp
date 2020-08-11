@@ -428,6 +428,7 @@ namespace Energy.Base
         /// Double quote is replaced with '\"'.
         /// Backslash is replaced with '\\'.
         /// 
+        /// Escaped text must be surrounded with double quotes.
         /// </summary>
         /// <param name="text">Text to be escaped</param>
         /// <returns>JSON string</returns>
@@ -477,7 +478,7 @@ namespace Energy.Base
         #region Strip
 
         /// <summary>
-        /// Strip quotes and unescapes JSON string to text.
+        /// Strip double quotes and unescapes string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -508,7 +509,7 @@ namespace Energy.Base
         #region Quote
 
         /// <summary>
-        /// Quote text for JSOV value. 
+        /// Quote text. 
         /// Represents text in double quotes and escapes special characters.
         /// Null strings are represented as single word "null".
         /// </summary>

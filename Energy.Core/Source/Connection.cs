@@ -53,7 +53,7 @@ namespace Energy.Source
             _ConnectionString = connectionString;
         }
 
-        public Connection(Type vendor, Configuration configuration)
+        public Connection(Type vendor, Energy.Source.Configuration configuration)
             : this(vendor)
         {
             _ConnectionString = configuration.ConnectionString;
