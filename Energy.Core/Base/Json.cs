@@ -403,20 +403,22 @@ namespace Energy.Base
 
         #endregion
 
-        #region Static utility functions
+        #region Static
 
         private static readonly string[] characterReplacementArray = new string[]{
             "\b", "\\b",
             "\f", "\\f",
             "\n", "\\n",
             "\r", "\\r",
+            "\t", "\\t",
             "\"", "\\\"",
             "\\", "\\\\",
         };
 
+        #region Escape
+
         /// <summary>
-        /// Escape JSON characters and include string in double quotes.
-        /// Null strings will be represented as "null".
+        /// Escape special characters for JSON value.
         /// 
         /// Backspace is replaced with '\b'.
         /// Form feed is replaced with '\f'.
@@ -427,21 +429,52 @@ namespace Energy.Base
         /// Backslash is replaced with '\\'.
         /// 
         /// </summary>
-        /// <param name="text">Text to be escaped for JSON string</param>
+        /// <param name="text">Text to be escaped</param>
         /// <returns>JSON string</returns>
         public static string Escape(string text)
         {
-            if (text == null)
-                return "null";
-            if (text == "")
-                return "\"\"";
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
             for (int i = characterReplacementArray.Length - 2; i >= 0; i -= 2)
             {
                 if (text.Contains(characterReplacementArray[i]))
+                {
                     text = text.Replace(characterReplacementArray[i], characterReplacementArray[i + 1]);
+                }
             }
             return text;
         }
+
+        #endregion
+
+        #region Unescape
+
+        /// <summary>
+        /// Strip backslashes from previously escaped value.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Unescape(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            for (int i = 0; i < characterReplacementArray.Length; i += 2)
+            {
+                if (text.Contains(characterReplacementArray[i + 1]))
+                {
+                    text = text.Replace(characterReplacementArray[i + 1], characterReplacementArray[i]);
+                }
+            }
+            return text;
+        }
+
+        #endregion
+
+        #region Strip
 
         /// <summary>
         /// Strip quotes and unescapes JSON string to text.
@@ -451,36 +484,42 @@ namespace Energy.Base
         public static string Strip(string text)
         {
             if (text == null)
+            {
                 return null;
+            }
             if (text == "null")
+            {
                 return null;
+            }
             if (text == "")
+            {
                 return "";
+            }
             if (text.StartsWith("\"") && text.EndsWith("\""))
             {
                 text = text.Substring(1, text.Length - 2);
-                for (int i = 0; i < characterReplacementArray.Length; i += 2)
-                {
-                    if (text.Contains(characterReplacementArray[i + 1]))
-                        text = text.Replace(characterReplacementArray[i + 1], characterReplacementArray[i]);
-                }
-                return text;
+                text = Energy.Base.Json.Unescape(text);
             }
-            else
-            {
-                return text;
-            }
+            return text;
         }
 
+        #endregion
+
+        #region Quote
+
         /// <summary>
-        /// Quote
+        /// Quote text for JSOV value. 
+        /// Represents text in double quotes and escapes special characters.
+        /// Null strings are represented as single word "null".
         /// </summary>
-        /// <param name="jsonString"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static string Quote(string jsonString)
+        public static string Quote(string text)
         {
-            return "\"" + Escape(jsonString) + "\"";
+            return text == null ? "null" : "\"" + Escape(text) + "\"";
         }
+
+        #endregion
 
         #endregion
     }

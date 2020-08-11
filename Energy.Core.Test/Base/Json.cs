@@ -13,6 +13,9 @@ namespace Energy.Core.Test.Base
             string text1 = Energy.Base.Json.Strip(json1);
             string unescaped1 = "Hello \"Name\"!\r\nHow are you?";
             Assert.AreEqual(unescaped1, text1);
+            Assert.IsNull(Energy.Base.Json.Strip(null));
+            Assert.IsNull(Energy.Base.Json.Strip("null"));
+            Assert.AreEqual("null", Energy.Base.Json.Strip("\"null\""));
         }
 
         [TestMethod]
@@ -61,6 +64,42 @@ namespace Energy.Core.Test.Base
             result = doc.Serialize(layout);
             string expect;
             expect = "{\"Name\":\"Hello \\\"Henry\\\".\"}";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void JsonQuote()
+        {
+            string expect, result, value;
+            value = null;
+            result = Energy.Base.Json.Quote(value);
+            expect = "null";
+            Assert.AreEqual(expect, result);
+            value = "";
+            result = Energy.Base.Json.Quote(value);
+            expect = "\"\"";
+            Assert.AreEqual(expect, result);
+            value = "\t";
+            result = Energy.Base.Json.Quote(value);
+            expect = "\"\\t\"";
+            Assert.AreEqual(expect, result);
+        }
+
+        [TestMethod]
+        public void JsonUnescape()
+        {
+            string expect, result, value;
+            value = null;
+            result = Energy.Base.Json.Unescape(value);
+            expect = null;
+            Assert.AreEqual(expect, result);
+            value = "";
+            result = Energy.Base.Json.Unescape(value);
+            expect = "";
+            Assert.AreEqual(expect, result);
+            value = "\\t";
+            result = Energy.Base.Json.Unescape(value);
+            expect = "\t";
             Assert.AreEqual(expect, result);
         }
     }
