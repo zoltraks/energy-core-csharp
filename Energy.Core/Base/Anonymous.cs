@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Energy.Base
+﻿namespace Energy.Base
 {
     public class Anonymous
     {
         /// <summary>
-        /// Represents function that only output string.
+        /// Represents parameterless function that returns only string.
         /// </summary>
         /// <returns></returns>
         public delegate string String();
 
         /// <summary>
-        /// Represents function that only output string and takes one argument.
+        /// Represents function that takes one argument of specified type and returns only string.
         /// </summary>
         /// <typeparam name="TString">Argument type</typeparam>
         /// <returns></returns>
         public delegate string String<TString>(TString argument);
 
         /// <summary>
-        /// Represents function that changes input state into output one.
+        /// Generic function that takes argument of specified type and returns result with the same type.
         /// </summary>
         /// <typeparam name="TState">State type</typeparam>
         /// <param name="input"></param>
