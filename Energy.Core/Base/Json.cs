@@ -405,7 +405,9 @@ namespace Energy.Base
 
         #region Static
 
-        private static readonly string[] characterReplacementArray = new string[]{
+        #region Private
+
+        private static readonly string[] _EscapeReplacementArray = new string[]{
             "\b", "\\b",
             "\f", "\\f",
             "\n", "\\n",
@@ -414,6 +416,19 @@ namespace Energy.Base
             "\"", "\\\"",
             "\\", "\\\\",
         };
+
+        private static readonly string[] _UnescapeReplacementArray = new string[]{
+            "\b", "\\b",
+            "\f", "\\f",
+            "\n", "\\n",
+            "\r", "\\r",
+            "\t", "\\t",
+            "\"", "\\\"",
+            "\\", "\\\\",
+            "/",  "\\/",
+        };
+
+        #endregion
 
         #region Escape
 
@@ -438,11 +453,11 @@ namespace Energy.Base
             {
                 return text;
             }
-            for (int i = characterReplacementArray.Length - 2; i >= 0; i -= 2)
+            for (int i = _EscapeReplacementArray.Length - 2; i >= 0; i -= 2)
             {
-                if (text.Contains(characterReplacementArray[i]))
+                if (text.Contains(_EscapeReplacementArray[i]))
                 {
-                    text = text.Replace(characterReplacementArray[i], characterReplacementArray[i + 1]);
+                    text = text.Replace(_EscapeReplacementArray[i], _EscapeReplacementArray[i + 1]);
                 }
             }
             return text;
@@ -463,11 +478,11 @@ namespace Energy.Base
             {
                 return text;
             }
-            for (int i = 0; i < characterReplacementArray.Length; i += 2)
+            for (int i = 0; i < _UnescapeReplacementArray.Length; i += 2)
             {
-                if (text.Contains(characterReplacementArray[i + 1]))
+                if (text.Contains(_UnescapeReplacementArray[i + 1]))
                 {
-                    text = text.Replace(characterReplacementArray[i + 1], characterReplacementArray[i]);
+                    text = text.Replace(_UnescapeReplacementArray[i + 1], _UnescapeReplacementArray[i]);
                 }
             }
             return text;
