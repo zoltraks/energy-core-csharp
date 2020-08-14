@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Energy.Query
 {
     /// <summary>
-    /// Value formatter for SQL.
+    /// Value formatter for SQL
     /// </summary>
     public class Format
     {
