@@ -19,8 +19,12 @@ namespace Energy.Query
         public class Bag
         {
             private Energy.Base.Collection.StringDictionary<object> _Values;
+            /// <summary>Values</summary>
+            public Energy.Base.Collection.StringDictionary<object> Values { get { return _Values; } }
 
             private Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType> _Types;
+            /// <summary>Types</summary>
+            public Energy.Base.Collection.StringDictionary<Energy.Enumeration.FormatType> Types { get { return _Types; } }
 
             private readonly string patternVariable = @"
 --[^\n]*\r?\n?
