@@ -50,13 +50,19 @@ namespace Energy.Base
             Type t = value.GetType();
 
             if (t == r)
+            {
                 return value;
+            }
 
             if (r == typeof(object))
+            {
                 return (object)value;
+            }
 
             if (r == typeof(string))
+            {
                 return ObjectToString(value);
+            }
             if (r == typeof(byte))
                 return ObjectToByte(value);
             if (r == typeof(sbyte))
@@ -1374,7 +1380,9 @@ namespace Energy.Base
         public static Stream StringToStream(string value)
         {
             if (value == null)
+            {
                 value = string.Empty;
+            }
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(value));
             return stream;
         }
@@ -1388,9 +1396,13 @@ namespace Energy.Base
         public static Stream StringToStream(string value, Encoding encoding)
         {
             if (encoding == null)
+            {
                 encoding = Encoding.UTF8;
+            }
             if (value == null)
+            {
                 value = string.Empty;
+            }
             MemoryStream stream = new MemoryStream(encoding.GetBytes(value));
             return stream;
         }
@@ -1424,7 +1436,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static byte[] StreamRead(Stream stream)
+        public static byte[] StreamToByteArray(Stream stream)
         {
             byte[] buffer = new byte[8 * 1024];
             using (MemoryStream ms = new MemoryStream())
@@ -1450,7 +1462,7 @@ namespace Energy.Base
             {
                 encoding = Encoding.UTF8;
             }
-            byte[] data = StreamRead(stream);
+            byte[] data = Energy.Base.Cast.StreamToByteArray(stream);
             if (null == data)
             {
                 return null;
@@ -1466,6 +1478,18 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Read all bytes from stream and return as hexadecimal string
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToHex(Stream stream)
+        {
+            byte[] data = Energy.Base.Cast.StreamToByteArray(stream);
+            string hex = Energy.Base.Cast.ByteArrayToHex(data);
+            return hex;
+        }
+
+        /// <summary>
         /// Return string from a stream using UTF-8 encoding.
         /// </summary>
         /// <param name="stream"></param>
@@ -1473,7 +1497,7 @@ namespace Energy.Base
         public static string StreamToString(Stream stream)
         {
             Encoding encoding = System.Text.Encoding.UTF8;
-            byte[] data = StreamRead(stream);
+            byte[] data = StreamToByteArray(stream);
             if (null == data)
             {
                 return null;
@@ -2002,6 +2026,8 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
+        [Obsolete]
+        [Energy.Attribute.Code.Obsolete]
         public static string ByteToStringSign(byte value)
         {
             return NumberToStringSign(value.ToString(), null);
@@ -2013,6 +2039,8 @@ namespace Energy.Base
         /// <param name="value"></param>
         /// <param name="sign"></param>
         /// <returns></returns>
+        [Obsolete]
+        [Energy.Attribute.Code.Obsolete]
         public static string ByteToStringSign(byte value, string sign)
         {
             return NumberToStringSign(value.ToString(), sign);
@@ -2867,20 +2895,32 @@ namespace Energy.Base
         {
             // treat DBNull as empty string //
             if (value == null || value == System.DBNull.Value)
+            {
                 return null;
+            }
             // maybe it is already string? //
             if (value is string)
+            {
                 return (string)value;
+            }
             // what about bool numbers //
             if (value is bool)
+            {
                 return (bool)value ? "1" : "0";
+            }
             // convert to culture invariant form //
             if (value is double)
+            {
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             if (value is decimal)
+            {
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             if (value is float)
+            {
                 return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             // works with nullable version DateTime? //
             if (value is DateTime)
             {
@@ -2905,6 +2945,10 @@ namespace Energy.Base
             if (value is TimeSpan)
             {
                 return TimeSpanToStringMilliseconds((TimeSpan)value, true, true, true);
+            }
+            if (value is byte[])
+            {
+                return ByteArrayToHex((byte[])value);
             }
             // return default string representation //
             return value.ToString();
@@ -3794,21 +3838,6 @@ namespace Energy.Base
             return data;
         }
 
-        /// <summary>
-        /// Convert byte array to Base64 string
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static string ByteArrayToBase64(byte[] data)
-        {
-            if (data == null)
-                return null;
-            if (data.Length == 0)
-                return "";
-            string base64 = System.Convert.ToBase64String(data);
-            return base64;
-        }
-
         #endregion
 
         #region Json
@@ -3992,6 +4021,70 @@ namespace Energy.Base
                         return Energy.Enumeration.TextAlign.Justify;
                 }
             }
+        }
+
+        #endregion
+
+        #region ByteArray
+
+        /// <summary>
+        /// Convert byte array to Base64 string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToBase64(byte[] data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            if (data.Length == 0)
+            {
+                return "";
+            }
+            string base64 = System.Convert.ToBase64String(data);
+            return base64;
+        }
+
+        /// <summary>
+        /// Convert byte array to hexadecimal string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToHex(byte[] data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            if (data.Length == 0)
+            {
+                return "";
+            }
+            string hex = BitConverter.ToString(data).Replace("-", "").ToLower();
+            return hex;
+        }
+
+        /// <summary>
+        /// Convert UTF-8 string to hexadecimal value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string StringToHex(string input)
+        {
+            return Energy.Base.Cast.StringToHex(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert string to hexadecimal value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StringToHex(string input, System.Text.Encoding encoding)
+        {
+            byte[] data = encoding.GetBytes(input);
+            return Energy.Base.Cast.ByteArrayToHex(data);
         }
 
         #endregion

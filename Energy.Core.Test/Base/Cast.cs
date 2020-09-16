@@ -726,5 +726,22 @@ namespace Energy.Core.Test.Base
             Debug.WriteLine(n);
             Assert.AreNotEqual(0, n);
         }
+
+        [TestMethod]
+        public void ByteArrayToHex()
+        {
+            byte[] b;
+            b = new byte[] { 1, 2, 3, 10 };
+            string s;
+            s = Energy.Base.Cast.ByteArrayToHex(b);
+            Assert.AreEqual("0102030a", s);
+            s = Energy.Base.Cast.ObjectToString(b);
+            Assert.AreEqual("0102030a", s);
+            b = Energy.Base.Cast.StreamToByteArray(Energy.Base.Cast.StringToStream("abc"));
+            s = Energy.Base.Cast.ByteArrayToHex(b);
+            Assert.AreEqual("616263", s);
+            s = Energy.Base.Cast.StreamToHex(Energy.Base.Cast.StringToStream("abc"));
+            Assert.AreEqual("616263", s);
+        }
     }
 }
