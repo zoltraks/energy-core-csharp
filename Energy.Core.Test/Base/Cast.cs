@@ -770,6 +770,16 @@ namespace Energy.Core.Test.Base
             expect = new DateTime(2010, 5, 3);
             result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010 6:1";
+            expect = new DateTime(2010, 5, 3, 6, 1, 0);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010 6";
+            expect = new DateTime(2010, 5, 3, 0, 0, 0);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
         }
     }
 }
