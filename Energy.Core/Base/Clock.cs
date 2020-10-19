@@ -540,7 +540,9 @@ namespace Energy.Base
             DateTime result = DateTime.MinValue;
 
             if (String.IsNullOrEmpty(text))
+            {
                 return result;
+            }
 
             text = text.Trim();
             int n;
@@ -563,6 +565,7 @@ namespace Energy.Base
                 {
                     result = result.AddDays(n - 1);
                 }
+                text = text.Substring(0, match.Index) + text.Substring(match.Index + match.Length);
             }
 
             //match = Regex.Match(text, Energy.Base.Pattern.Time);

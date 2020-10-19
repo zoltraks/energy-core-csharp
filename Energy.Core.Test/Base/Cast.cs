@@ -743,5 +743,33 @@ namespace Energy.Core.Test.Base
             s = Energy.Base.Cast.StreamToHex(Energy.Base.Cast.StringToStream("abc"));
             Assert.AreEqual("616263", s);
         }
+
+        [TestMethod]
+        public void StringToDateTime()
+        {
+            DateTime expect;
+            DateTime result;
+            string needle;
+
+            needle = "2000-01-01";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "2000-01-01 23:59:59.999111";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle).Date;
+            Assert.AreEqual(expect, result);
+
+            needle = "23:59:59.999111 \t 2000-01-01 \t ";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle).Date;
+            Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010";
+            expect = new DateTime(2010, 5, 3);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+        }
     }
 }
