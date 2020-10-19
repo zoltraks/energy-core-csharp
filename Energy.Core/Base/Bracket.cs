@@ -412,10 +412,18 @@ namespace Energy.Base
         {
             string prefix = GetPrefixText();
             string suffix = GetSuffixText();
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return prefix + suffix;
+            }
+
             string include = GetIncludeText();
 
             if (include.Length > 0)
+            {
                 text = text.Replace(suffix, include);
+            }
 
             return string.Concat(prefix, text, suffix);
         }

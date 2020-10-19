@@ -502,6 +502,10 @@ namespace Energy.Query
                     {
                         continue;
                     }
+                    else if (name.StartsWith("@@"))
+                    {
+                        continue;
+                    }
                     else if (optionUnknownAsEmpty)
                     {
                         value = format.Text("");

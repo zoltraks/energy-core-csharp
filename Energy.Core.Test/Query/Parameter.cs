@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Energy.Core.Test.Query
 {
@@ -168,10 +169,17 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
+            text = "@Unicode";
+            bag.Unicode = true;
+            bag["unicode"] = ' ';
+            must = "N' '";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
             text = "@unknown";
             bag.Unicode = true;
             bag.UnknownAsEmpty = true;
-            must = "N''";
+            must = "''";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
@@ -186,49 +194,16 @@ GO
 
             text = "@zero @a";
             bag.Unicode = false;
-            must = "'0' '''X'''";
+            must = "0 '''X'''";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            text = "@zero @a";
+            text = "@zero @a1";
             bag.UnknownAsEmpty = false;
             bag.UnknownAsNull = false;
-            must = "'0' @a";
+            must = "0 @a1";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
-        }
-
-        public class Class
-        {
-            public class C1
-            {
-                public Energy.Query.Parameter.Bag Bag { get; set; }
-            }
-        }
-
-        [TestMethod]
-        public void Serialize()
-        {
-            var o1 = new Class.C1();
-            o1.Bag = new Energy.Query.Parameter.Bag();
-            o1.Bag.Set("a", "b");
-            o1.Bag.Set("c", 1);
-            string j;
-            j = System.Text.Json.JsonSerializer.Serialize(o1);
-            Assert.IsNotNull(j);
-            var opt = new System.Text.Json.JsonSerializerOptions()
-            {
-            };
-            var o2 = System.Text.Json.JsonSerializer.Deserialize<Class.C1>(j, opt);
-            Assert.IsNotNull(o2);
-            string s;
-            s = o2.Bag.Get("a").ToString();
-            Assert.IsNotNull(s);
-            string xml;
-            xml = Energy.Base.Xml.Serialize(o1);
-            Assert.IsNotNull(xml);
-            xml = Energy.Base.Xml.Serialize(o2);
-            Assert.IsNotNull(xml);
         }
     }
 }
