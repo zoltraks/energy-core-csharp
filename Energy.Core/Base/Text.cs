@@ -1604,77 +1604,118 @@ namespace Energy.Base
 
         #endregion
 
-        #region Case
+        #region Capitalize
 
         /// <summary>
-        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
+        /// Return a word with its first letter upper case and remaining letters in lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Word</returns>
-        public static string UpperFirst(string word)
+        /// <param name="word"></param>
+        /// <returns></returns>
+        public static string Capitalize(string word)
         {
             if (string.IsNullOrEmpty(word))
-                return word;
-            if (word.Length == 1)
-                return char.ToUpperInvariant(word[0]).ToString();
-            return string.Concat(char.ToUpperInvariant(word[0])
-                , word.Substring(1).ToLowerInvariant());
-        }
-
-        /// <summary>
-        /// Upper case conversion for string array.
-        /// </summary>
-        /// <param name="words">Words list</param>
-        /// <returns>Words list</returns>
-        public static string[] Upper(string[] words)
-        {
-            if (words == null || words.Length == 0)
-                return words;
-            for (int i = 0; i < words.Length; i++)
             {
-                if (null == words[i])
-                    continue;
-                words[i] = words[i].ToUpperInvariant();
+                return word;
             }
-            return words;
+            else
+            {
+                return word.Substring(0, 1).ToUpperInvariant() + word.Substring(1).ToLowerInvariant();
+            }
         }
 
         /// <summary>
-        /// Upper case conversion for string.
+        /// Return array of words with their first letters upper case and remaining letters in lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Words list</returns>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Capitalize(string[] words)
+        {
+            if (null == words || 0 == words.Length)
+            {
+                return words;
+            }
+            string[] result = new string[words.Length];
+            for (int i = 0, l = words.Length; i < l; i++)
+            {
+                result[i] = Capitalize(words[i]);
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region Upper
+
+        /// <summary>
+        /// Change letters in a word to upper case.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public static string Upper(string word)
         {
             return word == null ? null : word.ToUpperInvariant();
         }
 
         /// <summary>
-        /// Lower case conversion for string array.
+        /// Change letters in word list to upper case.
         /// </summary>
-        /// <param name="words">Words list</param>
-        /// <returns>Words list</returns>
-        public static string[] Lower(string[] words)
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Upper(string[] words)
         {
-            if (words == null || words.Length == 0)
+            if (null == words || 0 == words.Length)
+            {
                 return words;
-            for (int i = 0; i < words.Length; i++)
+            }
+            int n = words.Length;
+            string[] result = new string[n];
+            for (int i = 0; i < n; i++)
             {
                 if (null == words[i])
+                {
                     continue;
-                words[i] = words[i].ToLowerInvariant();
+                }
+                words[i] = words[i].ToUpperInvariant();
             }
             return words;
         }
 
+        #endregion
+
+        #region Lower
+
         /// <summary>
-        /// Lower case conversion for string.
+        /// Change letters in a word to lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Words list</returns>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public static string Lower(string word)
         {
             return word == null ? null : word.ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Change letters in word list to lower case.
+        /// </summary>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Lower(string[] words)
+        {
+            if (null == words || 0 == words.Length)
+            {
+                return words;
+            }
+            int n = words.Length;
+            string[] result = new string[n];
+            for (int i = 0; i < n; i++)
+            {
+                if (null == words[i])
+                {
+                    continue;
+                }
+                words[i] = words[i].ToLowerInvariant();
+            }
+            return words;
         }
 
         #endregion
@@ -1688,7 +1729,7 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string DashCase(string[] words)
         {
-            return string.Join("-", words);
+            return Energy.Base.Naming.DashCase(words);
         }
 
         /// <summary>
@@ -1698,21 +1739,17 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string HyphenCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            return string.Join("-", Lower(words));
+            return Energy.Base.Naming.HyphenCase(words);
         }
 
         /// <summary>
-        /// Return words lower case, separated with hyphen character.
+        /// Return words lower case, separated with underscore character.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
         public static string SnakeCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            return string.Join("-", Lower(words));
+            return Energy.Base.Naming.SnakeCase(words);
         }
 
         /// <summary>
@@ -1722,7 +1759,7 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string UnderscoreCase(string[] words)
         {
-            return string.Join("_", words);
+            return Energy.Base.Naming.UnderscoreCase(words);
         }
 
         /// <summary>
@@ -1732,13 +1769,7 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string PascalCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            for (int i = 0; i < words.Length; i++)
-            {
-                words[i] = UpperFirst(words[i]);
-            }
-            return string.Join("", words);
+            return Energy.Base.Naming.PascalCase(words);
         }
 
         /// <summary>
@@ -1756,14 +1787,7 @@ namespace Energy.Base
         /// <returns>String</returns>
         public static string CamelCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            words[0] = words[0].ToLowerInvariant();
-            for (int i = 1; i < words.Length; i++)
-            {
-                words[i] = UpperFirst(words[i]);
-            }
-            return string.Join("", words);
+            return Energy.Base.Naming.CamelCase(words);
         }
 
         /// <summary>
@@ -4255,6 +4279,26 @@ namespace Energy.Base
         public static string FindAnyWord(string input, string[] words)
         {
             return FindAnyWord(input, words, false);
+        }
+
+        #endregion
+
+        #region Obsolete
+
+        /// <summary>
+        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Word</returns>
+        [Obsolete("Use Energy.Base.Text.Capitalize() instead.")]
+        public static string UpperFirst(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return word;
+            if (word.Length == 1)
+                return char.ToUpperInvariant(word[0]).ToString();
+            return string.Concat(char.ToUpperInvariant(word[0])
+                , word.Substring(1).ToLowerInvariant());
         }
 
         #endregion

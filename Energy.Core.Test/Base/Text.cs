@@ -888,5 +888,17 @@ Another
             Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e+3"));
             Assert.IsTrue(Energy.Base.Text.IsNumber("-12.e-3"));
         }
+
+        [TestMethod]
+        public void TextUpper()
+        {
+            Assert.AreEqual("AAÀÀŹŹŢŢǬǬΔΔДД", Energy.Base.Text.Upper("AaÀàŹźŢţǬǭΔδДд"));
+        }
+
+        [TestMethod]
+        public void TextLower()
+        {
+            Assert.AreEqual("aaààźźţţǭǭδδдд", Energy.Base.Text.Lower("AaÀàŹźŢţǬǭΔδДд"));
+        }
     }
 }
