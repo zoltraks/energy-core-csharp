@@ -3,6 +3,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -11,12 +12,147 @@ namespace Energy.Base
     /// </summary>
     public static class Naming
     {
+        #region CamelCase
+
+        /// <summary>
+        /// Return words capitalized with first word in lower case.
+        /// <br/><br/>
+        /// camelCase
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string CamelCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                words[0] = words[0].ToLowerInvariant();
+                for (int i = 1; i < words.Length; i++)
+                {
+                    words[i] = Energy.Base.Text.Capitalize(words[i]);
+                }
+                return string.Join("", words);
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in camelCase.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsCamelCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Ll}+)(?:\p{Lu}\p{Ll}*|\d+)*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region CobolCase
+
+        /// <summary>
+        /// Return words upper case, separated with hyphen character.
+        /// <br/><br/>
+        /// COBOL-CASE
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string CobolCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return string.Join("-", Energy.Base.Text.Upper(words));
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in COBOL-CASE.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsCobolCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Lu}+|\d+)(?:-(?:\p{Lu}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region ConstantCase
+
+        /// <summary>
+        /// Return words upper case, separated with underscore character.
+        /// <br/><br/>
+        /// CONSTANT_CASE
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string ConstantCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return string.Join("_", Energy.Base.Text.Upper(words));
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in CONSTANT_CASE.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsConstantCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Lu}+|\d+)(?:_(?:\p{Lu}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region DashCase
+
         /// <summary>
         /// Return words lower case, separated with hyphen character.
         /// <br/><br/>
+        /// dash-case
+        /// <br/><br/>
         /// This style is often used in URLs to give more human-readable look.
         /// <br/><br/>
-        /// Known as dash-case, kebab-case or hyphen-case.
+        /// Also known as kebab-case or hyphen-case.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
@@ -37,36 +173,32 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return words lower case, separated with hyphen character.
-        /// <br/><br/>
-        /// This style is often used in URLs to give more human-readable look.
-        /// <br/><br/>
-        /// Known as dash-case, kebab-case or hyphen-case.
+        /// Check if text is valid identifier written in dash-case.
         /// </summary>
-        /// <param name="words">Array of words</param>
-        /// <returns>String</returns>
-        public static string KebabCase(string[] words)
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsDashCase(string text)
         {
-            if (null == words)
+            if (string.IsNullOrEmpty(text))
             {
-                return null;
+                return false;
             }
-            else if (0 == words.Length)
-            {
-                return "";
-            }
-            else
-            {
-                return string.Join("-", Energy.Base.Text.Lower(words));
-            }
+            string pattern = @"^(?:\p{Ll}+|\d+)(?:-(?:\p{Ll}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
         }
+
+        #endregion
+
+        #region HyphenCase
 
         /// <summary>
         /// Return words lower case, separated with hyphen character.
         /// <br/><br/>
+        /// hyphen-case
+        /// <br/><br/>
         /// This style is often used in URLs to give more human-readable look.
         /// <br/><br/>
-        /// Known as dash-case, kebab-case or hyphen-case.
+        /// Also known as dash-case or kebab-case.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
@@ -87,95 +219,246 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Check if text is valid identifier written in hyphen-case.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsHyphenCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Ll}+|\d+)(?:-(?:\p{Ll}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region KebabCase
+
+        /// <summary>
         /// Return words lower case, separated with hyphen character.
+        /// <br/><br/>
+        /// kebab-case
+        /// <br/><br/>
+        /// This style is often used in URLs to give more human-readable look.
+        /// <br/><br/>
+        /// Also known as dash-case or hyphen-case.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
-        public static string SnakeCase(string[] words)
+        public static string KebabCase(string[] words)
         {
-            if (words == null || words.Length == 0)
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
                 return "";
-            return string.Join("-", Energy.Base.Text.Lower(words));
+            }
+            else
+            {
+                return string.Join("-", Energy.Base.Text.Lower(words));
+            }
         }
 
         /// <summary>
-        /// Return words as a string separated with underscore character
+        /// Check if text is valid identifier written in kebab-case.
         /// </summary>
-        /// <param name="words">Array of words</param>
-        /// <returns>String</returns>
-        public static string UnderscoreCase(string[] words)
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsKebabCase(string text)
         {
-            return string.Join("_", words);
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Ll}+|\d+)(?:-(?:\p{Ll}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
         }
 
+        #endregion
+
+        #region PascalCase
+
         /// <summary>
-        /// Return words using medial capitalization
+        /// Return words capitalized.
+        /// <br/><br/>
+        /// PascalCase
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
         public static string PascalCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            for (int i = 0; i < words.Length; i++)
+            if (null == words)
             {
-                words[i] = Energy.Base.Text.Capitalize(words[i]);
+                return null;
             }
-            return string.Join("", words);
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                for (int i = 0; i < words.Length; i++)
+                {
+                    words[i] = Energy.Base.Text.Capitalize(words[i]);
+                }
+                return string.Join("", words);
+            }
         }
 
         /// <summary>
-        /// Return words using medial capitalization in optional java
-        /// style of camel case
+        /// Check if text is valid identifier written in PascalCase.
         /// </summary>
-        /// <remarks>
-        /// Example of getting "camelGoesFirst" word
-        /// <pre>
-        ///     string[] words = { "Camel", "gOES", "fIrSt" };
-        ///     MessageBox.Show(Core.Transform.CamelCase(words, true));
-        /// </pre>
-        /// </remarks>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsPascalCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Lu}\p{Ll}*)(?:\p{Lu}\p{Ll}*|\d+)*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region SnakeCase
+
+        /// <summary>
+        /// Return words lower case, joined with underscore character.
+        /// <br/><br/>
+        /// snake_case
+        /// <br/><br/>
+        /// Also known as underscore_case.
+        /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
-        public static string CamelCase(string[] words)
+        public static string SnakeCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            words[0] = words[0].ToLowerInvariant();
-            for (int i = 1; i < words.Length; i++)
+            if (null == words)
             {
-                words[i] = Energy.Base.Text.Capitalize(words[i]);
+                return null;
             }
-            return string.Join("", words);
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return string.Join("_", Energy.Base.Text.Lower(words));
+            }
         }
-
-        /*
 
         /// <summary>
-        /// Convert PascalCase to dash-case
+        /// Check if text is valid identifier written in snake_case.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static string PascalCaseToDashCase(string name)
+        public static bool IsSnakeCase(string text)
         {
-            string pattern = @"[A-Z]{2,}|[A-Z][^A-Z\s]*";
-            MatchCollection matches = Regex.Matches(name, pattern);
-            List<string> pieces = new List<string>();
-            foreach (Match match in matches)
+            if (string.IsNullOrEmpty(text))
             {
-                string value = match.Value;
-                if (string.IsNullOrEmpty(value))
-                    continue;
-                value = value.Trim();
-                if (value == "")
-                    continue;
-                pieces.Add(value);
+                return false;
             }
-            string text = string.Join("-", pieces.ToArray());
-            text = text.ToLowerInvariant();
-            return text;
+            string pattern = @"^(?:\p{Ll}+|\d+)(?:_(?:\p{Ll}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
         }
 
-        */
+        #endregion
+
+        #region TrainCase
+
+        /// <summary>
+        /// Return words capitalized and separated by hyphen character.
+        /// <br/><br/>
+        /// Train-Case
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string TrainCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                for (int i = 0; i < words.Length; i++)
+                {
+                    words[i] = Energy.Base.Text.Capitalize(words[i]);
+                }
+                return string.Join("-", words);
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in Train-Case.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsTrainCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Lu}\p{Ll}*)(?:-(?:\p{Lu}\p{Ll}*|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
+        #region UnderscoreCase
+
+        /// <summary>
+        /// Return words lower case, joined with underscore character.
+        /// <br/><br/>
+        /// underscore_case
+        /// <br/><br/>
+        /// Also known as snake_case.
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string UnderscoreCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                return string.Join("_", Energy.Base.Text.Lower(words));
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in underscore_case.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsUnderscoreCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Ll}+)(?:_(?:\p{Ll}+|\d+))*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
     }
 }

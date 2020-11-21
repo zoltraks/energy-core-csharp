@@ -1727,6 +1727,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.DashCase instead")]
         public static string DashCase(string[] words)
         {
             return Energy.Base.Naming.DashCase(words);
@@ -1737,6 +1738,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.HyphenCase instead")]
         public static string HyphenCase(string[] words)
         {
             return Energy.Base.Naming.HyphenCase(words);
@@ -1747,6 +1749,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.SnakeCase instead")]
         public static string SnakeCase(string[] words)
         {
             return Energy.Base.Naming.SnakeCase(words);
@@ -1757,6 +1760,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.UnderscoreCase instead")]
         public static string UnderscoreCase(string[] words)
         {
             return Energy.Base.Naming.UnderscoreCase(words);
@@ -1767,6 +1771,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.PascalCase instead")]
         public static string PascalCase(string[] words)
         {
             return Energy.Base.Naming.PascalCase(words);
@@ -1785,6 +1790,7 @@ namespace Energy.Base
         /// </remarks>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.CamelCase instead")]
         public static string CamelCase(string[] words)
         {
             return Energy.Base.Naming.CamelCase(words);
