@@ -9,6 +9,7 @@ namespace Energy.Core
 {
     /// <summary>
     /// Thread worker generic base class.
+    /// <br /><br />
     /// Override Work method in derrived class.
     /// </summary>
     public class Worker<T> : Energy.Interface.IWorker
@@ -288,13 +289,23 @@ namespace Energy.Core
             {
                 _Stopped = true;
                 if (null == _Thread)
+                {
                     return;
+                }
                 if (!_Thread.IsAlive)
                 {
                     _Thread = null;
                     return;
                 }
-                _Thread.Abort();
+                try
+                {
+                    _Thread.Abort();
+                    //_Thread.Interrupt();
+                }
+                catch (PlatformNotSupportedException)
+                {
+
+                }
             }
         }
 
@@ -460,7 +471,8 @@ namespace Energy.Core
             }
 
             /// <summary>
-            /// Purge worker pool by removing all workres that are currently stopped (not working).
+            /// Purge worker pool by removing all workers that are currently stopped (not working).
+            /// <br /><br />
             /// Returns amount of workers removed this way.
             /// </summary>
             /// <returns></returns>

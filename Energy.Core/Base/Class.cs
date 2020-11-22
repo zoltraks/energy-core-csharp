@@ -1290,10 +1290,10 @@ namespace Energy.Base
 
         #endregion
 
-        #region Class information repository
+        #region Class repository
 
         /// <summary>
-        /// Class information repository
+        /// Class repository
         /// </summary>
         public class Repository
         {
@@ -1461,7 +1461,9 @@ namespace Energy.Base
                 bool check = Energy.Base.Text.Check(input, Energy.Enumeration.MatchStyle.Any
                     , matchMode, ignoreCase, filters);
                 if (!check)
+                {
                     continue;
+                }
                 list.Add(assembly);
             }
             return list.ToArray();

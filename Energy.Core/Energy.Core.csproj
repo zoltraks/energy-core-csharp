@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>18.12.34</Version>
-    <FileVersion>18.12.34</FileVersion>
-    <AssemblyVersion>18.12.34</AssemblyVersion>
+    <Version>18.12.35</Version>
+    <FileVersion>18.12.35</FileVersion>
+    <AssemblyVersion>18.12.35</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
     <ApplicationIcon>Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
