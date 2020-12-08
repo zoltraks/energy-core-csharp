@@ -160,6 +160,11 @@ namespace Energy.Base
         /// Expression for finding root element in XML
         /// </summary>
         public static readonly string XmlRootName = @"(?:<\?[xX][mM][lL][^>]*>\s*)?(?:<\s*([a-zA-Z_][^\s>]*))";
+        
+        /// <summary>
+        /// Expression for XML tag line (informal)
+        /// </summary>
+        public static string XmlTagLineInformal = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
 
         /// <summary>
         /// Expression for matching tilde color text

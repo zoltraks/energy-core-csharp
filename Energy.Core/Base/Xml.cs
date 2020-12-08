@@ -62,15 +62,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Pattern
-
-        public class Pattern
-        {
-            public static string InformalXmlTagLine = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
-        }
-
-        #endregion
-
         #region Serialize
 
         /// <summary>
@@ -443,7 +434,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static Class.XmlTagLine ExtractRootNodeLine(string xml)
         {
-            Match m = Regex.Match(xml, Pattern.InformalXmlTagLine, RegexOptions.IgnorePatternWhitespace);
+            Match m = Regex.Match(xml, Energy.Base.Expression.XmlTagLineInformal, RegexOptions.IgnorePatternWhitespace);
             while (true)
             {
                 if (!m.Success)
