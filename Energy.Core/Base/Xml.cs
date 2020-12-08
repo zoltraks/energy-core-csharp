@@ -4,6 +4,7 @@ using System.Xml;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Energy.Base
 {
@@ -472,9 +473,13 @@ namespace Energy.Base
         {
             Match match = Regex.Match(xml, Energy.Base.Expression.XmlRootName);
             if (!match.Success)
+            {
                 return "";
+            }
             else
+            {
                 return match.Groups[1].Value;
+            }
         }
 
         /// <summary>
@@ -486,8 +491,222 @@ namespace Energy.Base
         {
             string root = ExtractRoot(xml);
             if (string.IsNullOrEmpty(root) || !root.Contains(":"))
+            {
                 return root;
-            return root.Substring(root.LastIndexOf(":") + 1);
+            }
+            else
+            {
+                return root.Substring(root.LastIndexOf(":") + 1);
+            }
+        }
+
+        #endregion
+
+        #region Encode
+
+        /// <summary>
+        /// Encode special characters with valid XML entities.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Encode(string text)
+        {
+            return Energy.Base.Xml.Encode(text, null);
+        }
+
+        /// <summary>
+        /// Encode special characters with valid XML entities.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.UTF-8 then only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.ASCII then additionaly all characters with codes higher that 126 will be encoded as character entities.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.Unicode then Unicode surrogate pairs (i.e. emoji) will also be encoded as character entities.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Encode(string text, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (null == encoding)
+            {
+                encoding = Encoding.UTF8;
+            }
+            bool ascii = encoding == Encoding.ASCII;
+            bool surrogate = encoding == Encoding.UTF8;
+            int n = text.Length;
+            char c = '\0';
+            int i;
+            for (i = 0; i < n; i++)
+            {
+                c = text[i];
+                if (c == 9 || c == 10 || c == 13)
+                {
+                    continue;
+                }
+                if (c >= 0 && c < 32 || c == 127)
+                {
+                    break;
+                }
+                if (c == '<' || c == '>' || c == '"' || c == '\'' || c == '&')
+                {
+                    break;
+                }
+                // non ASCII characters
+                if (ascii && c > 127)
+                {
+                    break;
+                }
+                // unicode surrogate pairs
+                if (!surrogate && c >= 0xd800 && c <= 0xdfff)
+                {
+                    break;
+                }
+            }
+            if (i == n)
+            {
+                return text;
+            }
+            StringBuilder s = new StringBuilder(n + 16);
+            s.Append(text.Substring(0, i));
+            for (; i < n; i++, c = i < n ? text[i] : c)
+            {
+                if (c == 9 || c == 10 || c == 13)
+                {
+                    s.Append(c);
+                    continue;
+                }
+                if (!surrogate && c >= 0xd800 && c <= 0xdfff)
+                {
+                    if (i + 1 < n)
+                    {
+                        char d = text[i + 1];
+                        if (c >= 0xd800 && c <= 0xdbff && d >= 0xdc00 && d <= 0xdfff)
+                        {
+                            int p = 0x10000 + (c - 0xd800 << 10) + d - 0xdc00;
+                            s.Append("&#x");
+                            s.Append(p.ToString("X"));
+                            s.Append(";");
+                            i++;
+                            continue;
+                        }
+                    }
+                    s.Append("&#x");
+                    s.Append((int)c);
+                    s.Append(";");
+                    continue;
+                }
+                if (c >= 0 && c < 32 || c == 127 || ascii && c > 127)
+                {
+                    s.Append("&#");
+                    s.Append((int)c);
+                    s.Append(";");
+                    continue;
+                }
+                switch (c)
+                {
+                    case '<':
+                        s.Append("&lt;");
+                        continue;
+                    case '>':
+                        s.Append("&gt;");
+                        continue;
+                    case '"':
+                        s.Append("&quot;");
+                        continue;
+                    case '&':
+                        s.Append("&amp;");
+                        continue;
+                    case '\'':
+                        s.Append("&apos;");
+                        continue;
+                }
+                s.Append(c);
+            }
+            return s.ToString();
+        }
+
+        #endregion
+
+        #region Decode
+
+        /// <summary>
+        /// Decode named or numeric character XML entities with corresponding characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Decode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            string replace = Regex.Replace(text, "&#?(?:[xX][0-9a-fA-F]+|[0-9]+|[a-zA-Z]+);", match =>
+            {
+                string check = match.Value;
+                if (false) { }
+                else if (check.StartsWith("&#"))
+                {
+                    int code = 0;
+                    if ('x' == check[2] || 'X' == check[2])
+                    {
+                        if (!int.TryParse(check.Substring(3, check.Length - 4), 
+                            NumberStyles.HexNumber, CultureInfo.InvariantCulture, out code))
+                        {
+                            return check;
+                        }
+                    }
+                    else
+                    {
+                        if (!int.TryParse(check.Substring(2, check.Length - 3), out code))
+                        {
+                            return check;
+                        }
+                    }
+                    if (code < 65536)
+                    {
+                        return new string((char)code, 1);
+                    }
+                    else
+                    {
+                        int p = code - 0x10000;
+                        int c = 0xd800 + (p >> 10);
+                        int d = 0xdc00 + (p & 0x3ff);
+                        return string.Concat((char)c, (char)d);
+                    }
+                }
+                else if (0 == string.Compare(check, "&lt;", true))
+                {
+                    return "<";
+                }
+                else if (0 == string.Compare(check, "&gt;", true))
+                {
+                    return ">";
+                }
+                else if (0 == string.Compare(check, "&amp;", true))
+                {
+                    return "&";
+                }
+                else if (0 == string.Compare(check, "&quot;", true))
+                {
+                    return "\"";
+                }
+                else if (0 == string.Compare(check, "&apos;", true))
+                {
+                    return "'";
+                }
+                else
+                {
+                    return check;
+                }
+            });
+            return replace;
         }
 
         #endregion

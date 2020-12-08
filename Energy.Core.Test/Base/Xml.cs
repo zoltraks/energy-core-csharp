@@ -50,5 +50,60 @@ namespace Energy.Core.Test.Base
             var s = Energy.Base.Xml.Serialize(d);
             Assert.IsNotNull(s);
         }
+
+        [TestMethod]
+        public void XmlEncode()
+        {
+            Assert.IsNull(Energy.Base.Xml.Encode(null));
+            Assert.AreEqual("", Energy.Base.Xml.Encode(""));
+            string s, x;
+            s = "0 A z";
+            x = Energy.Base.Xml.Encode(s);
+            Assert.AreEqual(s, x);
+            s = "0\r\n1";
+            x = Energy.Base.Xml.Encode(s);
+            Assert.AreEqual(s, x);
+            s = "<&'\">";
+            x = Energy.Base.Xml.Encode(s);
+            Assert.AreEqual("&lt;&amp;&apos;&quot;&gt;", x);
+            s = "Ț";
+            x = Energy.Base.Xml.Encode(s, Encoding.UTF8);
+            Assert.AreEqual(s, x);
+            x = Energy.Base.Xml.Encode(s, Encoding.ASCII);
+            Assert.AreEqual("&#538;", x);
+            x = Energy.Base.Xml.Encode(s, Encoding.Unicode);
+            Assert.AreEqual(s, x);
+            s = "Ț";
+            x = Energy.Base.Xml.Encode(s, Encoding.UTF8);
+            Assert.AreEqual(s, x);
+            x = Energy.Base.Xml.Encode(s, Encoding.ASCII);
+            Assert.AreEqual("&#538;", x);
+            x = Energy.Base.Xml.Encode(s, Encoding.Unicode);
+            Assert.AreEqual(s, x);
+            s = "🌹";
+            x = Energy.Base.Xml.Encode(s, Encoding.UTF8);
+            Assert.AreEqual(s, x);
+            x = Energy.Base.Xml.Encode(s, Encoding.ASCII);
+            Assert.AreEqual("&#x1F339;", x);
+            x = Energy.Base.Xml.Encode(s, Encoding.Unicode);
+            Assert.AreEqual("&#x1F339;", x);
+        }
+
+        [TestMethod]
+        public void XmlDecode()
+        {
+            Assert.IsNull(Energy.Base.Xml.Decode(null));
+            Assert.AreEqual("", Energy.Base.Xml.Decode(""));
+            string s, x;
+            s = "0 A z";
+            x = Energy.Base.Xml.Decode(s);
+            Assert.AreEqual(s, x);
+            s = "&#x1F339;";
+            x = Energy.Base.Xml.Decode(s);
+            Assert.AreEqual("🌹", x);
+            s = "&lt;&amp;&apos;&quot;&gt;";
+            x = Energy.Base.Xml.Decode(s);
+            Assert.AreEqual("<&'\">", x);
+        }
     }
 }
