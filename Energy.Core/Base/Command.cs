@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Energy.Base
@@ -16,7 +15,7 @@ namespace Energy.Base
         /// <summary>
         /// Command line arguments utility class.
         /// </summary>
-        public class Arguments: Energy.Base.Pattern.Builder<Arguments>
+        public class Arguments : Energy.Base.Pattern.Builder<Arguments>
         {
             #region Constructor
 
@@ -577,7 +576,7 @@ namespace Energy.Base
                         else
                         {
                             opt = new Option()
-                            { 
+                            {
                                 Name = target,
                                 Count = 0,
                                 Value = key,
@@ -707,7 +706,7 @@ namespace Energy.Base
                     text.Add("");
                     text.Add("");
                 }
-                
+
                 return string.Join(Environment.NewLine, text.ToArray());
             }
 
@@ -722,7 +721,7 @@ namespace Energy.Base
         {
             #region Array
 
-            public class Array : List<Option> 
+            public class Array : List<Option>
             {
                 private Dictionary<string, string> _Alias = new Dictionary<string, string>();
 

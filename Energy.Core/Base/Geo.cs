@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -159,7 +157,7 @@ namespace Energy.Base
             var latitudeDifference = Energy.Base.Number.Deg2Rad(location2.Latitude - location1.Latitude);
 
             var a = Math.Sin(latitudeDifference / 2) * Math.Sin(latitudeDifference / 2)
-                + Math.Cos(Energy.Base.Number.Deg2Rad(location1.Latitude)) 
+                + Math.Cos(Energy.Base.Number.Deg2Rad(location1.Latitude))
                 * Math.Cos(Energy.Base.Number.Deg2Rad(location2.Latitude))
                 * Math.Sin(longitudeDifference / 2) * Math.Sin(longitudeDifference / 2)
                 ;

@@ -1,5 +1,4 @@
-﻿using Energy.Interface;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
@@ -1876,7 +1875,7 @@ namespace Energy.Base
             //    set => throw new NotImplementedException();
             //}
 
-            public IRow<TKey, TValue> this[int index]
+            public Energy.Interface.IRow<TKey, TValue> this[int index]
             {
                 get => GetByIndex(index);
                 set => SetByIndex(index, value);
@@ -1896,48 +1895,32 @@ namespace Energy.Base
 
             public bool IsReadOnly => false;
 
-            public void Add(IRow<TKey, TValue> item) => _Rows.Add(item);
+            public void Add(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Add(item);
 
             public void Clear() => _Rows.Clear();
 
-            public bool Contains(IRow<TKey, TValue> item) => _Rows.Contains(item);
+            public bool Contains(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Contains(item);
 
-            public void CopyTo(IRow<TKey, TValue>[] array, int arrayIndex) => _Rows.CopyTo(array, arrayIndex);
+            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex) => _Rows.CopyTo(array, arrayIndex);
 
-            public IEnumerator<IRow<TKey, TValue>> GetEnumerator() => _Rows.GetEnumerator();
+            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator() => _Rows.GetEnumerator();
 
-            public int IndexOf(IRow<TKey, TValue> item) => _Rows.IndexOf(item);
+            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item) => _Rows.IndexOf(item);
 
-            public void Insert(int index, IRow<TKey, TValue> item) => Insert(index, item);
+            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item) => Insert(index, item);
 
-            public bool Remove(IRow<TKey, TValue> item) => _Rows.Remove(item);
+            public bool Remove(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Remove(item);
 
             public void RemoveAt(int index) => _Rows.RemoveAt(index);
 
             IEnumerator IEnumerable.GetEnumerator() => _Rows.GetEnumerator();
 
-            //public IRow<TKey, TValue> this[TKey key]
-            //{
-            //    get => GetByKey(key);
-            //    set => SetByKey(key, value);
-            //}
-
-            //private IRow<TKey, TValue> GetByKey(TKey key)
-            //{
-            //    throw new NotImplementedException();
-            //}
-
-            //private void SetByKey(TKey key, IRow<TKey, TValue> value)
-            //{
-            //    throw new NotImplementedException();
-            //}
-
-            private IRow<TKey, TValue> GetByIndex(int index)
+            private Energy.Interface.IRow<TKey, TValue> GetByIndex(int index)
             {
                 return _Rows[index];
             }
 
-            private void SetByIndex(int index, IRow<TKey, TValue> value)
+            private void SetByIndex(int index, Energy.Interface.IRow<TKey, TValue> value)
             {
                 _Rows[index] = value;
             }

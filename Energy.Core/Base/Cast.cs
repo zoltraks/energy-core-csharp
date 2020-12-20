@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
-using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -692,7 +690,7 @@ namespace Energy.Base
 
             if (!isZero)
             {
-                if (value[0] == '0' && value.Length > 1 
+                if (value[0] == '0' && value.Length > 1
                     && (value[1] == '.' || value[1] == ',')
                     )
                 {
@@ -1734,7 +1732,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT 
+            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT
                 == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT_G17)
             {
                 string s17 = value.ToString("G17", CultureInfo.InvariantCulture);
@@ -1749,7 +1747,8 @@ namespace Energy.Base
                     if (s17.Length - s16.Length > 10)
                     {
                         Energy.Core.Bug.Write("Energy.Base.Cast.DoubleToString"
-                            , delegate () {
+                            , delegate ()
+                            {
                                 return string.Format("Choosing {0} over {1}", s16, s17);
                             });
                         return s16;
@@ -3334,7 +3333,7 @@ namespace Energy.Base
             if (value is sbyte)
                 return (sbyte)value != 0;
             if (value is double)
-                return (double) value != 0;
+                return (double)value != 0;
             if (value is uint)
                 return (uint)value != 0;
             if (value is ulong)
