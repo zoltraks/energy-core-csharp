@@ -11,7 +11,7 @@ namespace SqlServerPlainReport
     {
         static void Main(string[] args)
         {
-            Energy.Core.Application.SetDefaultLanguage();
+            Energy.Core.Program.SetLanguage();
             try
             {
                 Go(args);

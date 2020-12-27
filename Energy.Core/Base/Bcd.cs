@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Energy.Base
+﻿namespace Energy.Base
 {
     /// <summary>
     /// Binary-coded decimal (BCD) class

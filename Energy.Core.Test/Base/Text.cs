@@ -214,6 +214,7 @@ namespace Energy.Core.Test.Base
             string expect;
             string value;
             string result;
+            bool change;
             value = "";
             result = Energy.Base.Text.Strip(value);
             expect = "";
@@ -236,6 +237,21 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, result);
             result = Energy.Base.Text.Strip(value, "]", "]");
             Assert.AreEqual(expect, result);
+            value = "[]]]";
+            expect = "]";
+            result = Energy.Base.Text.Strip(value, "[", "]", "]");
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Strip(value, "[", "]", "]", out change);
+            Assert.IsTrue(change);
+            Assert.AreEqual(expect, result);
+
+            var qa = new string[] { "@\"", "\"" };
+            var qb = new string[] { "\"", "\"" };
+            var qe = new string[] { "\"", "\\" };
+            var s1 = Energy.Base.Text.Strip("@\"Verbatim \"\"style\"\" example", qa, qb, qe);
+            var s2 = Energy.Base.Text.Strip("\"Normal \\\"style\\\" example", qa, qb, qe);
+            Assert.AreEqual(@"Verbatim ""style"" example", s1);
+            Assert.AreEqual(@"Normal ""style"" example", s2);
         }
 
         [TestMethod]

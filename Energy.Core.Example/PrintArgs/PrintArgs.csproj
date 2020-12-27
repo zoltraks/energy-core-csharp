@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energy.Core" Version="18.12.26" />
+    <ProjectReference Include="..\..\Energy.Core\Energy.Core.csproj" />
   </ItemGroup>
 
 </Project>

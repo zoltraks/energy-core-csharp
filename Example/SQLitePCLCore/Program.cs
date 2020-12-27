@@ -17,7 +17,7 @@ namespace SQLitePCLCore
         {
             SQLitePCL.Batteries_V2.Init();
 
-            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3());
+            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_dynamic_cdecl());
         }
     }
 }

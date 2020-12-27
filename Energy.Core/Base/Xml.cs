@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Text;
-using System.Xml;
-using System.IO;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Energy.Base
 {
@@ -497,6 +496,10 @@ namespace Energy.Base
 
         /// <summary>
         /// Encode special characters with valid XML entities.
+        /// <br/><br/>
+        /// Only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -647,7 +650,7 @@ namespace Energy.Base
                     int code = 0;
                     if ('x' == check[2] || 'X' == check[2])
                     {
-                        if (!int.TryParse(check.Substring(3, check.Length - 4), 
+                        if (!int.TryParse(check.Substring(3, check.Length - 4),
                             NumberStyles.HexNumber, CultureInfo.InvariantCulture, out code))
                         {
                             return check;

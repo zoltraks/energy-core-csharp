@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -185,7 +184,7 @@ namespace Energy.Base
                     string[] a = definition.Split(' ');
                     switch (a.Length)
                     {
-                        case 1:                            
+                        case 1:
                             o.Prefix = a[0];
                             o.Suffix = a[0];
                             o.Escape = new string[] { a[0] + a[0] };
@@ -486,51 +485,61 @@ namespace Energy.Base
 
         #region Check
 
-        public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool Check(string input, Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
         {
             switch (matchStyle)
             {
                 default:
                     return false;
-                case MatchStyle.All:
+                case Energy.Enumeration.MatchStyle.All:
                     return CheckAll(input, matchMode, ignoreCase, filters);
-                case MatchStyle.Not:
+                case Energy.Enumeration.MatchStyle.Not:
                     return CheckNot(input, matchMode, ignoreCase, filters);
-                case MatchStyle.Any:
+                case Energy.Enumeration.MatchStyle.Any:
                     return CheckAny(input, matchMode, ignoreCase, filters);
-                case MatchStyle.One:
+                case Energy.Enumeration.MatchStyle.One:
                     return CheckOne(input, matchMode, ignoreCase, filters);
             }
         }
 
-        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckAny(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
+                {
                     return true;
+                }
             }
             return false;
         }
 
-        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckAll(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (!Check(input, matchMode, ignoreCase, filter))
+                {
                     return false;
+                }
             }
             return true;
         }
 
-        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckNot(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
@@ -539,41 +548,48 @@ namespace Energy.Base
             return true;
         }
 
-        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckOne(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             bool found = false;
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
                 {
                     if (found)
+                    {
                         return false;
+                    }
                     else
+                    {
                         found = true;
+                    }
                 }
             }
             return found;
         }
 
-        public static bool Check(string input, MatchMode matchMode, bool ignoreCase, string filter)
+        public static bool Check(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string filter)
         {
             if (input == null || filter == null)
+            {
                 return false;
-
+            }
             switch (matchMode)
             {
                 default:
-                case MatchMode.None:
+                case Energy.Enumeration.MatchMode.None:
                     return false;
-                case MatchMode.Same:
+                case Energy.Enumeration.MatchMode.Same:
                     return CheckSame(input, filter, ignoreCase);
-                case MatchMode.Simple:
+                case Energy.Enumeration.MatchMode.Simple:
                     return CheckSimple(input, filter, ignoreCase);
-                case MatchMode.Regex:
+                case Energy.Enumeration.MatchMode.Regex:
                     return CheckRegex(input, filter, ignoreCase);
-                case MatchMode.Wild:
+                case Energy.Enumeration.MatchMode.Wild:
                     return CheckWild(input, filter, ignoreCase);
             }
         }
@@ -2794,42 +2810,44 @@ namespace Energy.Base
             return Quote(text, with, escape);
         }
 
-/*
- * Removed to avoid using any value and possible problem in future when
- * new methods with different parameter types will appear.
- * 
+        /*
+         * Removed to avoid using any value and possible problem in future when
+         * new methods with different parameter types will appear.
+         * 
 
-        /// <summary>
-        /// Surround text with quotation characters.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string Quote(object value)
-        {
-            string text = Energy.Base.Cast.AsString(value);
-            return Quote(text, "\"", "\"");
-        }
+                /// <summary>
+                /// Surround text with quotation characters.
+                /// </summary>
+                /// <param name="value"></param>
+                /// <returns></returns>
+                public static string Quote(object value)
+                {
+                    string text = Energy.Base.Cast.AsString(value);
+                    return Quote(text, "\"", "\"");
+                }
 
-        /// <summary>
-        /// Surround text with quotation characters.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="with"></param>
-        /// <returns></returns>
-        public static string Quote(object value, string with)
-        {
-            string text = Energy.Base.Cast.AsString(value);
-            return Quote(text, with, with);
-        }
-                
- */
+                /// <summary>
+                /// Surround text with quotation characters.
+                /// </summary>
+                /// <param name="value"></param>
+                /// <param name="with"></param>
+                /// <returns></returns>
+                public static string Quote(object value, string with)
+                {
+                    string text = Energy.Base.Cast.AsString(value);
+                    return Quote(text, with, with);
+                }
+
+         */
 
         #endregion
 
         #region Strip
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from double quotation marks.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -2839,7 +2857,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2851,7 +2871,22 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string quote)
+        {
+            return Strip(text, quote, quote);
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2865,18 +2900,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="quote"></param>
-        /// <returns></returns>
-        public static string Strip(string text, string quote)
-        {
-            return Strip(text, quote, quote);
-        }
-
-        /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2905,6 +2931,122 @@ namespace Energy.Base
                 cut = cut.Replace(escape + quote, quote);
             }
             return cut;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <param name="change">Will be set to true if text was stripped</param>
+        /// <returns></returns>
+        public static string Strip(string text, string start, string end, string escape, out bool change)
+        {
+            change = false;
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            int a = 0;
+            int b = text.Length;
+            if (!string.IsNullOrEmpty(start) && text.StartsWith(start))
+            {
+                change = true;
+                a += start.Length;
+                b -= a;
+            }
+            if (!string.IsNullOrEmpty(end) && text.EndsWith(end))
+            {
+                change = true;
+                b -= end.Length;
+            }
+            text = text.Substring(a, b);
+            if (!string.IsNullOrEmpty(escape))
+            {
+                string e = escape + end;
+                if (text.Contains(e))
+                {
+                    change = true;
+                    text = text.Replace(e, end);
+                }
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string start, string end, string escape)
+        {
+            bool _;
+            return Strip(text, start, end, escape, out _);
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// <br/><br/>
+        /// Multiple variations may be set to allow different quotation styles to work.
+        /// <br/><br/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <param name="change">Will be set to true if text was stripped</param>
+        /// <returns></returns>
+        public static string Strip(string text, string[] start, string[] end, string[] escape, out bool change)
+        {
+            change = false;
+            if (null == start || null == end || null == escape)
+            {
+                return text;
+            }
+            int n = start.Length;
+            if (n != end.Length || n != escape.Length)
+            {
+                return text;
+            }
+            for (int i = 0; i < n; i++)
+            {
+                text = Strip(text, start[i], end[i], escape[i], out change);
+                if (change)
+                {
+                    break;
+                }
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// <br/><br/>
+        /// Multiple variations may be set to allow different quotation styles to work.
+        /// <br/><br/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string[] start, string[] end, string[] escape)
+        {
+            bool _;
+            return Strip(text, start, end, escape, out _);
         }
 
         #endregion
@@ -3000,7 +3142,7 @@ namespace Energy.Base
         [Energy.Attribute.Code.Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace")]
         [Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace", false)]
         public class Editor : Energy.Core.Text.Editor { }
-        
+
         #endregion
 
         #region IndexOfAny
@@ -4248,7 +4390,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string FindAnyWord(string input, string[] words, bool ignoreCase)
         {
-            if (null == input || null == words || 0 == input.Length ||0 == words.Length)
+            if (null == input || null == words || 0 == input.Length || 0 == words.Length)
             {
                 return null;
             }

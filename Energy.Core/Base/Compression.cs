@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-//using System.IO.Compression;
-using System.Text;
 
 namespace Energy.Base
 {
@@ -59,7 +56,7 @@ namespace Energy.Base
                     {
                         int count = 2048;
                         byte[] buffer = new byte[count];
-                        for (;;)
+                        for (; ; )
                         {
                             int length = decompressionStream.Read(buffer, 0, count);
                             if (length == 0)
