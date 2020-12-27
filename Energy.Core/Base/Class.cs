@@ -5,7 +5,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Energy.Base
 {
@@ -1116,6 +1115,118 @@ namespace Energy.Base
             catch
             { }
             return 0;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Value
+
+        #region GetObjectPropertyOrFieldValue
+
+        public static object GetObjectPropertyOrFieldValue(object o, string name)
+        {
+            return GetObjectPropertyOrFieldValue(o, name, false, false);
+        }
+
+        public static object GetObjectPropertyOrFieldValue(object o, string name, bool ignoreCase, bool includePrivate)
+        {
+            if (null == o)
+            {
+                return o;
+            }
+            var t = o.GetType();
+            foreach (PropertyInfo pi in t.GetProperties())
+            {
+                if (0 == string.Compare(name, pi.Name, ignoreCase))
+                {
+                    try
+                    {
+                        return pi.GetValue(o, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return pi.GetValue(o, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            foreach (FieldInfo fi in t.GetFields())
+            {
+                if (0 == string.Compare(name, fi.Name, ignoreCase))
+                {
+                    try
+                    {
+                        return fi.GetValue(o);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region GetObjectFieldOrPropertyValue
+
+        public static object GetObjectFieldOrPropertyValue(object o, string name)
+        {
+            return GetObjectFieldOrPropertyValue(o, name, false, false);
+        }
+
+        public static object GetObjectFieldOrPropertyValue(object o, string name, bool ignoreCase, bool includePrivate)
+        {
+            if (null == o)
+            {
+                return o;
+            }
+            var t = o.GetType();
+            foreach (FieldInfo fi in t.GetFields())
+            {
+                if (0 == string.Compare(name, fi.Name, ignoreCase))
+                {
+                    try
+                    {
+                        return fi.GetValue(o);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            }
+            foreach (PropertyInfo pi in t.GetProperties())
+            {
+                if (0 == string.Compare(name, pi.Name, ignoreCase))
+                {
+                    try
+                    {
+                        return pi.GetValue(o, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return pi.GetValue(o, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         #endregion
