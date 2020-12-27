@@ -1,0 +1,59 @@
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>
+				Create singleton pattern object definition with default name "Global"
+			</Title>
+			<Shortcut>
+				energy_singleton_global
+			</Shortcut>
+			<Author>
+				Filip Golewski 菲利普
+			</Author>
+			<Description>
+				Create singleton pattern object definition with default name "Global"
+				<br />
+				<br />
+Made for Energy.Core library
+			</Description>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>Type</ID>
+					<ToolTip>Replace with object type</ToolTip>
+					<Default>object</Default>
+				</Literal>
+				<Literal>
+					<ID>ObjectName</ID>
+					<ToolTip>Replace with object name</ToolTip>
+					<Default>Global</Default>
+				</Literal>
+				<Literal>
+					<ID>AccessModifier</ID>
+					<ToolTip>Replace with class access modifier</ToolTip>
+					<Default>public</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="CSharp">
+<![CDATA[private static $Type$ _$ObjectName$;
+/// <summary>$ObjectName$</summary>
+$AccessModifier$ static $Type$ $ObjectName$ { get
+	{
+		if (_$ObjectName$ == null)
+		{
+			lock (typeof($Type$))
+			{
+				if (_$ObjectName$ == null)
+				{
+					_$ObjectName$ = new $Type$();
+				}
+			}
+		}
+		return _$ObjectName$;
+	}
+}]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
