@@ -2128,6 +2128,16 @@ namespace Energy.Base
             return Compare(array1, array2, false);
         }
 
+        public static int Compare(string one, string two)
+        {
+            return string.Compare(one, two);
+        }
+
+        public static int Compare(string one, string two, bool ignoreCase)
+        {
+            return string.Compare(one, two, ignoreCase);
+        }
+
         #endregion
 
         #region Chop
@@ -4447,6 +4457,36 @@ namespace Energy.Base
                 return char.ToUpperInvariant(word[0]).ToString();
             return string.Concat(char.ToUpperInvariant(word[0])
                 , word.Substring(1).ToLowerInvariant());
+        }
+
+        #endregion
+
+        #region Match
+
+        public static string Match(string text, Regex regex)
+        {
+            return Match(text, regex, -1);
+        }
+
+        public static string Match(string text, Regex regex, int index)
+        {
+            Match match = regex.Match(text);
+            if (!match.Success)
+            {
+                return null;
+            }
+            if (index < 0)
+            {
+                return match.Value;
+            }
+            else if (index >= match.Groups.Count)
+            {
+                return null;
+            }
+            else
+            {
+                return match.Groups[index].Value;
+            }
         }
 
         #endregion

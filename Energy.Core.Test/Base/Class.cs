@@ -150,7 +150,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void ClassGetObjectPropertyOrFieldValue()
+        public void ClassGetObjectValue()
         {
             object o1, o2;
             o1 = new
@@ -166,17 +166,7 @@ namespace Energy.Core.Test.Base
             Assert.IsNotNull(o2);
             o2 = Energy.Base.Class.GetObjectPropertyOrFieldValue(o1, "Index");
             Assert.AreEqual(16, o2);
-        }
 
-        [TestMethod]
-        public void ClassGetObjectFieldOrPropertyValue()
-        {
-            object o1, o2;
-            o1 = new
-            {
-                Name = "Name",
-                Index = 16,
-            };
             o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name");
             Assert.IsNotNull(o2);
             o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "name");
@@ -185,6 +175,20 @@ namespace Energy.Core.Test.Base
             Assert.IsNotNull(o2);
             o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Index");
             Assert.AreEqual(16, o2);
+        }
+
+        [TestMethod]
+        public void ClassSetObjectValue()
+        {
+            object o1, o2;
+            o1 = new
+            {
+                Name = "Name",
+                Index = 16,
+            };
+            Assert.AreEqual("Name", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
+            Energy.Base.Class.SetObjectFieldOrPropertyValue(o1, "Name", "Name1");
+            Assert.AreEqual("Name1", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
         }
     }
 }

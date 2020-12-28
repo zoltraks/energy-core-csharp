@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -1123,6 +1124,8 @@ namespace Energy.Base
 
         #region Value
 
+        internal static string ANGULAR_IDENTIFIER_PATTERN = "<([^>]+)>";
+
         #region GetObjectPropertyOrFieldValue
 
         public static object GetObjectPropertyOrFieldValue(object o, string name)
@@ -1137,9 +1140,20 @@ namespace Energy.Base
                 return o;
             }
             var t = o.GetType();
-            foreach (PropertyInfo pi in t.GetProperties())
+            BindingFlags bindingAttr = default;
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate)
             {
-                if (0 == string.Compare(name, pi.Name, ignoreCase))
+                bindingAttr |= BindingFlags.NonPublic;
+            }
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
                 {
                     try
                     {
@@ -1158,9 +1172,12 @@ namespace Energy.Base
                     }
                 }
             }
-            foreach (FieldInfo fi in t.GetFields())
+            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
             {
-                if (0 == string.Compare(name, fi.Name, ignoreCase))
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
                 {
                     try
                     {
@@ -1191,9 +1208,20 @@ namespace Energy.Base
                 return o;
             }
             var t = o.GetType();
-            foreach (FieldInfo fi in t.GetFields())
+            BindingFlags bindingAttr = default;
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate)
             {
-                if (0 == string.Compare(name, fi.Name, ignoreCase))
+                bindingAttr |= BindingFlags.NonPublic;
+            }
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
                 {
                     try
                     {
@@ -1205,9 +1233,12 @@ namespace Energy.Base
                     }
                 }
             }
-            foreach (PropertyInfo pi in t.GetProperties())
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
             {
-                if (0 == string.Compare(name, pi.Name, ignoreCase))
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
                 {
                     try
                     {
@@ -1227,6 +1258,138 @@ namespace Energy.Base
                 }
             }
             return null;
+        }
+
+        #endregion
+
+        #region SetObjectPropertyOrFieldValue
+
+        public static void SetObjectPropertyOrFieldValue(object o, string name, object value)
+        {
+            SetObjectPropertyOrFieldValue(o, name, value, false);
+        }
+
+        public static void SetObjectPropertyOrFieldValue(object o, string name, object value, bool ignoreCase)
+        {
+            if (null == o)
+            {
+                return;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default;
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        pi.SetValue(o, value, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            pi.SetValue(o, value, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return;
+                        }
+                        return;
+                    }
+                }
+            }
+            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase) 
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        fi.SetValue(o, value);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                    return;
+                }
+            }
+            return;
+        }
+
+        #endregion
+
+        #region SetObjectFieldOrPropertyValue
+
+        public static void SetObjectFieldOrPropertyValue(object o, string name, object value)
+        {
+            SetObjectFieldOrPropertyValue(o, name, value, false);
+        }
+
+        public static void SetObjectFieldOrPropertyValue(object o, string name, object value, bool ignoreCase)
+        {
+            if (null == o)
+            {
+                return;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default;
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        fi.SetValue(o, value);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                    return;
+                }
+            }
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        pi.SetValue(o, value, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            pi.SetValue(o, value, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return;
+                        }
+                    }
+                    return;
+                }
+            }
+            return;
         }
 
         #endregion
