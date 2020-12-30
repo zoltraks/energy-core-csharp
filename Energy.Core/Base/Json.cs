@@ -414,7 +414,7 @@ namespace Energy.Base
             "\r", "\\r",
             "\t", "\\t",
             "\"", "\\\"",
-            "\\", "\\\\",
+            "\\", "\\\\", // escape character must be last, order matters :-(
         };
 
         private static readonly string[] _UnescapeReplacementArray = new string[]{
@@ -532,7 +532,15 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Quote(string text)
         {
-            return text == null ? "null" : "\"" + Escape(text) + "\"";
+            //return text == null ? "null" : "\"" + Escape(text) + "\"";
+            if (null == text)
+            {
+                return "null";
+            }
+            else
+            {
+                return "\"" + Escape(text) + "\"";
+            }
         }
 
         #endregion

@@ -9,6 +9,26 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void JsonStrip()
         {
+            Assert.IsNull(Energy.Base.Json.Strip(null));
+            Assert.AreEqual("", Energy.Base.Json.Strip(""));
+
+            string needle, expect, result;
+
+            needle = "123.34";
+            expect = needle;
+            result = Energy.Base.Json.Strip(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = @""" \"" """;
+            expect = " \" ";
+            result = Energy.Base.Json.Strip(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = @""" \t """;
+            expect = " \t ";
+            result = Energy.Base.Json.Strip(needle);
+            Assert.AreEqual(expect, result);
+
             string json1 = @"""Hello \""Name\""!\r\nHow are you?""";
             string text1 = Energy.Base.Json.Strip(json1);
             string unescaped1 = "Hello \"Name\"!\r\nHow are you?";
@@ -21,6 +41,16 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void JsonEscape()
         {
+            Assert.IsNull(Energy.Base.Json.Escape(null));
+            Assert.AreEqual("", Energy.Base.Json.Escape(""));
+
+            string needle, expect, result;
+
+            needle = "123.34";
+            expect = needle;
+            result = Energy.Base.Json.Escape(needle);
+            Assert.AreEqual(expect, result);
+
             string text1 = "Hello \"Name\"!\r\nHow are you?";
             string json1 = Energy.Base.Json.Escape(text1);
             string escaped1 = @"Hello \""Name\""!\r\nHow are you?";
@@ -88,18 +118,22 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void JsonUnescape()
         {
-            string expect, result, value;
-            value = null;
-            result = Energy.Base.Json.Unescape(value);
+            string expect, result, needle;
+            needle = null;
+            result = Energy.Base.Json.Unescape(needle);
             expect = null;
             Assert.AreEqual(expect, result);
-            value = "";
-            result = Energy.Base.Json.Unescape(value);
+            needle = "";
+            result = Energy.Base.Json.Unescape(needle);
             expect = "";
             Assert.AreEqual(expect, result);
-            value = "\\t";
-            result = Energy.Base.Json.Unescape(value);
+            needle = "\\t";
+            result = Energy.Base.Json.Unescape(needle);
             expect = "\t";
+            Assert.AreEqual(expect, result);
+            needle = "\\\\\\t";
+            result = Energy.Base.Json.Unescape(needle);
+            expect = "\\\t";
             Assert.AreEqual(expect, result);
         }
     }
