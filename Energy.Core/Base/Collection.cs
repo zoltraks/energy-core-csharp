@@ -1968,7 +1968,7 @@ namespace Energy.Base
 
             public bool Remove(Energy.Interface.IRow<TKey, TValue> item)
             {
-                _Rows.Remove(item);
+                return _Rows.Remove(item);
             }
 
             public void RemoveAt(int index) 
