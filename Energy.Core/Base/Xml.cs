@@ -128,7 +128,8 @@ namespace Energy.Base
         /// <returns>XML string</returns>
         public static string Serialize(object data, string root, string space)
         {
-            return Serialize(data, root, space, out string error);
+            string _;
+            return Serialize(data, root, space, out _);
         }
 
         /// <summary>
@@ -161,7 +162,8 @@ namespace Energy.Base
         /// <returns>XML string</returns>
         public static string Serialize(object data)
         {
-            return Serialize(data, "", "", out string error);
+            string _;
+            return Serialize(data, "", "", out _);
         }
 
         /// <summary>
@@ -178,7 +180,8 @@ namespace Energy.Base
         /// <returns>XML string</returns>
         public static string Serialize(object data, string root)
         {
-            return Serialize(data, root, "", out string error);
+            string _;
+            return Serialize(data, root, "", out _);
         }
 
         /// <summary>

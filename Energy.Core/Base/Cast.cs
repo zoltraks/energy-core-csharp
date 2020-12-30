@@ -25,7 +25,7 @@ namespace Energy.Base
         {
             if (value == null)
             {
-                return default;
+                return default(T);
             }
             Type type = typeof(T);
             return (T)As(type, value);
@@ -751,7 +751,8 @@ namespace Energy.Base
             {
                 return 0;
             }
-            if (!int.TryParse(text, out int result))
+            int result;
+            if (!int.TryParse(text, out result))
             {
                 return 0;
             }
@@ -1944,15 +1945,21 @@ namespace Energy.Base
         public static byte StringToByte(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
+            {
                 return 0;
+            }
             byte result = 0;
             if (byte.TryParse(value, out result))
+            {
                 return result;
+            }
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length != value.Length)
             {
                 if (byte.TryParse(value, out result))
+                {
                     return result;
+                }
             }
             if (!allowDecimal)
                 return 0;
@@ -2766,7 +2773,7 @@ namespace Energy.Base
                 TKey key = Energy.Base.Cast.As<TKey>(array[array.Length - 1]);
                 if (key != null)
                 {
-                    dictionary[key] = default;
+                    dictionary[key] = default(TValue);
                 }
             }
             return dictionary;
@@ -3606,7 +3613,7 @@ namespace Energy.Base
             string s = ObjectToString(o);
             if (null == s)
             {
-                return default;
+                return default(TStream);
             }
             return StringToStream(s) as TStream;
         }

@@ -105,12 +105,24 @@ namespace Energy.Base
             /// <summary>
             /// Represents state of command line options.
             /// </summary>
-            public Option.Array Options { get => _Option; }
+            public Option.Array Options 
+            { 
+                get 
+                {
+                    return _Option; 
+                }
+            }
 
             /// <summary>
             /// Number of non option elements from command line argument list.
             /// </summary>
-            public int Count { get => _Heap.Count; }
+            public int Count 
+            { 
+                get 
+                {
+                    return _Heap.Count; 
+                }
+            }
 
             #endregion
 
@@ -725,19 +737,19 @@ namespace Energy.Base
             {
                 private Dictionary<string, string> _Alias = new Dictionary<string, string>();
 
-                public Dictionary<string, string> Alias { get => _Alias; }
+                public Dictionary<string, string> Alias { get { return _Alias; } }
 
                 private Dictionary<string, string> _Help = new Dictionary<string, string>();
 
-                public Dictionary<string, string> Help { get => _Help; }
+                public Dictionary<string, string> Help { get { return _Help; } }
 
                 private Dictionary<string, List<string>> _Description = new Dictionary<string, List<string>>();
 
-                public Dictionary<string, List<string>> Description { get => _Description; }
+                public Dictionary<string, List<string>> Description { get { return _Description; } }
 
                 private Dictionary<string, List<string>> _Example = new Dictionary<string, List<string>>();
 
-                public Dictionary<string, List<string>> Example { get => _Example; }
+                public Dictionary<string, List<string>> Example { get { return _Example; } }
 
                 /// <summary>
                 /// Nullify all existing values.
@@ -806,15 +818,15 @@ namespace Energy.Base
 
             public int Count;
 
-            public string Value { get => GetValue(); set => SetValue(value); }
+            public string Value { get { return GetValue(); } set { SetValue(value); } }
 
             public string[] Values { get; internal set; }
 
             public bool IsTemporary { get; internal set; }
 
-            public bool IsEmpty { get => GetIsEmpty(); }
+            public bool IsEmpty { get { return GetIsEmpty(); } }
 
-            public bool IsNull { get => GetIsNull(); }
+            public bool IsNull { get { return GetIsNull(); } }
 
             public string GetValue()
             {

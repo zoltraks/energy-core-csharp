@@ -753,15 +753,18 @@ namespace Energy.Base
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static bool IsUnreserved(char c) => false
-            || c >= 0x41 && c <= 0x5a     // capital letter
-            || c >= 0x61 && c <= 0x7a     // lower letter
-            || c >= 0x30 && c <= 0x39     // digit
-            || c == 0x2d                  // hyphen
-            || c == 0x2e                  // period
-            || c == 0x5f                  // underscore
-            || c == 0x7e                  // tilde
-            ;
+        public static bool IsUnreserved(char c) 
+        {
+            return false
+                || c >= 0x41 && c <= 0x5a     // capital letter
+                || c >= 0x61 && c <= 0x7a     // lower letter
+                || c >= 0x30 && c <= 0x39     // digit
+                || c == 0x2d                  // hyphen
+                || c == 0x2e                  // period
+                || c == 0x5f                  // underscore
+                || c == 0x7e                  // tilde
+                ;
+        }
 
         /// <summary>
         /// Check if character is unreserved (allowed) character in URI according to RFC 3986.
@@ -770,15 +773,18 @@ namespace Energy.Base
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static bool IsUnreserved(byte c) => false
-            || c >= 0x41 && c <= 0x5a     // capital letter
-            || c >= 0x61 && c <= 0x7a     // lower letter
-            || c >= 0x30 && c <= 0x39     // digit
-            || c == 0x2d                  // hyphen
-            || c == 0x2e                  // period
-            || c == 0x5f                  // underscore
-            || c == 0x7e                  // tilde
-            ;
+        public static bool IsUnreserved(byte c)
+        {
+            return false
+                || c >= 0x41 && c <= 0x5a     // capital letter
+                || c >= 0x61 && c <= 0x7a     // lower letter
+                || c >= 0x30 && c <= 0x39     // digit
+                || c == 0x2d                  // hyphen
+                || c == 0x2e                  // period
+                || c == 0x5f                  // underscore
+                || c == 0x7e                  // tilde
+                ;
+        }
 
         #endregion
 
@@ -884,7 +890,7 @@ namespace Energy.Base
             byte[] bytes = new byte[ms.Length];
             ms.Seek(0, SeekOrigin.Begin);
             ms.Read(bytes, 0, (int)ms.Length);
-            string result = encoding.GetString(bytes);
+            string result = encoding.GetString(bytes, 0, bytes.Length);
             return result;
         }
 

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Net;
 using System.IO;
 using System.ComponentModel;
 using System.Threading;
+#if !NETCF
+using System.Net.NetworkInformation;
+#endif
 
 namespace Energy.Core
 {
@@ -1648,6 +1650,8 @@ namespace Energy.Core
 
         #region Ping
 
+#if !NETCF
+
         public static int Ping(string address, int timeout, out System.Net.NetworkInformation.IPStatus status)
         {
             status = System.Net.NetworkInformation.IPStatus.Unknown;
@@ -1683,6 +1687,8 @@ namespace Energy.Core
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
+
+#endif
 
         #endregion
     }

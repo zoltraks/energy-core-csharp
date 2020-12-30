@@ -421,7 +421,9 @@ namespace Energy.Core
 
             try
             {
+#if !NETCF
                 Console.CancelKeyPress += Console_CancelKeyPress;
+#endif
                 _Cancel_Foreground_ConsoleColor = foreground;
             }
             catch { }
@@ -1688,6 +1690,8 @@ namespace Energy.Core
 
         #region Event
 
+#if !NETCF
+
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             if (_Cancel_Foreground_ConsoleColor != null)
@@ -1699,6 +1703,8 @@ namespace Energy.Core
                 _Cancel_Foreground_ConsoleColor = null;
             }
         }
+
+#endif
 
         #endregion
     }

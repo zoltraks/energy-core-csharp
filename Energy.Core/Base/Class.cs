@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
+#if !NETCF
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace Energy.Base
 {
@@ -588,8 +590,23 @@ namespace Energy.Base
         public static Type GetClassInterface(Type classType, string interfaceName)
         {
             if (classType.Name == interfaceName)
+            {
                 return classType;
-            Type type = classType.GetInterface(interfaceName);
+            }
+            Type type = null;
+#if NETCF
+            Type[] interfaces = classType.GetInterfaces();
+            foreach (Type interfaceType in interfaces)
+            {
+                if (0 == string.Compare(interfaceType.Name, interfaceName))
+                {
+                    return interfaceType;
+                }
+            }
+#endif
+#if !NETCF
+            type = classType.GetInterface(interfaceName);
+#endif
             return type;
         }
 
@@ -602,7 +619,9 @@ namespace Energy.Base
             if (assemblies == null)
                 return null;
             if (assemblies.Length == 0)
+            {
                 return new System.Type[] { };
+            }
             List<System.Type> list = new List<System.Type>();
             for (int i = 0; i < assemblies.Length; i++)
             {
@@ -612,10 +631,18 @@ namespace Energy.Base
                 {
                     typeList = assembly.GetTypes();
                 }
+#if !NETCF
                 catch (System.Reflection.ReflectionTypeLoadException)
                 {
                     continue;
                 }
+#endif
+#if NETCF
+                catch
+                {
+                    continue;
+                }
+#endif
                 if (filter == null)
                 {
                     list.AddRange(typeList);
@@ -823,18 +850,28 @@ namespace Energy.Base
         public static bool HasParameterlessConstructor(Type type)
         {
             if (null == type)
+            {
                 return false;
+            }
 
             if (type.IsAbstract)
+            {
                 return false;
+            }
 
-            ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+            ConstructorInfo constructor;
+            //constructor = type.GetConstructor(Type.EmptyTypes);
+            constructor = type.GetConstructor(new Type[] { });
 
             if (null == constructor)
+            {
                 return false;
+            }
 
             if (constructor.IsPublic)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -1104,6 +1141,7 @@ namespace Energy.Base
             }
             catch (ArgumentException)
             { }
+#if !NETCF
             try
             {
                 BinaryFormatter bf = new BinaryFormatter();
@@ -1115,6 +1153,7 @@ namespace Energy.Base
             }
             catch
             { }
+#endif
             return 0;
         }
 
@@ -1140,7 +1179,7 @@ namespace Energy.Base
                 return o;
             }
             var t = o.GetType();
-            BindingFlags bindingAttr = default;
+            BindingFlags bindingAttr = default(BindingFlags);
             bindingAttr |= BindingFlags.Instance;
             bindingAttr |= BindingFlags.Public;
             if (includePrivate)
@@ -1148,7 +1187,7 @@ namespace Energy.Base
                 bindingAttr |= BindingFlags.NonPublic;
             }
             Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
-            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, pi.Name, ignoreCase)
@@ -1172,7 +1211,7 @@ namespace Energy.Base
                     }
                 }
             }
-            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, fi.Name, ignoreCase)
@@ -1208,7 +1247,7 @@ namespace Energy.Base
                 return o;
             }
             var t = o.GetType();
-            BindingFlags bindingAttr = default;
+            BindingFlags bindingAttr = default(BindingFlags);
             bindingAttr |= BindingFlags.Instance;
             bindingAttr |= BindingFlags.Public;
             if (includePrivate)
@@ -1216,7 +1255,7 @@ namespace Energy.Base
                 bindingAttr |= BindingFlags.NonPublic;
             }
             Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
-            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, fi.Name, ignoreCase)
@@ -1233,7 +1272,7 @@ namespace Energy.Base
                     }
                 }
             }
-            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, pi.Name, ignoreCase)
@@ -1276,11 +1315,11 @@ namespace Energy.Base
                 return;
             }
             var t = o.GetType();
-            BindingFlags bindingAttr = default;
+            BindingFlags bindingAttr = default(BindingFlags);
             bindingAttr |= BindingFlags.Instance;
             bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
             Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
-            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, pi.Name, ignoreCase)
@@ -1305,7 +1344,7 @@ namespace Energy.Base
                     }
                 }
             }
-            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, fi.Name, ignoreCase) 
@@ -1342,11 +1381,11 @@ namespace Energy.Base
                 return;
             }
             var t = o.GetType();
-            BindingFlags bindingAttr = default;
+            BindingFlags bindingAttr = default(BindingFlags);
             bindingAttr |= BindingFlags.Instance;
             bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
             Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
-            foreach (FieldInfo fi in t.GetFields(bindingAttr: bindingAttr))
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, fi.Name, ignoreCase)
@@ -1364,7 +1403,7 @@ namespace Energy.Base
                     return;
                 }
             }
-            foreach (PropertyInfo pi in t.GetProperties(bindingAttr: bindingAttr))
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
             {
                 if (false
                     || 0 == string.Compare(name, pi.Name, ignoreCase)
@@ -1716,7 +1755,12 @@ namespace Energy.Base
         /// <returns></returns>
         public static System.Reflection.Assembly[] GetAssemblies()
         {
+#if !NETCF
             return AppDomain.CurrentDomain.GetAssemblies();
+#endif
+#if NETCF
+            return GetAssemblies();
+#endif
         }
 
         /// <summary>
@@ -1866,6 +1910,8 @@ namespace Energy.Base
         {
 #if NETSTANDARD
             return assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+#elif NETCF
+            return "";
 #else
             return assembly.ImageRuntimeVersion;
 #endif
@@ -1878,7 +1924,12 @@ namespace Energy.Base
         {
             try
             {
+#if !NETCF
                 return System.IO.File.GetLastWriteTimeUtc(assembly.Location);
+#endif
+#if NETCF
+                return DateTime.MinValue;
+#endif
             }
             catch
             { }
