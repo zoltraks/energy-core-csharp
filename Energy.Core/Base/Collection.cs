@@ -1751,19 +1751,31 @@ namespace Energy.Base
 
                 public TValue this[TKey key]
                 {
-                    get => Get(key);
-                    set => Set(key, value);
+                    get 
+                    {
+                        return Get(key);
+                    }
+                    set 
+                    {
+                        Set(key, value);
+                    }
                 }
 
                 public TValue this[int index]
                 {
-                    get => Get(index);
-                    set => Set(index, value);
+                    get 
+                    {
+                        return Get(index);
+                    }
+                    set 
+                    {
+                        Set(index, value);
+                    }
                 }
 
                 public TValue New()
                 {
-                    TValue o = default;
+                    TValue o = default(TValue);
                     _List.Add(o);
                     return o;
                 }
@@ -1772,7 +1784,7 @@ namespace Energy.Base
                 {
                     if (index < 0 || index < _List.Count)
                     {
-                        return default;
+                        return default(TValue);
                     }
                     else
                     {
@@ -1784,7 +1796,7 @@ namespace Energy.Base
                 {
                     if (!_Index.ContainsKey(key))
                     {
-                        return default;
+                        return default(TValue);
                     }
                     else
                     {
@@ -1877,43 +1889,97 @@ namespace Energy.Base
 
             public Energy.Interface.IRow<TKey, TValue> this[int index]
             {
-                get => GetByIndex(index);
-                set => SetByIndex(index, value);
+                get 
+                {
+                    return GetByIndex(index);
+                }
+                set 
+                {
+                    SetByIndex(index, value);
+                }
             }
 
             public IList<Energy.Interface.IRow<TKey, TValue>> Rows
             {
-                get => _Rows;
+                get 
+                {
+                    return _Rows;
+                }
             }
 
             public IList<Energy.Interface.IColumn<TKey, TValue>> Columns
             {
-                get => _Columns;
+                get 
+                {
+                    return _Columns;
+                }
             }
 
-            public int Count => _Rows.Count;
+            public int Count 
+            {
+                get 
+                {
+                    return _Rows.Count;
+                }
+            }
 
-            public bool IsReadOnly => false;
+            public bool IsReadOnly 
+            {
+                get
+                {
+                    return false;
+                }
+            }
 
-            public void Add(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Add(item);
+            public void Add(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                _Rows.Add(item);
+            }
 
-            public void Clear() => _Rows.Clear();
+            public void Clear()
+            {
+                _Rows.Clear();
+            }
 
-            public bool Contains(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Contains(item);
+            public bool Contains(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                return _Rows.Contains(item);
+            }
 
-            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex) => _Rows.CopyTo(array, arrayIndex);
+            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex) 
+            {
+                _Rows.CopyTo(array, arrayIndex);
+            }
 
-            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator() => _Rows.GetEnumerator();
+            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator() 
+            {
+                return _Rows.GetEnumerator();
+            }
 
-            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item) => _Rows.IndexOf(item);
+            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                return _Rows.IndexOf(item);
+            }
 
-            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item) => Insert(index, item);
+            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                Insert(index, item);
+            }
 
-            public bool Remove(Energy.Interface.IRow<TKey, TValue> item) => _Rows.Remove(item);
+            public bool Remove(Energy.Interface.IRow<TKey, TValue> item)
+            {
+                _Rows.Remove(item);
+            }
 
-            public void RemoveAt(int index) => _Rows.RemoveAt(index);
+            public void RemoveAt(int index) 
+            {
+                _Rows.RemoveAt(index);
+            }
 
-            IEnumerator IEnumerable.GetEnumerator() => _Rows.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() 
+            {
+                return _Rows.GetEnumerator();
+            }
 
             private Energy.Interface.IRow<TKey, TValue> GetByIndex(int index)
             {

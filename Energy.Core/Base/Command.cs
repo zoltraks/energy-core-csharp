@@ -566,10 +566,10 @@ namespace Energy.Base
                     {
                         if (strictMode)
                         {
-                            string m = $"Unrecognized command line option: {key}";
+                            string m = string.Format("Unrecognized command line option: {0}", key);
                             if (Debugger.IsAttached)
                             {
-                                Debug.WriteLine($"Strict mode error: $m");
+                                Debug.WriteLine(string.Format("Strict mode error: {0}", m));
                             }
                             throw new Exception(m);
                         }

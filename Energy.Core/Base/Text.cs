@@ -376,6 +376,7 @@ namespace Energy.Base
                 if (!text.StartsWith(prefix))
                     text = prefix + text;
                 if (!text.EndsWith(suffix))
+// Warning code IDE0054 is invalid number in Visual Studio 2008
 #pragma warning disable IDE0054 // Use compound assignment
                     text = text + suffix;
 #pragma warning restore IDE0054 // Use compound assignment
@@ -2151,7 +2152,7 @@ namespace Energy.Base
         {
             if (array == null || array.Length == 0)
             {
-                return default;
+                return default(T);
             }
             T first = array[0];
             List<T> list = new List<T>(array.Length);
@@ -3950,7 +3951,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static bool IsInteger(string input) => Regex.Match(input ?? "", @"^[+\-]?[0-9]+$").Success;
+        public static bool IsInteger(string input) 
+        {
+            return Regex.Match(input ?? "", @"^[+\-]?[0-9]+$").Success;
+        }
 
         #endregion
 
@@ -3961,7 +3965,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static bool IsNumber(string input) => Regex.Match(input ?? "", @"^[+\-]?[0-9]+([.,][0-9]*)?([eE][+\-]?[0-9]+)?$").Success;
+        public static bool IsNumber(string input)
+        {
+            return Regex.Match(input ?? "", @"^[+\-]?[0-9]+([.,][0-9]*)?([eE][+\-]?[0-9]+)?$").Success;
+        }
 
         #endregion
 
