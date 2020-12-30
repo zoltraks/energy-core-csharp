@@ -294,10 +294,34 @@ namespace Energy.Base
             {
                 return value;
             }
+            else
+            {
+                return value;
+            }
+        }
+
+        #endregion
+
+        #region HexToByte
+
+        /// <summary>
+        /// Convert hexadecimal string to byte value (System.Byte).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static byte HexToByte(string hex)
+        {
+            byte value;
+            if (byte.TryParse(hex, System.Globalization.NumberStyles.HexNumber
+                , System.Globalization.CultureInfo.InvariantCulture, out value))
+            {
+                return value;
+            }
             return value;
         }
 
         #endregion
+
 
         #region BinToHex
 
@@ -697,11 +721,11 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <param name="prefixArray"></param>
-        /// <param name="removeWhite"></param>
+        /// <param name="ignoreWhite"></param>
         /// <returns></returns>
-        public static bool IsHex(string value, string[] prefixArray, bool removeWhite)
+        public static bool IsHex(string value, string[] prefixArray, bool ignoreWhite)
         {
-            if (removeWhite)
+            if (ignoreWhite)
             {
                 value = Energy.Base.Text.RemoveWhite(value);
             }
@@ -740,23 +764,27 @@ namespace Energy.Base
         /// <returns></returns>
         public static bool IsHex(string value)
         {
-            if (null == value)
+            if (string.IsNullOrEmpty(value))
+            {
                 return false;
+            }
             return IsHex(value.ToCharArray());
         }
 
         /// <summary>
         /// Check if text is a hexadecimal number string.
         /// </summary>
-        /// <param name="charArray"></param>
+        /// <param name="chars"></param>
         /// <returns></returns>
-        private static bool IsHex(char[] charArray)
+        private static bool IsHex(char[] chars)
         {
-            if (charArray == null)
-                return false;
-            for (int i = 0; i < charArray.Length; i++)
+            if (chars == null)
             {
-                if (0 < HEX_STRING_24_REVERSE.IndexOf(charArray[i]))
+                return false;
+            }
+            for (int i = 0; i < chars.Length; i++)
+            {
+                if (0 > HEX_STRING_24_REVERSE.IndexOf(chars[i]))
                 {
                     return false;
                 }

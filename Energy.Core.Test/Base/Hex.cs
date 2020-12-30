@@ -175,5 +175,15 @@ namespace Energy.Core.Test.Base
             s = Energy.Base.Hex.ByteToHex(127);
             Assert.AreEqual("7F", s);
         }
+
+        [TestMethod]
+        public void HexIsHex()
+        {
+            Assert.IsFalse(Energy.Base.Hex.IsHex(null));
+            Assert.IsFalse(Energy.Base.Hex.IsHex(""));
+            Assert.IsFalse(Energy.Base.Hex.IsHex("G"));
+            Assert.IsFalse(Energy.Base.Hex.IsHex("0a-0b"));
+            Assert.IsTrue(Energy.Base.Hex.IsHex("0123456789abcdefABCDEF"));
+        }
     }
 }
