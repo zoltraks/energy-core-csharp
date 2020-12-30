@@ -128,5 +128,47 @@ namespace Energy.Core.Test.Base
             url = Energy.Base.Url.Make("a@b", "mailto:", null, null, null, null, null, null, null, null);
             Assert.AreEqual("mailto:a@b", url);
         }
+
+        [TestMethod]
+        public void UrlEncode()
+        {
+            string a, b;
+
+            Assert.IsNull(Energy.Base.Url.Encode(null));
+            Assert.AreEqual("", Energy.Base.Url.Encode(""));
+
+            a = "❤";
+            b = "%E2%9D%A4";
+            Assert.AreEqual(b, Energy.Base.Url.Encode(a));
+
+            a = "a + b";
+            b = "a%20%2B%20b";
+            Assert.AreEqual(b, Energy.Base.Url.Encode(a));
+        }
+
+        [TestMethod]
+        public void UrlDecode()
+        {
+            string a, b;
+
+            Assert.IsNull(Energy.Base.Url.Encode(null));
+            Assert.AreEqual("", Energy.Base.Url.Decode(""));
+
+            a = "%E2%9D%A4";
+            b = "❤";
+            Assert.AreEqual(b, Energy.Base.Url.Decode(a));
+
+            a = "a%20%2B%20b";
+            b = "a + b";
+            Assert.AreEqual(b, Energy.Base.Url.Decode(a));
+
+            a = "Águila";
+            b = "Águila";
+            Assert.AreEqual(b, Energy.Base.Url.Decode(a));
+
+            a = "10 % 2";
+            b = "10 % 2";
+            Assert.AreEqual(b, Energy.Base.Url.Decode(a));
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Energy.Base
@@ -738,6 +740,179 @@ namespace Energy.Base
                 }
             }
             return string.Join("", list.ToArray());
+        }
+
+        #endregion
+
+        #region IsUnreserved
+
+        /// <summary>
+        /// Check if character is unreserved (allowed) character in URI according to RFC 3986.
+        /// <br/><br/>
+        /// https://tools.ietf.org/html/rfc3986
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool IsUnreserved(char c) => false
+            || c >= 0x41 && c <= 0x5a     // capital letter
+            || c >= 0x61 && c <= 0x7a     // lower letter
+            || c >= 0x30 && c <= 0x39     // digit
+            || c == 0x2d                  // hyphen
+            || c == 0x2e                  // period
+            || c == 0x5f                  // underscore
+            || c == 0x7e                  // tilde
+            ;
+
+        /// <summary>
+        /// Check if character is unreserved (allowed) character in URI according to RFC 3986.
+        /// <br/><br/>
+        /// https://tools.ietf.org/html/rfc3986
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool IsUnreserved(byte c) => false
+            || c >= 0x41 && c <= 0x5a     // capital letter
+            || c >= 0x61 && c <= 0x7a     // lower letter
+            || c >= 0x30 && c <= 0x39     // digit
+            || c == 0x2d                  // hyphen
+            || c == 0x2e                  // period
+            || c == 0x5f                  // underscore
+            || c == 0x7e                  // tilde
+            ;
+
+        #endregion
+
+        #region Encode
+
+        /// <summary>
+        /// Encode special characters for URL string, according to RFC 3986.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Encode(string text)
+        {
+            return Encode(text, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Encode special characters for URL string, according to RFC 3986.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Encode(string text, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            StringBuilder s = new StringBuilder(text.Length);
+            byte[] b = encoding.GetBytes(text);
+            for (int i = 0, n = b.Length; i < n; i++)
+            {
+                if (IsUnreserved(b[i]))
+                {
+                    s.Append((char)b[i]);
+                }
+                else
+                {
+                    s.Append('%');
+                    s.Append(b[i].ToString("X2"));
+                }
+            }
+            return s.ToString();
+        }
+
+        #endregion
+
+        #region Decode
+
+        /// <summary>
+        /// Decode previously URL encoded string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Decode(string text)
+        {
+            return Decode(text, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Decode previously URL encoded string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Decode(string text, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            MemoryStream ms = new MemoryStream(text.Length);
+            int x = 0;
+            int n = text.Length;
+            for (int i = 0; i < n; i++)
+            {
+                char c = text[i];
+                if (i < n - 2 && c == '%')
+                {
+                    string h = text.Substring(i + 1, 2);
+                    if (Energy.Base.Hex.IsHex(h))
+                    {
+                        if (x < i)
+                        {
+                            byte[] a = encoding.GetBytes(text.Substring(x, i - x));
+                            ms.Write(a, 0, a.Length);
+                        }
+                        byte v = Energy.Base.Hex.HexToByte(text.Substring(i + 1, 2));
+                        ms.WriteByte(v);
+                        i += 2;
+                        x = i + 1;
+                        continue;
+                    }
+                }
+            }
+
+            if (x < n)
+            {
+                byte[] a = encoding.GetBytes(text.Substring(x, n - x));
+                ms.Write(a, 0, a.Length);
+            }
+
+            byte[] bytes = new byte[ms.Length];
+            ms.Seek(0, SeekOrigin.Begin);
+            ms.Read(bytes, 0, (int)ms.Length);
+            string result = encoding.GetString(bytes);
+            return result;
+        }
+
+        #endregion
+
+        #region Escape
+
+        /// <summary>
+        /// Escape all but unreserved characters for URI string with percentage codes.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Escape(string text)
+        {
+            return Encode(text);
+        }
+
+        #endregion
+
+        #region Unescape
+
+        /// <summary>
+        /// Unescape previously encoded string from percentage codes.
+        /// </summary>
+        /// <param name="text"></param>
+        public static string Unescape(string text)
+        {
+            return Decode(text);
         }
 
         #endregion
