@@ -704,5 +704,73 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Escape
+
+        /// <summary>
+        /// Escape special characters with valid XML entities.
+        /// <br/><br/>
+        /// Only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Escape(string text)
+        {
+            return Encode(text);
+        }
+
+        #endregion
+
+        #region Unescape
+
+        /// <summary>
+        /// Unescape XML from named or numeric character entities.
+        /// </summary>
+        /// <param name="text"></param>
+        public static string Unescape(string text)
+        {
+            return Decode(text);
+        }
+
+        #endregion
+
+        #region CDATA
+
+        /// <summary>
+        /// Utitlity class for handling XML CDATA sections.
+        /// </summary>
+        public static class CData
+        {
+            /// <summary>
+            /// Quote text inside XML CDATA section.
+            /// <br/><br/>
+            /// Text must not contain "]]&gt;" neither "&lt;![CDATA[" although this function doesn't check that.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public static string Quote(string text)
+            {
+                return "<![CDATA[" + text + "]]>";
+            }
+
+            /// <summary>
+            /// Strip text from one or more XML CDATA sections.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public static string Strip(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+                string pattern = @"<!\s*\[\s*CDATA\s*\[(.+?)]\s*]\s*>";
+                return Regex.Replace(text, pattern, "$1");
+            }
+        }
+
+        #endregion
     }
 }
