@@ -91,7 +91,9 @@ namespace Energy.Core
         {
             AddressFamily addressFamily = Settings.AddressFamily;
             if (addressFamily == AddressFamily.Unspecified)
+            {
                 addressFamily = GetAddressFamily(host);
+            }
             return GetHostAddress(host, addressFamily);
         }
 
@@ -107,29 +109,46 @@ namespace Energy.Core
         /// </returns>
         public static AddressFamily GetAddressFamily(string address)
         {
-            if (address == "localhost" || address == "127.0.0.1")
-                return AddressFamily.InterNetwork;
-            if (address == "::1" || address == "[::1]" || address == "::" || address == "[::]")
-                return AddressFamily.InterNetworkV6;
-            IPAddress ipAddress = null;
-            if (IPAddress.TryParse(address, out ipAddress))
+            if (string.IsNullOrEmpty(address))
             {
-                return ipAddress.AddressFamily;
+                return AddressFamily.Unknown;
             }
-            else
+
+            if (address == "localhost" || address == "127.0.0.1")
+            {
+                return AddressFamily.InterNetwork;
+            }
+
+            if (address == "::1" || address == "[::1]" || address == "::" || address == "[::]")
+            {
+                return AddressFamily.InterNetworkV6;
+            }
+
+            if (Energy.Base.Network.IsValidAddress(address))
             {
                 try
                 {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(address);
-                    ipAddress = ipHostInfo.AddressList[0];
+                    IPAddress ipAddress = IPAddress.Parse(address);
                     return ipAddress.AddressFamily;
                 }
-                catch (SocketException socketException)
+                catch (FormatException formatException)
                 {
-                    Energy.Core.Bug.Catch(socketException);
-                    return AddressFamily.Unknown;
+                    Energy.Core.Bug.Catch("Energy.Core.Network.GetAddressFamily", formatException);
                 }
             }
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(address);
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                return ipAddress.AddressFamily;
+            }
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch("Energy.Core.Network.GetAddressFamily", socketException);
+            }
+
+            return AddressFamily.Unknown;
         }
 
         public static SocketType GetSocketType(ProtocolType protocol, AddressFamily family)
@@ -168,7 +187,9 @@ namespace Energy.Core
         public static void Shutdown(Socket socket)
         {
             if (socket == null)
+            {
                 return;
+            }
             try
             {
                 socket.Shutdown(SocketShutdown.Both);
@@ -186,9 +207,9 @@ namespace Energy.Core
             {
                 socket.Close();
             }
-            catch (Exception exceptionAny)
+            catch (Exception exception)
             {
-                Energy.Core.Bug.Catch(exceptionAny);
+                Energy.Core.Bug.Catch("Energy.Core.Network.Shutdown", exception);
             }
         }
 
@@ -204,17 +225,21 @@ namespace Energy.Core
         {
             string name = Environment.MachineName;
             if (!string.IsNullOrEmpty(name))
+            {
                 return name;
-                try
-                {
-                    name = System.Net.Dns.GetHostName();
-                }
-                catch (SocketException exceptionSocket)
-                {
-                    Energy.Core.Bug.Catch(exceptionSocket);
-                }
+            }
+            try
+            {
+                name = System.Net.Dns.GetHostName();
+            }
+            catch (SocketException exceptionSocket)
+            {
+                Energy.Core.Bug.Catch(exceptionSocket);
+            }
             if (!string.IsNullOrEmpty(name))
+            {
                 return name;
+            }
             name = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
             return name;
         }
@@ -231,12 +256,21 @@ namespace Energy.Core
         public static bool IsConnected(Socket socket)
         {
             if (socket == null)
+            {
                 return false;
-            if (!socket.Connected)
+            }
+            else if (!socket.Connected)
+            {
                 return false;
-            if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+            }
+            else if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+            {
                 return false;
-            return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         #endregion
