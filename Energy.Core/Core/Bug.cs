@@ -583,6 +583,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Write debug message with numeric code which may be suppressed or limited.
+        /// <br /><br />
         /// Provide a function that returns message and will be invoked only if not suppressed.
         /// </summary>
         /// <param name="code"></param>

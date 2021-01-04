@@ -20,55 +20,71 @@ namespace Energy.Core
 
         public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
-            if (host == null)
+            if (string.IsNullOrEmpty(host))
             {
-                return null;
+                return host;
             }
 
-            if (host == "")
-            {
-                return "";
-            }
+            //if (host == null)
+            //{
+            //    return null;
+            //}
 
-            if (host == "localhost" || host == ".")
+            //if (host == "")
+            //{
+            //    return "";
+            //}
+
+            if (0 == string.Compare(host, "localhost", true) || host == ".")
             {
                 return IPAddress.Parse("127.0.0.1").ToString();
             }
 
-            IPAddress ipAddress;
-            if (!IPAddress.TryParse(host, out ipAddress))
+            if (Energy.Base.Network.IsValidAddress(host))
             {
                 try
                 {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
-                    ipAddress = ipHostInfo.AddressList[0];
-                    if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                    IPAddress ipAddress = IPAddress.Parse(host);
+                    return ipAddress.ToString();
+                }
+                catch (FormatException)
+                {
+                }
+            }
+
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                {
+                    Energy.Core.Bug.Write("Energy.Core.Network.GetHostAddress", () =>
                     {
-                        Energy.Core.Bug.Write("C175", () =>
-                        {
-                            List<string> ls = new List<string>();
-                            for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
-                            {
-                                ls.Add(ipHostInfo.AddressList[i].ToString());
-                            }
-                            string msg = string.Join(" , ", ls.ToArray());
-                            return msg;
-                        });
+                        List<string> ls = new List<string>();
                         for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
                         {
-                            ipAddress = ipHostInfo.AddressList[i];
-                            if (ipAddress.AddressFamily == addressFamily)
-                                break;
+                            ls.Add(ipHostInfo.AddressList[i].ToString());
+                        }
+                        string msg = string.Join(" , ", ls.ToArray());
+                        return msg;
+                    });
+                    for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                    {
+                        ipAddress = ipHostInfo.AddressList[i];
+                        if (ipAddress.AddressFamily == addressFamily)
+                        {
+                            return ipAddress.ToString();
                         }
                     }
                 }
-                catch (SocketException socketException)
-                {
-                    Energy.Core.Bug.Catch(socketException);
-                    return null;
-                }
             }
-            return ipAddress.ToString();
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch(socketException);
+            }
+
+            return null;
         }
 
         public static string GetHostAddress(string host)
