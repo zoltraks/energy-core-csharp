@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -20,6 +21,20 @@ namespace Energy.Base
         public const int DEFAULT_PING_TIMEOUT = 30000;
 
         public const AddressFamily DEFAULT_ADDRESS_FAMILY = AddressFamily.Unspecified;
+
+        /// <summary>
+        /// Regex pattern for IPv4 address from https://ihateregex.io/expr/ipv4/
+        /// </summary>
+        public const string IP4_PATTERN = @"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}";
+
+        private const string IP4_PATTERN_FULL = "^" + IP4_PATTERN + "$";
+
+        /// <summary>
+        /// Regex pattern for IPv4 address from https://ihateregex.io/expr/ipv6/
+        /// </summary>
+        public const string IP6_PATTERN = @"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
+
+        private const string IP6_PATTERN_FULL = "^(\\[" + IP6_PATTERN + "\\]|" + IP6_PATTERN + ")$";
 
         #endregion
 
@@ -88,6 +103,39 @@ namespace Energy.Base
             [DefaultValue(0)]
             public int Port { get; set; }
         }
+
+        #endregion
+
+        #region Utility
+
+        #region IsValidAddress
+
+        /// <summary>
+        /// Check if text is valid IPv4 or IPv6 network address.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public static bool IsValidAddress(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                return false;
+            }
+            if (Regex.Match(address, IP4_PATTERN_FULL).Success)
+            {
+                return true;
+            }
+            else if (Regex.Match(address, IP6_PATTERN_FULL).Success)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion
 
         #endregion
     }

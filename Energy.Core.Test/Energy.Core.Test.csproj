@@ -92,6 +92,7 @@
     <Compile Include="Base\Bit.cs" />
     <Compile Include="Base\ConnectionString.cs" />
     <Compile Include="Base\Clock.cs" />
+    <Compile Include="Base\Network.cs" />
     <Compile Include="Base\Naming.cs" />
     <Compile Include="Base\Number.cs" />
     <Compile Include="Base\Path.cs" />

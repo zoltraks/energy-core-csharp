@@ -14,24 +14,7 @@ namespace Energy.Core
 {
     public class Network
     {
-        #region Constant
-
-        public const string IP4_PATTERN = @"";
-
-        public const string IP6_PATTERN = @"";
-
-        #endregion
-
         #region Utility
-
-        #region IsValidAddress
-
-        public static bool IsValidAddress(string address)
-        {
-            return true;
-        }
-
-        #endregion
 
         #region GetHostAddress
 
