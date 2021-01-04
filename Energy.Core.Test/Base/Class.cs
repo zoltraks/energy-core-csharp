@@ -180,7 +180,7 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void ClassSetObjectValue()
         {
-            object o1, o2;
+            object o1;
             o1 = new
             {
                 Name = "Name",

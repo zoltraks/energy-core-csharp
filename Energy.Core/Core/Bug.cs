@@ -488,14 +488,43 @@ namespace Energy.Core
         #region Catch
 
         /// <summary>
-        /// Handle exception
+        /// Handle exception.
+        /// <br /><br />
+        /// If code is not empty, exception message may be suppressed.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="exception"></param>
+        public static void Catch(string code, Exception exception)
+        {
+            if (exception == null)
+            {
+                Energy.Core.Bug.Write("Energy.Core.Bug.Catch", "Can't catch null exception");
+                return;
+            }
+            if (!string.IsNullOrEmpty(code) && IsSuppressed(code))
+            {
+                return;
+            }
+            string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(exception.GetType().Name, message));
+            if ((bool)ExceptionTrace)
+            {
+                if (_Logger != null)
+                {
+                    _Logger.Write(message, Enumeration.LogLevel.Bug);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handle exception.
         /// </summary>
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
             if (exception == null)
             {
-                Energy.Core.Bug.Write("C601", "Can't catch null exception");
+                Energy.Core.Bug.Write("Energy.Core.Bug.Catch", "Can't catch null exception");
                 return;
             }
             string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
