@@ -72,6 +72,12 @@ namespace Energy.Base
         /// </summary>
         public const string NEWLINE_PATTERN = "\r\n|\n|\r";
 
+        /// <summary>
+        /// Regular expressions pattern for new line.
+        /// Greedy version.
+        /// </summary>
+        public const string NEWLINE_GREEDY_PATTERN = "(?:\r\n|\n|\r)+";
+
         #endregion
 
         #region Private
@@ -904,7 +910,13 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitLine(string content)
         {
-            return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
+            if (string.IsNullOrEmpty(content))
+            {
+                return new string[] { };
+            }
+            //return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
+            //return content.Split(NEWLINE_ARRAY);
+            return Regex.Split(content, NEWLINE_PATTERN);
         }
 
         /// <summary>
@@ -917,10 +929,43 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitLine(string content, bool removeEmpty)
         {
-            string[] split = content.Split(NEWLINE_ARRAY
-                , removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
-                );
-            return split;
+            if (string.IsNullOrEmpty(content))
+            {
+                return new string[] { };
+            }
+
+            //string[] split = content.Split(NEWLINE_ARRAY
+            //    , removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
+            //    );
+            //return split;
+
+            //string[] array = content.Split(NEWLINE_ARRAY);
+            //if (!removeEmpty || 0 == array.Length)
+            //{
+            //    return array;
+            //}
+            //else
+            //{
+            //    var list = new List<string>(array);
+            //    for (int i = array.Length - 1; i >= 0; i--)
+            //    {
+            //        if (string.IsNullOrEmpty(list[i]))
+            //        {
+            //            list.RemoveAt(i);
+            //        }
+            //    }
+            //    array = list.ToArray();
+            //    return array;
+            //}
+
+            if (removeEmpty)
+            {
+                return Regex.Split(content, NEWLINE_GREEDY_PATTERN);
+            }
+            else
+            {
+                return Regex.Split(content, NEWLINE_PATTERN);
+            }
         }
 
         #endregion

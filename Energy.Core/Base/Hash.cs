@@ -175,11 +175,16 @@ namespace Energy.Base
             {
                 return null;
             }
+#if !NETCF
             using (System.Security.Cryptography.SHA256 cipher = System.Security.Cryptography.SHA256.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
                 return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>
@@ -208,11 +213,16 @@ namespace Energy.Base
             {
                 return null;
             }
+#if !NETCF
             using (System.Security.Cryptography.SHA384 cipher = System.Security.Cryptography.SHA384.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
                 return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>
@@ -241,11 +251,16 @@ namespace Energy.Base
             {
                 return null;
             }
+#if !NETCF
             using (System.Security.Cryptography.SHA512 cipher = System.Security.Cryptography.SHA512.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
                 return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>

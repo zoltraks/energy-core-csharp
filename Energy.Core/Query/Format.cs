@@ -594,7 +594,12 @@ namespace Energy.Query
         /// <returns>string</returns>
         public string Integer(decimal number)
         {
+#if !NETCF
             return Number(Math.Floor(number));
+#endif
+#if NETCF
+            return Number(Math.Floor((double)number));
+#endif
         }
 
         /// <summary>

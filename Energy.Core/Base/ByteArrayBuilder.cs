@@ -631,7 +631,7 @@ namespace Energy.Base
         public string ReadString(int length, System.Text.Encoding encoding)
         {
             byte[] data = ReadArray(length);
-            return encoding.GetString(data);
+            return encoding.GetString(data, 0, data.Length);
         }
 
         /// <summary>
@@ -642,7 +642,7 @@ namespace Energy.Base
         public string ReadString(int length)
         {
             byte[] data = ReadArray(length);
-            return _Encoding.GetString(data);
+            return _Encoding.GetString(data, 0, data.Length);
         }
 
         /// <summary>
@@ -652,7 +652,8 @@ namespace Energy.Base
         /// <returns></returns>
         public string ReadString(System.Text.Encoding encoding)
         {
-            return encoding.GetString(ReadArray());
+            byte[] data = ReadArray();
+            return encoding.GetString(data, 0, data.Length);
         }
 
         /// <summary>
@@ -929,12 +930,14 @@ namespace Energy.Base
 
         public override string ToString()
         {
-            return _Encoding.GetString(ToArray());
+            byte[] data = this.ToArray();
+            return _Encoding.GetString(data, 0, data.Length);
         }
 
         public string ToString(System.Text.Encoding encoding)
         {
-            return encoding.GetString(ToArray());
+            byte[] data = this.ToArray();
+            return encoding.GetString(data, 0, data.Length);
         }
 
         #endregion

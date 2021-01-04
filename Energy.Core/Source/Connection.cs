@@ -1210,6 +1210,7 @@ namespace Energy.Source
         /// <returns></returns>
         public DataTable Read(string query)
         {
+            string _;
             return Read(query, out _);
         }
 
@@ -1328,6 +1329,7 @@ namespace Energy.Source
         /// <returns></returns>
         public int Execute(string query)
         {
+            string _;
             return Execute(query, out _);
         }
 

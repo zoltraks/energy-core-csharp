@@ -572,9 +572,11 @@ namespace Energy.Core
                             {
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
-                                    IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                                    IsBackground = true
                                 };
+#if !NETCF
+                                thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+#endif
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
                                 activate = false;
@@ -634,7 +636,7 @@ namespace Energy.Core
                                     _Buffer.InsertRange(0, entries);
                                 }
                             }
-                            if (_ActivateResetEvent.WaitOne(_SleepDelay))
+                            if (_ActivateResetEvent.WaitOne(_SleepDelay, true))
                                 continue;
                             else
                                 continue;
@@ -877,7 +879,7 @@ namespace Energy.Core
                                     _Buffer.InsertRange(0, entries);
                                 }
                             }
-                            if (_ActivateResetEvent.WaitOne(_SleepDelay))
+                            if (_ActivateResetEvent.WaitOne(_SleepDelay, true))
                                 continue;
                             else
                                 continue;
@@ -943,11 +945,13 @@ namespace Energy.Core
                     }
                     else
                     {
-                        Thread thread = new Thread(() => { WriteUnsafe(log); })
+                        Thread thread = new Thread(() => { WriteUnsafe(log); }) 
                         {
-                            IsBackground = true,
-                            CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                            IsBackground = true
                         };
+#if !NETCF
+                        thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+#endif
                         thread.Start();
                         return true;
                     }
