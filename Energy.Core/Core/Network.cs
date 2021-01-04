@@ -20,11 +20,6 @@ namespace Energy.Core
 
         public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
-            if (string.IsNullOrEmpty(host))
-            {
-                return host;
-            }
-
             //if (host == null)
             //{
             //    return null;
@@ -34,6 +29,11 @@ namespace Energy.Core
             //{
             //    return "";
             //}
+
+            if (string.IsNullOrEmpty(host))
+            {
+                return host;
+            }
 
             if (0 == string.Compare(host, "localhost", true) || host == ".")
             {
