@@ -329,7 +329,7 @@ namespace Energy.Base
 
                 _PushResetEvent.Reset();
 
-                if (!_PushResetEvent.WaitOne(TimeSpan.FromSeconds(timeout).Milliseconds, true))
+                if (!_PushResetEvent.WaitOne((int)TimeSpan.FromSeconds(timeout).TotalMilliseconds, true))
                 {
                     return default(T);
                 }
