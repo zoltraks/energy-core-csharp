@@ -702,7 +702,12 @@ namespace Energy.Query
             }
             if (number is decimal)
             {
+#if !NETCF
                 return Number(Math.Floor((decimal)number));
+#endif
+#if NETCF
+                return Number(Math.Floor((double)(decimal)number));
+#endif
             }
             if (number is float)
             {

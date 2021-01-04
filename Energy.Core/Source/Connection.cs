@@ -1499,6 +1499,7 @@ namespace Energy.Source
         /// <returns></returns>
         public T Scalar<T>(string query)
         {
+            string _;
             object value = Scalar(query, out _);
             return Energy.Base.Cast.As<T>(value);
         }

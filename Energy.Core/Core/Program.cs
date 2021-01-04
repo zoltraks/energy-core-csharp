@@ -253,6 +253,7 @@ namespace Energy.Core
         /// <param name="encoding"></param>
         public static System.Text.Encoding SetConsoleEncoding(System.Text.Encoding encoding)
         {
+#if !NETCF
             try
             {
                 Console.InputEncoding = encoding;
@@ -262,8 +263,9 @@ namespace Energy.Core
             { }
             catch (Exception x)
             {
-                Energy.Core.Bug.Catch(x);
+                Energy.Core.Bug.Catch("Energy.Core.Program.SetConsoleEncoding", x);
             }
+#endif
             return encoding;
         }
 

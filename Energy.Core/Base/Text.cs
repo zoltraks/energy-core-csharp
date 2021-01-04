@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Energy.Base
 {
@@ -310,14 +311,18 @@ namespace Energy.Base
         public static string Surround(string value, string delimiter, string[] special)
         {
             if (value == null || value == "")
+            {
                 return value;
+            }
 
             bool quote = false;
 
             if (String.IsNullOrEmpty(delimiter))
             {
                 if (special == null)
+                {
                     return value;
+                }
             }
             else if (value.Contains(delimiter))
             {
@@ -337,7 +342,9 @@ namespace Energy.Base
             }
 
             if (!quote)
+            {
                 return value;
+            }
 
             return String.Concat(delimiter, value, delimiter);
         }
@@ -902,7 +909,8 @@ namespace Energy.Base
 
         /// <summary>
         /// Split string to array by new line characters.
-        /// Elements will not include new line itself.
+        /// <br /><br />
+        /// Elements will not include new line character itself.
         /// </summary>
         /// <param name="content"></param>
         /// <param name="removeEmpty"></param>
@@ -1636,7 +1644,7 @@ namespace Energy.Base
             }
             else
             {
-                return word.Substring(0, 1).ToUpperInvariant() + word.Substring(1).ToLowerInvariant();
+                return word.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture) + word.Substring(1).ToLower(CultureInfo.InvariantCulture);
             }
         }
 
@@ -1708,7 +1716,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Lower(string word)
         {
-            return word == null ? null : word.ToLowerInvariant();
+            return word == null ? null : word.ToLower(CultureInfo.InvariantCulture);
         }
 
         /// <summary>

@@ -212,17 +212,18 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
-            try
-            {
-                Console.InputEncoding = encoding;
-                Console.OutputEncoding = encoding;
-            }
-            catch (System.Security.SecurityException)
-            { }
-            catch (Exception x)
-            {
-                Energy.Core.Bug.Catch(x);
-            }
+            Energy.Core.Program.SetConsoleEncoding(encoding);
+            //try
+            //{
+            //    Console.InputEncoding = encoding;
+            //    Console.OutputEncoding = encoding;
+            //}
+            //catch (System.Security.SecurityException)
+            //{ }
+            //catch (Exception x)
+            //{
+            //    Energy.Core.Bug.Catch(x);
+            //}
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]

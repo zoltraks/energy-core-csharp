@@ -3814,7 +3814,7 @@ namespace Energy.Base
             {
                 return null;
             }
-            return System.Text.Encoding.UTF8.GetString(data);
+            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
         /// <summary>
