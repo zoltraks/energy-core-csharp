@@ -193,7 +193,8 @@ namespace Energy.Core
             try
             {
                 socket.Shutdown(SocketShutdown.Both);
-                socket.Disconnect(true);
+                //socket.Disconnect(true);
+                //socket.Disconnect(false);
             }
             catch (SocketException socketException)
             {
