@@ -575,7 +575,7 @@ namespace Energy.Core
                                     IsBackground = true
                                 };
 #if !NETCF
-                                thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                                thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
 #endif
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
@@ -950,7 +950,7 @@ namespace Energy.Core
                             IsBackground = true
                         };
 #if !NETCF
-                        thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                        thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
 #endif
                         thread.Start();
                         return true;

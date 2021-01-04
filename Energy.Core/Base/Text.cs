@@ -910,10 +910,16 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitLine(string content)
         {
-            if (string.IsNullOrEmpty(content))
+            if (null == content)
+            {
+                return null;
+            }
+
+            if (0 == content.Length)
             {
                 return new string[] { };
             }
+            
             //return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
             //return content.Split(NEWLINE_ARRAY);
             return Regex.Split(content, NEWLINE_PATTERN);
@@ -929,7 +935,12 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitLine(string content, bool removeEmpty)
         {
-            if (string.IsNullOrEmpty(content))
+            if (null == content)
+            {
+                return null;
+            }
+
+            if (0 == content.Length)
             {
                 return new string[] { };
             }

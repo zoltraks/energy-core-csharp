@@ -916,5 +916,24 @@ Another
         {
             Assert.AreEqual("aaààźźţţǭǭδδдд", Energy.Base.Text.Lower("AaÀàŹźŢţǬǭΔδДд"));
         }
+
+        [TestMethod]
+        public void TextSplitLine()
+        {
+            Assert.IsNull(Energy.Base.Text.SplitLine(null));
+            Assert.AreEqual(0, Energy.Base.Text.SplitLine("").Length);
+            string content;
+            string[] array;
+            content = "a";
+            array = Energy.Base.Text.SplitLine(content);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a" }, array));
+            content = "a\r\n\n\rb";
+            array = Energy.Base.Text.SplitLine(content);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "", "", "b" }, array));
+            array = Energy.Base.Text.SplitLine(content, false);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "", "", "b" }, array));
+            array = Energy.Base.Text.SplitLine(content, true);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "b" }, array));
+        }
     }
 }
