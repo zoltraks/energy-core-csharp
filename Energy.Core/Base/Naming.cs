@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Energy.Base
 {
@@ -33,7 +34,8 @@ namespace Energy.Base
             }
             else
             {
-                words[0] = words[0].ToLowerInvariant();
+                //words[0] = words[0].ToLowerInvariant();
+                words[0] = words[0].ToLower(CultureInfo.InvariantCulture);
                 for (int i = 1; i < words.Length; i++)
                 {
                     words[i] = Energy.Base.Text.Capitalize(words[i]);

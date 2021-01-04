@@ -15,6 +15,7 @@ namespace Energy.Core.Test.Core
             string result;
             result = Energy.Core.Network.GetHostAddress("localhost");
             Assert.IsNotNull(result);
+            Assert.AreEqual("127.0.0.1", result);
         }
 
         [TestMethod]
