@@ -792,9 +792,11 @@ namespace Energy.Core
                             {
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
-                                    IsBackground = true,
-                                    CurrentUICulture = Energy.Core.Program.GetCultureInfo(),
+                                    IsBackground = true
                                 };
+#if !NETCF
+                                thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                                 _Thread = thread;
                                 _ActivateResetEvent.Reset();
                                 activate = false;
@@ -879,10 +881,14 @@ namespace Energy.Core
                                     _Buffer.InsertRange(0, entries);
                                 }
                             }
-                            if (_ActivateResetEvent.WaitOne(_SleepDelay, true))
+                            if (_ActivateResetEvent.WaitOne((int)_SleepDelay.TotalMilliseconds, true))
+                            {
                                 continue;
+                            }
                             else
+                            {
                                 continue;
+                            }
                         }
                     }
                     catch (ThreadAbortException)
