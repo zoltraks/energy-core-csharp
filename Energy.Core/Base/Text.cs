@@ -660,8 +660,8 @@ namespace Energy.Base
             }
             else
             {
-                string insensitiveInput = input.ToUpperInvariant();
-                string insensitiveFilter = filter.ToUpperInvariant();
+                string insensitiveInput = input.ToUpper(CultureInfo.InvariantCulture);
+                string insensitiveFilter = filter.ToUpper(CultureInfo.InvariantCulture);
                 if (insensitiveInput.StartsWith(insensitiveFilter))
                     return true;
                 else if (insensitiveInput.EndsWith(insensitiveFilter))
@@ -1678,7 +1678,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Upper(string word)
         {
-            return word == null ? null : word.ToUpperInvariant();
+            return word == null ? null : word.ToUpper(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1700,7 +1700,7 @@ namespace Energy.Base
                 {
                     continue;
                 }
-                words[i] = words[i].ToUpperInvariant();
+                words[i] = words[i].ToUpper(CultureInfo.InvariantCulture);
             }
             return words;
         }
@@ -1738,7 +1738,7 @@ namespace Energy.Base
                 {
                     continue;
                 }
-                words[i] = words[i].ToLowerInvariant();
+                words[i] = words[i].ToLower(CultureInfo.InvariantCulture);
             }
             return words;
         }
@@ -1842,7 +1842,7 @@ namespace Energy.Base
                 pieces.Add(value);
             }
             string text = string.Join("-", pieces.ToArray());
-            text = text.ToLowerInvariant();
+            text = text.ToLower(CultureInfo.InvariantCulture);
             return text;
         }
 
@@ -3863,7 +3863,7 @@ namespace Energy.Base
             {
                 string key = array[i * 2] ?? "";
                 if (ignoreCase)
-                    key = key.ToUpperInvariant();
+                    key = key.ToUpper(CultureInfo.InvariantCulture);
                 dictionary[key] = array[1 + i * 2] ?? "";
             }
             if (dictionary.Count == 0)
@@ -3890,7 +3890,7 @@ namespace Energy.Base
                 position += Δ;
                 string value = match.Value;
                 if (ignoreCase)
-                    value = value.ToUpperInvariant();
+                    value = value.ToUpper(CultureInfo.InvariantCulture);
                 string replacement = dictionary[value];
                 result = string.Concat(result.Substring(0, position), replacement, result.Substring(position + length));
                 Δ += replacement.Length - length;
@@ -4467,11 +4467,17 @@ namespace Energy.Base
         public static string UpperFirst(string word)
         {
             if (string.IsNullOrEmpty(word))
+            {
                 return word;
-            if (word.Length == 1)
-                return char.ToUpperInvariant(word[0]).ToString();
-            return string.Concat(char.ToUpperInvariant(word[0])
-                , word.Substring(1).ToLowerInvariant());
+            }
+            else if (1 == word.Length)
+            {
+                return char.ToUpper(word[0], CultureInfo.InvariantCulture).ToString();
+            }
+            else
+            {
+                return string.Concat(char.ToUpper(word[0], CultureInfo.InvariantCulture), word.Substring(1).ToLower(CultureInfo.InvariantCulture));
+            }
         }
 
         #endregion

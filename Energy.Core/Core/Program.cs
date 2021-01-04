@@ -205,6 +205,7 @@ namespace Energy.Core
         /// <returns></returns>
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
+#if !NETCF
             try
             {
                 System.Globalization.CultureInfo cultureInfo;
@@ -217,6 +218,10 @@ namespace Energy.Core
                 Energy.Core.Bug.Write(exception);
                 throw;
             }
+#endif
+#if NETCF
+            // Compact Framework does not allow for changing CultureInfo of UI at runtime.
+#endif
         }
 
         /// <summary>

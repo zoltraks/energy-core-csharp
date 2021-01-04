@@ -328,7 +328,7 @@ namespace Energy.Core
                 { }
             });
             thread.Start();
-            reset.WaitOne(timeSpan);
+            reset.WaitOne(timeSpan.Milliseconds, true);
             thread.Abort();
             return count;
         }

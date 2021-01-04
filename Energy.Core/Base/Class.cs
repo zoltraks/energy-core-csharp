@@ -1937,8 +1937,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get filename of assembly.
-        /// This is just a simple alias for Location field of assembly object.
+        /// Get assembly file.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -1948,12 +1947,18 @@ namespace Energy.Base
             {
                 return null;
             }
-            string fileName = assembly.Location;
-            return fileName;
+            string file = "";
+#if !NETCF
+            file = assembly.Location;
+#endif
+#if NETCF
+            file = assembly.GetName().CodeBase;
+#endif
+            return file;
         }
 
         /// <summary>
-        /// Get directory name of assembly.
+        /// Get assembly directory.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -1963,9 +1968,13 @@ namespace Energy.Base
             {
                 return null;
             }
-            string fileName = assembly.Location;
-            string directoryName = System.IO.Path.GetDirectoryName(fileName);
-            return directoryName;
+            string file = GetAssemblyFile(assembly);
+            if (null == file)
+            {
+                return null;
+            }
+            string directory = System.IO.Path.GetDirectoryName(file);
+            return directory;
         }
 
         #endregion

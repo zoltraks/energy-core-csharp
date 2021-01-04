@@ -616,7 +616,7 @@ namespace Energy.Core
 
                 Clear();
 
-                if (ConnectDone.WaitOne(0))
+                if (ConnectDone.WaitOne(0, true))
                 {
                     if (!ConnectBegin())
                     {
@@ -654,7 +654,7 @@ namespace Energy.Core
                     {
                         Energy.Core.Worker.Fire(() =>
                         {
-                            if (!this.ConnectDone.WaitOne(timeout))
+                            if (!this.ConnectDone.WaitOne(timeout, true))
                             {
                                 //this.Active = false;
                                 this.Close();
@@ -731,31 +731,46 @@ namespace Energy.Core
                         connection.Receive();
                     }
                 }
-                catch (SocketException exceptionSocket)
+                catch (SocketException socketException)
                 {
-                    switch (exceptionSocket.SocketErrorCode)
+                    //switch (socketException.SocketErrorCode)
+                    //{
+                    //    default:
+                    //        connection.Active = false;
+                    //        break;
+
+                    //    case SocketError.ConnectionRefused:
+                    //        connection.Active = false;
+                    //        break;
+
+                    //    case SocketError.TimedOut:
+                    //        connection.Active = false;
+                    //        break;
+                    //}
+
+                    switch (socketException.ErrorCode)
                     {
                         default:
                             connection.Active = false;
                             break;
 
-                        case SocketError.ConnectionRefused:
+                        case 10061: // ConnectionRefused
                             connection.Active = false;
                             break;
 
-                        case SocketError.TimedOut:
+                        case 10060: // TimedOut
                             connection.Active = false;
                             break;
                     }
 
                     if (this.OnException != null)
                     {
-                        this.OnException(this, (Exception)exceptionSocket);
+                        this.OnException(this, (Exception)socketException);
                     }
                 }
                 catch (Exception exception)
                 {
-                    Energy.Core.Bug.Write(exception);
+                    Energy.Core.Bug.Write("Energy.Core.Network.SocketClient.ConnectCallback", exception);
 
                     if (this.OnException != null)
                     {
@@ -788,7 +803,7 @@ namespace Energy.Core
                     Energy.Core.Bug.Write("X " + SendBuffer.Count);
                 }
 
-                if (SendDone.WaitOne(0))
+                if (SendDone.WaitOne(0, true))
                 {
                     if (!SendBegin())
                     {
@@ -898,7 +913,7 @@ namespace Energy.Core
 
                     if (more)
                     {
-                        if (SendDone.WaitOne(0))
+                        if (SendDone.WaitOne(0, true))
                         {
                             SendBegin();
                         }
@@ -936,7 +951,7 @@ namespace Energy.Core
 
             public bool Receive()
             {
-                if (this.ReceiveDone.WaitOne(0))
+                if (this.ReceiveDone.WaitOne(0, true))
                 {
                     return ReceiveBegin();
                 }
@@ -1607,16 +1622,30 @@ namespace Energy.Core
 
                 if (exception is SocketException)
                 {
-                    switch (((SocketException)exception).SocketErrorCode)
+                    //switch (((SocketException)exception).SocketErrorCode)
+                    //{
+                    //    case SocketError.ConnectionRefused:
+                    //        return true;
+
+                    //    case SocketError.ConnectionReset:
+                    //        Close();
+                    //        return true;
+
+                    //    case SocketError.ConnectionAborted:
+                    //        Close();
+                    //        return true;
+                    //}
+                    SocketException socketException = (SocketException)exception;
+                    switch (socketException.ErrorCode)
                     {
-                        case SocketError.ConnectionRefused:
+                        case 10061: // ConnectionRefused
                             return true;
 
-                        case SocketError.ConnectionReset:
+                        case 10054: // ConnectionReset
                             Close();
                             return true;
 
-                        case SocketError.ConnectionAborted:
+                        case 10053: // ConnectionAborted
                             Close();
                             return true;
                     }

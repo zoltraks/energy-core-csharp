@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Globalization;
 
 namespace Energy.Base
 {
@@ -818,7 +819,7 @@ namespace Energy.Base
                 Index = new Dictionary<string, string>();
                 foreach (string key in base.Keys)
                 {
-                    string map = key.ToUpperInvariant();
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     if (_SelectionOfDuplicates == Energy.Enumeration.MultipleBehaviour.Last)
                     {
                         Index[map] = key;
@@ -866,7 +867,7 @@ namespace Energy.Base
                     }
                     else
                     {
-                        string map = key.ToUpperInvariant();
+                        string map = key.ToUpper(CultureInfo.InvariantCulture);
                         if (Index != null && Index.Count == 0 && base.Count > 0)
                         {
                             Index = null;
@@ -911,7 +912,7 @@ namespace Energy.Base
                         base[key] = value;
                         return this;
                     }
-                    string map = key.ToUpperInvariant();
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     if (Index != null && Index.ContainsKey(map))
                     {
                         string link = Index[map];
@@ -1125,7 +1126,7 @@ namespace Energy.Base
                     {
                         return false;
                     }
-                    string map = key.ToUpperInvariant();
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     return Index.ContainsKey(map);
                 }
             }
