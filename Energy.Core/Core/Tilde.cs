@@ -1673,6 +1673,7 @@ namespace Energy.Core
         {
             if (_ConsolePresent == null)
             {
+#if !NETCF
                 _ConsolePresent = true;
                 try
                 {
@@ -1682,6 +1683,11 @@ namespace Energy.Core
                 {
                     _ConsolePresent = false;
                 }
+#endif
+#if NETCF
+                // TODO Check in CF environment if it works
+                _ConsolePresent = Console.Out != null;
+#endif
             }
             return _ConsolePresent.Value;
         }

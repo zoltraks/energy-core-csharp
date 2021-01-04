@@ -224,7 +224,10 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetHostName()
         {
-            string name = Environment.MachineName;
+            string name = "";
+#if !NETCF
+            name = Environment.MachineName;
+#endif
             if (!string.IsNullOrEmpty(name))
             {
                 return name;
@@ -235,13 +238,15 @@ namespace Energy.Core
             }
             catch (SocketException exceptionSocket)
             {
-                Energy.Core.Bug.Catch(exceptionSocket);
+                Energy.Core.Bug.Catch("Energy.Core.Network.GetHostName", exceptionSocket);
             }
             if (!string.IsNullOrEmpty(name))
             {
                 return name;
             }
+#if !NETCF
             name = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+#endif
             return name;
         }
 
@@ -310,6 +315,7 @@ namespace Energy.Core
         public static string[] GetSocketConfigurationStringArray(System.Net.Sockets.Socket socket)
         {
             List<string> list = new List<string>();
+#if !NETCF
             list.Add(string.Format("ReceiveBufferSize: {0}", socket.ReceiveBufferSize));
             list.Add(string.Format("ReceiveTimeout: {0}", socket.ReceiveTimeout));
             list.Add(string.Format("SendBufferSize: {0}", socket.SendBufferSize));
@@ -319,6 +325,7 @@ namespace Energy.Core
             list.Add(string.Format("NoDelay: {0}", socket.NoDelay));
             list.Add(string.Format("LingerState: {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
             list.Add(string.Format("IsBound: {0}", socket.IsBound));
+#endif
             return list.ToArray();
         }
 
@@ -334,7 +341,9 @@ namespace Energy.Core
             list.Add(string.Format("ReceiveTimeout: {0}", client.ReceiveTimeout));
             list.Add(string.Format("SendBufferSize: {0}", client.SendBufferSize));
             list.Add(string.Format("SendTimeout: {0}", client.SendTimeout));
+#if !NETCF
             list.Add(string.Format("ExclusiveAddressUse: {0}", client.ExclusiveAddressUse));
+#endif
             list.Add(string.Format("NoDelay: {0}", client.NoDelay));
             list.Add(string.Format("LingerState: {0}, {1}", client.LingerState.Enabled, client.LingerState.LingerTime));
             //list.Add(string.Format("Available: {0}", socket.Available));
@@ -361,13 +370,16 @@ namespace Energy.Core
         {
             if (exclusive != null)
             {
+#if !NETCF
                 // Don't allow another socket to bind to this port.
                 // Should be true unless special cases.
                 socket.ExclusiveAddressUse = (bool)exclusive;
+#endif
             }
 
             if (linger != null)
             {
+#if !NETCF
                 // The socket will linger for specified amount of seconds after Socket.Close is called.
                 // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections
                 // sitting in the TIME_WAIT state, tying up all the available resources on a server.
@@ -383,26 +395,38 @@ namespace Energy.Core
                 {
                     socket.LingerState = new System.Net.Sockets.LingerOption(true, (int)linger);
                 }
+#endif
             }
 
+#if !NETCF
             // Disable the Nagle Algorithm for this socket.
             // Sets NO_DELAY option for this socket.
             socket.NoDelay = true;
+#endif
 
+#if !NETCF
             // Set the receive buffer size
             socket.ReceiveBufferSize = buffer;
+#endif
 
+#if !NETCF
             // Set the send buffer size
             socket.SendBufferSize = buffer;
+#endif
 
+#if !NETCF
             // Set the timeout for synchronous receive methods
             socket.ReceiveTimeout = timeout;
+#endif
 
+#if !NETCF
             // Set the timeout for synchronous send methods
             socket.SendTimeout = timeout;
+#endif
 
             if (ttl != null)
             {
+#if !NETCF
                 // Set the Time To Live (TTL) to specified router hops
                 // or 42 by default.
                 if (ttl == 0)
@@ -413,9 +437,10 @@ namespace Energy.Core
                 {
                     socket.Ttl = (short)ttl;
                 }
+#endif
             }
 
-            Energy.Core.Bug.Write(string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
+            Energy.Core.Bug.Write("Energy.Core.Network.ConfigureSocket", string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }
@@ -434,7 +459,9 @@ namespace Energy.Core
         {
             if (exclusive != null)
             {
+#if !NETCF
                 socket.ExclusiveAddressUse = (bool)exclusive;
+#endif
             }
 
             if (linger != null)
