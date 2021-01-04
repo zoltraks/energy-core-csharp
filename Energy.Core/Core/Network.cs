@@ -14,15 +14,38 @@ namespace Energy.Core
 {
     public class Network
     {
+        #region Constant
+
+        public const string IP4_PATTERN = @"";
+
+        public const string IP6_PATTERN = @"";
+
+        #endregion
+
         #region Utility
+
+        #region IsValidAddress
+
+        public static bool IsValidAddress(string address)
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region GetHostAddress
 
         public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
             if (host == null)
+            {
                 return null;
+            }
 
             if (host == "")
+            {
                 return "";
+            }
 
             if (host == "localhost" || host == ".")
             {
@@ -72,6 +95,8 @@ namespace Energy.Core
                 addressFamily = GetAddressFamily(host);
             return GetHostAddress(host, addressFamily);
         }
+
+        #endregion
 
         /// <summary>
         /// Return System.Net.Sockets.AddressFamily appropriate to host address.
