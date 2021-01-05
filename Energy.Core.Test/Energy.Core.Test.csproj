@@ -87,6 +87,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\Expression.cs" />
     <Compile Include="Base\Command.cs" />
     <Compile Include="Base\ByteArrayBuilder.cs" />
     <Compile Include="Base\Bit.cs" />
