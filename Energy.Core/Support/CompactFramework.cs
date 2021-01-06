@@ -1,7 +1,11 @@
-﻿#if CFNET
+﻿#if !NETCF && (WindowsCE || PocketPC || WINDOWS_PHONE || COMPACT_FRAMEWORK)
+#define NETCF
+#endif
+
+#if CFNET
     //
 #elif WindowsCE || PocketPC || WINDOWS_PHONE
-    //
+//
 #define CFNET
 #elif COMPACT_FRAMEWORK
     //
