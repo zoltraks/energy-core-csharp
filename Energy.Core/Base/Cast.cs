@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -39,7 +41,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static object As(System.Type type, object value)
         {
-            if (value == null)
+            if (null == value)
             {
                 return null;
             }
@@ -47,53 +49,83 @@ namespace Energy.Base
             Type r = type;
             Type t = value.GetType();
 
-            if (t == r)
+            if (r == t)
             {
                 return value;
             }
-
-            if (r == typeof(object))
+            else if (r == typeof(object))
             {
                 return (object)value;
             }
-
-            if (r == typeof(string))
+            else if (r == typeof(string))
             {
                 return ObjectToString(value);
             }
-            if (r == typeof(byte))
+            else if (r == typeof(byte))
+            {
                 return ObjectToByte(value);
-            if (r == typeof(sbyte))
+            }
+            else if (r == typeof(sbyte))
+            {
                 return ObjectToSignedByte(value);
-            if (r == typeof(char))
+            }
+            else if (r == typeof(char))
+            {
                 return ObjectToChar(value);
-            if (r == typeof(float))
+            }
+            else if (r == typeof(float))
+            {
                 return ObjectToFloat(value);
-            if (r == typeof(double))
+            }
+            else if (r == typeof(double))
+            {
                 return ObjectToDouble(value);
-            if (r == typeof(decimal))
+            }
+            else if (r == typeof(decimal))
+            {
                 return ObjectToDecimal(value);
-            if (r == typeof(Int16))
+            }
+            else if (r == typeof(Int16))
+            {
                 return ObjectToWord(value);
-            if (r == typeof(UInt16))
+            }
+            else if (r == typeof(UInt16))
+            {
                 return ObjectToUnsignedWord(value);
-            if (r == typeof(Int32))
+            }
+            else if (r == typeof(Int32))
+            {
                 return ObjectToInteger(value);
-            if (r == typeof(UInt32))
+            }
+            else if (r == typeof(UInt32))
+            {
                 return ObjectToUnsignedInteger(value);
-            if (r == typeof(Int64))
+            }
+            else if (r == typeof(Int64))
+            {
                 return ObjectToLong(value);
-            if (r == typeof(UInt64))
+            }
+            else if (r == typeof(UInt64))
+            {
                 return ObjectToUnsignedLong(value);
-            if (r == typeof(bool))
+            }
+            else if (r == typeof(bool))
+            {
                 return ObjectToBool(value);
-            if (r == typeof(Stream))
+            }
+            else if (r == typeof(Stream))
+            {
                 return ObjectToStream(value);
+            }
 
             if (r.IsEnum)
+            {
                 return StringToEnum(ObjectToString(value), r);
-
-            return Energy.Base.Class.GetDefault(type);
+            }
+            else
+            {
+                return Energy.Base.Class.GetDefault(type);
+            }
         }
 
         #endregion
@@ -3069,12 +3101,19 @@ namespace Energy.Base
         public static byte ObjectToByte(object value)
         {
             if (value == null)
+            {
                 return 0;
+            }
 
             if (value is byte)
+            {
                 return (byte)(byte)value;
+            }
+            
             if (value is char)
+            {
                 return (byte)(char)value;
+            }
 
             try
             {
@@ -4091,6 +4130,83 @@ namespace Energy.Base
         {
             byte[] data = encoding.GetBytes(input);
             return Energy.Base.Cast.ByteArrayToHex(data);
+        }
+
+        #endregion
+
+        #region TryParse
+
+        public static T TryParse<T>(string value)
+        {
+            T o = default(T);
+            Energy.Base.Cast.TryParse<T>(value, out o);
+            return o;
+        }
+
+        public static bool TryParse<T>(string value, out T result)
+        {
+            result = default(T);
+            bool success = false;
+            if (value != null)
+            {
+                object o = result;
+                Type t = typeof(T);
+                success = Energy.Base.Cast.TryParse(t, value, ref o);
+                if (success)
+                {
+                    result = (T)o;
+                }
+            }
+            return success;
+        }
+
+        private const string PATTERN_BYTE = @"\s*\+?(?:25[0-5]|2[0-4][0-9]|(?:[01]?[0-9])?[0-9])\s*";
+
+        private const string PATTERN_BYTE_WHITE = @"\s*" + PATTERN_BYTE + @"\s*";
+
+        private const string PATTERN_BYTE_ALL = "^" + PATTERN_BYTE_WHITE + "$";
+
+        private const string PATTERN_SBYTE = @"\s*(\-(?:12[0-8]|1[0-1][0-9]|(?:0?[0-9])?[0-9])|\+?(?:12[0-7]|1[0-1][0-9]|(?:0?[0-9])?[0-9]))\s*";
+
+        private const string PATTERN_SBYTE_WHITE = @"\s*" + PATTERN_SBYTE + @"\s*";
+
+        private const string PATTERN_SBYTE_ALL = "^" + PATTERN_SBYTE_WHITE + "$";
+
+        public static bool TryParse(Type type, string value, ref object result)
+        {
+            try
+            {
+                if (null == value)
+                {
+                    return false;
+                }
+                else if (type == typeof(string) || type == typeof(object))
+                {
+                    result = value;
+                    return true;
+                }
+                else if (type == typeof(byte))
+                {
+                    if (Regex.IsMatch(value, PATTERN_BYTE_ALL))
+                    {
+                        result = byte.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(sbyte))
+                {
+                    if (Regex.IsMatch(value, PATTERN_SBYTE_ALL))
+                    {
+                        result = sbyte.Parse(value);
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                Debug.Write(null);
+            }
+            return false;
         }
 
         #endregion

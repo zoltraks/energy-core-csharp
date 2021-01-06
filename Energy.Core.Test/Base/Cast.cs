@@ -781,5 +781,149 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void TryParse()
+        {
+            Assert.IsNull(Energy.Base.Cast.TryParse<object>(null));
+            Assert.AreEqual("", Energy.Base.Cast.TryParse<string>(""));
+            Assert.AreEqual("", Energy.Base.Cast.TryParse<object>(""));
+
+            bool b;
+            string s;
+
+            #region byte
+
+            byte o_byte;
+
+            Assert.IsFalse(Energy.Base.Cast.TryParse<byte>("-1", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Cast.TryParse<byte>("-1"));
+
+            b = byte.TryParse("1", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Cast.TryParse<byte>("1", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Cast.TryParse<byte>("1"));
+
+            b = byte.TryParse(" 1 ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Cast.TryParse<byte>(" 1 ", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Cast.TryParse<byte>(" 1 "));
+
+            b = byte.TryParse(" \t\r\n 1 \t\r\n ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Cast.TryParse<byte>(" \t\r\n 1 \t\r\n ", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Cast.TryParse<byte>(" \t\r\n 1 \t\r\n "));
+
+            b = byte.TryParse("256", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Cast.TryParse<byte>("256", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Cast.TryParse<byte>("256"));
+
+            b = byte.TryParse("1.0", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Cast.TryParse<byte>("1.0", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Cast.TryParse<byte>("1.0"));
+
+            b = byte.TryParse("255", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(255, o_byte);
+            Assert.IsTrue(Energy.Base.Cast.TryParse<byte>("255", out o_byte));
+            Assert.AreEqual(255, o_byte);
+            Assert.AreEqual(255, Energy.Base.Cast.TryParse<byte>("255"));
+
+            b = byte.TryParse(" +255 ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(255, o_byte);
+            Assert.IsTrue(Energy.Base.Cast.TryParse<byte>(" +255 ", out o_byte));
+            Assert.AreEqual(255, o_byte);
+            Assert.AreEqual(255, Energy.Base.Cast.TryParse<byte>(" +255 "));
+
+            b = byte.TryParse(" + 2 ", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Cast.TryParse<byte>(" + 2", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Cast.TryParse<byte>(" + 2"));
+
+            #endregion
+
+            #region sbyte
+
+            sbyte o_sbyte;
+
+            foreach (var v_sbyte in new sbyte[] { 0, 1, -1, sbyte.MinValue , sbyte.MaxValue, 2, -2})
+            {
+                s = v_sbyte.ToString();
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.AreEqual(v_sbyte, Energy.Base.Cast.TryParse<sbyte>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.AreEqual(v_sbyte, Energy.Base.Cast.TryParse<sbyte>(s));
+            }
+
+            foreach (var s_sbyte in new string[] { "128", "-129", "+ 127", "- 128"})
+            {
+                s = s_sbyte;
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(0, Energy.Base.Cast.TryParse<sbyte>(s));
+            }
+
+            #endregion
+
+            #region int
+
+            int o_int;
+
+            foreach (var v_int in new int[] { 0, 1, -1, int.MinValue, int.MaxValue, 2, -2 })
+            {
+                s = v_int.ToString();
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_int, o_int);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<int>(s, out o_int));
+                Assert.AreEqual(v_int, o_int);
+                Assert.AreEqual(v_int, Energy.Base.Cast.TryParse<int>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_int, o_int);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<int>(s, out o_int));
+                Assert.AreEqual(v_int, o_int);
+                Assert.AreEqual(v_int, Energy.Base.Cast.TryParse<int>(s));
+            }
+
+            foreach (var s_int in new string[] { "128", "-129", "+ 127", "- 128" })
+            {
+                s = s_int;
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<int>(s, out o_int));
+                Assert.AreEqual(0, Energy.Base.Cast.TryParse<int>(s));
+            }
+
+            #endregion
+        }
     }
 }
