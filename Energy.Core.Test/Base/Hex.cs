@@ -215,5 +215,35 @@ namespace Energy.Core.Test.Base
             hex = "  100  ";
             Assert.AreEqual(0, Energy.Base.Hex.HexToByte(hex));
         }
+
+        [TestMethod]
+        public void HexToShort()
+        {
+            string hex;
+            foreach (string s in new string[] { null, "", "0", "00", "0000", "00000000", "ZZZ", "00000000000000000000000000000000" })
+            {
+                hex = s;
+                Assert.AreEqual(0, Energy.Base.Hex.HexToShort(hex));
+            }
+            hex = "   ffFF  ";
+            Assert.AreEqual(-1, Energy.Base.Hex.HexToShort(hex));
+            hex = "  10000  ";
+            Assert.AreEqual(0, Energy.Base.Hex.HexToShort(hex));
+        }
+
+        [TestMethod]
+        public void HexToLong()
+        {
+            string hex;
+            foreach (string s in new string[] { null, "", "0", "00", "0000", "00000000", "ZZZ", "00000000000000000000000000000000" })
+            {
+                hex = s;
+                Assert.AreEqual(0, Energy.Base.Hex.HexToLong(hex));
+            }
+            hex = "   ffFFffFFffFFffFF  ";
+            Assert.AreEqual(-1, Energy.Base.Hex.HexToLong(hex));
+            hex = "  10000000000000000  ";
+            Assert.AreEqual(0, Energy.Base.Hex.HexToLong(hex));
+        }
     }
 }

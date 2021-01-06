@@ -343,6 +343,70 @@ namespace Energy.Base
 
         #endregion
 
+        #region HexToShort
+
+        private const string PATTERN_HEX_UP_TO_4 = @"[0-9a-fA-F]{1,4}";
+
+        private const string PATTERN_HEX_UP_TO_4_WHITE = @"\s*" + PATTERN_HEX_UP_TO_4 + @"\s*";
+
+        private const string PATTERN_HEX_UP_TO_4_WHITE_FULL = @"^" + PATTERN_HEX_UP_TO_4_WHITE + "$";
+
+        /// <summary>
+        /// Convert hexadecimal string to short integer value (System.Int16).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static short HexToShort(string hex)
+        {
+            if (string.IsNullOrEmpty(hex))
+            {
+                return 0;
+            }
+            else if (!Regex.IsMatch(hex, PATTERN_HEX_UP_TO_4_WHITE_FULL))
+            {
+                return 0;
+            }
+            else
+            {
+                short value = short.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+                return value;
+            }
+        }
+
+        #endregion
+
+        #region HexToLong
+
+        private const string PATTERN_HEX_UP_TO_16 = @"[0-9a-fA-F]{1,16}";
+
+        private const string PATTERN_HEX_UP_TO_16_WHITE = @"\s*" + PATTERN_HEX_UP_TO_16 + @"\s*";
+
+        private const string PATTERN_HEX_UP_TO_16_WHITE_FULL = @"^" + PATTERN_HEX_UP_TO_16_WHITE + "$";
+
+        /// <summary>
+        /// Convert hexadecimal string to long integer value (System.Int64).
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static long HexToLong(string hex)
+        {
+            if (string.IsNullOrEmpty(hex))
+            {
+                return 0;
+            }
+            else if (!Regex.IsMatch(hex, PATTERN_HEX_UP_TO_16_WHITE_FULL))
+            {
+                return 0;
+            }
+            else
+            {
+                long value = long.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+                return value;
+            }
+        }
+
+        #endregion
+
         #region BinToHex
 
         /// <summary>
