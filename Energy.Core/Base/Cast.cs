@@ -4138,7 +4138,7 @@ namespace Energy.Base
 
         public static T TryParse<T>(string value)
         {
-            T o = default(T);
+            T o;
             Energy.Base.Cast.TryParse<T>(value, out o);
             return o;
         }
@@ -4160,17 +4160,41 @@ namespace Energy.Base
             return success;
         }
 
-        private const string PATTERN_BYTE = @"\s*\+?(?:25[0-5]|2[0-4][0-9]|(?:[01]?[0-9])?[0-9])\s*";
+        private const string PATTERN_BYTE = @"\+?(?:25[0-5]|2[0-4][0-9]|[0-9]{1,2})";
 
         private const string PATTERN_BYTE_WHITE = @"\s*" + PATTERN_BYTE + @"\s*";
 
         private const string PATTERN_BYTE_ALL = "^" + PATTERN_BYTE_WHITE + "$";
 
-        private const string PATTERN_SBYTE = @"\s*(\-(?:12[0-8]|1[0-1][0-9]|(?:0?[0-9])?[0-9])|\+?(?:12[0-7]|1[0-1][0-9]|(?:0?[0-9])?[0-9]))\s*";
+        private const string PATTERN_SBYTE = @"\-(?:12[0-8]|1[01][0-9]|[0-9]{1,2})|\+?(?:12[0-7]|1[01][0-9]|[0-9]{1,2})";
 
-        private const string PATTERN_SBYTE_WHITE = @"\s*" + PATTERN_SBYTE + @"\s*";
+        private const string PATTERN_SBYTE_WHITE = @"\s*(?:" + PATTERN_SBYTE + @")\s*";
 
         private const string PATTERN_SBYTE_ALL = "^" + PATTERN_SBYTE_WHITE + "$";
+
+        private const string PATTERN_USHORT = @"\+?(?:[0-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[012][0-9]|6553[0-5]|[0-9]{1,4})";
+
+        private const string PATTERN_USHORT_WHITE = @"\s*" + PATTERN_USHORT + @"\s*";
+
+        private const string PATTERN_USHORT_ALL = "^" + PATTERN_USHORT_WHITE + "$";
+
+        private const string PATTERN_SHORT = @"\-(?:[012][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[012][0-9]|3276[0-8]|[0-9]{1,4})|\+?(?:[0-2][0-9]{4}|3[0-1][0-9]{3}|32[0-6][0-9]{2}|327[0-2][0-9]|3276[0-7]|[0-9]{1,4})";
+
+        private const string PATTERN_SHORT_WHITE = @"\s*(?:" + PATTERN_SHORT + @")\s*";
+
+        private const string PATTERN_SHORT_ALL = "^" + PATTERN_SHORT_WHITE + "$";
+
+        private const string PATTERN_UINT = @"\+?(?:[0-3][0-9]{9}|4[01][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[01][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]|[0-9]{1,9})";
+
+        private const string PATTERN_UINT_WHITE = @"\s*" + PATTERN_UINT + @"\s*";
+
+        private const string PATTERN_UINT_ALL = "^" + PATTERN_UINT_WHITE + "$";
+
+        private const string PATTERN_INT = @"\-(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-8]|[0-9]{1,9})|\+?(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-7]|[0-9]{1,9})";
+
+        private const string PATTERN_INT_WHITE = @"\s*(?:" + PATTERN_INT + @")\s*";
+
+        private const string PATTERN_INT_ALL = "^" + PATTERN_INT_WHITE + "$";
 
         public static bool TryParse(Type type, string value, ref object result)
         {
@@ -4198,6 +4222,38 @@ namespace Energy.Base
                     if (Regex.IsMatch(value, PATTERN_SBYTE_ALL))
                     {
                         result = sbyte.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(ushort))
+                {
+                    if (Regex.IsMatch(value, PATTERN_USHORT_ALL))
+                    {
+                        result = ushort.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(short))
+                {
+                    if (Regex.IsMatch(value, PATTERN_SHORT_ALL))
+                    {
+                        result = short.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(uint))
+                {
+                    if (Regex.IsMatch(value, PATTERN_UINT_ALL))
+                    {
+                        result = uint.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(int))
+                {
+                    if (Regex.IsMatch(value, PATTERN_INT_ALL))
+                    {
+                        result = int.Parse(value);
                         return true;
                     }
                 }
