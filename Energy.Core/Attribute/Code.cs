@@ -313,7 +313,7 @@ namespace Energy.Attribute
         }
 
         /// <summary>
-        /// Code is a wrapper function whose purpose is to call another funtion
+        /// Code is a wrapper function which purpose is to call another funtion
         /// </summary>
         public class WrapperAttribute : CodeAttribute
         {

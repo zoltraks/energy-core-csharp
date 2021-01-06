@@ -630,7 +630,9 @@ namespace Energy.Base
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
+            {
                 options |= RegexOptions.IgnoreCase;
+            }
             return CheckRegex(input, pattern, options);
         }
 
@@ -639,7 +641,9 @@ namespace Energy.Base
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
+            {
                 options |= RegexOptions.IgnoreCase;
+            }
             string pattern = Energy.Base.Text.WildToRegex(wild);
             return CheckRegex(input, pattern, options);
         }
