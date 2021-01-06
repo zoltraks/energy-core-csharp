@@ -281,6 +281,12 @@ namespace Energy.Base
 
         #region HexToInteger
 
+        private const string PATTERN_HEX_UP_TO_8 = @"[0-9a-fA-F]{1,8}";
+
+        private const string PATTERN_HEX_UP_TO_8_WHITE = @"\s*" + PATTERN_HEX_UP_TO_8 + @"\s*";
+
+        private const string PATTERN_HEX_UP_TO_8_WHITE_FULL = @"^" + PATTERN_HEX_UP_TO_8_WHITE + "$";
+
         /// <summary>
         /// Convert hexadecimal string to integer value (System.Int32).
         /// </summary>
@@ -288,14 +294,17 @@ namespace Energy.Base
         /// <returns></returns>
         public static int HexToInteger(string hex)
         {
-            int value;
-            if (Int32.TryParse(hex, System.Globalization.NumberStyles.HexNumber
-                , System.Globalization.CultureInfo.InvariantCulture, out value))
+            if (string.IsNullOrEmpty(hex))
             {
-                return value;
+                return 0;
+            }
+            else if (!Regex.IsMatch(hex, PATTERN_HEX_UP_TO_8_WHITE_FULL))
+            {
+                return 0;
             }
             else
             {
+                int value = int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
                 return value;
             }
         }
@@ -304,6 +313,12 @@ namespace Energy.Base
 
         #region HexToByte
 
+        private const string PATTERN_HEX_UP_TO_2 = @"[0-9a-fA-F]{1,2}";
+
+        private const string PATTERN_HEX_UP_TO_2_WHITE = @"\s*" + PATTERN_HEX_UP_TO_2 + @"\s*";
+
+        private const string PATTERN_HEX_UP_TO_2_WHITE_FULL = @"^" + PATTERN_HEX_UP_TO_2_WHITE + "$";
+
         /// <summary>
         /// Convert hexadecimal string to byte value (System.Byte).
         /// </summary>
@@ -311,17 +326,22 @@ namespace Energy.Base
         /// <returns></returns>
         public static byte HexToByte(string hex)
         {
-            byte value;
-            if (byte.TryParse(hex, System.Globalization.NumberStyles.HexNumber
-                , System.Globalization.CultureInfo.InvariantCulture, out value))
+            if (string.IsNullOrEmpty(hex))
             {
+                return 0;
+            }
+            else if (!Regex.IsMatch(hex, PATTERN_HEX_UP_TO_2_WHITE_FULL))
+            {
+                return 0;
+            }
+            else
+            {
+                byte value = byte.Parse(hex, System.Globalization.NumberStyles.HexNumber);
                 return value;
             }
-            return value;
         }
 
         #endregion
-
 
         #region BinToHex
 

@@ -185,5 +185,35 @@ namespace Energy.Core.Test.Base
             Assert.IsFalse(Energy.Base.Hex.IsHex("0a-0b"));
             Assert.IsTrue(Energy.Base.Hex.IsHex("0123456789abcdefABCDEF"));
         }
+
+        [TestMethod]
+        public void HexToInteger()
+        {
+            string hex;
+            foreach (string s in new string[] { null, "", "0", "00", "0000", "00000000", "ZZZ", "00000000000000000000000000000000" })
+            {
+                hex = s;
+                Assert.AreEqual(0, Energy.Base.Hex.HexToInteger(hex));
+            }
+            hex = "   ffFFffFF  ";
+            Assert.AreEqual(-1, Energy.Base.Hex.HexToInteger(hex));
+            hex = "  100000000  ";
+            Assert.AreEqual(0, Energy.Base.Hex.HexToInteger(hex));
+        }
+
+        [TestMethod]
+        public void HexToByte()
+        {
+            string hex;
+            foreach (string s in new string[] { null, "", "0", "00", "0000", "00000000", "ZZZ", "00000000000000000000000000000000" })
+            {
+                hex = s;
+                Assert.AreEqual(0, Energy.Base.Hex.HexToByte(hex));
+            }
+            hex = "   ff  ";
+            Assert.AreEqual(255, Energy.Base.Hex.HexToByte(hex));
+            hex = "  100  ";
+            Assert.AreEqual(0, Energy.Base.Hex.HexToByte(hex));
+        }
     }
 }
