@@ -855,7 +855,7 @@ namespace Energy.Core.Test.Base
 
             sbyte o_sbyte;
 
-            foreach (var v_sbyte in new sbyte[] { 0, 1, -1, sbyte.MinValue , sbyte.MaxValue, 2, -2})
+            foreach (var v_sbyte in new sbyte[] { 0, 1, -1, sbyte.MinValue, sbyte.MaxValue, 2, -2 })
             {
                 s = v_sbyte.ToString();
 
@@ -876,7 +876,7 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(v_sbyte, Energy.Base.Cast.TryParse<sbyte>(s));
             }
 
-            foreach (var s_sbyte in new string[] { "128", "-129", "+ 127", "- 128"})
+            foreach (var s_sbyte in new string[] { "128", "-129", "+ 127", "- 128", "127.0" })
             {
                 s = s_sbyte;
 
@@ -884,6 +884,117 @@ namespace Energy.Core.Test.Base
                 Assert.IsFalse(b);
                 Assert.IsFalse(Energy.Base.Cast.TryParse<sbyte>(s, out o_sbyte));
                 Assert.AreEqual(0, Energy.Base.Cast.TryParse<sbyte>(s));
+            }
+
+            #endregion
+
+            #region ushort
+
+            ushort o_ushort;
+
+            foreach (var v_ushort in new ushort[] { 0, 1, ushort.MinValue, ushort.MaxValue, 2, })
+            {
+                s = v_ushort.ToString();
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.AreEqual(v_ushort, Energy.Base.Cast.TryParse<ushort>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.AreEqual(v_ushort, Energy.Base.Cast.TryParse<ushort>(s));
+            }
+
+            foreach (var s_ushort in new string[] { "65536", "-32768", "65535.0" })
+            {
+                s = s_ushort;
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(0, Energy.Base.Cast.TryParse<ushort>(s));
+            }
+
+            #endregion
+
+            #region short
+
+            short o_short;
+
+            foreach (var v_short in new short[] { 0, 1, -1, short.MinValue, short.MaxValue, 2, -2 })
+            {
+                s = v_short.ToString();
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_short, o_short);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<short>(s, out o_short));
+                Assert.AreEqual(v_short, o_short);
+                Assert.AreEqual(v_short, Energy.Base.Cast.TryParse<short>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_short, o_short);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<short>(s, out o_short));
+                Assert.AreEqual(v_short, o_short);
+                Assert.AreEqual(v_short, Energy.Base.Cast.TryParse<short>(s));
+            }
+
+            foreach (var s_short in new string[] { "32768", "-32769", "+ 32767", "- 32768", "32767.0" })
+            {
+                s = s_short;
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<short>(s, out o_short));
+                Assert.AreEqual(0, Energy.Base.Cast.TryParse<short>(s));
+            }
+
+            #endregion
+
+            #region uint
+
+            uint o_uint;
+
+            foreach (var v_uint in new uint[] { 0, 1, uint.MinValue, uint.MaxValue, 2, })
+            {
+                s = v_uint.ToString();
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.AreEqual(v_uint, Energy.Base.Cast.TryParse<uint>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.AreEqual(v_uint, Energy.Base.Cast.TryParse<uint>(s));
+            }
+
+            foreach (var s_uint in new string[] { "4294967296", "-1", "4294967295.0" })
+            {
+                s = s_uint;
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual((uint)0, Energy.Base.Cast.TryParse<uint>(s));
             }
 
             #endregion
@@ -913,7 +1024,7 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(v_int, Energy.Base.Cast.TryParse<int>(s));
             }
 
-            foreach (var s_int in new string[] { "128", "-129", "+ 127", "- 128" })
+            foreach (var s_int in new string[] { "2147483648", "-2147483649", "+ 2147483647", "- 2147483648", "2147483647.0" })
             {
                 s = s_int;
 
@@ -921,6 +1032,80 @@ namespace Energy.Core.Test.Base
                 Assert.IsFalse(b);
                 Assert.IsFalse(Energy.Base.Cast.TryParse<int>(s, out o_int));
                 Assert.AreEqual(0, Energy.Base.Cast.TryParse<int>(s));
+            }
+
+            #endregion
+
+            #region ulong
+
+            ulong o_ulong;
+
+            foreach (var v_ulong in new ulong[] { 0, 1, ulong.MinValue, ulong.MaxValue, 2, })
+            {
+                s = v_ulong.ToString();
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.AreEqual(v_ulong, Energy.Base.Cast.TryParse<ulong>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.AreEqual(v_ulong, Energy.Base.Cast.TryParse<ulong>(s));
+            }
+
+            foreach (var s_ulong in new string[] { "18446744073709551616", "-1", "18446744073709551615.0" })
+            {
+                s = s_ulong;
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual((ulong)0, Energy.Base.Cast.TryParse<ulong>(s));
+            }
+
+            #endregion
+
+            #region long
+
+            long o_long;
+
+            foreach (var v_long in new long[] { 0, 1, -1, long.MinValue, long.MaxValue, 2, -2 })
+            {
+                s = v_long.ToString();
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_long, o_long);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<long>(s, out o_long));
+                Assert.AreEqual(v_long, o_long);
+                Assert.AreEqual(v_long, Energy.Base.Cast.TryParse<long>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_long, o_long);
+                Assert.IsTrue(Energy.Base.Cast.TryParse<long>(s, out o_long));
+                Assert.AreEqual(v_long, o_long);
+                Assert.AreEqual(v_long, Energy.Base.Cast.TryParse<long>(s));
+            }
+
+            foreach (var s_long in new string[] { "9223372036854775808", "-9223372036854775809", "+ 9223372036854775807", "- 9223372036854775808", "9223372036854775807.0" })
+            {
+                s = s_long;
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Cast.TryParse<long>(s, out o_long));
+                Assert.AreEqual(0, Energy.Base.Cast.TryParse<long>(s));
             }
 
             #endregion
