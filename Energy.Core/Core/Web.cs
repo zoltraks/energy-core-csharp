@@ -96,6 +96,7 @@ namespace Energy.Core
 
         private static void SetIgnoreCertificateValidation(bool value)
         {
+#if !NETCF
             lock (_IgnoreCertificateValidationLock)
             {
                 ServicePointManager.ServerCertificateValidationCallback -= ServerIgnoreCertificateValidationCallback;
@@ -105,6 +106,10 @@ namespace Energy.Core
                     ServicePointManager.ServerCertificateValidationCallback += ServerIgnoreCertificateValidationCallback;
                 }
             }
+#endif
+#if NETCF
+            // TODO How to achieve that on Compact Framework?
+#endif
         }
 
         #endregion

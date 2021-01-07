@@ -37,12 +37,18 @@ namespace Energy.Query
 
         #region Accessor
 
+        // TODO Check if this property is needed anywhere. Maybe it should be removed?
+
+#if !NETCF
+
         public Format this[string dialect]
         {
             get
             {
                 if (string.IsNullOrEmpty(dialect))
+                {
                     return null;
+                }
                 Energy.Query.Format findFormat = null;
                 if (_DialectFormatDictionary == null)
                 {
@@ -73,6 +79,8 @@ namespace Energy.Query
 
             }
         }
+
+#endif
 
         #endregion
 

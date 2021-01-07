@@ -124,7 +124,6 @@
     <Compile Include="Core\Cipher.cs" />
     <Compile Include="Core\Configuration.cs" />
     <Compile Include="Core\Editor.cs" />
-    <Compile Include="Core\Information.cs" />
     <Compile Include="Core\Locale.cs" />
     <Compile Include="Core\Log.cs" />
     <Compile Include="Core\Manager.cs" />

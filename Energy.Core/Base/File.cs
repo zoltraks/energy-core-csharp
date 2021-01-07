@@ -274,7 +274,12 @@ namespace Energy.Base
                     {
                         now = DateTime.Now;
                     }
+#if !NETCF
                     System.IO.File.SetLastWriteTime(fileName, now);
+#endif
+#if NETCF
+                    using (var stream = System.IO.File.OpenWrite(fileName)) { };
+#endif
                     _Stamp = System.IO.File.GetLastWriteTime(fileName);
                     return true;
                 }
@@ -724,10 +729,19 @@ namespace Energy.Base
         /// <returns>bool</returns>
         public static bool IsDirectory(string file)
         {
+            if (string.IsNullOrEmpty(file))
+            {
+                return false;
+            }
             try
             {
+#if !NETCF
                 System.IO.FileAttributes attributes = System.IO.File.GetAttributes(file);
                 return (attributes & System.IO.FileAttributes.Directory) == System.IO.FileAttributes.Directory;
+#endif
+#if NETCF
+                return file.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString());
+#endif
             }
             catch
             {
@@ -1115,8 +1129,13 @@ namespace Energy.Base
         /// <returns></returns>
         public static string GetBaseDirectory()
         {
+#if !NETCF
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             return baseDirectory;
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         #endregion

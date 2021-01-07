@@ -636,7 +636,7 @@ namespace Energy.Core
                                     _Buffer.InsertRange(0, entries);
                                 }
                             }
-                            if (_ActivateResetEvent.WaitOne(_SleepDelay, true))
+                            if (_ActivateResetEvent.WaitOne((int)_SleepDelay.TotalMilliseconds, true))
                                 continue;
                             else
                                 continue;

@@ -55,31 +55,27 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetExecutionFile()
         {
-            System.Reflection.Assembly assembly;
+            System.Reflection.Assembly assembly = null;
 
             try
             {
-                assembly = System.Reflection.Assembly.GetCallingAssembly();
-                if (null != assembly)
+                if (null == assembly)
                 {
-                    return assembly.Location;
+                    assembly = System.Reflection.Assembly.GetCallingAssembly();
                 }
             }
-            catch
-            { }
+            catch {}
 
             try
             {
-                assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                if (null != assembly)
+                if (null == assembly)
                 {
-                    return assembly.Location;
+                    assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 }
             }
-            catch
-            { }
+            catch {}
 
-            return null;
+            return Energy.Base.Class.GetAssemblyFile(assembly);
         }
 
         #endregion
@@ -98,11 +94,11 @@ namespace Energy.Core
             {
                 return null;
             }
-            else
-            {
-                string directory = System.IO.Path.GetDirectoryName(assembly.Location);
-                return Energy.Base.Path.IncludeTrailingSeparator(directory);
-            }
+            //string directory = System.IO.Path.GetDirectoryName(assembly.Location);
+            string directory;
+            directory = Energy.Base.Class.GetAssemblyFile(assembly);
+            directory = Energy.Base.Path.IncludeTrailingSeparator(directory);
+            return directory;
         }
 
         /// <summary>
@@ -152,7 +148,7 @@ namespace Energy.Core
         {
             try
             {
-                string location = assembly.Location;
+                string location = Energy.Base.Class.GetAssemblyFile(assembly);
                 return Energy.Base.File.GetCommandName(location);
             }
             catch (NotSupportedException)
@@ -205,12 +201,16 @@ namespace Energy.Core
         /// <returns></returns>
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
-#if !NETCF
             try
             {
                 System.Globalization.CultureInfo cultureInfo;
                 cultureInfo = new System.Globalization.CultureInfo(culture);
+#if !NETCF
                 System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+#endif
+#if NETCF
+                // Compact Framework does not allow for changing CultureInfo of UI at runtime.
+#endif
                 return cultureInfo;
             }
             catch (Exception exception)
@@ -218,10 +218,6 @@ namespace Energy.Core
                 Energy.Core.Bug.Write(exception);
                 throw;
             }
-#endif
-#if NETCF
-            // Compact Framework does not allow for changing CultureInfo of UI at runtime.
-#endif
         }
 
         /// <summary>
