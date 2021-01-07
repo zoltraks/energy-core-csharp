@@ -1056,6 +1056,7 @@ namespace Energy.Source
         /// <returns></returns>
         public DataTable Load(string query)
         {
+            string _;
             return Load(query, out _);
         }
 
@@ -1490,6 +1491,7 @@ namespace Energy.Source
         /// <returns></returns>
         public object Scalar(string query)
         {
+            string _;
             return Scalar(query, out _);
         }
 
