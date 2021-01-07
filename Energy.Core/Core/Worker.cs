@@ -588,7 +588,7 @@ namespace Energy.Core
                 }
             })
             {
-                IsBackground = true
+                IsBackground = true,
             };
             guardian.Start();
             bool success = manualResetEvent.WaitOne(time);
@@ -666,7 +666,9 @@ namespace Energy.Core
                 catch (ThreadAbortException)
                 { }
             })
-            { IsBackground = true };
+            {
+                IsBackground = true,
+            };
             thread.Start();
             return thread;
         }

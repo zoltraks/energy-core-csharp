@@ -135,7 +135,6 @@
     <Compile Include="Core\Shell.cs" />
     <Compile Include="Core\Syntax.cs" />
     <Compile Include="Core\Text.cs" />
-    <Compile Include="Core\Tilde.cs" />
     <Compile Include="Core\Version.cs" />
     <Compile Include="Core\Web.cs" />
     <Compile Include="Core\Worker.cs" />

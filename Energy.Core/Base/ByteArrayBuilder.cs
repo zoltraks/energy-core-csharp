@@ -663,7 +663,7 @@ namespace Energy.Base
         public string ReadString()
         {
             byte[] data = ReadArray();
-            return _Encoding.GetString(data);
+            return _Encoding.GetString(data, 0, data.Length);
         }
 
         /// <summary>

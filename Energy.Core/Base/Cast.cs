@@ -3236,10 +3236,10 @@ namespace Energy.Base
 
                 if (value is double)
                     return (char)(double)value;
-                if (value is decimal)
-                    return (char)(decimal)value;
                 if (value is float)
                     return (char)(float)value;
+                if (value is decimal)
+                    return (char)(double)(decimal)value;
             }
             catch (OverflowException)
             {
