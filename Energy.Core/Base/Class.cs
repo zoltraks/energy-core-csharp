@@ -1964,10 +1964,10 @@ namespace Energy.Base
         /// <returns></returns>
         public static string GetAssemblyDirectory(System.Reflection.Assembly assembly)
         {
-            if (null == assembly)
-            {
-                return null;
-            }
+            //if (null == assembly)
+            //{
+            //    return null;
+            //}
             string file = GetAssemblyFile(assembly);
             if (null == file)
             {
