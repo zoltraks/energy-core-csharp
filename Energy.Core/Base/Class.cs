@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 #if !NETCF
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
