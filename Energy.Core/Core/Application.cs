@@ -98,7 +98,7 @@ namespace Energy.Core
         public Application(System.Reflection.Assembly assembly)
         {
             Name = assembly.FullName;
-            Directory = Information.GetAssemblyDirectory(assembly);
+            Directory = Energy.Base.Class.GetAssemblyDirectory(assembly);
         }
 
         #endregion

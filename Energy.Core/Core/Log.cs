@@ -572,7 +572,7 @@ namespace Energy.Core
                             {
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
-                                    IsBackground = true
+                                    IsBackground = true,
                                 };
 #if !NETCF
                                 thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
@@ -636,7 +636,7 @@ namespace Energy.Core
                                     _Buffer.InsertRange(0, entries);
                                 }
                             }
-                            if (_ActivateResetEvent.WaitOne(_SleepDelay, true))
+                            if (_ActivateResetEvent.WaitOne((int)_SleepDelay.TotalMilliseconds, true))
                                 continue;
                             else
                                 continue;
@@ -792,7 +792,7 @@ namespace Energy.Core
                             {
                                 Thread thread = new Thread(() => { WriteThread(); })
                                 {
-                                    IsBackground = true
+                                    IsBackground = true,
                                 };
 #if !NETCF
                                 thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
@@ -953,7 +953,7 @@ namespace Energy.Core
                     {
                         Thread thread = new Thread(() => { WriteUnsafe(log); }) 
                         {
-                            IsBackground = true
+                            IsBackground = true,
                         };
 #if !NETCF
                         thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();

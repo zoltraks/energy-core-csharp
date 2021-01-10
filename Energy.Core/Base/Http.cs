@@ -47,13 +47,20 @@ namespace Energy.Base
             private string GetBody()
             {
                 if (_Body != null)
+                {
                     return _Body;
+                }
                 if (_Data == null)
+                {
                     return null;
+                }
                 System.Text.Encoding encoding = _Encoding;
                 if (encoding == null)
+                {
                     encoding = System.Text.Encoding.UTF8;
-                return encoding.GetString(_Data);
+                }
+                string result = encoding.GetString(_Data, 0, _Data.Length);
+                return result;
             }
 
             private void SetBody(string value)

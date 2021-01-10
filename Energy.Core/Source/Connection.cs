@@ -343,6 +343,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnCreate",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -363,6 +366,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnOpen",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -383,6 +389,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnClose",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -571,11 +580,12 @@ namespace Energy.Source
                     }
                 })
                 {
-                    // Make sure it's marked as a background thread
-                    // so it'll get cleaned up automatically
-                    IsBackground = true, // don't block app
-                    CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
+                    IsBackground = true,
+                    Name = "Energy.Source.Connection.Open",
                 };
+#if !NETCF
+                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+#endif
                 thread.Start();
                 if (!thread.Join(timeout * 1000))
                 {
@@ -944,6 +954,7 @@ namespace Energy.Source
         /// <returns></returns>
         public Energy.Base.Table Fetch(string query)
         {
+            string _;
             return Fetch(query, out _);
         }
 
@@ -1045,6 +1056,7 @@ namespace Energy.Source
         /// <returns></returns>
         public DataTable Load(string query)
         {
+            string _;
             return Load(query, out _);
         }
 
@@ -1479,6 +1491,7 @@ namespace Energy.Source
         /// <returns></returns>
         public object Scalar(string query)
         {
+            string _;
             return Scalar(query, out _);
         }
 

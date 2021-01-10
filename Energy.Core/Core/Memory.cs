@@ -26,11 +26,12 @@ namespace Energy.Core
         /// Get current memory usage
         /// </summary>
         /// <returns></returns>
-#if !NETSTANDARD && !CFNET
+#if !NETSTANDARD && !NETCF
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
         public static long GetCurrentMemoryUsage()
         {
+#if !NETCF
             try
             {
                 System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
@@ -41,6 +42,10 @@ namespace Energy.Core
             {
                 return 0;
             }
+#endif
+#if NETCF
+            return 0;
+#endif
         }
 
         /// <summary>

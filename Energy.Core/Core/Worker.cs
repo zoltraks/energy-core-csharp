@@ -63,9 +63,22 @@ namespace Energy.Core
             lock (_ThreadLock)
             {
                 if (_Thread == null)
+                {
                     return false;
+                }
+#if !NETCF
                 if (_Thread.IsAlive)
+                {
                     return true;
+                }
+#endif
+#if NETCF
+                // Compact Framework doesn't have IsAlive :-(
+                if (_Thread != null)
+                {
+                    return true;
+                }
+#endif
                 return false;
             }
         }
@@ -164,7 +177,13 @@ namespace Energy.Core
                 {
                     if (null != _Thread)
                     {
+#if !NETCF
                         return _Thread.CurrentCulture;
+#endif
+#if NETCF
+                        // Compact Framework doesn't support this property in Thread class
+                        return _CurrentCulture;
+#endif
                     }
                     else
                     {
@@ -179,8 +198,10 @@ namespace Energy.Core
                     _CurrentCulture = value;
                     if (null != _Thread)
                     {
+#if !NETCF
                         _Thread.CurrentCulture = value;
                         _Thread.CurrentUICulture = value;
+#endif
                     }
                 }
             }
@@ -223,10 +244,12 @@ namespace Energy.Core
             {
                 if (null != _Thread)
                 {
+#if !NETCF
                     if (_Thread.IsAlive)
                     {
                         return;
                     }
+#endif
                 }
                 _Thread = new System.Threading.Thread(Work)
                 {
@@ -234,8 +257,10 @@ namespace Energy.Core
                 };
                 if (null != _CurrentCulture)
                 {
+#if !NETCF
                     _Thread.CurrentCulture = _CurrentCulture;
                     _Thread.CurrentUICulture = _CurrentCulture;
+#endif
                 }
                 _Stopped = false;
                 _LastStart = DateTime.Now;
@@ -292,11 +317,13 @@ namespace Energy.Core
                 {
                     return;
                 }
+#if !NETCF
                 if (!_Thread.IsAlive)
                 {
                     _Thread = null;
                     return;
                 }
+#endif
                 try
                 {
                     _Thread.Abort();
@@ -329,7 +356,7 @@ namespace Energy.Core
         /// </returns>
         public bool Sleep(int time)
         {
-            return !StoppedResetEvent.WaitOne(time);
+            return !StoppedResetEvent.WaitOne(time, true);
         }
 
         /// <summary>
@@ -588,7 +615,7 @@ namespace Energy.Core
                 }
             })
             {
-                IsBackground = true
+                IsBackground = true,
             };
             guardian.Start();
             bool success = manualResetEvent.WaitOne(time);
@@ -619,10 +646,16 @@ namespace Energy.Core
         /// <returns>True if thread exited, false if still running</returns>
         public static bool Wait(System.Threading.Thread thread, int time)
         {
-            if (null == thread || !thread.IsAlive)
+            if (null == thread)
             {
                 return true;
             }
+#if !NETCF
+            else if (!thread.IsAlive)
+            {
+                return true;
+            }
+#endif
             else
             {
                 bool success = thread.Join(time);
@@ -666,7 +699,9 @@ namespace Energy.Core
                 catch (ThreadAbortException)
                 { }
             })
-            { IsBackground = true };
+            {
+                IsBackground = true,
+            };
             thread.Start();
             return thread;
         }
@@ -686,14 +721,19 @@ namespace Energy.Core
                 if (FireThreadList.ContainsKey(name))
                 {
                     thread = FireThreadList[name];
+#if !NETCF
                     if (thread.IsAlive)
                     {
                         return thread;
                     }
-                    else
+#endif
+#if NETCF
+                    if (thread != null)
                     {
-                        FireThreadList.Remove(name);
+                        return thread;
                     }
+#endif
+                    FireThreadList.Remove(name);
                 }
                 thread = Fire(code);
                 FireThreadList[name] = thread;

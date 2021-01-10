@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 #if !NETCF
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
@@ -1964,10 +1965,10 @@ namespace Energy.Base
         /// <returns></returns>
         public static string GetAssemblyDirectory(System.Reflection.Assembly assembly)
         {
-            if (null == assembly)
-            {
-                return null;
-            }
+            //if (null == assembly)
+            //{
+            //    return null;
+            //}
             string file = GetAssemblyFile(assembly);
             if (null == file)
             {
@@ -1976,6 +1977,20 @@ namespace Energy.Base
             string directory = System.IO.Path.GetDirectoryName(file);
             return directory;
         }
+
+        #endregion
+
+        #region Runtime
+
+#if !NETCF
+
+        [System.Runtime.CompilerServices.MethodImpl(MethodImplOptions.NoInlining)]
+        public static string GetCurrentNamespace()
+        {
+            return System.Reflection.Assembly.GetCallingAssembly().EntryPoint.DeclaringType.Namespace;
+        }
+
+#endif
 
         #endregion
     }

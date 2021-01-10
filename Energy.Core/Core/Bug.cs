@@ -408,6 +408,7 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string CallingMethod(int stack)
         {
+#if !NETCF
             try
             {
                 string fullName = "";
@@ -438,6 +439,10 @@ namespace Energy.Core
             {
                 return "";
             }
+#endif
+#if NETCF    
+            return "";
+#endif
         }
 
         /// <summary>

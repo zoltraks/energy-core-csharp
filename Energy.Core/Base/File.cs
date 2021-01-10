@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -274,7 +275,12 @@ namespace Energy.Base
                     {
                         now = DateTime.Now;
                     }
+#if !NETCF
                     System.IO.File.SetLastWriteTime(fileName, now);
+#endif
+#if NETCF
+                    using (var stream = System.IO.File.OpenWrite(fileName)) { };
+#endif
                     _Stamp = System.IO.File.GetLastWriteTime(fileName);
                     return true;
                 }
@@ -724,10 +730,19 @@ namespace Energy.Base
         /// <returns>bool</returns>
         public static bool IsDirectory(string file)
         {
+            if (string.IsNullOrEmpty(file))
+            {
+                return false;
+            }
             try
             {
+#if !NETCF
                 System.IO.FileAttributes attributes = System.IO.File.GetAttributes(file);
                 return (attributes & System.IO.FileAttributes.Directory) == System.IO.FileAttributes.Directory;
+#endif
+#if NETCF
+                return file.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString());
+#endif
             }
             catch
             {
@@ -1115,8 +1130,13 @@ namespace Energy.Base
         /// <returns></returns>
         public static string GetBaseDirectory()
         {
+#if !NETCF
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             return baseDirectory;
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         #endregion
@@ -1137,6 +1157,85 @@ namespace Energy.Base
                 path += System.IO.Path.DirectorySeparatorChar;
             }
             return path;
+        }
+
+        #endregion
+
+        #region DeleteFile
+
+        /// <summary>
+        /// Delete file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>
+        /// 0 if filename was empty or file didn't exist,
+        /// <br/>
+        /// 1 if file was successfully deleted,
+        /// <br/>
+        /// -2 on I/O error,
+        /// <br/>
+        /// -3 on access error,
+        /// <br/>
+        /// -1 on other errors.
+        /// </returns>
+        public static int DeleteFile(string file)
+        {
+            if (string.IsNullOrEmpty(file))
+            {
+                return 0;
+            }
+            try
+            {
+                if (!System.IO.File.Exists(file))
+                {
+                    return 0;
+                }
+                System.IO.File.Delete(file);
+                return 1;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return -3;
+            }
+            catch (System.IO.IOException)
+            {
+                return -2;
+            }
+            
+            catch
+            {
+                Debug.Write(null);
+                return -1;
+            }
+        }
+
+        #endregion
+
+        #region Storage
+
+        public class Storage : Energy.Interface.IFileSystem, IDisposable
+        {
+            private List<string> _Files = new List<string>();
+            
+            private string _Root;
+
+            private bool _Persistent;
+
+            public void Dispose()
+            {
+                if (!_Persistent)
+                {
+                    for (int i = _Files.Count - 1; i <= 0; i--)
+                    {
+                        string file = _Files[i];
+                        if (0 > Energy.Base.File.DeleteFile(file))
+                        {
+                            Debug.Write(null);
+                        }
+                        _Files.RemoveAt(i);
+                    }
+                }
+            }
         }
 
         #endregion

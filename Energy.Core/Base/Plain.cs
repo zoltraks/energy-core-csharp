@@ -319,16 +319,16 @@ namespace Energy.Base
                         break;
                     case "GRAY":
                     case "SILVER":
-                        FrameTilde = Energy.Core.Tilde.Color.White;
-                        HeaderTilde = Energy.Core.Tilde.Color.Gray;
-                        TextTilde = Energy.Core.Tilde.Color.Gray;
-                        TextTildeOdd = Energy.Core.Tilde.Color.DarkGray;
+                        FrameTilde = "~15~";
+                        HeaderTilde = "~7~";
+                        TextTilde = "~7~";
+                        TextTildeOdd = "~8~";
                         break;
                     case "YELLOW":
-                        FrameTilde = Energy.Core.Tilde.Color.DarkYellow;
-                        HeaderTilde = Energy.Core.Tilde.Color.Yellow;
-                        TextTilde = Energy.Core.Tilde.Color.White;
-                        TextTildeOdd = Energy.Core.Tilde.Color.Yellow;
+                        FrameTilde = "~6~";
+                        HeaderTilde = "~14~";
+                        TextTilde = "~15~";
+                        TextTildeOdd = "~14~";
                         break;
                 }
                 return this;

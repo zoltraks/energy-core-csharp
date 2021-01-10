@@ -11,7 +11,8 @@ namespace Energy.Core
     {
         public abstract class File
         {
-            private string _FileName = Energy.Core.Information.GetCurrentNamespace() + ".conf";
+            //private string _FileName = Energy.Core.Information.GetCurrentNamespace() + ".conf";
+            private string _FileName;
             /// <summary>File</summary>
             [System.Xml.Serialization.XmlIgnore]
             public string FileName { get { return _FileName; } set { _FileName = value; } }

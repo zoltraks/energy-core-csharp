@@ -545,24 +545,40 @@ namespace Energy.Base
             text = text.Trim();
             int n;
             Match match;
+            string s;
 
             //match = Regex.Match(text, Energy.Base.Pattern.Date);
             match = DateRegex.Match(text);
 
             if (match.Success)
             {
-                if (int.TryParse(match.Groups["year"].ToString(), out n))
+                s = match.Groups["year"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddYears(n - 1);
                 }
-                if (int.TryParse(match.Groups["month"].ToString(), out n))
+                s = match.Groups["month"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddMonths(n - 1);
                 }
-                if (int.TryParse(match.Groups["day"].ToString(), out n))
+                s = match.Groups["day"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddDays(n - 1);
                 }
+                //if (int.TryParse(match.Groups["year"].ToString(), out n))
+                //{
+                //    result = result.AddYears(n - 1);
+                //}
+                //if (int.TryParse(match.Groups["month"].ToString(), out n))
+                //{
+                //    result = result.AddMonths(n - 1);
+                //}
+                //if (int.TryParse(match.Groups["day"].ToString(), out n))
+                //{
+                //    result = result.AddDays(n - 1);
+                //}
                 text = text.Substring(0, match.Index) + text.Substring(match.Index + match.Length);
             }
 
@@ -571,24 +587,46 @@ namespace Energy.Base
 
             if (match.Success)
             {
-                if (int.TryParse(match.Groups["hour"].ToString(), out n))
+                s = match.Groups["hour"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddHours(n);
                 }
-                if (int.TryParse(match.Groups["minute"].ToString(), out n))
+                s = match.Groups["minute"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddMinutes(n);
                 }
-                if (int.TryParse(match.Groups["second"].ToString(), out n))
+                s = match.Groups["second"].Value;
+                if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
                     result = result.AddSeconds(n);
                 }
+                //if (int.TryParse(match.Groups["hour"].ToString(), out n))
+                //{
+                //    result = result.AddHours(n);
+                //}
+                //if (int.TryParse(match.Groups["minute"].ToString(), out n))
+                //{
+                //    result = result.AddMinutes(n);
+                //}
+                //if (int.TryParse(match.Groups["second"].ToString(), out n))
+                //{
+                //    result = result.AddSeconds(n);
+                //}
                 if (!string.IsNullOrEmpty(match.Groups["fraction"].Value))
                 {
-                    double d;
-                    if (double.TryParse(string.Concat("0.", match.Groups["fraction"])
+                    //double d;
+                    //if (double.TryParse(string.Concat("0.", match.Groups["fraction"])
+                    //    , System.Globalization.NumberStyles.AllowDecimalPoint
+                    //    , System.Globalization.CultureInfo.InvariantCulture, out d))
+                    //{
+                    //    result = result.AddSeconds(d);
+                    //}
+                    double d = double.Parse(string.Concat("0.", match.Groups["fraction"])
                         , System.Globalization.NumberStyles.AllowDecimalPoint
-                        , System.Globalization.CultureInfo.InvariantCulture, out d))
+                        , System.Globalization.CultureInfo.InvariantCulture);
+                    if (d > 0)
                     {
                         result = result.AddSeconds(d);
                     }
