@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
-using System.Text;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
+#if !NETCF
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace Energy.Base
 {
@@ -585,8 +591,23 @@ namespace Energy.Base
         public static Type GetClassInterface(Type classType, string interfaceName)
         {
             if (classType.Name == interfaceName)
+            {
                 return classType;
-            Type type = classType.GetInterface(interfaceName);
+            }
+            Type type = null;
+#if NETCF
+            Type[] interfaces = classType.GetInterfaces();
+            foreach (Type interfaceType in interfaces)
+            {
+                if (0 == string.Compare(interfaceType.Name, interfaceName))
+                {
+                    return interfaceType;
+                }
+            }
+#endif
+#if !NETCF
+            type = classType.GetInterface(interfaceName);
+#endif
             return type;
         }
 
@@ -599,7 +620,9 @@ namespace Energy.Base
             if (assemblies == null)
                 return null;
             if (assemblies.Length == 0)
+            {
                 return new System.Type[] { };
+            }
             List<System.Type> list = new List<System.Type>();
             for (int i = 0; i < assemblies.Length; i++)
             {
@@ -609,10 +632,18 @@ namespace Energy.Base
                 {
                     typeList = assembly.GetTypes();
                 }
+#if !NETCF
                 catch (System.Reflection.ReflectionTypeLoadException)
                 {
                     continue;
                 }
+#endif
+#if NETCF
+                catch
+                {
+                    continue;
+                }
+#endif
                 if (filter == null)
                 {
                     list.AddRange(typeList);
@@ -820,18 +851,28 @@ namespace Energy.Base
         public static bool HasParameterlessConstructor(Type type)
         {
             if (null == type)
+            {
                 return false;
+            }
 
             if (type.IsAbstract)
+            {
                 return false;
+            }
 
-            ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+            ConstructorInfo constructor;
+            //constructor = type.GetConstructor(Type.EmptyTypes);
+            constructor = type.GetConstructor(new Type[] { });
 
             if (null == constructor)
+            {
                 return false;
+            }
 
             if (constructor.IsPublic)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -1068,6 +1109,333 @@ namespace Energy.Base
 
         #endregion
 
+        #region Size
+
+        #region Get object size
+
+        /// <summary>
+        /// Get size of object in bytes
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static int GetObjectSize(object o)
+        {
+            if (null == o)
+            {
+                return 0;
+            }
+            if (o is int)
+            {
+                return sizeof(int);
+            }
+            if (o is bool)
+            {
+                return sizeof(bool);
+            }
+            if (o is string)
+            {
+                return sizeof(bool);
+            }
+            try
+            {
+                return Marshal.SizeOf(o);
+            }
+            catch (ArgumentException)
+            { }
+#if !NETCF
+            try
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                MemoryStream ms = new MemoryStream();
+                byte[] Array;
+                bf.Serialize(ms, o);
+                Array = ms.ToArray();
+                return Array.Length;
+            }
+            catch
+            { }
+#endif
+            return 0;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Value
+
+        internal static string ANGULAR_IDENTIFIER_PATTERN = "<([^>]+)>";
+
+        #region GetObjectPropertyOrFieldValue
+
+        public static object GetObjectPropertyOrFieldValue(object o, string name)
+        {
+            return GetObjectPropertyOrFieldValue(o, name, false, false);
+        }
+
+        public static object GetObjectPropertyOrFieldValue(object o, string name, bool ignoreCase, bool includePrivate)
+        {
+            if (null == o)
+            {
+                return o;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate)
+            {
+                bindingAttr |= BindingFlags.NonPublic;
+            }
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        return pi.GetValue(o, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return pi.GetValue(o, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        return fi.GetValue(o);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region GetObjectFieldOrPropertyValue
+
+        public static object GetObjectFieldOrPropertyValue(object o, string name)
+        {
+            return GetObjectFieldOrPropertyValue(o, name, false, false);
+        }
+
+        public static object GetObjectFieldOrPropertyValue(object o, string name, bool ignoreCase, bool includePrivate)
+        {
+            if (null == o)
+            {
+                return o;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate)
+            {
+                bindingAttr |= BindingFlags.NonPublic;
+            }
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        return fi.GetValue(o);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            }
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        return pi.GetValue(o, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return pi.GetValue(o, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        #endregion
+
+        #region SetObjectPropertyOrFieldValue
+
+        public static void SetObjectPropertyOrFieldValue(object o, string name, object value)
+        {
+            SetObjectPropertyOrFieldValue(o, name, value, false);
+        }
+
+        public static void SetObjectPropertyOrFieldValue(object o, string name, object value, bool ignoreCase)
+        {
+            if (null == o)
+            {
+                return;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        pi.SetValue(o, value, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            pi.SetValue(o, value, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return;
+                        }
+                        return;
+                    }
+                }
+            }
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase) 
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        fi.SetValue(o, value);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                    return;
+                }
+            }
+            return;
+        }
+
+        #endregion
+
+        #region SetObjectFieldOrPropertyValue
+
+        public static void SetObjectFieldOrPropertyValue(object o, string name, object value)
+        {
+            SetObjectFieldOrPropertyValue(o, name, value, false);
+        }
+
+        public static void SetObjectFieldOrPropertyValue(object o, string name, object value, bool ignoreCase)
+        {
+            if (null == o)
+            {
+                return;
+            }
+            var t = o.GetType();
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public | BindingFlags.NonPublic;
+            Regex regex = new Regex(ANGULAR_IDENTIFIER_PATTERN, RegexOptions.None);
+            foreach (FieldInfo fi in t.GetFields(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, fi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        fi.SetValue(o, value);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                    return;
+                }
+            }
+            foreach (PropertyInfo pi in t.GetProperties(bindingAttr))
+            {
+                if (false
+                    || 0 == string.Compare(name, pi.Name, ignoreCase)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(pi.Name, regex), ignoreCase)
+                    )
+                {
+                    try
+                    {
+                        pi.SetValue(o, value, null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            pi.SetValue(o, value, new object[] { 0 });
+                        }
+                        catch
+                        {
+                            return;
+                        }
+                    }
+                    return;
+                }
+            }
+            return;
+        }
+
+        #endregion
+
+        #endregion
+
         #endregion
 
         #region Class information
@@ -1236,10 +1604,10 @@ namespace Energy.Base
 
         #endregion
 
-        #region Class information repository
+        #region Class repository
 
         /// <summary>
-        /// Class information repository
+        /// Class repository
         /// </summary>
         public class Repository
         {
@@ -1388,7 +1756,12 @@ namespace Energy.Base
         /// <returns></returns>
         public static System.Reflection.Assembly[] GetAssemblies()
         {
+#if !NETCF
             return AppDomain.CurrentDomain.GetAssemblies();
+#endif
+#if NETCF
+            return GetAssemblies();
+#endif
         }
 
         /// <summary>
@@ -1407,7 +1780,9 @@ namespace Energy.Base
                 bool check = Energy.Base.Text.Check(input, Energy.Enumeration.MatchStyle.Any
                     , matchMode, ignoreCase, filters);
                 if (!check)
+                {
                     continue;
+                }
                 list.Add(assembly);
             }
             return list.ToArray();
@@ -1536,6 +1911,8 @@ namespace Energy.Base
         {
 #if NETSTANDARD
             return assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
+#elif NETCF
+            return "";
 #else
             return assembly.ImageRuntimeVersion;
 #endif
@@ -1548,7 +1925,12 @@ namespace Energy.Base
         {
             try
             {
+#if !NETCF
                 return System.IO.File.GetLastWriteTimeUtc(assembly.Location);
+#endif
+#if NETCF
+                return DateTime.MinValue;
+#endif
             }
             catch
             { }
@@ -1556,8 +1938,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Get filename of assembly.
-        /// This is just a simple alias for Location field of assembly object.
+        /// Get assembly file.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
@@ -1567,25 +1948,49 @@ namespace Energy.Base
             {
                 return null;
             }
-            string fileName = assembly.Location;
-            return fileName;
+            string file = "";
+#if !NETCF
+            file = assembly.Location;
+#endif
+#if NETCF
+            file = assembly.GetName().CodeBase;
+#endif
+            return file;
         }
 
         /// <summary>
-        /// Get directory name of assembly.
+        /// Get assembly directory.
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
         public static string GetAssemblyDirectory(System.Reflection.Assembly assembly)
         {
-            if (null == assembly)
+            //if (null == assembly)
+            //{
+            //    return null;
+            //}
+            string file = GetAssemblyFile(assembly);
+            if (null == file)
             {
                 return null;
             }
-            string fileName = assembly.Location;
-            string directoryName = System.IO.Path.GetDirectoryName(fileName);
-            return directoryName;
+            string directory = System.IO.Path.GetDirectoryName(file);
+            return directory;
         }
+
+        #endregion
+
+        #region Runtime
+
+#if !NETCF
+
+        [System.Runtime.CompilerServices.MethodImpl(MethodImplOptions.NoInlining)]
+        public static string GetCurrentNamespace()
+        {
+            return System.Reflection.Assembly.GetCallingAssembly().EntryPoint.DeclaringType.Namespace;
+        }
+
+#endif
 
         #endregion
     }

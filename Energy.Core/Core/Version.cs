@@ -58,7 +58,9 @@ namespace Energy.Core
 #endif
         public void Set(System.Reflection.Assembly assembly)
         {
+#if !NETCF
             Product = GetProduct(assembly);
+#endif
             Compilation = GetCompilation(assembly);
         }
 
@@ -72,6 +74,7 @@ namespace Energy.Core
 #if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
 #endif
+#if !NETCF
         public static string GetProduct(System.Reflection.Assembly assembly)
         {
             try
@@ -83,6 +86,7 @@ namespace Energy.Core
                 return null;
             }
         }
+#endif
 
         /// <summary>
         /// Get compilation date for assembly
@@ -149,10 +153,12 @@ namespace Energy.Core
 #endif
             get
             {
+#if !NETCF
                 if (_LibraryProduct == null)
                 {
                     _LibraryProduct = GetProduct(System.Reflection.Assembly.GetExecutingAssembly());
                 }
+#endif
                 return _LibraryProduct;
             }
             set

@@ -146,7 +146,49 @@ namespace Energy.Core.Test.Base
         {
             var a = System.Reflection.Assembly.GetExecutingAssembly();
             var x = Energy.Base.Class.GetAssemblyFile(a);
+            // TODO Something, something, etc...
+        }
 
+        [TestMethod]
+        public void ClassGetObjectValue()
+        {
+            object o1, o2;
+            o1 = new
+            {
+                Name = "Name",
+                Index = 16,
+            };
+            o2 = Energy.Base.Class.GetObjectPropertyOrFieldValue(o1, "Name");
+            Assert.IsNotNull(o2);
+            o2 = Energy.Base.Class.GetObjectPropertyOrFieldValue(o1, "name");
+            Assert.IsNull(o2);
+            o2 = Energy.Base.Class.GetObjectPropertyOrFieldValue(o1, "name", true, false);
+            Assert.IsNotNull(o2);
+            o2 = Energy.Base.Class.GetObjectPropertyOrFieldValue(o1, "Index");
+            Assert.AreEqual(16, o2);
+
+            o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name");
+            Assert.IsNotNull(o2);
+            o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "name");
+            Assert.IsNull(o2);
+            o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "name", true, false);
+            Assert.IsNotNull(o2);
+            o2 = Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Index");
+            Assert.AreEqual(16, o2);
+        }
+
+        [TestMethod]
+        public void ClassSetObjectValue()
+        {
+            object o1;
+            o1 = new
+            {
+                Name = "Name",
+                Index = 16,
+            };
+            Assert.AreEqual("Name", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
+            Energy.Base.Class.SetObjectFieldOrPropertyValue(o1, "Name", "Name1");
+            Assert.AreEqual("Name1", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
         }
     }
 }

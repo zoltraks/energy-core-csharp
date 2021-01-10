@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Energy.Enumeration;
 
 namespace Energy.Base
 {
@@ -71,6 +72,12 @@ namespace Energy.Base
         /// Regular expressions pattern for new line.
         /// </summary>
         public const string NEWLINE_PATTERN = "\r\n|\n|\r";
+
+        /// <summary>
+        /// Regular expressions pattern for new line.
+        /// Greedy version.
+        /// </summary>
+        public const string NEWLINE_GREEDY_PATTERN = "(?:\r\n|\n|\r)+";
 
         #endregion
 
@@ -185,7 +192,7 @@ namespace Energy.Base
                     string[] a = definition.Split(' ');
                     switch (a.Length)
                     {
-                        case 1:                            
+                        case 1:
                             o.Prefix = a[0];
                             o.Suffix = a[0];
                             o.Escape = new string[] { a[0] + a[0] };
@@ -311,14 +318,18 @@ namespace Energy.Base
         public static string Surround(string value, string delimiter, string[] special)
         {
             if (value == null || value == "")
+            {
                 return value;
+            }
 
             bool quote = false;
 
             if (String.IsNullOrEmpty(delimiter))
             {
                 if (special == null)
+                {
                     return value;
+                }
             }
             else if (value.Contains(delimiter))
             {
@@ -338,7 +349,9 @@ namespace Energy.Base
             }
 
             if (!quote)
+            {
                 return value;
+            }
 
             return String.Concat(delimiter, value, delimiter);
         }
@@ -377,6 +390,7 @@ namespace Energy.Base
                 if (!text.StartsWith(prefix))
                     text = prefix + text;
                 if (!text.EndsWith(suffix))
+                    // Warning code IDE0054 is invalid number in Visual Studio 2008
 #pragma warning disable IDE0054 // Use compound assignment
                     text = text + suffix;
 #pragma warning restore IDE0054 // Use compound assignment
@@ -416,23 +430,31 @@ namespace Energy.Base
 
         #region Trim
 
+        private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
+
         /// <summary>
-        /// Remove leading and trailing whitespace.
-        /// Includes space, tabulation (horizontal and vertical), new line and null characters.
+        /// Remove all leading and trailing whitespace characters from text.
+        /// <br/><br/>
+        /// Following characters are treated as whitespace: space character " " (code 32),
+        /// horizontal tab "\t" (code 09), line feed "\n" (code 10),
+        /// carriage return "\r" (code 13), vertical tab "\v" (code 11),
+        /// form feed "\f" (code 12), null character "\0" (code 0).
         /// </summary>
-        /// <param name="value">String value</param>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="text">String value</param>
         /// <returns>Trimmed string</returns>
-        public static string Trim(string value)
+        public static string Trim(string text)
         {
-            if (value == null || value.Length == 0)
+            if (null == text || 0 == text.Length)
             {
-                return value;
+                return text;
             }
-            else
+            if (0 <= text.IndexOfAny(whiteCharacters))
             {
-                value = value.Trim(' ', '\t', '\r', '\n', '\v', '\0');
-                return value;
+                //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f', '\0');
+                text = text.Trim(whiteCharacters);
             }
+            return text;
         }
 
         #endregion
@@ -478,51 +500,61 @@ namespace Energy.Base
 
         #region Check
 
-        public static bool Check(string input, MatchStyle matchStyle, MatchMode matchMode, bool ignoreCase, string[] filters)
+        public static bool Check(string input, Energy.Enumeration.MatchStyle matchStyle, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string[] filters)
         {
             switch (matchStyle)
             {
                 default:
                     return false;
-                case MatchStyle.All:
+                case Energy.Enumeration.MatchStyle.All:
                     return CheckAll(input, matchMode, ignoreCase, filters);
-                case MatchStyle.Not:
+                case Energy.Enumeration.MatchStyle.Not:
                     return CheckNot(input, matchMode, ignoreCase, filters);
-                case MatchStyle.Any:
+                case Energy.Enumeration.MatchStyle.Any:
                     return CheckAny(input, matchMode, ignoreCase, filters);
-                case MatchStyle.One:
+                case Energy.Enumeration.MatchStyle.One:
                     return CheckOne(input, matchMode, ignoreCase, filters);
             }
         }
 
-        public static bool CheckAny(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckAny(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
+                {
                     return true;
+                }
             }
             return false;
         }
 
-        public static bool CheckAll(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckAll(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (!Check(input, matchMode, ignoreCase, filter))
+                {
                     return false;
+                }
             }
             return true;
         }
 
-        public static bool CheckNot(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckNot(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
@@ -531,41 +563,48 @@ namespace Energy.Base
             return true;
         }
 
-        public static bool CheckOne(string input, MatchMode matchMode, bool ignoreCase, params string[] filters)
+        public static bool CheckOne(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, params string[] filters)
         {
             if (input == null || filters == null)
+            {
                 return false;
+            }
             bool found = false;
             foreach (string filter in filters)
             {
                 if (Check(input, matchMode, ignoreCase, filter))
                 {
                     if (found)
+                    {
                         return false;
+                    }
                     else
+                    {
                         found = true;
+                    }
                 }
             }
             return found;
         }
 
-        public static bool Check(string input, MatchMode matchMode, bool ignoreCase, string filter)
+        public static bool Check(string input, Energy.Enumeration.MatchMode matchMode, bool ignoreCase, string filter)
         {
             if (input == null || filter == null)
+            {
                 return false;
-
+            }
             switch (matchMode)
             {
                 default:
-                case MatchMode.None:
+                case Energy.Enumeration.MatchMode.None:
                     return false;
-                case MatchMode.Same:
+                case Energy.Enumeration.MatchMode.Same:
                     return CheckSame(input, filter, ignoreCase);
-                case MatchMode.Simple:
+                case Energy.Enumeration.MatchMode.Simple:
                     return CheckSimple(input, filter, ignoreCase);
-                case MatchMode.Regex:
+                case Energy.Enumeration.MatchMode.Regex:
                     return CheckRegex(input, filter, ignoreCase);
-                case MatchMode.Wild:
+                case Energy.Enumeration.MatchMode.Wild:
                     return CheckWild(input, filter, ignoreCase);
             }
         }
@@ -592,7 +631,9 @@ namespace Energy.Base
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
+            {
                 options |= RegexOptions.IgnoreCase;
+            }
             return CheckRegex(input, pattern, options);
         }
 
@@ -601,7 +642,9 @@ namespace Energy.Base
         {
             RegexOptions options = RegexOptions.CultureInvariant;
             if (ignoreCase)
+            {
                 options |= RegexOptions.IgnoreCase;
+            }
             string pattern = Energy.Base.Text.WildToRegex(wild);
             return CheckRegex(input, pattern, options);
         }
@@ -628,8 +671,8 @@ namespace Energy.Base
             }
             else
             {
-                string insensitiveInput = input.ToUpperInvariant();
-                string insensitiveFilter = filter.ToUpperInvariant();
+                string insensitiveInput = input.ToUpper(CultureInfo.InvariantCulture);
+                string insensitiveFilter = filter.ToUpper(CultureInfo.InvariantCulture);
                 if (insensitiveInput.StartsWith(insensitiveFilter))
                     return true;
                 else if (insensitiveInput.EndsWith(insensitiveFilter))
@@ -850,6 +893,20 @@ namespace Energy.Base
 
         #region Split
 
+        public static string[] Split(string input)
+        {
+            System.Collections.Generic.List<string> list = new List<string>();
+            foreach (string line in Each(input))
+            {
+                list.Add(line);
+            }
+            return list.ToArray();
+        }
+
+        #endregion
+
+        #region SplitLine
+
         /// <summary>
         /// Split string to array by new line characters.
         /// Elements will not include new line itself.
@@ -858,31 +915,76 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] SplitLine(string content)
         {
-            return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
+            if (null == content)
+            {
+                return null;
+            }
+
+            if (0 == content.Length)
+            {
+                return new string[] { };
+            }
+
+            //return content.Split(NEWLINE_ARRAY, StringSplitOptions.None);
+            //return content.Split(NEWLINE_ARRAY);
+            return Regex.Split(content, NEWLINE_PATTERN);
         }
 
         /// <summary>
         /// Split string to array by new line characters.
-        /// Elements will not include new line itself.
+        /// <br /><br />
+        /// Elements will not include new line character itself.
         /// </summary>
         /// <param name="content"></param>
         /// <param name="removeEmpty"></param>
         /// <returns></returns>
         public static string[] SplitLine(string content, bool removeEmpty)
         {
-            string[] split = content.Split(NEWLINE_ARRAY
-                , removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
-                );
-            return split;
+            if (null == content)
+            {
+                return null;
+            }
+
+            if (0 == content.Length)
+            {
+                return new string[] { };
+            }
+
+            //string[] split = content.Split(NEWLINE_ARRAY
+            //    , removeEmpty ? StringSplitOptions.RemoveEmptyEntries : StringSplitOptions.None
+            //    );
+            //return split;
+
+            //string[] array = content.Split(NEWLINE_ARRAY);
+            //if (!removeEmpty || 0 == array.Length)
+            //{
+            //    return array;
+            //}
+            //else
+            //{
+            //    var list = new List<string>(array);
+            //    for (int i = array.Length - 1; i >= 0; i--)
+            //    {
+            //        if (string.IsNullOrEmpty(list[i]))
+            //        {
+            //            list.RemoveAt(i);
+            //        }
+            //    }
+            //    array = list.ToArray();
+            //    return array;
+            //}
+
+            if (removeEmpty)
+            {
+                return Regex.Split(content, NEWLINE_GREEDY_PATTERN);
+            }
+            else
+            {
+                return Regex.Split(content, NEWLINE_PATTERN);
+            }
         }
 
-        public static string[] Split(string input)
-        {
-            System.Collections.Generic.List<string> list = new List<string>();
-            foreach (string line in Each(input))
-                list.Add(line);
-            return list.ToArray();
-        }
+        #endregion
 
         #region SplitArray
 
@@ -947,17 +1049,23 @@ namespace Energy.Base
                 next = match.NextMatch();
                 string value = match.Groups[1].Value;
                 if (value == null)
+                {
                     continue;
+                }
                 value = value.Trim();
                 if (value.Length == 0)
+                {
                     continue;
+                }
                 if (!string.IsNullOrEmpty(quotes))
                 {
                     foreach (char c in quotes.ToCharArray())
                     {
                         string quote = c.ToString();
                         if (!value.StartsWith(quote) || !value.EndsWith(quote))
+                        {
                             continue;
+                        }
                         string escape = new string(c, 2);
                         value = value.Substring(1, value.Length - 2).Replace(escape, quote);
                     }
@@ -971,20 +1079,18 @@ namespace Energy.Base
 
         #region SplitDictionary
 
-        /// <summary>
-        /// Split string by new line
-        /// </summary>
-        /// <returns></returns>
-        // TODO Implement
-        [Energy.Attribute.Code.Draft]
-        [Energy.Attribute.Code.Implement]
-        private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
-        {
-            //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
-            return null;
-        }
-
-        #endregion
+        ///// <summary>
+        ///// Split string by new line
+        ///// </summary>
+        ///// <returns></returns>
+        //// TODO Implement
+        //[Energy.Attribute.Code.Draft]
+        //[Energy.Attribute.Code.Implement]
+        //private static string[] SplitDictionary(string text, string quotes, string equalities, string brackets)
+        //{
+        //    //return content.Split(new string[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+        //    return null;
+        //}
 
         #endregion
 
@@ -1116,20 +1222,22 @@ namespace Energy.Base
 
         #endregion
 
-        #region RemoveWhitespace
+        #region RemoveWhite
 
         /// <summary>
         /// Remove whitespace characters from entire string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string RemoveWhitespace(string value)
+        public static string RemoveWhite(string value)
         {
             if (value == null || value.Length == 0)
+            {
                 return value;
+            }
             string white = Energy.Base.Text.WS;
             char[] charArray = value.ToCharArray();
-            if (!Energy.Base.Text.ContainsWhitespace(charArray))
+            if (!Energy.Base.Text.ContainsWhite(charArray))
             {
                 return value;
             }
@@ -1137,40 +1245,60 @@ namespace Energy.Base
             for (int i = 0; i < charArray.Length; i++)
             {
                 if (white.IndexOf(charArray[i]) >= 0)
+                {
                     continue;
+                }
                 else
+                {
                     sb.Append(charArray[i]);
+                }
             }
             return sb.ToString();
         }
 
         #endregion
 
-        #region ContainsWhitespace
+        #region ContainsWhite
 
         /// <summary>
-        /// Check if array contains any of whitespace character.
+        /// Check if array contains any of whitespace characters.
         /// </summary>
-        /// <param name="charArray"></param>
+        /// <param name="array"></param>
         /// <returns></returns>
-        public static bool ContainsWhitespace(char[] charArray)
+        public static bool ContainsWhite(char[] array)
         {
-            if (null == charArray)
-                return false;
-            if (0 == charArray.Length)
-                return false;
-            string white = Energy.Base.Text.WS;
-            for (int i = 0; i < charArray.Length; i++)
+            if (null == array)
             {
-                if (0 <= white.IndexOf(charArray[i]))
+                return false;
+            }
+            if (0 == array.Length)
+            {
+                return false;
+            }
+            string white = Energy.Base.Text.WS;
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (0 <= white.IndexOf(array[i]))
+                {
                     return true;
+                }
             }
             return false;
         }
 
+        /// <summary>
+        /// Check if text contains whitespace character.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool ContainsWhite(string text)
+        {
+            return ContainsWhite(text.ToCharArray());
+        }
+
         #endregion
 
-        #region ReplaceWhitespace
+        #region ReplaceWhite
 
         /// <summary>
         /// Replace whitespace characters with replacement string in entire string.
@@ -1178,10 +1306,12 @@ namespace Energy.Base
         /// <param name="text"></param>
         /// <param name="replacement"></param>
         /// <returns></returns>
-        public static string ReplaceWhitespace(string text, string replacement)
+        public static string ReplaceWhite(string text, string replacement)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return text;
+            }
             text = Regex.Replace(text, @"\s+", replacement);
             return text;
         }
@@ -1459,42 +1589,64 @@ namespace Energy.Base
                     _EscapeExpressionStringDictionary.Add("\t", @"\t");
                     _EscapeExpressionStringDictionary.Add("\r", @"\r");
                     _EscapeExpressionStringDictionary.Add("\n", @"\n");
+                    _EscapeExpressionStringDictionary.Add("\v", @"\v");
                     _EscapeExpressionStringDictionary.Add("$", @"\$");
                     _EscapeExpressionStringDictionary.Add("^", @"\^");
                     _EscapeExpressionStringDictionary.Add("*", @"\*");
                     _EscapeExpressionStringDictionary.Add("?", @"\?");
                     _EscapeExpressionStringDictionary.Add("+", @"\+");
-                    _EscapeExpressionStringDictionary.Add("|", @"\+");
-                    _EscapeExpressionStringDictionary.Add("{", @"\{");
+                    _EscapeExpressionStringDictionary.Add("|", @"\|");
                     _EscapeExpressionStringDictionary.Add("[", @"\[");
-                    _EscapeExpressionStringDictionary.Add("(", @"\(");
-                    _EscapeExpressionStringDictionary.Add("}", @"\}");
                     _EscapeExpressionStringDictionary.Add("]", @"\]");
+                    _EscapeExpressionStringDictionary.Add("(", @"\(");
                     _EscapeExpressionStringDictionary.Add(")", @"\)");
+                    _EscapeExpressionStringDictionary.Add("{", @"\{");
+                    _EscapeExpressionStringDictionary.Add("}", @"\}");
                 }
                 return _EscapeExpressionStringDictionary;
             }
         }
 
         /// <summary>
-        /// Escape text for regular expression.
+        /// Escape text array for regular expression pattern.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="array"></param>
         /// <returns></returns>
-        public static string EscapeExpression(string text)
+        public static string[] EscapeExpression(string[] array)
         {
+            List<string> list = new List<string>();
+            for (int i = 0, length = array.Length; i < length; i++)
+            {
+                list.Add(EscapeExpression(array[i]));
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Escape text for regular expression pattern.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.Benchmark("Check versus building string from characters one by one replacing specials with equivalents.")]
+        public static string EscapeExpression(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
             System.Text.StringBuilder s = null;
             foreach (KeyValuePair<string, string> _ in EscapeExpressionStringDictionary)
             {
-                if (text.Contains(_.Key))
+                if (input.Contains(_.Key))
                 {
                     if (s == null)
-                        s = new System.Text.StringBuilder(text);
+                    {
+                        s = new System.Text.StringBuilder(input);
+                    }
                     s.Replace(_.Key, _.Value);
-
                 }
             }
-            return s == null ? text : s.ToString();
+            return s == null ? input : s.ToString();
         }
 
         /// <summary>
@@ -1538,77 +1690,118 @@ namespace Energy.Base
 
         #endregion
 
-        #region Case
+        #region Capitalize
 
         /// <summary>
-        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
+        /// Return a word with its first letter upper case and remaining letters in lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Word</returns>
-        public static string UpperFirst(string word)
+        /// <param name="word"></param>
+        /// <returns></returns>
+        public static string Capitalize(string word)
         {
             if (string.IsNullOrEmpty(word))
-                return word;
-            if (word.Length == 1)
-                return char.ToUpperInvariant(word[0]).ToString();
-            return string.Concat(char.ToUpperInvariant(word[0])
-                , word.Substring(1).ToLowerInvariant());
-        }
-
-        /// <summary>
-        /// Upper case conversion for string array.
-        /// </summary>
-        /// <param name="words">Words list</param>
-        /// <returns>Words list</returns>
-        public static string[] Upper(string[] words)
-        {
-            if (words == null || words.Length == 0)
-                return words;
-            for (int i = 0; i < words.Length; i++)
             {
-                if (null == words[i])
-                    continue;
-                words[i] = words[i].ToUpperInvariant();
+                return word;
             }
-            return words;
+            else
+            {
+                return word.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture) + word.Substring(1).ToLower(CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>
-        /// Upper case conversion for string.
+        /// Return array of words with their first letters upper case and remaining letters in lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Words list</returns>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Capitalize(string[] words)
+        {
+            if (null == words || 0 == words.Length)
+            {
+                return words;
+            }
+            string[] result = new string[words.Length];
+            for (int i = 0, l = words.Length; i < l; i++)
+            {
+                result[i] = Capitalize(words[i]);
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region Upper
+
+        /// <summary>
+        /// Change letters in a word to upper case.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public static string Upper(string word)
         {
-            return word == null ? null : word.ToUpperInvariant();
+            return word == null ? null : word.ToUpper(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
-        /// Lower case conversion for string array.
+        /// Change letters in word list to upper case.
         /// </summary>
-        /// <param name="words">Words list</param>
-        /// <returns>Words list</returns>
-        public static string[] Lower(string[] words)
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Upper(string[] words)
         {
-            if (words == null || words.Length == 0)
+            if (null == words || 0 == words.Length)
+            {
                 return words;
-            for (int i = 0; i < words.Length; i++)
+            }
+            int n = words.Length;
+            string[] result = new string[n];
+            for (int i = 0; i < n; i++)
             {
                 if (null == words[i])
+                {
                     continue;
-                words[i] = words[i].ToLowerInvariant();
+                }
+                words[i] = words[i].ToUpper(CultureInfo.InvariantCulture);
             }
             return words;
         }
 
+        #endregion
+
+        #region Lower
+
         /// <summary>
-        /// Lower case conversion for string.
+        /// Change letters in a word to lower case.
         /// </summary>
-        /// <param name="word">Word</param>
-        /// <returns>Words list</returns>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public static string Lower(string word)
         {
-            return word == null ? null : word.ToLowerInvariant();
+            return word == null ? null : word.ToLower(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Change letters in word list to lower case.
+        /// </summary>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string[] Lower(string[] words)
+        {
+            if (null == words || 0 == words.Length)
+            {
+                return words;
+            }
+            int n = words.Length;
+            string[] result = new string[n];
+            for (int i = 0; i < n; i++)
+            {
+                if (null == words[i])
+                {
+                    continue;
+                }
+                words[i] = words[i].ToLower(CultureInfo.InvariantCulture);
+            }
+            return words;
         }
 
         #endregion
@@ -1620,9 +1813,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.DashCase instead")]
         public static string DashCase(string[] words)
         {
-            return string.Join("-", words);
+            return Energy.Base.Naming.DashCase(words);
         }
 
         /// <summary>
@@ -1630,23 +1824,21 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.HyphenCase instead")]
         public static string HyphenCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            return string.Join("-", Lower(words));
+            return Energy.Base.Naming.HyphenCase(words);
         }
 
         /// <summary>
-        /// Return words lower case, separated with hyphen character.
+        /// Return words lower case, separated with underscore character.
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.SnakeCase instead")]
         public static string SnakeCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            return string.Join("-", Lower(words));
+            return Energy.Base.Naming.SnakeCase(words);
         }
 
         /// <summary>
@@ -1654,9 +1846,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.UnderscoreCase instead")]
         public static string UnderscoreCase(string[] words)
         {
-            return string.Join("_", words);
+            return Energy.Base.Naming.UnderscoreCase(words);
         }
 
         /// <summary>
@@ -1664,15 +1857,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.PascalCase instead")]
         public static string PascalCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            for (int i = 0; i < words.Length; i++)
-            {
-                words[i] = UpperFirst(words[i]);
-            }
-            return string.Join("", words);
+            return Energy.Base.Naming.PascalCase(words);
         }
 
         /// <summary>
@@ -1688,16 +1876,10 @@ namespace Energy.Base
         /// </remarks>
         /// <param name="words">Array of words</param>
         /// <returns>String</returns>
+        [Obsolete("Use Energy.Base.Naming.CamelCase instead")]
         public static string CamelCase(string[] words)
         {
-            if (words == null || words.Length == 0)
-                return "";
-            words[0] = words[0].ToLowerInvariant();
-            for (int i = 1; i < words.Length; i++)
-            {
-                words[i] = UpperFirst(words[i]);
-            }
-            return string.Join("", words);
+            return Energy.Base.Naming.CamelCase(words);
         }
 
         /// <summary>
@@ -1721,7 +1903,7 @@ namespace Energy.Base
                 pieces.Add(value);
             }
             string text = string.Join("-", pieces.ToArray());
-            text = text.ToLowerInvariant();
+            text = text.ToLower(CultureInfo.InvariantCulture);
             return text;
         }
 
@@ -1796,7 +1978,6 @@ namespace Energy.Base
         /// Find System.Text.Encoding for specified name.
         /// Get System.Text.Encoding.UTF8 by default or if encoding not exists.
         /// Treats UCS-2 the same as UTF-16 besides differences.
-        /// could not be found.
         /// </summary>
         /// <param name="encoding">UTF-8, UTF, UTF8, UNICODE, UCS-2 LE, UCS-2 BE, 1250, 1252, ...</param>
         /// <returns>System.Text.Encoding</returns>
@@ -1824,9 +2005,13 @@ namespace Energy.Base
             try
             {
                 if (number > 0)
+                {
                     return System.Text.Encoding.GetEncoding(number);
+                }
                 else
+                {
                     return System.Text.Encoding.GetEncoding(encoding);
+                }
             }
             catch (ArgumentException)
             {
@@ -2013,6 +2198,16 @@ namespace Energy.Base
             return Compare(array1, array2, false);
         }
 
+        public static int Compare(string one, string two)
+        {
+            return string.Compare(one, two);
+        }
+
+        public static int Compare(string one, string two, bool ignoreCase)
+        {
+            return string.Compare(one, two, ignoreCase);
+        }
+
         #endregion
 
         #region Chop
@@ -2025,7 +2220,9 @@ namespace Energy.Base
         public static T Chop<T>(ref T[] array)
         {
             if (array == null || array.Length == 0)
+            {
                 return default(T);
+            }
             T first = array[0];
             List<T> list = new List<T>(array.Length);
             list.AddRange(array);
@@ -2358,233 +2555,397 @@ namespace Energy.Base
 
         #region Parse
 
-        public static bool TryParse(string text, out bool boolean)
+        //public static bool TryParse(string text, out bool boolean)
+        //{
+        //    boolean = Energy.Base.Cast.StringToBool(text);
+        //    return true;
+        //}
+
+        //private static bool? _TypeInt32HasTryParse = null;
+        //private static bool? _TypeUInt32HasTryParse = null;
+        //private static bool? _TypeInt64HasTryParse = null;
+        //private static bool? _TypeUInt64HasTryParse = null;
+
+        //public static bool TryParse(string text, out int signedInteger)
+        //{
+        //    if (text == null || text.Length == 0)
+        //    {
+        //        signedInteger = 0;
+        //        return false;
+        //    }
+        //    if (_TypeInt32HasTryParse == null)
+        //    {
+        //        Type type = typeof(int);
+        //        System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+        //            , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+        //            , null
+        //            , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+        //            , null
+        //            );
+        //        _TypeInt32HasTryParse = method != null;
+        //    }
+        //    if ((bool)_TypeInt32HasTryParse)
+        //    {
+        //        return int.TryParse(text, out signedInteger);
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < text.Length; i++)
+        //        {
+        //            if (i == 0 && text[0] == '-')
+        //            {
+        //                if (text.Length == 1)
+        //                {
+        //                    signedInteger = 0;
+        //                    return false;
+        //                }
+        //                continue;
+        //            }
+        //            if (text[i] < '0' || text[i] > '9')
+        //            {
+        //                signedInteger = 0;
+        //                return false;
+        //            }
+        //        }
+        //        try
+        //        {
+        //            signedInteger = System.Convert.ToInt32(text);
+        //            return true;
+        //        }
+        //        catch (FormatException)
+        //        {
+        //            signedInteger = 0;
+        //            return false;
+        //        }
+        //        catch (OverflowException)
+        //        {
+        //            signedInteger = 0;
+        //            return false;
+        //        }
+        //    }
+        //}
+
+        //public static bool TryParse(string text, out uint unsignedInteger)
+        //{
+        //    if (text == null || text.Length == 0)
+        //    {
+        //        unsignedInteger = 0;
+        //        return false;
+        //    }
+        //    if (_TypeUInt32HasTryParse == null)
+        //    {
+        //        Type type = typeof(uint);
+        //        System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+        //            , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+        //            , null
+        //            , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+        //            , null
+        //            );
+        //        _TypeInt32HasTryParse = method != null;
+        //    }
+        //    if ((bool)_TypeInt32HasTryParse)
+        //    {
+        //        return uint.TryParse(text, out unsignedInteger);
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < text.Length; i++)
+        //        {
+        //            if (text[i] < '0' || text[i] > '9')
+        //            {
+        //                unsignedInteger = 0;
+        //                return false;
+        //            }
+        //        }
+        //        try
+        //        {
+        //            unsignedInteger = System.Convert.ToUInt32(text);
+        //            return true;
+        //        }
+        //        catch (FormatException)
+        //        {
+        //            unsignedInteger = 0;
+        //            return false;
+        //        }
+        //        catch (OverflowException)
+        //        {
+        //            unsignedInteger = 0;
+        //            return false;
+        //        }
+        //    }
+        //}
+
+        //public static bool TryParse(string text, out long signedLong)
+        //{
+        //    if (text == null || text.Length == 0)
+        //    {
+        //        signedLong = 0;
+        //        return false;
+        //    }
+        //    if (_TypeInt64HasTryParse == null)
+        //    {
+        //        Type type = typeof(long);
+        //        System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+        //            , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+        //            , null
+        //            , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+        //            , null
+        //            );
+        //        _TypeInt64HasTryParse = method != null;
+        //    }
+        //    if ((bool)_TypeInt64HasTryParse)
+        //    {
+        //        return long.TryParse(text, out signedLong);
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < text.Length; i++)
+        //        {
+        //            if (i == 0 && text[0] == '-')
+        //            {
+        //                if (text.Length == 1)
+        //                {
+        //                    signedLong = 0;
+        //                    return false;
+        //                }
+        //                continue;
+        //            }
+        //            if (text[i] < '0' || text[i] > '9')
+        //            {
+        //                signedLong = 0;
+        //                return false;
+        //            }
+        //        }
+        //        try
+        //        {
+        //            signedLong = System.Convert.ToInt64(text);
+        //            return true;
+        //        }
+        //        catch (FormatException)
+        //        {
+        //            signedLong = 0;
+        //            return false;
+        //        }
+        //        catch (OverflowException)
+        //        {
+        //            signedLong = 0;
+        //            return false;
+        //        }
+        //    }
+        //}
+
+        //public static bool TryParse(string text, out ulong unsignedLong)
+        //{
+        //    if (text == null || text.Length == 0)
+        //    {
+        //        unsignedLong = 0;
+        //        return false;
+        //    }
+        //    if (_TypeUInt64HasTryParse == null)
+        //    {
+        //        Type type = typeof(ulong);
+        //        System.Reflection.MemberInfo method = type.GetMethod("TryParse"
+        //            , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
+        //            , null
+        //            , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
+        //            , null
+        //            );
+        //        _TypeUInt64HasTryParse = method != null;
+        //    }
+        //    if ((bool)_TypeUInt64HasTryParse)
+        //    {
+        //        return ulong.TryParse(text, out unsignedLong);
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < text.Length; i++)
+        //        {
+        //            if (text[i] < '0' || text[i] > '9')
+        //            {
+        //                unsignedLong = 0;
+        //                return false;
+        //            }
+        //        }
+        //        try
+        //        {
+        //            unsignedLong = System.Convert.ToUInt32(text);
+        //            return true;
+        //        }
+        //        catch (FormatException)
+        //        {
+        //            unsignedLong = 0;
+        //            return false;
+        //        }
+        //        catch (OverflowException)
+        //        {
+        //            unsignedLong = 0;
+        //            return false;
+        //        }
+        //    }
+        //}
+
+        #endregion
+
+
+        #region TryParse
+
+        public static T TryParse<T>(string value)
         {
-            boolean = Energy.Base.Cast.StringToBool(text);
-            return true;
+            T o;
+            Energy.Base.Text.TryParse<T>(value, out o);
+            return o;
         }
 
-        private static bool? _TypeInt32HasTryParse = null;
-        private static bool? _TypeUInt32HasTryParse = null;
-        private static bool? _TypeInt64HasTryParse = null;
-        private static bool? _TypeUInt64HasTryParse = null;
-
-        public static bool TryParse(string text, out int signedInteger)
+        public static bool TryParse<T>(string value, out T result)
         {
-            if (text == null || text.Length == 0)
+            result = default(T);
+            bool success = false;
+            if (value != null)
             {
-                signedInteger = 0;
-                return false;
-            }
-            if (_TypeInt32HasTryParse == null)
-            {
-                Type type = typeof(int);
-                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
-                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
-                    , null
-                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
-                    , null
-                    );
-                _TypeInt32HasTryParse = method != null;
-            }
-            if ((bool)_TypeInt32HasTryParse)
-            {
-                return int.TryParse(text, out signedInteger);
-            }
-            else
-            {
-                for (int i = 0; i < text.Length; i++)
+                object o = result;
+                Type t = typeof(T);
+                success = Energy.Base.Text.TryParse(t, value, ref o);
+                if (success)
                 {
-                    if (i == 0 && text[0] == '-')
-                    {
-                        if (text.Length == 1)
-                        {
-                            signedInteger = 0;
-                            return false;
-                        }
-                        continue;
-                    }
-                    if (text[i] < '0' || text[i] > '9')
-                    {
-                        signedInteger = 0;
-                        return false;
-                    }
-                }
-                try
-                {
-                    signedInteger = System.Convert.ToInt32(text);
-                    return true;
-                }
-                catch (FormatException)
-                {
-                    signedInteger = 0;
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    signedInteger = 0;
-                    return false;
+                    result = (T)o;
                 }
             }
+            return success;
         }
 
-        public static bool TryParse(string text, out uint unsignedInteger)
-        {
-            if (text == null || text.Length == 0)
-            {
-                unsignedInteger = 0;
-                return false;
-            }
-            if (_TypeUInt32HasTryParse == null)
-            {
-                Type type = typeof(uint);
-                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
-                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
-                    , null
-                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
-                    , null
-                    );
-                _TypeInt32HasTryParse = method != null;
-            }
-            if ((bool)_TypeInt32HasTryParse)
-            {
-                return uint.TryParse(text, out unsignedInteger);
-            }
-            else
-            {
-                for (int i = 0; i < text.Length; i++)
-                {
-                    if (text[i] < '0' || text[i] > '9')
-                    {
-                        unsignedInteger = 0;
-                        return false;
-                    }
-                }
-                try
-                {
-                    unsignedInteger = System.Convert.ToUInt32(text);
-                    return true;
-                }
-                catch (FormatException)
-                {
-                    unsignedInteger = 0;
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    unsignedInteger = 0;
-                    return false;
-                }
-            }
-        }
+        private const string PATTERN_BYTE = @"\+?(?:25[0-5]|2[0-4][0-9]|[0-9]{1,2})";
 
-        public static bool TryParse(string text, out long signedLong)
-        {
-            if (text == null || text.Length == 0)
-            {
-                signedLong = 0;
-                return false;
-            }
-            if (_TypeInt64HasTryParse == null)
-            {
-                Type type = typeof(long);
-                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
-                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
-                    , null
-                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
-                    , null
-                    );
-                _TypeInt64HasTryParse = method != null;
-            }
-            if ((bool)_TypeInt64HasTryParse)
-            {
-                return long.TryParse(text, out signedLong);
-            }
-            else
-            {
-                for (int i = 0; i < text.Length; i++)
-                {
-                    if (i == 0 && text[0] == '-')
-                    {
-                        if (text.Length == 1)
-                        {
-                            signedLong = 0;
-                            return false;
-                        }
-                        continue;
-                    }
-                    if (text[i] < '0' || text[i] > '9')
-                    {
-                        signedLong = 0;
-                        return false;
-                    }
-                }
-                try
-                {
-                    signedLong = System.Convert.ToInt64(text);
-                    return true;
-                }
-                catch (FormatException)
-                {
-                    signedLong = 0;
-                    return false;
-                }
-                catch (OverflowException)
-                {
-                    signedLong = 0;
-                    return false;
-                }
-            }
-        }
+        private const string PATTERN_BYTE_WHITE = @"\s*" + PATTERN_BYTE + @"\s*";
 
-        public static bool TryParse(string text, out ulong unsignedLong)
+        private const string PATTERN_BYTE_ALL = "^" + PATTERN_BYTE_WHITE + "$";
+
+        private const string PATTERN_SBYTE = @"\-(?:12[0-8]|1[01][0-9]|[0-9]{1,2})|\+?(?:12[0-7]|1[01][0-9]|[0-9]{1,2})";
+
+        private const string PATTERN_SBYTE_WHITE = @"\s*(?:" + PATTERN_SBYTE + @")\s*";
+
+        private const string PATTERN_SBYTE_ALL = "^" + PATTERN_SBYTE_WHITE + "$";
+
+        private const string PATTERN_USHORT = @"\+?(?:[0-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[012][0-9]|6553[0-5]|[0-9]{1,4})";
+
+        private const string PATTERN_USHORT_WHITE = @"\s*" + PATTERN_USHORT + @"\s*";
+
+        private const string PATTERN_USHORT_ALL = "^" + PATTERN_USHORT_WHITE + "$";
+
+        private const string PATTERN_SHORT = @"\-(?:[012][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[012][0-9]|3276[0-8]|[0-9]{1,4})|\+?(?:[0-2][0-9]{4}|3[0-1][0-9]{3}|32[0-6][0-9]{2}|327[0-2][0-9]|3276[0-7]|[0-9]{1,4})";
+
+        private const string PATTERN_SHORT_WHITE = @"\s*(?:" + PATTERN_SHORT + @")\s*";
+
+        private const string PATTERN_SHORT_ALL = "^" + PATTERN_SHORT_WHITE + "$";
+
+        private const string PATTERN_UINT = @"\+?(?:[0-3][0-9]{9}|4[01][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[01][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]|[0-9]{1,9})";
+
+        private const string PATTERN_UINT_WHITE = @"\s*" + PATTERN_UINT + @"\s*";
+
+        private const string PATTERN_UINT_ALL = "^" + PATTERN_UINT_WHITE + "$";
+
+        private const string PATTERN_INT = @"\-(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-8]|[0-9]{1,9})|\+?(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-7]|[0-9]{1,9})";
+
+        private const string PATTERN_INT_WHITE = @"\s*(?:" + PATTERN_INT + @")\s*";
+
+        private const string PATTERN_INT_ALL = "^" + PATTERN_INT_WHITE + "$";
+
+        private const string PATTERN_ULONG_MAX = @"0[0-9]{19}|1[0-7][0-9]{18}|18[0-3][0-9]{17}|184[0-3][0-9]{16}|1844[0-5][0-9]{15}|18446[0-6][0-9]{14}|184467[0-3][0-9]{13}|1844674[0-3][0-9]{12}|184467440[0-6][0-9]{10}|1844674407[012][0-9]{9}|18446744073[0-6][0-9]{8}|1844674407370[0-8][0-9]{6}|18446744073709[0-4][0-9]{5}|184467440737095[0-4][0-9]{4}|18446744073709550[0-9]{3}|18446744073709551[0-5][0-9]{3}|1844674407370955160[0-9]|1844674407370955161[0-5]|[0-9]{1,19}";
+
+        private const string PATTERN_ULONG = @"\+?(?:" + PATTERN_ULONG_MAX + ")";
+
+        private const string PATTERN_ULONG_WHITE = @"\s*" + PATTERN_ULONG + @"\s*";
+
+        private const string PATTERN_ULONG_ONLY = "^" + PATTERN_ULONG_WHITE + "$";
+
+        private const string PATTERN_LONG = @"\-(?:" + @"[0-8][0-9]{18}|9[01][0-9]{17}|92[01][0-9]{16}|922[012][0-9]{15}|9223[012][0-9]{14}|92233[0-6][0-9]{13}|922337[01][0-9]{12}|92233720[012][0-9]{10}|922337203[0-5][0-9]{9}|9223372036[0-7][0-9]{8}|92233720368[0-4][0-9]{7}|922337203685[0-3][0-9]{6}|9223372036854[0-6][0-9]{5}|92233720368547[0-6][0-9]{4}|922337203685477[0-4][0-9]{3}|9223372036854775[0-7][0-9]{2}|922337203685477580[0-8]|[0-9]{1,18}" + @")|\+?(?:" + @"[0-8][0-9]{18}|9[01][0-9]{17}|92[01][0-9]{16}|922[012][0-9]{15}|9223[012][0-9]{14}|92233[0-6][0-9]{13}|922337[01][0-9]{12}|92233720[012][0-9]{10}|922337203[0-5][0-9]{9}|9223372036[0-7][0-9]{8}|92233720368[0-4][0-9]{7}|922337203685[0-3][0-9]{6}|9223372036854[0-6][0-9]{5}|92233720368547[0-6][0-9]{4}|922337203685477[0-4][0-9]{3}|9223372036854775[0-7][0-9]{2}|922337203685477580[0-7]|[0-9]{1,18}" + ")";
+
+        private const string PATTERN_LONG_WHITE = @"\s*(?:" + PATTERN_LONG + @")\s*";
+
+        private const string PATTERN_LONG_ALL = "^" + PATTERN_LONG_WHITE + "$";
+
+        public static bool TryParse(Type type, string value, ref object result)
         {
-            if (text == null || text.Length == 0)
+            try
             {
-                unsignedLong = 0;
-                return false;
-            }
-            if (_TypeUInt64HasTryParse == null)
-            {
-                Type type = typeof(ulong);
-                System.Reflection.MemberInfo method = type.GetMethod("TryParse"
-                    , System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public
-                    , null
-                    , new Type[] { typeof(string), type.MakeByRefType() } // Method TryParse() with 2 parameters
-                    , null
-                    );
-                _TypeUInt64HasTryParse = method != null;
-            }
-            if ((bool)_TypeUInt64HasTryParse)
-            {
-                return ulong.TryParse(text, out unsignedLong);
-            }
-            else
-            {
-                for (int i = 0; i < text.Length; i++)
+                if (null == value)
                 {
-                    if (text[i] < '0' || text[i] > '9')
-                    {
-                        unsignedLong = 0;
-                        return false;
-                    }
+                    return false;
                 }
-                try
+                else if (type == typeof(string) || type == typeof(object))
                 {
-                    unsignedLong = System.Convert.ToUInt32(text);
+                    result = value;
                     return true;
                 }
-                catch (FormatException)
+                else if (type == typeof(byte))
                 {
-                    unsignedLong = 0;
-                    return false;
+                    if (Regex.IsMatch(value, PATTERN_BYTE_ALL))
+                    {
+                        result = byte.Parse(value);
+                        return true;
+                    }
                 }
-                catch (OverflowException)
+                else if (type == typeof(sbyte))
                 {
-                    unsignedLong = 0;
-                    return false;
+                    if (Regex.IsMatch(value, PATTERN_SBYTE_ALL))
+                    {
+                        result = sbyte.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(ushort))
+                {
+                    if (Regex.IsMatch(value, PATTERN_USHORT_ALL))
+                    {
+                        result = ushort.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(short))
+                {
+                    if (Regex.IsMatch(value, PATTERN_SHORT_ALL))
+                    {
+                        result = short.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(uint))
+                {
+                    if (Regex.IsMatch(value, PATTERN_UINT_ALL))
+                    {
+                        result = uint.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(int))
+                {
+                    if (Regex.IsMatch(value, PATTERN_INT_ALL))
+                    {
+                        result = int.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(ulong))
+                {
+                    if (Regex.IsMatch(value, PATTERN_ULONG_ONLY))
+                    {
+                        result = ulong.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(long))
+                {
+                    if (Regex.IsMatch(value, PATTERN_LONG_ALL))
+                    {
+                        result = long.Parse(value);
+                        return true;
+                    }
                 }
             }
+            catch
+            {
+                Debug.Write(null);
+            }
+            return false;
         }
 
         #endregion
@@ -2693,42 +3054,44 @@ namespace Energy.Base
             return Quote(text, with, escape);
         }
 
-/*
- * Removed to avoid using any value and possible problem in future when
- * new methods with different parameter types will appear.
- * 
+        /*
+         * Removed to avoid using any value and possible problem in future when
+         * new methods with different parameter types will appear.
+         * 
 
-        /// <summary>
-        /// Surround text with quotation characters.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string Quote(object value)
-        {
-            string text = Energy.Base.Cast.AsString(value);
-            return Quote(text, "\"", "\"");
-        }
+                /// <summary>
+                /// Surround text with quotation characters.
+                /// </summary>
+                /// <param name="value"></param>
+                /// <returns></returns>
+                public static string Quote(object value)
+                {
+                    string text = Energy.Base.Cast.AsString(value);
+                    return Quote(text, "\"", "\"");
+                }
 
-        /// <summary>
-        /// Surround text with quotation characters.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="with"></param>
-        /// <returns></returns>
-        public static string Quote(object value, string with)
-        {
-            string text = Energy.Base.Cast.AsString(value);
-            return Quote(text, with, with);
-        }
-                
- */
+                /// <summary>
+                /// Surround text with quotation characters.
+                /// </summary>
+                /// <param name="value"></param>
+                /// <param name="with"></param>
+                /// <returns></returns>
+                public static string Quote(object value, string with)
+                {
+                    string text = Energy.Base.Cast.AsString(value);
+                    return Quote(text, with, with);
+                }
+
+         */
 
         #endregion
 
         #region Strip
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from double quotation marks.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -2738,7 +3101,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2750,7 +3115,22 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Two sequential quotation characters inside the text will be replaced by single characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="quote"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string quote)
+        {
+            return Strip(text, quote, quote);
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2764,18 +3144,9 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Strip text from quotation characters.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="quote"></param>
-        /// <returns></returns>
-        public static string Strip(string text, string quote)
-        {
-            return Strip(text, quote, quote);
-        }
-
-        /// <summary>
-        /// Strip text from quotation characters.
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="quote"></param>
@@ -2804,6 +3175,122 @@ namespace Energy.Base
                 cut = cut.Replace(escape + quote, quote);
             }
             return cut;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <param name="change">Will be set to true if text was stripped</param>
+        /// <returns></returns>
+        public static string Strip(string text, string start, string end, string escape, out bool change)
+        {
+            change = false;
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            int a = 0;
+            int b = text.Length;
+            if (!string.IsNullOrEmpty(start) && text.StartsWith(start))
+            {
+                change = true;
+                a += start.Length;
+                b -= a;
+            }
+            if (!string.IsNullOrEmpty(end) && text.EndsWith(end))
+            {
+                change = true;
+                b -= end.Length;
+            }
+            text = text.Substring(a, b);
+            if (!string.IsNullOrEmpty(escape))
+            {
+                string e = escape + end;
+                if (text.Contains(e))
+                {
+                    change = true;
+                    text = text.Replace(e, end);
+                }
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string start, string end, string escape)
+        {
+            bool _;
+            return Strip(text, start, end, escape, out _);
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// <br/><br/>
+        /// Multiple variations may be set to allow different quotation styles to work.
+        /// <br/><br/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <param name="change">Will be set to true if text was stripped</param>
+        /// <returns></returns>
+        public static string Strip(string text, string[] start, string[] end, string[] escape, out bool change)
+        {
+            change = false;
+            if (null == start || null == end || null == escape)
+            {
+                return text;
+            }
+            int n = start.Length;
+            if (n != end.Length || n != escape.Length)
+            {
+                return text;
+            }
+            for (int i = 0; i < n; i++)
+            {
+                text = Strip(text, start[i], end[i], escape[i], out change);
+                if (change)
+                {
+                    break;
+                }
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Strip text from quotation.
+        /// <br/><br/>
+        /// Escape character for including quotation characters inside the text may be provided.
+        /// <br/><br/>
+        /// Multiple variations may be set to allow different quotation styles to work.
+        /// <br/><br/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="escape"></param>
+        /// <returns></returns>
+        public static string Strip(string text, string[] start, string[] end, string[] escape)
+        {
+            bool _;
+            return Strip(text, start, end, escape, out _);
         }
 
         #endregion
@@ -2899,7 +3386,7 @@ namespace Energy.Base
         [Energy.Attribute.Code.Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace")]
         [Obsolete("Energy.Base.Text.Editor moved to Energy.Core.Text namespace", false)]
         public class Editor : Energy.Core.Text.Editor { }
-        
+
         #endregion
 
         #region IndexOfAny
@@ -3601,7 +4088,7 @@ namespace Energy.Base
             {
                 string key = array[i * 2] ?? "";
                 if (ignoreCase)
-                    key = key.ToUpperInvariant();
+                    key = key.ToUpper(CultureInfo.InvariantCulture);
                 dictionary[key] = array[1 + i * 2] ?? "";
             }
             if (dictionary.Count == 0)
@@ -3628,7 +4115,7 @@ namespace Energy.Base
                 position += Δ;
                 string value = match.Value;
                 if (ignoreCase)
-                    value = value.ToUpperInvariant();
+                    value = value.ToUpper(CultureInfo.InvariantCulture);
                 string replacement = dictionary[value];
                 result = string.Concat(result.Substring(0, position), replacement, result.Substring(position + length));
                 Δ += replacement.Length - length;
@@ -3662,69 +4149,71 @@ namespace Energy.Base
 
         #region IsInteger
 
-        /// <summary>
-        /// Checks if string is an integer number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="negative"></param>
-        /// <returns></returns>
-        public static bool IsInteger(string value, bool negative)
-        {
-            if (negative)
-            {
-                int useless;
-                return int.TryParse(value, out useless);
-            }
-            else
-            {
-                uint useless;
-                return uint.TryParse(value, out useless);
-            }
-        }
+        private const string PATTERN_INTEGER_NUMBER_WITH_SIGN_ONLY = @"^\s*[+\-]?[0-9]+\s*$";
 
         /// <summary>
-        /// Checks if string is an integer number.
+        /// Check if value represents integer number.
+        /// <br /><br />
+        /// Allows optional sign character followed by any number of digits, optionally surrounded by whitespace characters.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        public static bool IsInteger(string value)
+        public static bool IsInteger(string input)
         {
-            return IsInteger(value, true);
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+            return Regex.IsMatch(input, PATTERN_INTEGER_NUMBER_WITH_SIGN_ONLY);
+        }
+
+        #endregion
+
+        #region IsNumber
+
+        /// <summary>
+        /// Check if value represents number.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsNumber(string input)
+        {
+            return Regex.Match(input ?? "", @"^[+\-]?[0-9]+([.,][0-9]*)?([eE][+\-]?[0-9]+)?$").Success;
         }
 
         #endregion
 
         #region IsLong
 
-        /// <summary>
-        /// Checks if string is a long integer number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="negative"></param>
-        /// <returns></returns>
-        public static bool IsLong(string value, bool negative)
-        {
-            if (negative)
-            {
-                long useless;
-                return long.TryParse(value, out useless);
-            }
-            else
-            {
-                long useless;
-                return long.TryParse(value, out useless);
-            }
-        }
+        ///// <summary>
+        ///// Checks if string is a long integer number.
+        ///// </summary>
+        ///// <param name="value"></param>
+        ///// <param name="negative"></param>
+        ///// <returns></returns>
+        //public static bool IsLong(string value, bool negative)
+        //{
+        //    if (negative)
+        //    {
+        //        long useless;
+        //        return long.TryParse(value, out useless);
+        //    }
+        //    else
+        //    {
+        //        long useless;
+        //        return long.TryParse(value, out useless);
+        //    }
+        //}
 
-        /// <summary>
-        /// Checks if string is a long integer number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool IsLong(string value)
-        {
-            return IsLong(value, true);
-        }
+        ///// <summary>
+        ///// Checks if string is a long integer number.
+        ///// </summary>
+        ///// <param name="value"></param>
+        ///// <returns></returns>
+        //public static bool IsLong(string value)
+        //{
+        //    return IsLong(value, true);
+        //}
 
         #endregion
 
@@ -3800,7 +4289,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string EmptyIfNull(string value)
         {
-            return value == null ? "" : value;
+            return value != null ? value : "";
         }
 
         #endregion
@@ -3960,6 +4449,268 @@ namespace Energy.Base
             string cut = Cut(text, terminator, quotation);
             text = text.Substring(cut.Length);
             return cut;
+        }
+
+        #endregion
+
+        #region AddSlashes
+
+        /// <summary>
+        /// Quote string with slashes in a C style.
+        /// Returns a string with backslashes before special characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string AddSlashes(string text)
+        {
+            return AddSlashes(text, GetSlashesDictionary());
+        }
+
+        /// <summary>
+        /// Quote string with slashes in a C style.
+        /// Returns a string with backslashes before special characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
+        public static string AddSlashes(string text, Dictionary<char, string> dictionary)
+        {
+            if (string.IsNullOrEmpty(text) || dictionary == null || dictionary.Count == 0)
+            {
+                return text;
+            }
+            int length = text.Length;
+            StringBuilder s = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                if (dictionary.ContainsKey(text[i]))
+                {
+                    s.Append(dictionary[text[i]]);
+                    continue;
+                }
+                s.Append(text[i]);
+            }
+            return s.ToString();
+        }
+
+        private static Dictionary<char, string> _SlashesDictionary;
+
+        private static Dictionary<char, string> GetSlashesDictionary()
+        {
+            if (null == _SlashesDictionary)
+            {
+                Dictionary<char, string> d = new Dictionary<char, string>();
+                d['\0'] = @"\0";
+                d['\x07'] = @"\a";
+                d['\x08'] = @"\b";
+                d['\x1b'] = @"\e";
+                d['\x0c'] = @"\f";
+                d['\x0a'] = @"\n";
+                d['\x0d'] = @"\r";
+                d['\x09'] = @"\t";
+                d['\x0b'] = @"\v";
+                d['\\'] = @"\";
+                d['\''] = @"\'";
+                d['"'] = @"\""";
+                d['?'] = @"\?";
+                d['\x01'] = @"\x01";
+                d['\x02'] = @"\x02";
+                d['\x03'] = @"\x03";
+                d['\x04'] = @"\x04";
+                d['\x05'] = @"\x05";
+                d['\x0e'] = @"\x0e";
+                d['\x0f'] = @"\x0f";
+                d['\x10'] = @"\x10";
+                d['\x11'] = @"\x11";
+                d['\x12'] = @"\x12";
+                d['\x13'] = @"\x13";
+                d['\x14'] = @"\x14";
+                d['\x15'] = @"\x15";
+                d['\x16'] = @"\x16";
+                d['\x17'] = @"\x17";
+                d['\x18'] = @"\x18";
+                d['\x19'] = @"\x19";
+                d['\x1a'] = @"\x1a";
+                d['\x1c'] = @"\x1c";
+                d['\x1d'] = @"\x1d";
+                d['\x1e'] = @"\x1e";
+                d['\x1f'] = @"\x1f";
+                if (null == _SlashesDictionary)
+                {
+                    _SlashesDictionary = d;
+                }
+            }
+            return _SlashesDictionary;
+        }
+
+        #endregion
+
+        #region IfEmpty
+
+        /// <summary>
+        /// Returns first non empty string from a parameter list.
+        /// Strings are considered to be empty if they are null.
+        /// Function will return empty string ("") if parameter list is empty.
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string IfEmpty(params string[] input)
+        {
+            if (null != input && 0 < input.Length)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(input[i]))
+                    {
+                        return input[i];
+                    }
+                }
+            }
+            return "";
+        }
+
+        #endregion
+
+        #region IfWhite
+
+        /// <summary>
+        /// Returns first non white string from a parameter list. 
+        /// White string is considered to be null, zero length or string containing only whitespace characters.
+        /// Function will return empty string ("") if parameter list is empty.
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string IfWhite(params string[] input)
+        {
+            if (null != input && 0 < input.Length)
+            {
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (string.IsNullOrEmpty(input[i]))
+                    {
+                        continue;
+                    }
+                    string t = Energy.Base.Text.Trim(input[i]);
+                    if (0 == t.Length)
+                    {
+                        continue;
+                    }
+                    return input[i];
+                }
+            }
+            return "";
+        }
+
+        #endregion
+
+        #region FindAnyWord
+
+        /// <summary>
+        /// Find any word from word list using regular expression match.
+        /// <br/><br/>
+        /// Return null if no word could be found.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="words"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string FindAnyWord(string input, string[] words, bool ignoreCase)
+        {
+            if (null == input || null == words || 0 == input.Length || 0 == words.Length)
+            {
+                return null;
+            }
+            List<string> list = new List<string>();
+            foreach (string word in words)
+            {
+                list.Add("(?:" + EscapeExpression(word) + ")");
+            }
+            string pattern = ""
+                + @"("
+                + string.Join("|", list.ToArray())
+                + @")"
+                ;
+            RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+            Match m = Regex.Match(input, pattern, options);
+            if (m.Success)
+            {
+                return m.Groups[1].Value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Find any word from word list using regular expression match.
+        /// <br/><br/>
+        /// Return null if no word could be found.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="words"></param>
+        /// <returns></returns>
+        public static string FindAnyWord(string input, string[] words)
+        {
+            return FindAnyWord(input, words, false);
+        }
+
+        #endregion
+
+        #region Obsolete
+
+        /// <summary>
+        /// Capitalize string by uppercasing the first letter, remaining the rest unchanged.
+        /// </summary>
+        /// <param name="word">Word</param>
+        /// <returns>Word</returns>
+        [Obsolete("Use Energy.Base.Text.Capitalize() instead.")]
+        public static string UpperFirst(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+            {
+                return word;
+            }
+            else if (1 == word.Length)
+            {
+                return char.ToUpper(word[0], CultureInfo.InvariantCulture).ToString();
+            }
+            else
+            {
+                return string.Concat(char.ToUpper(word[0], CultureInfo.InvariantCulture), word.Substring(1).ToLower(CultureInfo.InvariantCulture));
+            }
+        }
+
+        #endregion
+
+        #region Match
+
+        public static string Match(string text, Regex regex)
+        {
+            return Match(text, regex, -1);
+        }
+
+        public static string Match(string text, Regex regex, int index)
+        {
+            Match match = regex.Match(text);
+            if (!match.Success)
+            {
+                return null;
+            }
+            if (index < 0)
+            {
+                return match.Value;
+            }
+            else if (index >= match.Groups.Count)
+            {
+                return null;
+            }
+            else
+            {
+                return match.Groups[index].Value;
+            }
         }
 
         #endregion

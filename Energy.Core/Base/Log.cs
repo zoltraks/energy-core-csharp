@@ -29,7 +29,7 @@ namespace Energy.Base
             /// <summary>
             /// Log entry error code
             /// </summary>
-            public long Code;
+            public string Code;
 
             /// <summary>
             /// Log entry source name
@@ -39,7 +39,7 @@ namespace Energy.Base
             /// <summary>
             /// Log entry severity level
             /// </summary>
-            public Energy.Enumeration.LogLevel Level;
+            public int Level;
 
             /// <summary>
             /// Log entry additional context
@@ -79,7 +79,29 @@ namespace Energy.Base
                 Source = source;
             }
 
+            public Entry(string message, string source, Energy.Enumeration.LogLevel level)
+                : this()
+            {
+                Message = message;
+                Source = source;
+                Level = (int)level;
+            }
+
+            public Entry(string message, string source, int level)
+                : this()
+            {
+                Message = message;
+                Source = source;
+                Level = level;
+            }
+
             public Entry(string message, Energy.Enumeration.LogLevel level)
+                : this(message)
+            {
+                Level = (int)level;
+            }
+
+            public Entry(string message, int level)
                 : this(message)
             {
                 Level = level;
@@ -94,7 +116,7 @@ namespace Energy.Base
             public Entry(DateTime stamp, string message, Energy.Enumeration.LogLevel level)
                 : this(stamp, message)
             {
-                Level = level;
+                Level = (int)level;
             }
 
             public Entry(DateTime stamp, string message, string source)
@@ -106,6 +128,30 @@ namespace Energy.Base
             public Entry(DateTime stamp, string message, string source, Energy.Enumeration.LogLevel level)
                 : this(stamp, message, source)
             {
+                Level = (int)level;
+            }
+
+            public Entry(string message, string source, string code, Energy.Enumeration.LogLevel level)
+                : this()
+            {
+                Message = message;
+                Source = source;
+                Code = code;
+                Level = (int)level;
+            }
+
+            public Entry(string message, string source, string code, int level)
+                : this()
+            {
+                Message = message;
+                Source = source;
+                Code = code;
+                Level = level;
+            }
+
+            public Entry(DateTime stamp, string message, string source, int level)
+                : this(stamp, message, source)
+            {
                 Level = level;
             }
 
@@ -113,6 +159,48 @@ namespace Energy.Base
                 : this(Energy.Core.Bug.ExceptionMessage(exception))
             {
                 Exception = exception;
+            }
+
+            public Entry(Exception exception, string source)
+            {
+                Stamp = DateTime.Now;
+                Message = Energy.Core.Bug.ExceptionMessage(exception);
+                Exception = exception;
+                Source = source;
+            }
+
+            public Entry(Exception exception, string source, Energy.Enumeration.LogLevel level)
+            {
+                Stamp = DateTime.Now;
+                Message = Energy.Core.Bug.ExceptionMessage(exception);
+                Exception = exception;
+                Source = source;
+                Level = (int)level;
+            }
+
+            public Entry(Exception exception, string source, int level)
+            {
+                Stamp = DateTime.Now;
+                Message = Energy.Core.Bug.ExceptionMessage(exception);
+                Exception = exception;
+                Source = source;
+                Level = level;
+            }
+
+            public Entry(Exception exception, Energy.Enumeration.LogLevel level)
+            {
+                Stamp = DateTime.Now;
+                Message = Energy.Core.Bug.ExceptionMessage(exception);
+                Exception = exception;
+                Level = (int)level;
+            }
+
+            public Entry(Exception exception, int level)
+            {
+                Stamp = DateTime.Now;
+                Message = Energy.Core.Bug.ExceptionMessage(exception);
+                Exception = exception;
+                Level = level;
             }
 
             #endregion
@@ -124,7 +212,7 @@ namespace Energy.Base
                 List<string> list = new List<string>();
                 DateTime stamp = this.Stamp != DateTime.MinValue ? this.Stamp : DateTime.Now;
                 list.Add(stamp.ToString("HH:mm:ss.fff"));
-                if (Code != 0)
+                if (!string.IsNullOrEmpty(Code) && "0" != Code)
                 {
                     list.Add(Code.ToString());
                 }
@@ -189,12 +277,12 @@ namespace Energy.Base
             /// <summary>
             /// Minimum entry log level for being accepted
             /// </summary>
-            public Energy.Enumeration.LogLevel Minimum = Energy.Enumeration.LogLevel.None;
+            public int? Minimum;
 
             /// <summary>
-            /// Minimum entry log level for being accepted
+            /// Maximum entry log level for being accepted
             /// </summary>
-            public Energy.Enumeration.LogLevel Maximum = Energy.Enumeration.LogLevel.None;
+            public int? Maximum;
 
             /// <summary>
             /// Write list of entries
@@ -225,10 +313,14 @@ namespace Energy.Base
             /// <returns></returns>
             public bool Accept(Energy.Base.Log.Entry entry)
             {
-                if (Minimum != Energy.Enumeration.LogLevel.None && entry.Level < Minimum)
+                if (null != Minimum && entry.Level < Minimum)
+                {
                     return false;
-                if (Maximum != Energy.Enumeration.LogLevel.None && entry.Level > Maximum)
+                }
+                if (null != Maximum && entry.Level > Maximum)
+                {
                     return false;
+                }
                 return true;
             }
         }

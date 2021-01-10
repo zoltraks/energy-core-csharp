@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
-using System.Net.NetworkInformation;
 using System.Net;
 using System.IO;
 using System.ComponentModel;
 using System.Threading;
+#if !NETCF
+using System.Net.NetworkInformation;
+#endif
 
 namespace Energy.Core
 {
@@ -14,62 +16,88 @@ namespace Energy.Core
     {
         #region Utility
 
+        #region GetHostAddress
+
         public static string GetHostAddress(string host, AddressFamily addressFamily)
         {
-            if (host == null)
-                return null;
+            //if (host == null)
+            //{
+            //    return null;
+            //}
 
-            if (host == "")
-                return "";
+            //if (host == "")
+            //{
+            //    return "";
+            //}
 
-            if (host == "localhost" || host == ".")
+            if (string.IsNullOrEmpty(host))
+            {
+                return host;
+            }
+
+            if (0 == string.Compare(host, "localhost", true) || host == ".")
             {
                 return IPAddress.Parse("127.0.0.1").ToString();
             }
 
-            IPAddress ipAddress;
-            if (!IPAddress.TryParse(host, out ipAddress))
+            if (Energy.Base.Network.IsValidAddress(host))
             {
                 try
                 {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
-                    ipAddress = ipHostInfo.AddressList[0];
-                    if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                    IPAddress ipAddress = IPAddress.Parse(host);
+                    return ipAddress.ToString();
+                }
+                catch (FormatException)
+                {
+                }
+            }
+
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(host);
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                if (ipHostInfo.AddressList.Length > 0 && addressFamily != AddressFamily.Unspecified)
+                {
+                    Energy.Core.Bug.Write("Energy.Core.Network.GetHostAddress", () =>
                     {
-                        Energy.Core.Bug.Write("C175", () =>
-                        {
-                            List<string> ls = new List<string>();
-                            for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
-                            {
-                                ls.Add(ipHostInfo.AddressList[i].ToString());
-                            }
-                            string msg = string.Join(" , ", ls.ToArray());
-                            return msg;
-                        });
+                        List<string> ls = new List<string>();
                         for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
                         {
-                            ipAddress = ipHostInfo.AddressList[i];
-                            if (ipAddress.AddressFamily == addressFamily)
-                                break;
+                            ls.Add(ipHostInfo.AddressList[i].ToString());
+                        }
+                        string msg = string.Join(" , ", ls.ToArray());
+                        return msg;
+                    });
+                    for (int i = 0; i < ipHostInfo.AddressList.Length; i++)
+                    {
+                        ipAddress = ipHostInfo.AddressList[i];
+                        if (ipAddress.AddressFamily == addressFamily)
+                        {
+                            return ipAddress.ToString();
                         }
                     }
                 }
-                catch (SocketException socketException)
-                {
-                    Energy.Core.Bug.Catch(socketException);
-                    return null;
-                }
             }
-            return ipAddress.ToString();
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch(socketException);
+            }
+
+            return null;
         }
 
         public static string GetHostAddress(string host)
         {
             AddressFamily addressFamily = Settings.AddressFamily;
             if (addressFamily == AddressFamily.Unspecified)
+            {
                 addressFamily = GetAddressFamily(host);
+            }
             return GetHostAddress(host, addressFamily);
         }
+
+        #endregion
 
         /// <summary>
         /// Return System.Net.Sockets.AddressFamily appropriate to host address.
@@ -81,29 +109,46 @@ namespace Energy.Core
         /// </returns>
         public static AddressFamily GetAddressFamily(string address)
         {
-            if (address == "localhost" || address == "127.0.0.1")
-                return AddressFamily.InterNetwork;
-            if (address == "::1" || address == "[::1]" || address == "::" || address == "[::]")
-                return AddressFamily.InterNetworkV6;
-            IPAddress ipAddress = null;
-            if (IPAddress.TryParse(address, out ipAddress))
+            if (string.IsNullOrEmpty(address))
             {
-                return ipAddress.AddressFamily;
+                return AddressFamily.Unknown;
             }
-            else
+
+            if (address == "localhost" || address == "127.0.0.1")
+            {
+                return AddressFamily.InterNetwork;
+            }
+
+            if (address == "::1" || address == "[::1]" || address == "::" || address == "[::]")
+            {
+                return AddressFamily.InterNetworkV6;
+            }
+
+            if (Energy.Base.Network.IsValidAddress(address))
             {
                 try
                 {
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(address);
-                    ipAddress = ipHostInfo.AddressList[0];
+                    IPAddress ipAddress = IPAddress.Parse(address);
                     return ipAddress.AddressFamily;
                 }
-                catch (SocketException socketException)
+                catch (FormatException formatException)
                 {
-                    Energy.Core.Bug.Catch(socketException);
-                    return AddressFamily.Unknown;
+                    Energy.Core.Bug.Catch("Energy.Core.Network.GetAddressFamily", formatException);
                 }
             }
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(address);
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                return ipAddress.AddressFamily;
+            }
+            catch (SocketException socketException)
+            {
+                Energy.Core.Bug.Catch("Energy.Core.Network.GetAddressFamily", socketException);
+            }
+
+            return AddressFamily.Unknown;
         }
 
         public static SocketType GetSocketType(ProtocolType protocol, AddressFamily family)
@@ -142,11 +187,14 @@ namespace Energy.Core
         public static void Shutdown(Socket socket)
         {
             if (socket == null)
+            {
                 return;
+            }
             try
             {
                 socket.Shutdown(SocketShutdown.Both);
-                socket.Disconnect(true);
+                //socket.Disconnect(true);
+                //socket.Disconnect(false);
             }
             catch (SocketException socketException)
             {
@@ -160,9 +208,9 @@ namespace Energy.Core
             {
                 socket.Close();
             }
-            catch (Exception exceptionAny)
+            catch (Exception exception)
             {
-                Energy.Core.Bug.Catch(exceptionAny);
+                Energy.Core.Bug.Catch("Energy.Core.Network.Shutdown", exception);
             }
         }
 
@@ -176,20 +224,29 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetHostName()
         {
-            string name = Environment.MachineName;
+            string name = "";
+#if !NETCF
+            name = Environment.MachineName;
+#endif
             if (!string.IsNullOrEmpty(name))
+            {
                 return name;
-                try
-                {
-                    name = System.Net.Dns.GetHostName();
-                }
-                catch (SocketException exceptionSocket)
-                {
-                    Energy.Core.Bug.Catch(exceptionSocket);
-                }
+            }
+            try
+            {
+                name = System.Net.Dns.GetHostName();
+            }
+            catch (SocketException exceptionSocket)
+            {
+                Energy.Core.Bug.Catch("Energy.Core.Network.GetHostName", exceptionSocket);
+            }
             if (!string.IsNullOrEmpty(name))
+            {
                 return name;
+            }
+#if !NETCF
             name = System.Environment.GetEnvironmentVariable("COMPUTERNAME");
+#endif
             return name;
         }
 
@@ -205,12 +262,21 @@ namespace Energy.Core
         public static bool IsConnected(Socket socket)
         {
             if (socket == null)
+            {
                 return false;
-            if (!socket.Connected)
+            }
+            else if (!socket.Connected)
+            {
                 return false;
-            if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+            }
+            else if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+            {
                 return false;
-            return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         #endregion
@@ -249,6 +315,7 @@ namespace Energy.Core
         public static string[] GetSocketConfigurationStringArray(System.Net.Sockets.Socket socket)
         {
             List<string> list = new List<string>();
+#if !NETCF
             list.Add(string.Format("ReceiveBufferSize: {0}", socket.ReceiveBufferSize));
             list.Add(string.Format("ReceiveTimeout: {0}", socket.ReceiveTimeout));
             list.Add(string.Format("SendBufferSize: {0}", socket.SendBufferSize));
@@ -258,6 +325,7 @@ namespace Energy.Core
             list.Add(string.Format("NoDelay: {0}", socket.NoDelay));
             list.Add(string.Format("LingerState: {0}, {1}", socket.LingerState.Enabled, socket.LingerState.LingerTime));
             list.Add(string.Format("IsBound: {0}", socket.IsBound));
+#endif
             return list.ToArray();
         }
 
@@ -273,7 +341,9 @@ namespace Energy.Core
             list.Add(string.Format("ReceiveTimeout: {0}", client.ReceiveTimeout));
             list.Add(string.Format("SendBufferSize: {0}", client.SendBufferSize));
             list.Add(string.Format("SendTimeout: {0}", client.SendTimeout));
+#if !NETCF
             list.Add(string.Format("ExclusiveAddressUse: {0}", client.ExclusiveAddressUse));
+#endif
             list.Add(string.Format("NoDelay: {0}", client.NoDelay));
             list.Add(string.Format("LingerState: {0}, {1}", client.LingerState.Enabled, client.LingerState.LingerTime));
             //list.Add(string.Format("Available: {0}", socket.Available));
@@ -300,13 +370,16 @@ namespace Energy.Core
         {
             if (exclusive != null)
             {
+#if !NETCF
                 // Don't allow another socket to bind to this port.
                 // Should be true unless special cases.
                 socket.ExclusiveAddressUse = (bool)exclusive;
+#endif
             }
 
             if (linger != null)
             {
+#if !NETCF
                 // The socket will linger for specified amount of seconds after Socket.Close is called.
                 // The typical reason to set a SO_LINGER timeout of zero is to avoid large numbers of connections
                 // sitting in the TIME_WAIT state, tying up all the available resources on a server.
@@ -322,26 +395,38 @@ namespace Energy.Core
                 {
                     socket.LingerState = new System.Net.Sockets.LingerOption(true, (int)linger);
                 }
+#endif
             }
 
+#if !NETCF
             // Disable the Nagle Algorithm for this socket.
             // Sets NO_DELAY option for this socket.
             socket.NoDelay = true;
+#endif
 
+#if !NETCF
             // Set the receive buffer size
             socket.ReceiveBufferSize = buffer;
+#endif
 
+#if !NETCF
             // Set the send buffer size
             socket.SendBufferSize = buffer;
+#endif
 
+#if !NETCF
             // Set the timeout for synchronous receive methods
             socket.ReceiveTimeout = timeout;
+#endif
 
+#if !NETCF
             // Set the timeout for synchronous send methods
             socket.SendTimeout = timeout;
+#endif
 
             if (ttl != null)
             {
+#if !NETCF
                 // Set the Time To Live (TTL) to specified router hops
                 // or 42 by default.
                 if (ttl == 0)
@@ -352,9 +437,10 @@ namespace Energy.Core
                 {
                     socket.Ttl = (short)ttl;
                 }
+#endif
             }
 
-            Energy.Core.Bug.Write(string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
+            Energy.Core.Bug.Write("Energy.Core.Network.ConfigureSocket", string.Format("Socket configuration: {0}", string.Join(", ", GetSocketConfigurationStringArray(socket))));
 
             return socket;
         }
@@ -373,7 +459,9 @@ namespace Energy.Core
         {
             if (exclusive != null)
             {
+#if !NETCF
                 socket.ExclusiveAddressUse = (bool)exclusive;
+#endif
             }
 
             if (linger != null)
@@ -528,7 +616,7 @@ namespace Energy.Core
 
                 Clear();
 
-                if (ConnectDone.WaitOne(0))
+                if (ConnectDone.WaitOne(0, true))
                 {
                     if (!ConnectBegin())
                     {
@@ -566,7 +654,7 @@ namespace Energy.Core
                     {
                         Energy.Core.Worker.Fire(() =>
                         {
-                            if (!this.ConnectDone.WaitOne(timeout))
+                            if (!this.ConnectDone.WaitOne(timeout, true))
                             {
                                 //this.Active = false;
                                 this.Close();
@@ -643,31 +731,46 @@ namespace Energy.Core
                         connection.Receive();
                     }
                 }
-                catch (SocketException exceptionSocket)
+                catch (SocketException socketException)
                 {
-                    switch (exceptionSocket.SocketErrorCode)
+                    //switch (socketException.SocketErrorCode)
+                    //{
+                    //    default:
+                    //        connection.Active = false;
+                    //        break;
+
+                    //    case SocketError.ConnectionRefused:
+                    //        connection.Active = false;
+                    //        break;
+
+                    //    case SocketError.TimedOut:
+                    //        connection.Active = false;
+                    //        break;
+                    //}
+
+                    switch (socketException.ErrorCode)
                     {
                         default:
                             connection.Active = false;
                             break;
 
-                        case SocketError.ConnectionRefused:
+                        case 10061: // ConnectionRefused
                             connection.Active = false;
                             break;
 
-                        case SocketError.TimedOut:
+                        case 10060: // TimedOut
                             connection.Active = false;
                             break;
                     }
 
                     if (this.OnException != null)
                     {
-                        this.OnException(this, (Exception)exceptionSocket);
+                        this.OnException(this, (Exception)socketException);
                     }
                 }
                 catch (Exception exception)
                 {
-                    Energy.Core.Bug.Write(exception);
+                    Energy.Core.Bug.Write("Energy.Core.Network.SocketClient.ConnectCallback", exception);
 
                     if (this.OnException != null)
                     {
@@ -700,7 +803,7 @@ namespace Energy.Core
                     Energy.Core.Bug.Write("X " + SendBuffer.Count);
                 }
 
-                if (SendDone.WaitOne(0))
+                if (SendDone.WaitOne(0, true))
                 {
                     if (!SendBegin())
                     {
@@ -810,7 +913,7 @@ namespace Energy.Core
 
                     if (more)
                     {
-                        if (SendDone.WaitOne(0))
+                        if (SendDone.WaitOne(0, true))
                         {
                             SendBegin();
                         }
@@ -848,7 +951,7 @@ namespace Energy.Core
 
             public bool Receive()
             {
-                if (this.ReceiveDone.WaitOne(0))
+                if (this.ReceiveDone.WaitOne(0, true))
                 {
                     return ReceiveBegin();
                 }
@@ -1519,16 +1622,30 @@ namespace Energy.Core
 
                 if (exception is SocketException)
                 {
-                    switch (((SocketException)exception).SocketErrorCode)
+                    //switch (((SocketException)exception).SocketErrorCode)
+                    //{
+                    //    case SocketError.ConnectionRefused:
+                    //        return true;
+
+                    //    case SocketError.ConnectionReset:
+                    //        Close();
+                    //        return true;
+
+                    //    case SocketError.ConnectionAborted:
+                    //        Close();
+                    //        return true;
+                    //}
+                    SocketException socketException = (SocketException)exception;
+                    switch (socketException.ErrorCode)
                     {
-                        case SocketError.ConnectionRefused:
+                        case 10061: // ConnectionRefused
                             return true;
 
-                        case SocketError.ConnectionReset:
+                        case 10054: // ConnectionReset
                             Close();
                             return true;
 
-                        case SocketError.ConnectionAborted:
+                        case 10053: // ConnectionAborted
                             Close();
                             return true;
                     }
@@ -1648,6 +1765,8 @@ namespace Energy.Core
 
         #region Ping
 
+#if !NETCF
+
         public static int Ping(string address, int timeout, out System.Net.NetworkInformation.IPStatus status)
         {
             status = System.Net.NetworkInformation.IPStatus.Unknown;
@@ -1683,6 +1802,8 @@ namespace Energy.Core
             System.Net.NetworkInformation.IPStatus status;
             return Ping(address, Energy.Base.Network.DEFAULT_PING_TIMEOUT, out status);
         }
+
+#endif
 
         #endregion
     }

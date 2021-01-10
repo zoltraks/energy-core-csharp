@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Energy.Enumeration;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -25,7 +26,9 @@ namespace Energy.Base
         public static T As<T>(object value)
         {
             if (value == null)
+            {
                 return default(T);
+            }
             Type type = typeof(T);
             return (T)As(type, value);
         }
@@ -38,48 +41,91 @@ namespace Energy.Base
         /// <returns></returns>
         public static object As(System.Type type, object value)
         {
-            if (value == null)
+            if (null == value)
+            {
                 return null;
+            }
 
             Type r = type;
             Type t = value.GetType();
 
-            if (t == r)
+            if (r == t)
+            {
                 return value;
-
-            if (r == typeof(object))
+            }
+            else if (r == typeof(object))
+            {
                 return (object)value;
-
-            if (r == typeof(string))
+            }
+            else if (r == typeof(string))
+            {
                 return ObjectToString(value);
-            if (r == typeof(byte))
+            }
+            else if (r == typeof(byte))
+            {
                 return ObjectToByte(value);
-            if (r == typeof(sbyte))
+            }
+            else if (r == typeof(sbyte))
+            {
                 return ObjectToSignedByte(value);
-            if (r == typeof(char))
+            }
+            else if (r == typeof(char))
+            {
                 return ObjectToChar(value);
-            if (r == typeof(float))
+            }
+            else if (r == typeof(float))
+            {
                 return ObjectToFloat(value);
-            if (r == typeof(double))
+            }
+            else if (r == typeof(double))
+            {
                 return ObjectToDouble(value);
-            if (r == typeof(decimal))
+            }
+            else if (r == typeof(decimal))
+            {
                 return ObjectToDecimal(value);
-            if (r == typeof(Int16))
+            }
+            else if (r == typeof(Int16))
+            {
                 return ObjectToWord(value);
-            if (r == typeof(UInt16))
+            }
+            else if (r == typeof(UInt16))
+            {
                 return ObjectToUnsignedWord(value);
-            if (r == typeof(Int32))
+            }
+            else if (r == typeof(Int32))
+            {
                 return ObjectToInteger(value);
-            if (r == typeof(UInt32))
+            }
+            else if (r == typeof(UInt32))
+            {
                 return ObjectToUnsignedInteger(value);
-            if (r == typeof(Int64))
+            }
+            else if (r == typeof(Int64))
+            {
                 return ObjectToLong(value);
-            if (r == typeof(UInt64))
+            }
+            else if (r == typeof(UInt64))
+            {
                 return ObjectToUnsignedLong(value);
-            if (r == typeof(bool))
+            }
+            else if (r == typeof(bool))
+            {
                 return ObjectToBool(value);
+            }
+            else if (r == typeof(Stream))
+            {
+                return ObjectToStream(value);
+            }
 
-            return Energy.Base.Class.GetDefault(type);
+            if (r.IsEnum)
+            {
+                return StringToEnum(ObjectToString(value), r);
+            }
+            else
+            {
+                return Energy.Base.Class.GetDefault(type);
+            }
         }
 
         #endregion
@@ -676,7 +722,7 @@ namespace Energy.Base
 
             if (!isZero)
             {
-                if (value[0] == '0' && value.Length > 1 
+                if (value[0] == '0' && value.Length > 1
                     && (value[1] == '.' || value[1] == ',')
                     )
                 {
@@ -721,6 +767,32 @@ namespace Energy.Base
         #endregion
 
         #region Integer
+
+        /// <summary>
+        /// Convert text to signed 32-bit integer number without exception
+        /// ignoring leading and trailing whitespace characters.
+        /// <br/><br/>
+        /// If conversion cannot be performed, default value 0 is returned.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int StringToInt(string text)
+        {
+            text = Energy.Base.Text.Trim(text);
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+            int result;
+            if (!int.TryParse(text, out result))
+            {
+                return 0;
+            }
+            else
+            {
+                return result;
+            }
+        }
 
         /// <summary>
         /// Convert string to integer value without exception.
@@ -1339,7 +1411,9 @@ namespace Energy.Base
         public static Stream StringToStream(string value)
         {
             if (value == null)
+            {
                 value = string.Empty;
+            }
             MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(value));
             return stream;
         }
@@ -1353,9 +1427,13 @@ namespace Energy.Base
         public static Stream StringToStream(string value, Encoding encoding)
         {
             if (encoding == null)
+            {
                 encoding = Encoding.UTF8;
+            }
             if (value == null)
+            {
                 value = string.Empty;
+            }
             MemoryStream stream = new MemoryStream(encoding.GetBytes(value));
             return stream;
         }
@@ -1389,7 +1467,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static byte[] StreamRead(Stream stream)
+        public static byte[] StreamToByteArray(Stream stream)
         {
             byte[] buffer = new byte[8 * 1024];
             using (MemoryStream ms = new MemoryStream())
@@ -1415,7 +1493,7 @@ namespace Energy.Base
             {
                 encoding = Encoding.UTF8;
             }
-            byte[] data = StreamRead(stream);
+            byte[] data = Energy.Base.Cast.StreamToByteArray(stream);
             if (null == data)
             {
                 return null;
@@ -1431,6 +1509,18 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Read all bytes from stream and return as hexadecimal string
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static string StreamToHex(Stream stream)
+        {
+            byte[] data = Energy.Base.Cast.StreamToByteArray(stream);
+            string hex = Energy.Base.Cast.ByteArrayToHex(data);
+            return hex;
+        }
+
+        /// <summary>
         /// Return string from a stream using UTF-8 encoding.
         /// </summary>
         /// <param name="stream"></param>
@@ -1438,7 +1528,7 @@ namespace Energy.Base
         public static string StreamToString(Stream stream)
         {
             Encoding encoding = System.Text.Encoding.UTF8;
-            byte[] data = StreamRead(stream);
+            byte[] data = StreamToByteArray(stream);
             if (null == data)
             {
                 return null;
@@ -1675,7 +1765,7 @@ namespace Energy.Base
         /// <returns>string</returns>
         public static string DoubleToString(double value)
         {
-            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT 
+            if (Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT
                 == Energy.Base.Cast.Behaviour.DOUBLE_STRING_FORMAT_G17)
             {
                 string s17 = value.ToString("G17", CultureInfo.InvariantCulture);
@@ -1690,7 +1780,8 @@ namespace Energy.Base
                     if (s17.Length - s16.Length > 10)
                     {
                         Energy.Core.Bug.Write("Energy.Base.Cast.DoubleToString"
-                            , delegate () {
+                            , delegate ()
+                            {
                                 return string.Format("Choosing {0} over {1}", s16, s17);
                             });
                         return s16;
@@ -1886,15 +1977,21 @@ namespace Energy.Base
         public static byte StringToByte(string value, bool allowDecimal)
         {
             if (value == null || value.Length == 0)
+            {
                 return 0;
+            }
             byte result = 0;
             if (byte.TryParse(value, out result))
+            {
                 return result;
+            }
             string trim = Energy.Base.Text.Trim(value);
             if (trim.Length != value.Length)
             {
                 if (byte.TryParse(value, out result))
+                {
                     return result;
+                }
             }
             if (!allowDecimal)
                 return 0;
@@ -1953,58 +2050,6 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value)
-        {
-            return StringToByteSmart(value, new string[] { "0x", "0X", "$" }, true);
-        }
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="hexPrefix">List of possible hexadecimal prefixes if you want to decode byte from a hexadecimal string</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value, string[] hexPrefix)
-        {
-            return StringToByteSmart(value, hexPrefix, true);
-        }
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows use of hexadecimal with 0x / 0X and $ characters.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="hexPrefix">List of possible hexadecimal prefixes if you want to decode byte from a hexadecimal string</param>
-        /// <param name="takeFirst">Little Endian (true) or Big Endian (false) style</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByteSmart(string value, string[] hexPrefix, bool takeFirst)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            if (hexPrefix != null)
-            {
-                if (Energy.Base.Hex.IsHex(value, hexPrefix))
-                {
-                    byte[] byteArray = Energy.Base.Hex.HexToByteArray(value, hexPrefix);
-                    if (byteArray != null && byteArray.Length > 0)
-                    {
-                        if (takeFirst)
-                            return byteArray[0];
-                        else
-                            return byteArray[byteArray.Length - 1];
-                    }
-                }
-            }
-            return StringToByte(value);
-        }
-
-        /// <summary>
         /// Represent byte as decimal text.
         /// </summary>
         /// <param name="value"></param>
@@ -2019,6 +2064,8 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
+        [Obsolete]
+        [Energy.Attribute.Code.Obsolete]
         public static string ByteToStringSign(byte value)
         {
             return NumberToStringSign(value.ToString(), null);
@@ -2030,6 +2077,8 @@ namespace Energy.Base
         /// <param name="value"></param>
         /// <param name="sign"></param>
         /// <returns></returns>
+        [Obsolete]
+        [Energy.Attribute.Code.Obsolete]
         public static string ByteToStringSign(byte value, string sign)
         {
             return NumberToStringSign(value.ToString(), sign);
@@ -2755,7 +2804,9 @@ namespace Energy.Base
             {
                 TKey key = Energy.Base.Cast.As<TKey>(array[array.Length - 1]);
                 if (key != null)
+                {
                     dictionary[key] = default(TValue);
+                }
             }
             return dictionary;
         }
@@ -2882,20 +2933,32 @@ namespace Energy.Base
         {
             // treat DBNull as empty string //
             if (value == null || value == System.DBNull.Value)
+            {
                 return null;
+            }
             // maybe it is already string? //
             if (value is string)
+            {
                 return (string)value;
+            }
             // what about bool numbers //
             if (value is bool)
+            {
                 return (bool)value ? "1" : "0";
+            }
             // convert to culture invariant form //
             if (value is double)
+            {
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             if (value is decimal)
+            {
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             if (value is float)
+            {
                 return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             // works with nullable version DateTime? //
             if (value is DateTime)
             {
@@ -2920,6 +2983,10 @@ namespace Energy.Base
             if (value is TimeSpan)
             {
                 return TimeSpanToStringMilliseconds((TimeSpan)value, true, true, true);
+            }
+            if (value is byte[])
+            {
+                return ByteArrayToHex((byte[])value);
             }
             // return default string representation //
             return value.ToString();
@@ -3034,12 +3101,19 @@ namespace Energy.Base
         public static byte ObjectToByte(object value)
         {
             if (value == null)
+            {
                 return 0;
+            }
 
             if (value is byte)
+            {
                 return (byte)(byte)value;
+            }
+            
             if (value is char)
+            {
                 return (byte)(char)value;
+            }
 
             try
             {
@@ -3162,10 +3236,10 @@ namespace Energy.Base
 
                 if (value is double)
                     return (char)(double)value;
-                if (value is decimal)
-                    return (char)(decimal)value;
                 if (value is float)
                     return (char)(float)value;
+                if (value is decimal)
+                    return (char)(double)(decimal)value;
             }
             catch (OverflowException)
             {
@@ -3305,7 +3379,7 @@ namespace Energy.Base
             if (value is sbyte)
                 return (sbyte)value != 0;
             if (value is double)
-                return (double) value != 0;
+                return (double)value != 0;
             if (value is uint)
                 return (uint)value != 0;
             if (value is ulong)
@@ -3567,44 +3641,121 @@ namespace Energy.Base
             return dictionary;
         }
 
+        public static Stream ObjectToStream(object o)
+        {
+            string s = ObjectToString(o);
+            return StringToStream(s);
+        }
+
+        public static TStream ObjectToStream<TStream>(object o) where TStream : Stream
+        {
+            string s = ObjectToString(o);
+            if (null == s)
+            {
+                return default(TStream);
+            }
+            return StringToStream(s) as TStream;
+        }
+
         #endregion
 
         #region Enum
 
         /// <summary>
         /// Convert string to enumeration value.
+        /// Ignore case and surrounding whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
         /// </summary>
         /// <param name="value">string</param>
         /// <param name="type">Type</param>
         /// <returns>object</returns>
         public static object StringToEnum(string value, Type type)
         {
-            if (String.IsNullOrEmpty(value))
+            return StringToEnum(value, type, true);
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore leading and trailing whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="type">Type</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns>object</returns>
+        public static object StringToEnum(string value, Type type, bool ignoreCase)
+        {
+            if (type == null)
+            {
+                return 0;
+            }
+            if (value == null)
+            {
+                return 0;
+            }
+            value = Energy.Base.Text.Trim(value);
+            if (value.Length == 0)
             {
                 return 0;
             }
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
-                if (String.Compare(value, names[i], true) == 0)
+                if (string.Compare(value, names[i], ignoreCase) == 0)
                 {
-                    return Enum.Parse(type, value, true);
-                }
-            }
-            int length = value.Length;
-            value = Energy.Base.Text.Trim(value);
-            if (value.Length == length)
-            {
-                return 0;
-            }
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (String.Compare(value, names[i], true) == 0)
-                {
-                    return Enum.Parse(type, value, true);
+                    return Enum.Parse(type, value, ignoreCase);
                 }
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore case and surrounding whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T StringToEnum<T>(string value)
+        {
+            return (T)StringToEnum(value, typeof(T), true);
+        }
+
+        /// <summary>
+        /// Convert string to enumeration value.
+        /// Ignore leading and trailing whitespace.
+        /// If string value can't be found, equivalent of 0 will be returned.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static T StringToEnum<T>(string value, bool ignoreCase)
+        {
+            return (T)StringToEnum(value, typeof(T), ignoreCase);
+        }
+
+        /// <summary>
+        /// Convert integer number to enumeration value.
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <param name="type">Type</param>
+        /// <returns>object</returns>
+        public static object IntToEnum(int value, Type type)
+        {
+            return Enum.ToObject(type, value);
+        }
+
+        /// <summary>
+        /// Convert integer number to enumeration value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T IntToEnum<T>(int value)
+        {
+            return (T)IntToEnum(value, typeof(T));
         }
 
         #endregion
@@ -3702,7 +3853,7 @@ namespace Energy.Base
             {
                 return null;
             }
-            return System.Text.Encoding.UTF8.GetString(data);
+            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
         /// <summary>
@@ -3713,9 +3864,13 @@ namespace Energy.Base
         public static byte[] Base64ToByteArray(string input)
         {
             if (input == null)
+            {
                 return null;
+            }
             if (input.Length == 0)
+            {
                 return new byte[] { };
+            }
             byte[] data;
             try
             {
@@ -3726,21 +3881,6 @@ namespace Energy.Base
                 return null;
             }
             return data;
-        }
-
-        /// <summary>
-        /// Convert byte array to Base64 string
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static string ByteArrayToBase64(byte[] data)
-        {
-            if (data == null)
-                return null;
-            if (data.Length == 0)
-                return "";
-            string base64 = System.Convert.ToBase64String(data);
-            return base64;
         }
 
         #endregion
@@ -3926,6 +4066,70 @@ namespace Energy.Base
                         return Energy.Enumeration.TextAlign.Justify;
                 }
             }
+        }
+
+        #endregion
+
+        #region ByteArray
+
+        /// <summary>
+        /// Convert byte array to Base64 string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToBase64(byte[] data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            if (data.Length == 0)
+            {
+                return "";
+            }
+            string base64 = System.Convert.ToBase64String(data);
+            return base64;
+        }
+
+        /// <summary>
+        /// Convert byte array to hexadecimal string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToHex(byte[] data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            if (data.Length == 0)
+            {
+                return "";
+            }
+            string hex = BitConverter.ToString(data).Replace("-", "").ToLower();
+            return hex;
+        }
+
+        /// <summary>
+        /// Convert UTF-8 string to hexadecimal value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string StringToHex(string input)
+        {
+            return Energy.Base.Cast.StringToHex(input, System.Text.Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Convert string to hexadecimal value
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string StringToHex(string input, System.Text.Encoding encoding)
+        {
+            byte[] data = encoding.GetBytes(input);
+            return Energy.Base.Cast.ByteArrayToHex(data);
         }
 
         #endregion

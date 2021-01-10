@@ -354,7 +354,7 @@ namespace Energy.Core
             if (!string.IsNullOrEmpty(name))
             {
                 string textSuffix = string.Format(ExceptionMessageAppendNameFormat, name);
-                message = Energy.Core.Text.Editor.Global.AppendAfterFirstLine(message, textSuffix);
+                message = Energy.Core.Editor.Global.AppendAfterFirstLine(message, textSuffix);
             }
             return message;
         }
@@ -362,10 +362,14 @@ namespace Energy.Core
         public static string GetExceptionMessage(Exception exception, bool trace, bool includeClassName)
         {
             if (exception == null)
+            {
                 return "";
+            }
             string name = null;
             if (includeClassName)
+            {
                 name = exception.GetType().Name;
+            }
             return GetExceptionMessage(exception, trace, name);
         }
 
@@ -404,6 +408,7 @@ namespace Energy.Core
         /// <returns>string</returns>
         public static string CallingMethod(int stack)
         {
+#if !NETCF
             try
             {
                 string fullName = "";
@@ -434,6 +439,10 @@ namespace Energy.Core
             {
                 return "";
             }
+#endif
+#if NETCF    
+            return "";
+#endif
         }
 
         /// <summary>
@@ -469,7 +478,7 @@ namespace Energy.Core
 
         #endregion
 
-            #region Static
+        #region Static
 
         private static Class.SuppressCodeList SuppressCodeList
         {
@@ -484,14 +493,43 @@ namespace Energy.Core
         #region Catch
 
         /// <summary>
-        /// Handle exception
+        /// Handle exception.
+        /// <br /><br />
+        /// If code is not empty, exception message may be suppressed.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="exception"></param>
+        public static void Catch(string code, Exception exception)
+        {
+            if (exception == null)
+            {
+                Energy.Core.Bug.Write("Energy.Core.Bug.Catch", "Can't catch null exception");
+                return;
+            }
+            if (!string.IsNullOrEmpty(code) && IsSuppressed(code))
+            {
+                return;
+            }
+            string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
+            System.Diagnostics.Debug.WriteLine(FormatDebugOutput(exception.GetType().Name, message));
+            if ((bool)ExceptionTrace)
+            {
+                if (_Logger != null)
+                {
+                    _Logger.Write(message, Enumeration.LogLevel.Bug);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handle exception.
         /// </summary>
         /// <param name="exception"></param>
         public static void Catch(Exception exception)
         {
             if (exception == null)
             {
-                Energy.Core.Bug.Write("C601", "Can't catch null exception");
+                Energy.Core.Bug.Write("Energy.Core.Bug.Catch", "Can't catch null exception");
                 return;
             }
             string message = Energy.Core.Bug.GetExceptionMessage(exception, true, true);
@@ -579,6 +617,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Write debug message with numeric code which may be suppressed or limited.
+        /// <br /><br />
         /// Provide a function that returns message and will be invoked only if not suppressed.
         /// </summary>
         /// <param name="code"></param>

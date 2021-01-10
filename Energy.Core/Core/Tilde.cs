@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Energy.Core
 {
@@ -128,7 +130,9 @@ namespace Energy.Core
             public static ColorTextList Explode(string message)
             {
                 if (message == null)
+                {
                     return null;
+                }
                 ColorTextList list = new ColorTextList();
                 Match m = Regex.Match(message, Energy.Base.Expression.TildeText);
                 System.ConsoleColor? current = null;
@@ -165,6 +169,12 @@ namespace Energy.Core
 
         #endregion
 
+        #region Private
+
+        private static ConsoleColor? _Cancel_Foreground_ConsoleColor = null;
+
+        #endregion
+
         #region Global
 
         private static readonly object _ConsoleLock = new object();
@@ -186,7 +196,9 @@ namespace Energy.Core
             set
             {
                 if (value == _Colorless)
+                {
                     return;
+                }
                 SetColorless(value);
             }
         }
@@ -217,45 +229,6 @@ namespace Energy.Core
         private static string _AskChangeText = DefaultAskChangeText;
         public static string AskChangeText { get { return _AskChangeText; } set { _AskChangeText = value; } }
 
-        private static string _ExampleColorPalleteTildeString = ""
-            + "~darkblue~~#~1~#~\t~#~darkblue~#~"
-            + Energy.Base.Text.NL
-            + "~darkgreen~~#~2~#~\t~#~darkgreen~#~"
-            + Energy.Base.Text.NL
-            + "~darkcyan~~#~3~#~\t~#~darkcyan~#~"
-            + Energy.Base.Text.NL
-            + "~darkred~~#~4~#~\t~#~darkred~#~"
-            + Energy.Base.Text.NL
-            + "~darkmagenta~~#~5~#~\t~#~darkmagenta~#~"
-            + Energy.Base.Text.NL
-            + "~darkyellow~~#~6~#~\t~#~darkyellow~#~"
-            + Energy.Base.Text.NL
-            + "~gray~~#~7~#~\t~#~gray~#~"
-            + Energy.Base.Text.NL
-            + "~darkgray~~#~8~#~\t~#~darkgray~#~"
-            + Energy.Base.Text.NL
-            + "~blue~~#~9~#~\t~#~blue~#~"
-            + Energy.Base.Text.NL
-            + "~green~~#~10~#~\t~#~green~#~"
-            + Energy.Base.Text.NL
-            + "~cyan~~#~11~#~\t~#~cyan~#~"
-            + Energy.Base.Text.NL
-            + "~red~~#~12~#~\t~#~red~#~"
-            + Energy.Base.Text.NL
-            + "~magenta~~#~13~#~\t~#~magenta~#~"
-            + Energy.Base.Text.NL
-            + "~yellow~~#~14~#~\t~#~yellow~#~"
-            + Energy.Base.Text.NL
-            + "~white~~#~15~#~\t~#~white~#~"
-            + Energy.Base.Text.NL
-            + "~black~~#~16~#~\t~#~black~#~"
-            ;
-
-        /// <summary>
-        /// Cheat sheet for all colors defined by default
-        /// </summary>
-        public static string ExampleColorPalleteTildeString { get { return _ExampleColorPalleteTildeString; } set { _ExampleColorPalleteTildeString = value; } }
-
         #endregion
 
         #region Default
@@ -269,48 +242,132 @@ namespace Energy.Core
 
         #endregion
 
-        #region Example
+        #region Utility
 
-        public static class Example
+        /// <summary>
+        /// Utility
+        /// </summary>
+        public static class Utility
         {
-            public static string GetRainbowLine(string text, int limit, int offset)
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <param name="offset">Starting color offset</param>
+            /// <param name="colors">Color table</param>
+            /// <returns></returns>
+            public static string RainbowLine(string pattern, int width, int offset, string[] colors)
             {
-                if (string.IsNullOrEmpty(text))
+                if (string.IsNullOrEmpty(pattern))
                 {
-                    return text;
+                    return pattern;
                 }
-
-                string[] rainbow = new string[]
+                if (null == colors || 0 == colors.Length)
                 {
-                    Color.DarkBlue, Color.Blue, Color.Green, Color.Yellow, Color.Red, Color.DarkRed,
-                };
-
-                int n = offset;
-
-                if (limit < 1 || limit == text.Length)
-                {
-                    return rainbow[offset % rainbow.Length] + text;
+                    colors = new string[] { "" };
                 }
-
+                if (width < 1 || width == pattern.Length)
+                {
+                    return colors[offset % colors.Length] + pattern;
+                }
                 StringBuilder s = new StringBuilder();
                 int l = 0;
-                int d = text.Length;
-                while (l < limit)
+                int d = pattern.Length;
+                int n = offset;
+                while (l < width)
                 {
-                    s.Append(rainbow[n++ % rainbow.Length]);
-                    if (l + d <= limit)
+                    s.Append(colors[n++ % colors.Length]);
+                    if (l + d <= width)
                     {
-                        s.Append(text);
+                        s.Append(pattern);
                     }
                     else
                     {
-                        s.Append(text.Substring(0, limit - l));
+                        s.Append(pattern.Substring(0, width - l));
                     }
                     l += d;
                 }
 
                 return s.ToString();
             }
+
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <param name="offset">Starting color offset</param>
+            /// <returns></returns>
+            public static string RainbowLine(string pattern, int width, int offset)
+            {
+                string[] rainbow = new string[]
+                {
+                    Color.Magenta, Color.Blue, Color.Green, Color.Yellow, Color.DarkYellow, Color.Red,
+                };
+                return RainbowLine(pattern, width, offset, rainbow);
+            }
+
+            /// <summary>
+            /// Generate "rainbow" line using table of colors and pattern text for specified length.
+            /// </summary>
+            /// <param name="pattern">Pattern text like "-=-" or "-"</param>
+            /// <param name="width">Maximum width of generated text</param>
+            /// <returns></returns>
+
+            public static string RainbowLine(string pattern, int width)
+            {
+                return RainbowLine(pattern, width, 0);
+            }
+        }
+
+        #endregion
+
+        #region Example
+
+        /// <summary>
+        /// Example
+        /// </summary>
+        public static class Example
+        {
+            private static string _ColorPalleteTildeString = ""
+                + "~darkblue~~`~1~`~\t~`~darkblue~`~"
+                + Energy.Base.Text.NL
+                + "~darkgreen~~`~2~`~\t~`~darkgreen~`~"
+                + Energy.Base.Text.NL
+                + "~darkcyan~~`~3~`~\t~`~darkcyan~`~"
+                + Energy.Base.Text.NL
+                + "~darkred~~`~4~`~\t~`~darkred~`~"
+                + Energy.Base.Text.NL
+                + "~darkmagenta~~`~5~`~\t~`~darkmagenta~`~"
+                + Energy.Base.Text.NL
+                + "~darkyellow~~`~6~`~\t~`~darkyellow~`~"
+                + Energy.Base.Text.NL
+                + "~gray~~`~7~`~\t~`~gray~`~"
+                + Energy.Base.Text.NL
+                + "~darkgray~~`~8~`~\t~`~darkgray~`~"
+                + Energy.Base.Text.NL
+                + "~blue~~`~9~`~\t~`~blue~`~"
+                + Energy.Base.Text.NL
+                + "~green~~`~10~`~\t~`~green~`~"
+                + Energy.Base.Text.NL
+                + "~cyan~~`~11~`~\t~`~cyan~`~"
+                + Energy.Base.Text.NL
+                + "~red~~`~12~`~\t~`~red~`~"
+                + Energy.Base.Text.NL
+                + "~magenta~~`~13~`~\t~`~magenta~`~"
+                + Energy.Base.Text.NL
+                + "~yellow~~`~14~`~\t~`~yellow~`~"
+                + Energy.Base.Text.NL
+                + "~white~~`~15~`~\t~`~white~`~"
+                + Energy.Base.Text.NL
+                + "~black~~`~16~`~\t~`~black~`~"
+                ;
+
+            /// <summary>
+            /// Cheat sheet for all colors defined by default
+            /// </summary>
+            public static string ColorPalleteTildeString { get { return _ColorPalleteTildeString; } }
         }
 
         #endregion
@@ -318,7 +375,8 @@ namespace Energy.Core
         #region Ask
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// </summary>
         /// <param name="question">Question string</param>
         /// <param name="value">Default value</param>
@@ -328,34 +386,81 @@ namespace Energy.Core
             if (!string.IsNullOrEmpty(question))
             {
                 if (value == null)
+                {
                     value = "";
+                }
                 string message = value == "" ? AskSimpleText : AskChangeText;
                 message = string.Format(message, question, value);
                 Energy.Core.Tilde.RealWrite(message);
             }
-            int left = System.Console.CursorLeft;
-            System.ConsoleColor foreground = System.Console.ForegroundColor;
-            System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+
+            int left = 0;
+            try
+            {
+                left = System.Console.CursorLeft;
+            }
+            catch (ArgumentOutOfRangeException) { }
+            catch (SecurityException) { }
+            catch (IOException) { }
+            
+            ConsoleColor foreground = ConsoleColor.Gray;
+            try
+            {
+                foreground = System.Console.ForegroundColor;
+                if (!_Colorless)
+                {
+                    System.Console.ForegroundColor = System.ConsoleColor.Yellow;
+                }
+            }
+            catch (ArgumentException) { }
+            catch (IOException) { }
+            catch (SecurityException)
+            {
+                _Colorless = true;
+            }
+
+            try
+            {
+#if !NETCF
+                Console.CancelKeyPress += Console_CancelKeyPress;
+#endif
+                _Cancel_Foreground_ConsoleColor = foreground;
+            }
+            catch { }
+
             string answer = System.Console.ReadLine().Trim();
-            int top = System.Console.CursorTop;
-            System.Console.ForegroundColor = foreground;
+            
+            if (!_Colorless)
+            {
+                System.Console.ForegroundColor = foreground;
+            }
+
+            try
+            {
+                Console.CancelKeyPress -= Console_CancelKeyPress;
+            }
+            catch { }
+
             if (answer.Length == 0)
             {
                 answer = value;
                 try
                 {
+                    int top = System.Console.CursorTop;
                     System.Console.SetCursorPosition(left, top - 1);
+                    System.Console.WriteLine(answer);
                 }
-                catch (ArgumentOutOfRangeException)
-                {
-                }
-                System.Console.WriteLine(answer);
+                catch (ArgumentOutOfRangeException) { }
+                catch (SecurityException) { }
+                catch (IOException) { }
             }
+
             return answer;
         }
 
         /// <summary>
-        /// Ask question with prompt. Empty string will be returned if no data were provided.
+        /// Ask question with prompt.
+        /// Empty string will be returned if no data were provided.
         /// </summary>
         /// <param name="question">Question string</param>
         /// <returns>Value entered or empty string if skipped</returns>
@@ -365,7 +470,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -376,7 +482,9 @@ namespace Energy.Core
         {
             string answer = Ask(question, value);
             if (String.IsNullOrEmpty(answer))
+            {
                 return value;
+            }
             switch (casing)
             {
                 default:
@@ -389,7 +497,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -402,7 +511,8 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ask question with optional default value. Default will be returned if skipped by entering empty value.
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
@@ -414,7 +524,9 @@ namespace Energy.Core
         }
 
         /// <summary>
-        ///
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to desired type.
         /// </summary>
         /// <param name="question"></param>
         /// <param name="value"></param>
@@ -441,12 +553,29 @@ namespace Energy.Core
             }
         }
 
+        /// <summary>
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to the type of value parameter.
+        /// </summary>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static object Ask(string question, object value)
         {
             Type type = value != null ? value.GetType() : typeof(string);
             return Ask(question, value, type);
         }
 
+        /// <summary>
+        /// Ask question with optional default value.
+        /// Default will be returned if skipped by entering empty value.
+        /// Input value will be converted to desired type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="question"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static T Ask<T>(string question, T value)
         {
             T result;
@@ -459,15 +588,17 @@ namespace Energy.Core
         #region Break
 
         /// <summary>
-        /// Break with new lines and set default text color.
+        /// Write out empty lines and set default text color.
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="count">Number of empty lines to write</param>
         public static void Break(int count)
         {
             lock (_ConsoleLock)
             {
                 if (_Foreground != null)
+                {
                     System.Console.ForegroundColor = (ConsoleColor)_Foreground;
+                }
                 for (int i = 0; i < count; i++)
                 {
                     System.Console.WriteLine();
@@ -476,7 +607,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break one line and set default text color.
+        /// Write out one break line and set default text color.
         /// </summary>
         public static void Break()
         {
@@ -484,7 +615,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Break with one or more padding lines and ruler line.
+        /// Write out ruler line surrounded by empty lines.
         /// </summary>
         /// <param name="padding"></param>
         /// <param name="line"></param>
@@ -492,7 +623,9 @@ namespace Energy.Core
         {
             StringBuilder s = new StringBuilder();
             for (int i = 0; i < padding; i++)
+            {
                 s.AppendLine();
+            }
             string x = s.ToString();
             string t = string.Concat(x, line, x, Energy.Base.Text.NL);
             Write(t);
@@ -813,6 +946,38 @@ namespace Energy.Core
 
         #endregion
 
+        #region Line
+
+        /// <summary>
+        /// Write color text line.
+        /// </summary>
+        /// <param name="value"></param>
+        public static void Line(string value)
+        {
+            Write(string.Concat(value, Energy.Base.Text.NL));
+        }
+
+        /// <summary>
+        /// Write text line using specifed color and escaping any tilde characters in text.
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="text"></param>
+        public static void Line(ConsoleColor color, string text)
+        {
+            text = string.Concat(ConsoleColorToTildeColor(color), Escape(text), Energy.Base.Text.NL);
+            Write(text);
+        }
+
+        /// <summary>
+        /// Write empty line.
+        /// </summary>
+        public static void Line()
+        {
+            Write(Energy.Base.Text.NL);
+        }
+
+        #endregion
+
         #region Private
 
         private static readonly object _ThreadLock = new object();
@@ -867,18 +1032,29 @@ namespace Energy.Core
         private static void RealWrite(object value)
         {
             if (value == null)
+            {
                 return;
+            }
 
             string text = null;
 
             if (value is string)
+            {
                 text = value as string;
+            }
 
             if (string.IsNullOrEmpty(text))
+            {
                 return;
+            }
+
             ColorTextList list = ColorTextList.Explode(text);
+            
             if (list.Count == 0)
+            {
                 return;
+            }
+            
             lock (_ConsoleLock)
             {
                 // TODO Fix new lines :)
@@ -906,6 +1082,7 @@ namespace Energy.Core
                     }
                     System.Console.Write(list[i].Text);
                 }
+
                 if (!_Colorless)
                 {
                     System.Console.ForegroundColor = previousForegroundColor;
@@ -931,7 +1108,7 @@ namespace Energy.Core
                         if (!_Thread.IsAlive)
                         {
                             _Thread = null;
-                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " " 
+                            Debug.WriteLine(Energy.Base.Clock.CurrentTimeMilliseconds + " "
                                 + "Energy.Core.Tilde Thread is not alive anymore ("
                                 + (bugThreadOrphan = Energy.Base.Number.Increment(bugThreadOrphan)).ToString()
                                 + ")"
@@ -1258,10 +1435,7 @@ namespace Energy.Core
         public static void Exception(Exception exception, bool trace)
         {
             string message = GetExceptionMessage(exception, trace);
-            if (trace)
-                Tilde.WriteLine(message);
-            else
-                Tilde.Write(message);
+            WriteLine(message);
         }
 
         /// <summary>
@@ -1274,6 +1448,20 @@ namespace Energy.Core
         }
 
         /// <summary>
+        /// Alias for Exception method.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="trace"></param>
+        public static void WriteException(Exception exception, bool trace)
+        {
+            Exception(exception, trace);
+        }
+
+        #endregion
+
+        #region Pause
+
+        /// <summary>
         /// Pause execution
         /// </summary>
         /// <returns></returns>
@@ -1282,16 +1470,6 @@ namespace Energy.Core
             WriteLine(_PauseText);
             string input = System.Console.ReadLine();
             return input;
-        }
-
-        /// <summary>
-        /// Alias for Exception method.
-        /// </summary>
-        /// <param name="exception"></param>
-        /// <param name="trace"></param>
-        public static void WriteException(Exception exception, bool trace)
-        {
-            Exception(exception, trace);
         }
 
         #endregion
@@ -1314,7 +1492,9 @@ namespace Energy.Core
                 while (System.Console.KeyAvailable)
                 {
                     if (_ReadLineStringBuilder == null)
+                    {
                         _ReadLineStringBuilder = new StringBuilder();
+                    }
                     System.ConsoleKeyInfo key = System.Console.ReadKey();
                     if (key.Key == System.ConsoleKey.Enter)
                     {
@@ -1368,9 +1548,13 @@ namespace Energy.Core
                 {
                     stringBuilder.Append(key.KeyChar);
                     if (mask != null)
+                    {
                         Console.Write(mask);
+                    }
                     else
+                    {
                         Console.Write(key.KeyChar);
+                    }
                 }
             }
             while (key.Key != ConsoleKey.Escape);
@@ -1383,10 +1567,8 @@ namespace Energy.Core
 
         /// <summary>
         /// Write out prompt message and wait for input string. 
-        /// If empty string is read from console, function will return 
-        /// defaultValue parameter value.
-        /// If message contains placeholder {0}, it will be
-        /// replaced with defaultValue parameter value.
+        /// If empty string is read from console, function will return defaultValue parameter value.
+        /// If input message contains placeholder {0}, it will be replaced with defaultValue parameter value.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="defaultValue"></param>
@@ -1399,15 +1581,29 @@ namespace Energy.Core
             else
             {
                 if (message.Contains("{0}"))
+                {
                     message = string.Format(message, defaultValue);
+                }
             }
             Energy.Core.Tilde.RealWrite(message);
             string input = Console.ReadLine();
             if (string.IsNullOrEmpty(input))
+            {
                 input = defaultValue;
+            }
             return input;
         }
 
+        /// <summary>
+        /// Write out prompt message and wait for input string.
+        /// If empty string is read from console, function will return defaultValue parameter value.
+        /// If input message contains placeholder {0}, it will be replaced with defaultValue parameter value.
+        /// Input value will be converted to desired type.
+        /// </summary>
+        /// <typeparam name="TInput"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static TInput Input<TInput>(string message, object defaultValue)
         {
             string defaultString = Energy.Base.Cast.ObjectToString(defaultValue);
@@ -1416,7 +1612,7 @@ namespace Energy.Core
         }
 
         #endregion
-        
+
         #region Length
 
         /// <summary>
@@ -1435,6 +1631,9 @@ namespace Energy.Core
 
         #region Width
 
+        /// <summary>
+        /// Console window width in characters
+        /// </summary>
         public static int Width
         {
             get
@@ -1447,6 +1646,9 @@ namespace Energy.Core
 
         #region Height
 
+        /// <summary>
+        /// Console window height in lines
+        /// </summary>
         public static int Height
         {
             get
@@ -1454,6 +1656,61 @@ namespace Energy.Core
                 return GetHeight();
             }
         }
+
+        #endregion
+
+        #region IsConsolePresent
+
+        /// <summary>
+        /// Is "real" console present?
+        /// Important when you want to perform some operations that requires "real" console.
+        /// </summary>
+        public static bool IsConsolePresent { get { return GetConsolePresent(); } }
+
+        private static bool? _ConsolePresent;
+        
+        private static bool GetConsolePresent()
+        {
+            if (_ConsolePresent == null)
+            {
+#if !NETCF
+                _ConsolePresent = true;
+                try
+                {
+                    int windowHeight = Console.WindowHeight;
+                }
+                catch
+                {
+                    _ConsolePresent = false;
+                }
+#endif
+#if NETCF
+                // TODO Check in CF environment if it works
+                _ConsolePresent = Console.Out != null;
+#endif
+            }
+            return _ConsolePresent.Value;
+        }
+
+        #endregion
+
+        #region Event
+
+#if !NETCF
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            if (_Cancel_Foreground_ConsoleColor != null)
+            {
+                if (!_Colorless)
+                {
+                    Console.ForegroundColor = (ConsoleColor)_Cancel_Foreground_ConsoleColor;
+                }
+                _Cancel_Foreground_ConsoleColor = null;
+            }
+        }
+
+#endif
 
         #endregion
     }

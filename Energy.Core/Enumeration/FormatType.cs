@@ -5,36 +5,52 @@ namespace Energy.Enumeration
     /// <summary>
     /// Value representation format
     /// </summary>
+    //[Flags]
     public enum FormatType
     {
         /// <summary>
+        /// Format as is
+        /// </summary>
+        Plain = 0,
+
+        /// <summary>
         /// Format as text
         /// </summary>
-        Text,
+        Text = 1,
+
+        ///// <summary>
+        ///// Format as boolean value
+        ///// </summary>
+        //Bool = 2,
 
         /// <summary>
         /// Format as number
         /// </summary>
-        Number,
+        Number = 4,
+
+        /// <summary>
+        /// Format as integer number
+        /// </summary>
+        Integer = 8,
 
         /// <summary>
         /// Format as date
         /// </summary>
-        Date,
+        Date = 16,
 
         /// <summary>
         /// Format as time
         /// </summary>
-        Time,
+        Time = 32,
 
         /// <summary>
         /// Format as timestamp
         /// </summary>
-        Stamp,
+        Stamp = 64,
 
         /// <summary>
         /// Format as binary
         /// </summary>
-        Binary,
+        Binary = 128,
     }
 }

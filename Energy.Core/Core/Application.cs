@@ -98,7 +98,7 @@ namespace Energy.Core
         public Application(System.Reflection.Assembly assembly)
         {
             Name = assembly.FullName;
-            Directory = Information.GetAssemblyDirectory(assembly);
+            Directory = Energy.Base.Class.GetAssemblyDirectory(assembly);
         }
 
         #endregion
@@ -173,18 +173,20 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetLanguage instead")]
         public static System.Globalization.CultureInfo SetLanguage(string culture)
         {
-            try
-            {
-                System.Globalization.CultureInfo cultureInfo;
-                cultureInfo = new System.Globalization.CultureInfo(culture);
-                System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
-                return cultureInfo;
-            }
-            catch (Exception exception)
-            {
-                Energy.Core.Bug.Write(exception);
-                throw;
-            }
+            //try
+            //{
+            //    System.Globalization.CultureInfo cultureInfo;
+            //    cultureInfo = new System.Globalization.CultureInfo(culture);
+            //    var thread = System.Threading.Thread.CurrentThread;
+            //    System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            //    return cultureInfo;
+            //}
+            //catch (Exception exception)
+            //{
+            //    Energy.Core.Bug.Write(exception);
+            //    throw;
+            //}
+            return Energy.Core.Program.SetLanguage(culture);
         }
 
         [Obsolete("Use Energy.Core.Program.SetLanguage without any parameters instead")]
@@ -212,17 +214,18 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
-            try
-            {
-                Console.InputEncoding = encoding;
-                Console.OutputEncoding = encoding;
-            }
-            catch (System.Security.SecurityException)
-            { }
-            catch (Exception x)
-            {
-                Energy.Core.Bug.Catch(x);
-            }
+            Energy.Core.Program.SetConsoleEncoding(encoding);
+            //try
+            //{
+            //    Console.InputEncoding = encoding;
+            //    Console.OutputEncoding = encoding;
+            //}
+            //catch (System.Security.SecurityException)
+            //{ }
+            //catch (Exception x)
+            //{
+            //    Energy.Core.Bug.Catch(x);
+            //}
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
@@ -245,9 +248,7 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.GetExecutionDirectory instead")]
         public static string GetExecutionPath(System.Reflection.Assembly assembly)
         {
-            if (assembly == null)
-                return null;
-            return System.IO.Path.GetDirectoryName(assembly.Location);
+            return Energy.Base.Class.GetAssemblyDirectory(assembly);
         }
 
         /// <summary>
@@ -259,8 +260,10 @@ namespace Energy.Core
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
             if (null == assembly)
+            {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            return System.IO.Path.GetDirectoryName(assembly.Location);
+            }
+            return Energy.Base.Class.GetAssemblyDirectory(assembly);
         }
 
         #endregion

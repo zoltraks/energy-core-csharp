@@ -129,8 +129,7 @@ namespace Energy.Base
                 string column = match.Groups["column"].Value;
                 bool stickyRow = "$" == match.Groups["stickyRow"].Value;
                 bool stickyColumn = "$" == match.Groups["stickyColumn"].Value;
-                long row = 0;
-                long.TryParse(match.Groups["row"].Value, out row);
+                long row = Energy.Base.Text.TryParse<long>(match.Groups["row"].Value);
                 return 
                     new Address() 
                     { 
@@ -180,13 +179,11 @@ namespace Energy.Base
                 string columnA = match.Groups["columnA"].Value;
                 bool stickyRowA = "$" == match.Groups["stickyRowA"].Value;
                 bool stickyColumnA = "$" == match.Groups["stickyColumnA"].Value;
-                long rowA = 0;
-                long.TryParse(match.Groups["rowA"].Value, out rowA);
+                long rowA = Energy.Base.Text.TryParse<long>(match.Groups["rowA"].Value);
                 string columnB = match.Groups["columnB"].Value;
                 bool stickyRowB = "$" == match.Groups["stickyRowB"].Value;
                 bool stickyColumnB = "$" == match.Groups["stickyColumnB"].Value;
-                long rowB = 0;
-                long.TryParse(match.Groups["rowB"].Value, out rowB);
+                long rowB = Energy.Base.Text.TryParse<long>(match.Groups["rowB"].Value);
                 return
                     new Range()
                     {

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Security.Cryptography;
-using System.IO;
-using System.Diagnostics;
 
 namespace Energy.Base
 {

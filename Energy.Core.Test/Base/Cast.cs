@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Security.Policy;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -240,6 +241,14 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, c1);
         }
 
+        [Flags]
+        private enum SomeEnum
+        {
+            A,
+            B,
+            AB=A|B,
+        }
+
         [TestMethod]
         public void As()
         {
@@ -377,6 +386,14 @@ namespace Energy.Core.Test.Base
             expectDateTime = new DateTime(2000, 01, 01);
             resultDateTime = Energy.Base.Cast.AsDateTime(textRepresentation, DateTime.MinValue, expectDateTime);
             Assert.AreEqual(expectDateTime, resultDateTime);
+
+            // enum
+
+            var enumA = Energy.Base.Cast.As<SomeEnum>("A");
+            Assert.AreEqual(SomeEnum.A, enumA);
+
+            var enumAB = Energy.Base.Cast.As<SomeEnum>("AB");
+            Assert.AreEqual(SomeEnum.AB, enumAB);
         }
 
 
@@ -459,7 +476,106 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void StreamToString()
         {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                var bb = Encoding.UTF8.GetBytes("Test String");
+                ms.Write(bb, 0, bb.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                var ss = Energy.Base.Cast.StreamToString(ms);
+                Assert.AreEqual("Test String", ss);
+            }
+        }
 
+        public enum OptionsEnum
+        {
+            None,
+            One,
+            Two,
+            Three,
+            three,
+        }
+
+        public enum NegativeEnum
+        {
+            M1 = -1,
+            M2 = -2,
+        }
+
+        public enum DummyEnum
+        {
+        }
+
+        [TestMethod]
+        public void StringToEnum()
+        {
+            string s;
+            OptionsEnum o;
+            s = null;
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.None, o);
+            s = "";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.None, o);
+            s = "One";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.One, o);
+            s = "one";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.One, o);
+            s = " three ";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum));
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = (OptionsEnum)Energy.Base.Cast.StringToEnum(s, typeof(OptionsEnum), false);
+            Assert.AreEqual(OptionsEnum.three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s);
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s, true);
+            Assert.AreEqual(OptionsEnum.Three, o);
+            s = " three ";
+            o = Energy.Base.Cast.StringToEnum<OptionsEnum>(s, false);
+            Assert.AreEqual(OptionsEnum.three, o);
+        }
+
+        [Flags]
+        public enum BitsEnum
+        {
+            B0 = 0,
+            B1 = 1,
+            B2 = 2,
+            B3 = 4,
+        }
+
+        [TestMethod]
+        public void IntToEnum()
+        {
+            int i;
+            BitsEnum b;
+
+            i = 0;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B0, b);
+            i = 1;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1, b);
+            i = 2;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B2, b);
+            i = 3;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1 | BitsEnum.B2, b);
+            i = 4;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B3, b);
+            i = 5;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(BitsEnum.B1 | BitsEnum.B3, b);
+
+            i = -1;
+            b = Energy.Base.Cast.IntToEnum<BitsEnum>(i);
+            Assert.AreEqual(-1, (int)b);
         }
 
         [TestMethod]
@@ -574,6 +690,95 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
             expect = 67;
+            Assert.AreEqual(expect, result);
+        }
+        
+        [TestMethod]
+        public void StringToInteger()
+        {
+            string s;
+            int i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToInteger(s);
+            Assert.AreEqual(1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToInteger(s);
+            Assert.AreEqual(1000, i);
+        }
+
+        [TestMethod]
+        public void StringToInt()
+        {
+            string s;
+            int i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToInt(s);
+            Assert.AreEqual(1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToInt(s);
+            Assert.AreEqual(1000, i);
+
+            int n = Energy.Core.Benchmark.Loop(() => i = Energy.Base.Cast.StringToInt(s), 1);
+            Debug.WriteLine(n);
+            Assert.AreNotEqual(0, n);
+        }
+
+        [TestMethod]
+        public void ByteArrayToHex()
+        {
+            byte[] b;
+            b = new byte[] { 1, 2, 3, 10 };
+            string s;
+            s = Energy.Base.Cast.ByteArrayToHex(b);
+            Assert.AreEqual("0102030a", s);
+            s = Energy.Base.Cast.ObjectToString(b);
+            Assert.AreEqual("0102030a", s);
+            b = Energy.Base.Cast.StreamToByteArray(Energy.Base.Cast.StringToStream("abc"));
+            s = Energy.Base.Cast.ByteArrayToHex(b);
+            Assert.AreEqual("616263", s);
+            s = Energy.Base.Cast.StreamToHex(Energy.Base.Cast.StringToStream("abc"));
+            Assert.AreEqual("616263", s);
+        }
+
+        [TestMethod]
+        public void StringToDateTime()
+        {
+            DateTime expect;
+            DateTime result;
+            string needle;
+
+            needle = "2000-01-01";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "2000-01-01 23:59:59.999111";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle).Date;
+            Assert.AreEqual(expect, result);
+
+            needle = "23:59:59.999111 \t 2000-01-01 \t ";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle).Date;
+            Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010";
+            expect = new DateTime(2010, 5, 3);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010 6:1";
+            expect = new DateTime(2010, 5, 3, 6, 1, 0);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "03.05.2010 6";
+            expect = new DateTime(2010, 5, 3, 0, 0, 0);
+            result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
         }
     }

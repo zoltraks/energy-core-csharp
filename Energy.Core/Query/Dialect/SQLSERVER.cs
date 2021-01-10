@@ -10,7 +10,7 @@ namespace Energy.Query.Dialect
     /// </summary>
     public class SQLSERVER: Energy.Interface.IDialect
     {
-        public Format Format { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Format Format { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
 
         public string CreateTable(Energy.Source.Structure.Table table, Energy.Query.Style configuration)
         {

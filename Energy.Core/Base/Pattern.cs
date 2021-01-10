@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Energy.Base
 {
     /// <summary>
     /// Design patterns class repository
     /// </summary>
-    public class Pattern
+    public static class Pattern
     {
+        #region GlobalObject
+
         /// <summary>
         /// Represents class for "GLOBAL OBJECT" pattern.
         /// Singleton instance pattern.
@@ -62,6 +62,10 @@ namespace Energy.Base
                 }
             }
         }
+
+        #endregion
+
+        #region GlobalDestroy
 
         /// <summary>
         /// Represents class for "GLOBAL DESTROYABLE OBJECT" pattern.
@@ -160,6 +164,10 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region DefaultProperty
+
         /// <summary>
         /// Default property / Static instance pattern
         /// </summary>
@@ -203,6 +211,10 @@ namespace Energy.Base
                 }
             }
         }
+
+        #endregion
+
+        #region Singleton
 
         /// <summary>
         /// Represents class for "SINGLETON" pattern.
@@ -250,5 +262,28 @@ namespace Energy.Base
                 return _Instance;
             }
         }
+
+        #endregion
+
+        #region Builder
+
+        /// <summary>
+        /// Builder pattern.
+        /// Includes static Create() method which returns new instance of a class.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public class Builder<T>
+        {
+            /// <summary>
+            /// Create instance of class
+            /// </summary>
+            public static T Create()
+            {
+                T o = Activator.CreateInstance<T>();
+                return o;
+            }
+        }
+
+        #endregion
     }
 }

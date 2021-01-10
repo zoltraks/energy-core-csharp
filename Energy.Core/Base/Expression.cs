@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -140,10 +141,31 @@ namespace Energy.Base
 +
 ";
 
+        public static readonly string PathSplitCaptureUniversal = @"
+(?<white>[\r\n]+)
+|
+(?<slash>[\\/]+)
+|
+(?<item>
+[^\\/""'`\r\n]+
+|
+""(?:\\""|""""|[^""])*""
+|
+'(?:\\'|''|[^'])*'
+|
+`(?:\\`|``|[^`])*`
+)+
+";
+
         /// <summary>
         /// Expression for finding root element in XML
         /// </summary>
         public static readonly string XmlRootName = @"(?:<\?[xX][mM][lL][^>]*>\s*)?(?:<\s*([a-zA-Z_][^\s>]*))";
+        
+        /// <summary>
+        /// Expression for XML tag line (informal)
+        /// </summary>
+        public static string XmlTagLineInformal = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
 
         /// <summary>
         /// Expression for matching tilde color text
@@ -180,6 +202,21 @@ namespace Energy.Base
         public static string Escape(char? character)
         {
             return Escape(character, SPECIAL_CHARACTERS_STRING);
+        }
+
+        public static string Escape(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            StringBuilder b = new StringBuilder();
+            foreach (char c in text.ToCharArray())
+            {
+                b.Append(Escape(c));
+            }
+            string s = b.ToString();
+            return s;
         }
 
         public static string EscapeJoin(string glue, char[] array)
@@ -279,6 +316,86 @@ namespace Energy.Base
             }
             return result;
         }
+        #endregion
+
+        #region MatchNamedGroups
+
+        /// <summary>
+        /// Match named capture groups in text and return them as Dictionary of strings.
+        /// Returning Dictionary object will always contain keys.
+        /// Values that were not captured will remain null values.
+        /// </summary>
+        /// <param name="inputText"></param>
+        /// <param name="regexPattern"></param>
+        /// <param name="regexOptions"></param>
+        /// <param name="groupNames"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> MatchNamedGroups(string inputText, string regexPattern, RegexOptions regexOptions, string[] groupNames)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            Regex regex = null;
+            List<string> groups = null;
+            try
+            {
+                if (null == groupNames)
+                {
+                    if (string.IsNullOrEmpty(regexPattern))
+                    {
+                        return result;
+                    }
+                    regex = regex ?? new Regex(regexPattern, regexOptions);
+                    List<string> filtered = new List<string>();
+                    foreach (string candidate in regex.GetGroupNames())
+                    {
+                        if (Regex.Match(candidate, "^[0-9]+$").Success)
+                        {
+                            continue;
+                        }
+                        filtered.Add(candidate);
+                    }
+                    groupNames = filtered.ToArray();
+                    groups = groups ?? new List<string>(groupNames);
+                }
+
+                if (0 == groupNames.Length)
+                {
+                    return result;
+                }
+
+                foreach (string name in groupNames)
+                {
+                    result[name] = null;
+                }
+
+                if (string.IsNullOrEmpty(inputText) || string.IsNullOrEmpty(regexPattern))
+                {
+                    return result;
+                }
+
+                regex = regex ?? new Regex(regexPattern, regexOptions);
+                groups = groups ?? new List<string>(regex.GetGroupNames());
+
+                Match match = Regex.Match(inputText, regexPattern, regexOptions);
+                if (!match.Success)
+                {
+                    return result;
+                }
+                foreach (string key in groupNames)
+                {
+                    if (!groups.Contains(key))
+                    {
+                        continue;
+                    }
+                    result[key] = match.Groups[key].Value;
+                }
+            }
+            catch (Exception x)
+            {
+                Debug.WriteLine(Energy.Base.Clock.CurrentTime + " " + x.Message);
+            }
+            return result;
+        }
+
         #endregion
 
         #endregion

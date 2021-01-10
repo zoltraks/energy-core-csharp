@@ -10,7 +10,7 @@ namespace TextUnique
         static void Main(string[] args)
         {
             string[] array1 = new string[] { "äußern", "ÄUßERN", "żółty", "ŻÓŁTY", "éphémère", "ÉPHÉMÈRE", };
-            Energy.Core.Application.SetConsoleEncoding();
+            Energy.Core.Program.SetConsoleEncoding();
             Energy.Core.Tilde.WriteLine("UTF-8 Console Test: ĄÄĘ...\n");
             Test(array1);
             Energy.Core.Tilde.Pause();

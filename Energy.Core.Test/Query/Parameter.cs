@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Energy.Core.Test.Query
 {
@@ -39,6 +40,41 @@ namespace Energy.Core.Test.Query
             expect = "0x01020304";
             result = bag.Parse(query);
             Assert.AreEqual(expect, result);
+
+            query = @"INSERT INTO [dic_place] (
+  [location]
+ ,[code]
+ ,[count]
+)
+ VALUES 
+ ( 'loc'
+  , @EditCode
+  ,@EditCount
+)
+ SELECT SCOPE_IDENTITY()";
+            bag.Clear();
+            bag.Set("@EditCode", "ww", Enumeration.FormatType.Text);
+            bag.Set("@EditCount", "12", Enumeration.FormatType.Number);
+            result = bag.Parse(query);
+            Assert.IsNotNull(result);
+
+            bag.Clear();
+            bag.Set("where", "1=1", Enumeration.FormatType.Plain);
+            result = bag.Parse("@WHERE");
+            Assert.AreEqual("1=1", result);
+
+            bag.Clear();
+            bag.Set("where", "1=1", "PlAiN");
+            result = bag.Parse("@WHERE");
+            Assert.AreEqual("1=1", result);
+
+            bag.Clear();
+            bag.Set("a", "1");
+            bag.Set("@a", "2");
+            bag.Set("a", "3");
+            Assert.AreEqual(1, bag.Count);
+            result = bag.Parse("SELECT '@a' + @a");
+            Assert.AreEqual("SELECT '@a' + '3'", result);
         }
 
         [TestMethod]
@@ -120,8 +156,8 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            bag.Type["b"] = Energy.Enumeration.FormatType.Number;
-            bag.Type["c"] = Energy.Enumeration.FormatType.Number;
+            bag.SetType("b", Energy.Enumeration.FormatType.Number);
+            bag.SetType("c", Energy.Enumeration.FormatType.Number);
 
             text = "@a @b @c";
             must = "'''X''' 1 3.1415";
@@ -133,10 +169,17 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
+            text = "@Unicode";
+            bag.Unicode = true;
+            bag["unicode"] = ' ';
+            must = "N' '";
+            have = bag.Parse(text);
+            Assert.AreEqual(must, have);
+
             text = "@unknown";
             bag.Unicode = true;
             bag.UnknownAsEmpty = true;
-            must = "N''";
+            must = "''";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
@@ -147,19 +190,18 @@ GO
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            bag.Type["zero"] = Energy.Enumeration.FormatType.Number;
+            bag.SetType("zero", Energy.Enumeration.FormatType.Number);
 
             text = "@zero @a";
             bag.Unicode = false;
-            must = "'0' '''X'''";
+            must = "0 '''X'''";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
 
-            text = "@zero @a";
-            bag.Explicit = true;
+            text = "@zero @a1";
             bag.UnknownAsEmpty = false;
             bag.UnknownAsNull = false;
-            must = "'0' @a";
+            must = "0 @a1";
             have = bag.Parse(text);
             Assert.AreEqual(must, have);
         }

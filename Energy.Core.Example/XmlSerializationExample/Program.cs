@@ -29,6 +29,14 @@ namespace XmlSerializationExample
             _.Name = "Example name 2";
             s.Add("y", _);
             Console.WriteLine(Energy.Base.Xml.Serialize(s));
+            Console.WriteLine();
+
+            Test test = new Test();
+
+            test.SerializeBaseTable();
+
+            test.SerializeDataTable();
+
             Console.ReadLine();
         }
     }

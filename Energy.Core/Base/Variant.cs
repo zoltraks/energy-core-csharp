@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Energy.Base
 {
@@ -18,9 +16,13 @@ namespace Energy.Base
                 get
                 {
                     if (Value == null)
+                    {
                         return false;
+                    }
                     if (Value is bool)
+                    {
                         return (bool)Value;
+                    }
                     return Energy.Base.Cast.ObjectToBool(Value);
                 }
                 set { Value = value; }
@@ -31,9 +33,13 @@ namespace Energy.Base
                 get
                 {
                     if (Value == null)
+                    {
                         return (byte)0;
+                    }
                     if (Value is byte)
+                    {
                         return (byte)Value;
+                    }
                     return Energy.Base.Cast.ObjectToByte(Value);
                 }
                 set { Value = value; }
@@ -133,6 +139,26 @@ namespace Energy.Base
             {
                 get { return (object)Value; }
                 set { Value = value; }
+            }
+
+            public override bool Equals(object obj)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+
+            public static bool operator ==(Union left, Union right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(Union left, Union right)
+            {
+                return !(left == right);
             }
         }
 

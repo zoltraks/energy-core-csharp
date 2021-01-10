@@ -8,6 +8,18 @@ namespace Energy.Core.Test.Base
     public class Text
     {
         [TestMethod]
+        public void TextTrim()
+        {
+            Assert.AreEqual("", Energy.Base.Text.Trim(" "));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\t"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\v"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\r"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\n"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\f"));
+            Assert.AreEqual("", Energy.Base.Text.Trim("\0"));
+        }
+
+        [TestMethod]
         public void TextFormatWithNull()
         {
             string value = string.Format("{0} {1}", null, null).Trim();
@@ -202,6 +214,7 @@ namespace Energy.Core.Test.Base
             string expect;
             string value;
             string result;
+            bool change;
             value = "";
             result = Energy.Base.Text.Strip(value);
             expect = "";
@@ -224,6 +237,21 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(expect, result);
             result = Energy.Base.Text.Strip(value, "]", "]");
             Assert.AreEqual(expect, result);
+            value = "[]]]";
+            expect = "]";
+            result = Energy.Base.Text.Strip(value, "[", "]", "]");
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Strip(value, "[", "]", "]", out change);
+            Assert.IsTrue(change);
+            Assert.AreEqual(expect, result);
+
+            var qa = new string[] { "@\"", "\"" };
+            var qb = new string[] { "\"", "\"" };
+            var qe = new string[] { "\"", "\\" };
+            var s1 = Energy.Base.Text.Strip("@\"Verbatim \"\"style\"\" example", qa, qb, qe);
+            var s2 = Energy.Base.Text.Strip("\"Normal \\\"style\\\" example", qa, qb, qe);
+            Assert.AreEqual(@"Verbatim ""style"" example", s1);
+            Assert.AreEqual(@"Normal ""style"" example", s2);
         }
 
         [TestMethod]
@@ -766,6 +794,475 @@ Another
             Assert.IsNotNull(q.Escape);
             Assert.AreEqual(1, q.Escape.Length);
             Assert.AreEqual(@"\ ", q.Escape[0]);
+        }
+
+        [TestMethod]
+        public void TextIfEmpty()
+        {
+            string s;
+            s = Energy.Base.Text.IfEmpty(null, "", " ", "X");
+            Assert.AreEqual(" ", s);
+            s = Energy.Base.Text.IfEmpty(null);
+            Assert.AreEqual("", s);
+            s = Energy.Base.Text.IfEmpty();
+            Assert.AreEqual("", s);
+        }
+
+        [TestMethod]
+        public void TextIfWhite()
+        {
+            string s;
+            s = Energy.Base.Text.IfWhite(null, "", " ", "\t", "\t\r\n\v", ".", "!");
+            Assert.AreEqual(".", s);
+            s = Energy.Base.Text.IfWhite(null);
+            Assert.AreEqual("", s);
+            s = Energy.Base.Text.IfWhite();
+            Assert.AreEqual("", s);
+        }
+
+        [TestMethod]
+        public void TextFindAnyWord()
+        {
+            string[] a;
+            a = new string[] { };
+            string x;
+            x = Energy.Base.Text.FindAnyWord(null, a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            a = null;
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            a = new string[] { "a|b" , "[]" };
+            x = Energy.Base.Text.FindAnyWord(null, a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("a|b", a);
+            Assert.AreEqual("a|b", x);
+            x = Energy.Base.Text.FindAnyWord("[]", a);
+            Assert.AreEqual("[]", x);
+            a = new string[] { "." };
+            x = Energy.Base.Text.FindAnyWord("", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord("a", a);
+            Assert.IsNull(x);
+            x = Energy.Base.Text.FindAnyWord(".", a);
+            Assert.AreEqual(".", x);
+        }
+
+        [TestMethod]
+        public void TextIsInteger()
+        {
+            Assert.IsFalse(Energy.Base.Text.IsInteger(null));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(""));
+            Assert.IsFalse(Energy.Base.Text.IsInteger(" "));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("-"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("+"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger(" +1"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger(" -1"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("+ 1"));
+            Assert.IsFalse(Energy.Base.Text.IsInteger("- 1"));
+
+            Assert.IsTrue(Energy.Base.Text.IsInteger("+0"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("-0"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("-1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsInteger("+1234567890123456789012345678901234567890"));
+        }
+
+        [TestMethod]
+        public void TextIsNumber()
+        {
+            Assert.IsFalse(Energy.Base.Text.IsNumber(null));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(""));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" "));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("-"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("+"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" +1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(" -1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("+ 1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("- 1"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("12e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("12. e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("e"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber("e0"));
+            Assert.IsFalse(Energy.Base.Text.IsNumber(".e0"));
+
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+1234567890123456789012345678901234567890.1234567890123456789012345678901234567890"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("0e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("0.e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e0"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e3"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("+12.e+3"));
+            Assert.IsTrue(Energy.Base.Text.IsNumber("-12.e-3"));
+        }
+
+        [TestMethod]
+        public void TextUpper()
+        {
+            Assert.AreEqual("AAÀÀŹŹŢŢǬǬΔΔДД", Energy.Base.Text.Upper("AaÀàŹźŢţǬǭΔδДд"));
+        }
+
+        [TestMethod]
+        public void TextLower()
+        {
+            Assert.AreEqual("aaààźźţţǭǭδδдд", Energy.Base.Text.Lower("AaÀàŹźŢţǬǭΔδДд"));
+        }
+
+        [TestMethod]
+        public void TextSplitLine()
+        {
+            Assert.IsNull(Energy.Base.Text.SplitLine(null));
+            Assert.AreEqual(0, Energy.Base.Text.SplitLine("").Length);
+            string content;
+            string[] array;
+            content = "a";
+            array = Energy.Base.Text.SplitLine(content);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a" }, array));
+            content = "a\r\n\n\rb";
+            array = Energy.Base.Text.SplitLine(content);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "", "", "b" }, array));
+            array = Energy.Base.Text.SplitLine(content, false);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "", "", "b" }, array));
+            array = Energy.Base.Text.SplitLine(content, true);
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(new string[] { "a", "b" }, array));
+        }
+
+        [TestMethod]
+        public void TryParse()
+        {
+            Assert.IsNull(Energy.Base.Text.TryParse<object>(null));
+            Assert.AreEqual("", Energy.Base.Text.TryParse<string>(""));
+            Assert.AreEqual("", Energy.Base.Text.TryParse<object>(""));
+
+            bool b;
+            string s;
+
+            #region byte
+
+            byte o_byte;
+
+            Assert.IsFalse(Energy.Base.Text.TryParse<byte>("-1", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Text.TryParse<byte>("-1"));
+
+            b = byte.TryParse("1", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Text.TryParse<byte>("1", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Text.TryParse<byte>("1"));
+
+            b = byte.TryParse(" 1 ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Text.TryParse<byte>(" 1 ", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Text.TryParse<byte>(" 1 "));
+
+            b = byte.TryParse(" \t\r\n 1 \t\r\n ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(1, o_byte);
+            Assert.IsTrue(Energy.Base.Text.TryParse<byte>(" \t\r\n 1 \t\r\n ", out o_byte));
+            Assert.AreEqual(1, o_byte);
+            Assert.AreEqual(1, Energy.Base.Text.TryParse<byte>(" \t\r\n 1 \t\r\n "));
+
+            b = byte.TryParse("256", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Text.TryParse<byte>("256", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Text.TryParse<byte>("256"));
+
+            b = byte.TryParse("1.0", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Text.TryParse<byte>("1.0", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Text.TryParse<byte>("1.0"));
+
+            b = byte.TryParse("255", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(255, o_byte);
+            Assert.IsTrue(Energy.Base.Text.TryParse<byte>("255", out o_byte));
+            Assert.AreEqual(255, o_byte);
+            Assert.AreEqual(255, Energy.Base.Text.TryParse<byte>("255"));
+
+            b = byte.TryParse(" +255 ", out o_byte);
+            Assert.IsTrue(b);
+            Assert.AreEqual(255, o_byte);
+            Assert.IsTrue(Energy.Base.Text.TryParse<byte>(" +255 ", out o_byte));
+            Assert.AreEqual(255, o_byte);
+            Assert.AreEqual(255, Energy.Base.Text.TryParse<byte>(" +255 "));
+
+            b = byte.TryParse(" + 2 ", out o_byte);
+            Assert.IsFalse(b);
+            Assert.IsFalse(Energy.Base.Text.TryParse<byte>(" + 2", out o_byte));
+            Assert.AreEqual(0, Energy.Base.Text.TryParse<byte>(" + 2"));
+
+            #endregion
+
+            #region sbyte
+
+            sbyte o_sbyte;
+
+            foreach (var v_sbyte in new sbyte[] { 0, 1, -1, sbyte.MinValue, sbyte.MaxValue, 2, -2 })
+            {
+                s = v_sbyte.ToString();
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.IsTrue(Energy.Base.Text.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.AreEqual(v_sbyte, Energy.Base.Text.TryParse<sbyte>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.IsTrue(Energy.Base.Text.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(v_sbyte, o_sbyte);
+                Assert.AreEqual(v_sbyte, Energy.Base.Text.TryParse<sbyte>(s));
+            }
+
+            foreach (var s_sbyte in new string[] { "128", "-129", "+ 127", "- 128", "127.0" })
+            {
+                s = s_sbyte;
+
+                b = sbyte.TryParse(s, out o_sbyte);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<sbyte>(s, out o_sbyte));
+                Assert.AreEqual(0, Energy.Base.Text.TryParse<sbyte>(s));
+            }
+
+            #endregion
+
+            #region ushort
+
+            ushort o_ushort;
+
+            foreach (var v_ushort in new ushort[] { 0, 1, ushort.MinValue, ushort.MaxValue, 2, })
+            {
+                s = v_ushort.ToString();
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.IsTrue(Energy.Base.Text.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.AreEqual(v_ushort, Energy.Base.Text.TryParse<ushort>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.IsTrue(Energy.Base.Text.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(v_ushort, o_ushort);
+                Assert.AreEqual(v_ushort, Energy.Base.Text.TryParse<ushort>(s));
+            }
+
+            foreach (var s_ushort in new string[] { "65536", "-32768", "65535.0" })
+            {
+                s = s_ushort;
+
+                b = ushort.TryParse(s, out o_ushort);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<ushort>(s, out o_ushort));
+                Assert.AreEqual(0, Energy.Base.Text.TryParse<ushort>(s));
+            }
+
+            #endregion
+
+            #region short
+
+            short o_short;
+
+            foreach (var v_short in new short[] { 0, 1, -1, short.MinValue, short.MaxValue, 2, -2 })
+            {
+                s = v_short.ToString();
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_short, o_short);
+                Assert.IsTrue(Energy.Base.Text.TryParse<short>(s, out o_short));
+                Assert.AreEqual(v_short, o_short);
+                Assert.AreEqual(v_short, Energy.Base.Text.TryParse<short>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_short, o_short);
+                Assert.IsTrue(Energy.Base.Text.TryParse<short>(s, out o_short));
+                Assert.AreEqual(v_short, o_short);
+                Assert.AreEqual(v_short, Energy.Base.Text.TryParse<short>(s));
+            }
+
+            foreach (var s_short in new string[] { "32768", "-32769", "+ 32767", "- 32768", "32767.0" })
+            {
+                s = s_short;
+
+                b = short.TryParse(s, out o_short);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<short>(s, out o_short));
+                Assert.AreEqual(0, Energy.Base.Text.TryParse<short>(s));
+            }
+
+            #endregion
+
+            #region uint
+
+            uint o_uint;
+
+            foreach (var v_uint in new uint[] { 0, 1, uint.MinValue, uint.MaxValue, 2, })
+            {
+                s = v_uint.ToString();
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.IsTrue(Energy.Base.Text.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.AreEqual(v_uint, Energy.Base.Text.TryParse<uint>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.IsTrue(Energy.Base.Text.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual(v_uint, o_uint);
+                Assert.AreEqual(v_uint, Energy.Base.Text.TryParse<uint>(s));
+            }
+
+            foreach (var s_uint in new string[] { "4294967296", "-1", "4294967295.0" })
+            {
+                s = s_uint;
+
+                b = uint.TryParse(s, out o_uint);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<uint>(s, out o_uint));
+                Assert.AreEqual((uint)0, Energy.Base.Text.TryParse<uint>(s));
+            }
+
+            #endregion
+
+            #region int
+
+            int o_int;
+
+            foreach (var v_int in new int[] { 0, 1, -1, int.MinValue, int.MaxValue, 2, -2 })
+            {
+                s = v_int.ToString();
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_int, o_int);
+                Assert.IsTrue(Energy.Base.Text.TryParse<int>(s, out o_int));
+                Assert.AreEqual(v_int, o_int);
+                Assert.AreEqual(v_int, Energy.Base.Text.TryParse<int>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_int, o_int);
+                Assert.IsTrue(Energy.Base.Text.TryParse<int>(s, out o_int));
+                Assert.AreEqual(v_int, o_int);
+                Assert.AreEqual(v_int, Energy.Base.Text.TryParse<int>(s));
+            }
+
+            foreach (var s_int in new string[] { "2147483648", "-2147483649", "+ 2147483647", "- 2147483648", "2147483647.0" })
+            {
+                s = s_int;
+
+                b = int.TryParse(s, out o_int);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<int>(s, out o_int));
+                Assert.AreEqual(0, Energy.Base.Text.TryParse<int>(s));
+            }
+
+            #endregion
+
+            #region ulong
+
+            ulong o_ulong;
+
+            foreach (var v_ulong in new ulong[] { 0, 1, ulong.MinValue, ulong.MaxValue, 2, })
+            {
+                s = v_ulong.ToString();
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.IsTrue(Energy.Base.Text.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.AreEqual(v_ulong, Energy.Base.Text.TryParse<ulong>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.IsTrue(Energy.Base.Text.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual(v_ulong, o_ulong);
+                Assert.AreEqual(v_ulong, Energy.Base.Text.TryParse<ulong>(s));
+            }
+
+            foreach (var s_ulong in new string[] { "18446744073709551616", "-1", "18446744073709551615.0" })
+            {
+                s = s_ulong;
+
+                b = ulong.TryParse(s, out o_ulong);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<ulong>(s, out o_ulong));
+                Assert.AreEqual((ulong)0, Energy.Base.Text.TryParse<ulong>(s));
+            }
+
+            #endregion
+
+            #region long
+
+            long o_long;
+
+            foreach (var v_long in new long[] { 0, 1, -1, long.MinValue, long.MaxValue, 2, -2 })
+            {
+                s = v_long.ToString();
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_long, o_long);
+                Assert.IsTrue(Energy.Base.Text.TryParse<long>(s, out o_long));
+                Assert.AreEqual(v_long, o_long);
+                Assert.AreEqual(v_long, Energy.Base.Text.TryParse<long>(s));
+
+                s = " \t\r\n\r " + s + " \t\r\n\r ";
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsTrue(b);
+                Assert.AreEqual(v_long, o_long);
+                Assert.IsTrue(Energy.Base.Text.TryParse<long>(s, out o_long));
+                Assert.AreEqual(v_long, o_long);
+                Assert.AreEqual(v_long, Energy.Base.Text.TryParse<long>(s));
+            }
+
+            foreach (var s_long in new string[] { "9223372036854775808", "-9223372036854775809", "+ 9223372036854775807", "- 9223372036854775808", "9223372036854775807.0" })
+            {
+                s = s_long;
+
+                b = long.TryParse(s, out o_long);
+                Assert.IsFalse(b);
+                Assert.IsFalse(Energy.Base.Text.TryParse<long>(s, out o_long));
+                Assert.AreEqual(0, Energy.Base.Text.TryParse<long>(s));
+            }
+
+            #endregion
         }
     }
 }

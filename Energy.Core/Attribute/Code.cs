@@ -313,7 +313,7 @@ namespace Energy.Attribute
         }
 
         /// <summary>
-        /// Code is a wrapper function whose purpose is to call another funtion
+        /// Code is a wrapper function which purpose is to call another funtion
         /// </summary>
         public class WrapperAttribute : CodeAttribute
         {
@@ -399,6 +399,37 @@ namespace Energy.Attribute
             /// Constructor
             /// </summary>
             public AttentionAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        /// <summary>
+        /// Benchmark should be done with this code
+        /// </summary>
+        public class BenchmarkAttribute : CodeAttribute
+        {
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public BenchmarkAttribute(string description, string help)
                 : this(description)
             {
                 this.Help = help;
@@ -529,6 +560,15 @@ namespace Energy.Attribute
             /// </summary>
             public RenameAttribute()
             {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public RenameAttribute(string description)
+                : this()
+            {
+                this.Description = description;
             }
 
             /// <summary>

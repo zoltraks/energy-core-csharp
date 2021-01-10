@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Globalization;
 
 namespace Energy.Base
 {
@@ -336,7 +337,7 @@ namespace Energy.Base
         /// <typeparam name="T">Value type</typeparam>
         [XmlRoot]
         [Serializable]
-        public class Associative<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
+        public class Associative<T> : Dictionary<string, T>, IXmlSerializable
         {
             #region IXmlSerializable Members
 
@@ -675,13 +676,48 @@ namespace Energy.Base
             }
 
             #endregion
+
+            #region ToCSharpObject
+
+            public static string ToCSharpObject(string[] array, string name)
+            {
+                if (null == name)
+                {
+                    name = "string[] stringArray";
+                }
+                string code = "";
+                if (0 < name.Length)
+                {
+                    code += name + " = ";
+                }
+                code += "new string[] { ";
+                var t1 = new List<string>();
+                for (int i = 0, l = array.Length; i < l; i++)
+                {
+                    string s = array[i];
+                    if (0 < s.Length)
+                    {
+                        s = s
+                            .Replace("\\", "\\\\")
+                            .Replace("\"", "\\\"")
+                            ;
+                    }
+                    s = "\"" + s + "\"";
+                    t1.Add(s);
+                }
+                code += string.Join(", ", t1.ToArray());
+                code += " };";
+                return code;
+            }
+
+            #endregion
         }
 
         #endregion
 
         #region StringDictionary
 
-        public class StringDictionary<T> : Dictionary<string, T>, Energy.Interface.IXmlSerializable
+        public class StringDictionary<T> : Dictionary<string, T>, IXmlSerializable
         {
             #region Contructor
 
@@ -709,13 +745,12 @@ namespace Energy.Base
                 }
             }
 
-
             #endregion
 
             /// <summary>
             /// Index of keys for case insensitive option
             /// </summary>
-            public Dictionary<string, string> Index = null;
+            private Dictionary<string, string> Index = null;
 
             private Energy.Enumeration.MultipleBehaviour _SelectionOfDuplicates = Energy.Enumeration.MultipleBehaviour.Last;
 
@@ -749,12 +784,18 @@ namespace Energy.Base
                     lock (_Lock)
                     {
                         if (_CaseSensitive == value)
+                        {
                             return;
+                        }
                         _CaseSensitive = value;
                         if (value)
+                        {
                             Index = null;
+                        }
                         else
+                        {
                             RebuildIndex();
+                        }
                     }
                 }
             }
@@ -778,11 +819,15 @@ namespace Energy.Base
                 Index = new Dictionary<string, string>();
                 foreach (string key in base.Keys)
                 {
-                    string map = key.ToUpperInvariant();
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     if (_SelectionOfDuplicates == Energy.Enumeration.MultipleBehaviour.Last)
+                    {
                         Index[map] = key;
+                    }
                     else if (!Index.ContainsKey(map))
+                    {
                         Index.Add(map, key);
+                    }
                 }
             }
 
@@ -803,20 +848,43 @@ namespace Energy.Base
             public T Get(string key)
             {
                 if (string.IsNullOrEmpty(key))
+                {
                     return default(T);
+                }
 
                 lock (_Lock)
                 {
                     if (CaseSensitive)
                     {
-                        if (!base.ContainsKey(key))
+                        if (base.ContainsKey(key))
+                        {
+                            return base[key];
+                        }
+                        else
+                        {
                             return default(T);
-                        return base[key];
+                        }
                     }
-                    string map = key.ToUpperInvariant();
-                    if (Index == null || !Index.ContainsKey(map))
-                        return default(T);
-                    return base[Index[map]];
+                    else
+                    {
+                        string map = key.ToUpper(CultureInfo.InvariantCulture);
+                        if (Index != null && Index.Count == 0 && base.Count > 0)
+                        {
+                            Index = null;
+                        }
+                        if (Index == null)
+                        {
+                            RebuildIndex();
+                        }
+                        if (Index != null && Index.ContainsKey(map))
+                        {
+                            return base[Index[map]];
+                        }
+                        else
+                        {
+                            return default(T);
+                        }
+                    }
                 }
             }
 
@@ -833,7 +901,9 @@ namespace Energy.Base
             public Energy.Base.Collection.StringDictionary<T> Set(string key, T value)
             {
                 if (string.IsNullOrEmpty(key))
+                {
                     return null;
+                }
 
                 lock (_Lock)
                 {
@@ -842,7 +912,7 @@ namespace Energy.Base
                         base[key] = value;
                         return this;
                     }
-                    string map = key.ToUpperInvariant();
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     if (Index != null && Index.ContainsKey(map))
                     {
                         string link = Index[map];
@@ -852,7 +922,9 @@ namespace Energy.Base
                     {
                         base[key] = value;
                         if (Index == null)
+                        {
                             Index = new Dictionary<string, string>();
+                        }
                         Index.Add(map, key);
                     }
                 }
@@ -1047,10 +1119,14 @@ namespace Energy.Base
                 lock (_Lock)
                 {
                     if (CaseSensitive)
+                    {
                         return base.ContainsKey(key);
+                    }
                     if (Index == null)
+                    {
                         return false;
-                    string map = key.ToUpperInvariant();
+                    }
+                    string map = key.ToUpper(CultureInfo.InvariantCulture);
                     return Index.ContainsKey(map);
                 }
             }
@@ -1289,7 +1365,8 @@ namespace Energy.Base
 
         #region SerializableDictionary
 
-        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, Energy.Interface.IXmlSerializable
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+            , System.Xml.Serialization.IXmlSerializable
         {
             public System.Xml.Schema.XmlSchema GetSchema()
             {
@@ -1647,6 +1724,280 @@ namespace Energy.Base
                     return dictionary[key];
                 else
                     return default(TValue);
+            }
+        }
+
+        #endregion
+
+        #region
+
+        public class Table
+        {
+            public class Column<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Column
+            {
+            }
+
+
+            #region Row
+
+            //public class Row<TKey, TValue> : Energy.Base.Collection.Table<TKey, TValue>.Row
+            //{
+            //}
+
+            public class Row<TKey, TValue> : Energy.Interface.IRow<TKey, TValue>
+            {
+                private IList<TValue> _List = new List<TValue>();
+
+                private IDictionary<TKey, int> _Index = new Dictionary<TKey, int>();
+
+                public TValue this[TKey key]
+                {
+                    get 
+                    {
+                        return Get(key);
+                    }
+                    set 
+                    {
+                        Set(key, value);
+                    }
+                }
+
+                public TValue this[int index]
+                {
+                    get 
+                    {
+                        return Get(index);
+                    }
+                    set 
+                    {
+                        Set(index, value);
+                    }
+                }
+
+                public TValue New()
+                {
+                    TValue o = default(TValue);
+                    _List.Add(o);
+                    return o;
+                }
+
+                public TValue Get(int index)
+                {
+                    if (index < 0 || index < _List.Count)
+                    {
+                        return default(TValue);
+                    }
+                    else
+                    {
+                        return _List[index];
+                    }
+                }
+
+                public TValue Get(TKey key)
+                {
+                    if (!_Index.ContainsKey(key))
+                    {
+                        return default(TValue);
+                    }
+                    else
+                    {
+                        return _List[_Index[key]];
+                    }
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Append(TKey key, TValue value)
+                {
+                    int index = _List.Count;
+                    _List.Add(value);
+                    _Index[key] = index;
+                    return this;
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Set(TKey key, TValue value)
+                {
+                    if (_Index.ContainsKey(key))
+                    {
+                        _List[_Index[key]] = value;
+                    }
+                    else
+                    {
+                        Append(key, value);
+                    }
+                    return this;
+                }
+
+                public Energy.Interface.IRow<TKey, TValue> Set(int index, TValue value)
+                {
+                    if (index < 0 || index < _List.Count)
+                    {
+                        return this;
+                    }
+                    else
+                    {
+                        _List[index] = value;
+                    }
+                    return this;
+                }
+
+                public override string ToString()
+                {
+                    List<string> l = new List<string>();
+                    foreach (TKey key in _Index.Keys)
+                    {
+                        TValue value = _List[_Index[key]];
+                        string k = Energy.Base.Text.AddSlashes(Energy.Base.Cast.ObjectToString(key));
+                        string v = Energy.Base.Text.AddSlashes(Energy.Base.Cast.ObjectToString(value));
+                        l.Add("\"" + k + "\": \"" + v + "\"");
+                    }
+                    string r = string.Join(", ", l.ToArray());
+                    return r;
+                }
+            }
+
+            #endregion
+        }
+
+        public class Table<TValue> : Table<object, TValue>
+        {
+
+        }
+
+        public class Table<TKey, TValue> : Energy.Interface.ITable<TKey, TValue>
+            , IList<Energy.Interface.IRow<TKey, TValue>>
+        {
+            public class Column : Energy.Interface.IColumn<TKey, TValue>
+            {
+                public string Name { get; set; }
+
+                public int Index { get; set; }
+            }
+
+            private IList<Energy.Interface.IRow<TKey, TValue>> _Rows = new List<Energy.Interface.IRow<TKey, TValue>>();
+
+            private IList<Energy.Interface.IColumn<TKey, TValue>> _Columns = new List<Energy.Interface.IColumn<TKey, TValue>>();
+
+            //public IRow<TKey, TValue> this[int index]
+            //{
+            //    get => throw new NotImplementedException();
+            //    set => throw new NotImplementedException();
+            //}
+
+            //public IRow<TKey, TValue> this[TKey key]
+            //{
+            //    get => throw new NotImplementedException();
+            //    set => throw new NotImplementedException();
+            //}
+
+            public Energy.Interface.IRow<TKey, TValue> this[int index]
+            {
+                get 
+                {
+                    return GetByIndex(index);
+                }
+                set 
+                {
+                    SetByIndex(index, value);
+                }
+            }
+
+            public IList<Energy.Interface.IRow<TKey, TValue>> Rows
+            {
+                get 
+                {
+                    return _Rows;
+                }
+            }
+
+            public IList<Energy.Interface.IColumn<TKey, TValue>> Columns
+            {
+                get 
+                {
+                    return _Columns;
+                }
+            }
+
+            public int Count 
+            {
+                get 
+                {
+                    return _Rows.Count;
+                }
+            }
+
+            public bool IsReadOnly 
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public void Add(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                _Rows.Add(item);
+            }
+
+            public void Clear()
+            {
+                _Rows.Clear();
+            }
+
+            public bool Contains(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                return _Rows.Contains(item);
+            }
+
+            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex) 
+            {
+                _Rows.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator() 
+            {
+                return _Rows.GetEnumerator();
+            }
+
+            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                return _Rows.IndexOf(item);
+            }
+
+            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item) 
+            {
+                Insert(index, item);
+            }
+
+            public bool Remove(Energy.Interface.IRow<TKey, TValue> item)
+            {
+                return _Rows.Remove(item);
+            }
+
+            public void RemoveAt(int index) 
+            {
+                _Rows.RemoveAt(index);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() 
+            {
+                return _Rows.GetEnumerator();
+            }
+
+            private Energy.Interface.IRow<TKey, TValue> GetByIndex(int index)
+            {
+                return _Rows[index];
+            }
+
+            private void SetByIndex(int index, Energy.Interface.IRow<TKey, TValue> value)
+            {
+                _Rows[index] = value;
+            }
+
+            public Energy.Interface.IRow<TKey, TValue> New()
+            {
+                Energy.Interface.IRow<TKey, TValue> o;
+                o = new Energy.Base.Collection.Table.Row<TKey, TValue>();
+                _Rows.Add(o);
+                return o;
             }
         }
 

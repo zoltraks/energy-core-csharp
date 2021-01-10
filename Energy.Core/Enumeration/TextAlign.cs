@@ -8,27 +8,32 @@ namespace Energy.Enumeration
     public enum TextAlign
     {
         /// <summary>
-        /// Don't align
+        /// Don't use alignment
         /// </summary>
         None,
 
         /// <summary>
-        /// Align left
+        /// Left alignment
         /// </summary>
         Left,
 
         /// <summary>
-        /// Align right
+        /// Right alignment
         /// </summary>
         Right,
 
         /// <summary>
-        /// Align center
+        /// Center alignment
         /// </summary>
         Center,
 
         /// <summary>
-        /// Fill with justified text
+        /// Alias for center alignment
+        /// </summary>
+        Middle = Center,
+
+        /// <summary>
+        /// Justify content
         /// </summary>
         Justify,
     }

@@ -149,7 +149,7 @@ namespace DocumentationStartup
 
             Energy.Query.Parameter.Bag bag = new Energy.Query.Parameter.Bag();
             bag.Add("@@name", 12345678);
-            bag.Type["@@name"] = Energy.Enumeration.FormatType.Number;
+            bag.SetType("@@name", Energy.Enumeration.FormatType.Number);
             bag.Set("name", "my name", Energy.Enumeration.FormatType.Text);
             string text = bag.Parse(p);
             Console.WriteLine(text);

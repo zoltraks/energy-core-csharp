@@ -5,105 +5,10 @@ using System.Text;
 namespace Energy.Attribute
 {
     /// <summary>
-    /// Attributes for command line arguments
+    /// Attributes for command line arguments.
     /// </summary>
     public class Command
     {
-        ///// <summary>
-        ///// Switch attribute for options without values like flags, i.e. /help or --verbose.
-        ///// </summary>
-        //public class SwitchAttribute : System.Attribute
-        //{
-        //    public string Name;
-
-        //    public string Short;
-
-        //    public string Long;
-
-        //    public string Description;
-
-        //    public string[] Alternatives;
-            
-        //    /// <summary>
-        //    /// Table name
-        //    /// </summary>
-        //    public SwitchAttribute()
-        //    {
-        //    }
-
-        //    /// <summary>
-        //    /// Table name
-        //    /// </summary>
-        //    /// <param name="name"></param>
-        //    public SwitchAttribute(string name)
-        //    {
-        //        this.Name = name;
-        //    }
-
-        //    /// <summary>
-        //    /// Table name with description
-        //    /// </summary>
-        //    /// <param name="name"></param>
-        //    /// <param name="description"></param>
-        //    public SwitchAttribute(string name, string description)
-        //        : this(name)
-        //    {
-        //        this.Description = name;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Parameter attribute for options with one or more attributes.
-        ///// </summary>
-        //public class ParameterAttribute : System.Attribute
-        //{
-        //    public string Name;
-
-        //    public string Short;
-
-        //    public string Long;
-
-        //    public string Description;
-
-        //    public string Help;
-
-        //    public string Example;
-
-        //    public string[] Alternatives;
-
-        //    /// <summary>
-        //    /// May be set to 2 or more values to take from argument list.
-        //    /// </summary>
-        //    public int Count;
-
-        //    /// <summary>
-        //    /// Parameter
-        //    /// </summary>
-        //    public ParameterAttribute()
-        //    {
-        //    }
-
-        //    /// <summary>
-        //    /// Parameter
-        //    /// </summary>
-        //    /// <param name="name"></param>
-        //    public ParameterAttribute(string name)
-        //    {
-        //        this.Name = name;
-        //    }
-
-        //    /// <summary>
-        //    /// Parameter
-        //    /// </summary>
-        //    /// <param name="name"></param>
-        //    /// <param name="description"></param>
-        //    public ParameterAttribute(string name, string description)
-        //        : this(name)
-        //    {
-        //        this.Description = name;
-        //    }
-        //}
-
         /// <summary>
         /// Attribute for command line option.
         /// Options may have additional one or more arguments and becomes program parameters.
@@ -261,29 +166,124 @@ namespace Energy.Attribute
             }
         }
 
-        /// <summary>
-        /// Help attribute
-        /// </summary>
-        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-        public class HelpAttribute : System.Attribute
-        {
-            public string Text;
+        ///// <summary>
+        ///// Help attribute
+        ///// </summary>
+        //[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
+        //public class HelpAttribute : System.Attribute
+        //{
+        //    public string Text;
 
-            /// <summary>
-            /// Constructor
-            /// </summary>
-            public HelpAttribute()
-            {
-            }
+        //    /// <summary>
+        //    /// Constructor
+        //    /// </summary>
+        //    public HelpAttribute()
+        //    {
+        //    }
 
-            /// <summary>
-            /// Constructor
-            /// </summary>
-            /// <param name="text"></param>
-            public HelpAttribute(string text)
-            {
-                this.Text = text;
-            }
-        }
+        //    /// <summary>
+        //    /// Constructor
+        //    /// </summary>
+        //    /// <param name="text"></param>
+        //    public HelpAttribute(string text)
+        //    {
+        //        this.Text = text;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Switch attribute for options without values like flags, i.e. /help or --verbose.
+        ///// </summary>
+        //public class SwitchAttribute : System.Attribute
+        //{
+        //    public string Name;
+
+        //    public string Short;
+
+        //    public string Long;
+
+        //    public string Description;
+
+        //    public string[] Alternatives;
+
+        //    /// <summary>
+        //    /// Table name
+        //    /// </summary>
+        //    public SwitchAttribute()
+        //    {
+        //    }
+
+        //    /// <summary>
+        //    /// Table name
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    public SwitchAttribute(string name)
+        //    {
+        //        this.Name = name;
+        //    }
+
+        //    /// <summary>
+        //    /// Table name with description
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    /// <param name="description"></param>
+        //    public SwitchAttribute(string name, string description)
+        //        : this(name)
+        //    {
+        //        this.Description = name;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Parameter attribute for options with one or more attributes.
+        ///// </summary>
+        //public class ParameterAttribute : System.Attribute
+        //{
+        //    public string Name;
+
+        //    public string Short;
+
+        //    public string Long;
+
+        //    public string Description;
+
+        //    public string Help;
+
+        //    public string Example;
+
+        //    public string[] Alternatives;
+
+        //    /// <summary>
+        //    /// May be set to 2 or more values to take from argument list.
+        //    /// </summary>
+        //    public int Count;
+
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    public ParameterAttribute()
+        //    {
+        //    }
+
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    public ParameterAttribute(string name)
+        //    {
+        //        this.Name = name;
+        //    }
+
+        //    /// <summary>
+        //    /// Parameter
+        //    /// </summary>
+        //    /// <param name="name"></param>
+        //    /// <param name="description"></param>
+        //    public ParameterAttribute(string name, string description)
+        //        : this(name)
+        //    {
+        //        this.Description = name;
+        //    }
+        //}
     }
 }

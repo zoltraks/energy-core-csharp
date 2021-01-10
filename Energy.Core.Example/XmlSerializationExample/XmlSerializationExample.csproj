@@ -46,6 +46,9 @@
   <PropertyGroup>
     <ProjectGuid>{F70DC188-8A5B-496C-90B1-1F57012B824A}</ProjectGuid>
   </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>XmlSerializationExample</RootNamespace>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,6 +61,7 @@
     <Compile Include="Item.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

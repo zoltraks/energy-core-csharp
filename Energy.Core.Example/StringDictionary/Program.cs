@@ -9,7 +9,7 @@ namespace StringDictionary
     {
         static void Main(string[] args)
         {
-            Energy.Core.Application.SetConsoleEncoding();
+            Energy.Core.Program.SetConsoleEncoding();
             Energy.Core.Tilde.WriteLine("This example demonstrates usage of ~w~Energy~0~.~w~Base~0~.~w~Collection~0~.~y~StringDictionary~0~.");
 
             PrintMemoryUsage();

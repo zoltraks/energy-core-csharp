@@ -53,7 +53,7 @@ namespace Energy.Source
             _ConnectionString = connectionString;
         }
 
-        public Connection(Type vendor, Configuration configuration)
+        public Connection(Type vendor, Energy.Source.Configuration configuration)
             : this(vendor)
         {
             _ConnectionString = configuration.ConnectionString;
@@ -131,12 +131,12 @@ namespace Energy.Source
         /// </summary>
         public int Timeout { get { lock (_Lock) return _Timeout; } set { lock (_Lock) _Timeout = value; } }
 
-        private Energy.Core.Log.Logger _Logger;
+        private Energy.Interface.ILogger _Logger;
 
         /// <summary>
         /// Log
         /// </summary>
-        public Energy.Core.Log.Logger Logger { get { lock (_Lock) return _Logger; } set { lock (_Lock) _Logger = value; } }
+        public Energy.Interface.ILogger Logger { get { lock (_Lock) return _Logger; } set { lock (_Lock) _Logger = value; } }
 
         private Energy.Interface.IDialect _Dialect;
 
@@ -226,13 +226,19 @@ namespace Energy.Source
         private void SetVendor(Type vendor)
         {
             if (vendor == null)
+            {
                 throw new ArgumentNullException();
+            }
             if (!typeof(IDbConnection).IsAssignableFrom(vendor))
+            {
                 throw new Exception("Vendor must implement IDbConnection interface");
+            }
             lock (_Lock)
             {
                 if (vendor == _Vendor)
+                {
                     return;
+                }
                 Close();
                 _Vendor = vendor;
             }
@@ -251,9 +257,13 @@ namespace Energy.Source
             lock (_Lock)
             {
                 if (persistent == _Persistent)
+                {
                     return;
+                }
                 if (!persistent)
+                {
                     Close();
+                }
                 _Persistent = persistent;
             }
         }
@@ -276,7 +286,9 @@ namespace Energy.Source
             lock (_Lock)
             {
                 if (_Connection == null)
+                {
                     return false;
+                }
                 return IsActive(_Connection);
             }
         }
@@ -306,8 +318,14 @@ namespace Energy.Source
         /// </summary>
         public event EventHandler OnCreate;
 
+        /// <summary>
+        /// Event fired when vendor connection is open.
+        /// </summary>
         public event EventHandler OnOpen;
 
+        /// <summary>
+        /// Event fired when vendor connection was closed.
+        /// </summary>
         public event EventHandler OnClose;
 
         #endregion
@@ -325,6 +343,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnCreate",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -345,6 +366,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnOpen",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -365,6 +389,9 @@ namespace Energy.Source
                         IsBackground = true,
                         Name = "Energy.Source.Connection.OnClose",
                     };
+#if !NETCF
+                    thread.CurrentUICulture = Energy.Core.Program.GetCultureInfo();
+#endif
                     thread.Start();
                 }
                 else
@@ -378,21 +405,35 @@ namespace Energy.Source
 
         #region Error
 
-        private void SetError(Exception x)
+        private string SetError(Exception x)
         {
             int number = 0;
             int[] error = Energy.Source.Error.GetErrorNumber(x);
             if (error.Length > 0)
+            {
                 number = error[0];
+            }
             lock (_Lock)
             {
                 _ErrorNumber = number;
                 _ErrorMessage = x.Message;
                 _ErrorException = x;
+                return GetErrorText();
             }
         }
 
-        private void ClearError()
+        private string SetError(string error)
+        {
+            lock (_Lock)
+            {
+                _ErrorNumber = 0;
+                _ErrorMessage = error;
+                _ErrorException = null;
+            }
+            return error;
+        }
+
+        private string ClearError()
         {
             lock (_Lock)
             {
@@ -400,28 +441,52 @@ namespace Energy.Source
                 _ErrorMessage = "";
                 _ErrorException = null;
             }
+            return "";
         }
 
         private int GetNegativeErrorNumber()
         {
             int number = ErrorNumber;
             if (number == 0)
+            {
                 return -1;
+            }
             return number > 0 ? -number : number;
         }
 
         /// <summary>
-        /// Get error text
+        /// Get error text.
         /// </summary>
         /// <returns></returns>
         public string GetErrorText()
         {
             List<string> list = new List<string>();
-            if (ErrorNumber != 0)
-                list.Add(ErrorNumber.ToString());
-            if (!string.IsNullOrEmpty(ErrorMessage))
-                list.Add(Regex.Replace(ErrorMessage, @"(\r\n|\n|\r)+", " "));
+            lock (_Lock)
+            {
+                //if (_ErrorNumber != 0)
+                //{
+                //    list.Add(_ErrorNumber.ToString());
+                //}
+                if (!string.IsNullOrEmpty(_ErrorMessage))
+                {
+                    list.Add(Regex.Replace(_ErrorMessage, @"(\r\n|\n|\r)+", " "));
+                }
+            }
             return string.Join(" ", list.ToArray());
+        }
+
+        /// <summary>
+        /// Get error text or alternative if empty.
+        /// </summary>
+        /// <returns></returns>
+        public string GetErrorText(string alternative)
+        {
+            string text = GetErrorText();
+            if (string.IsNullOrEmpty(text))
+            {
+                text = alternative;
+            }
+            return text;
         }
 
         #endregion
@@ -468,14 +533,28 @@ namespace Energy.Source
 
         public IDbConnection Open(IDbConnection connection)
         {
+            string _;
+            return Open(connection, out _);
+        }
+
+        public IDbConnection Open(IDbConnection connection, out string error)
+        {
+            error = ClearError();
+
             if (connection == null)
+            {
                 return null;
+            }
 
             int timeout = Timeout;
             if (timeout < 1 && connection.ConnectionTimeout > 0)
+            {
                 timeout = connection.ConnectionTimeout;
+            }
             if (timeout < 1)
+            {
                 timeout = 5;
+            }
 
             bool success = false;
 
@@ -501,11 +580,12 @@ namespace Energy.Source
                     }
                 })
                 {
-                    // Make sure it's marked as a background thread
-                    // so it'll get cleaned up automatically
-                    IsBackground = true, // don't block app
-                    CurrentCulture = System.Globalization.CultureInfo.InvariantCulture,
+                    IsBackground = true,
+                    Name = "Energy.Source.Connection.Open",
                 };
+#if !NETCF
+                thread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+#endif
                 thread.Start();
                 if (!thread.Join(timeout * 1000))
                 {
@@ -528,12 +608,14 @@ namespace Energy.Source
                 }
                 catch (Exception x)
                 {
-                    SetError(x);
+                    error = SetError(x);
                 }
             }
 
             if (!success)
+            {
                 connection = null;
+            }
 
             FireOnOpen();
 
@@ -542,25 +624,26 @@ namespace Energy.Source
 
         public IDbConnection Open()
         {
-            lock (_Lock)
+            if (_Persistent)
             {
-                if (_Persistent)
+                lock (_Lock)
                 {
                     if (Active)
+                    {
                         Close();
+                    }
                     else
+                    {
                         Clear();
+                    }
                     _Connection = Open(Create());
                     return _Connection;
                 }
             }
-
-            return Open(Create());
-        }
-
-        private void Clear()
-        {
-            throw new NotImplementedException();
+            else
+            {
+                return Open(Create());
+            }
         }
 
         #endregion
@@ -572,10 +655,13 @@ namespace Energy.Source
         /// </summary>
         public void Close()
         {
+            ClearError();
             lock (_Lock)
             {
                 if (_Connection == null)
+                {
                     return;
+                }
                 try
                 {
                     _Connection.Close();
@@ -584,13 +670,6 @@ namespace Energy.Source
                 {
                     SetError(x);
                     (Logger ?? Energy.Core.Log.Default).Write(x);
-                }
-                try
-                {
-                    _Connection.Close();
-                }
-                catch
-                {
                     Energy.Core.Bug.Write("Exception during connection Close...");
                 }
                 try
@@ -611,6 +690,23 @@ namespace Energy.Source
 
         #endregion
 
+        #region Clear
+
+        public void Clear()
+        {
+            if (Active)
+            {
+                Close();
+            }
+            else
+            {
+                ClearError();
+                this._Connection = null;
+            }
+        }
+
+        #endregion
+
         #region Test
 
         /// <summary>
@@ -624,7 +720,7 @@ namespace Energy.Source
 
         #endregion
 
-        #region Active
+        #region IsActive
 
         /// <summary>
         /// Check if database connection is active
@@ -634,7 +730,9 @@ namespace Energy.Source
         public static bool IsActive(IDbConnection connection)
         {
             if (connection == null)
+            {
                 return false;
+            }
 
             switch (connection.State)
             {
@@ -651,6 +749,10 @@ namespace Energy.Source
             }
         }
 
+        #endregion
+
+        #region IsRunning
+
         /// <summary>
         /// Check if database connection is actually working
         /// </summary>
@@ -659,8 +761,9 @@ namespace Energy.Source
         public static bool IsRunning(IDbConnection connection)
         {
             if (connection == null)
+            {
                 return false;
-
+            }
             switch (connection.State)
             {
                 case ConnectionState.Executing:
@@ -697,7 +800,7 @@ namespace Energy.Source
 
             string message = exception.Message;
 
-            (Logger ?? Core.Log.Default).Add(result.ToString(), Energy.Enumeration.LogLevel.Trace);
+            (Logger ?? Core.Log.Default).Add(result.ToString(), (int)Energy.Enumeration.LogLevel.Trace);
 
             // Reaction
 
@@ -736,7 +839,9 @@ namespace Energy.Source
             DataTable schema = reader.GetSchemaTable();
 
             if (schema == null)
+            {
                 return null;
+            }
 
             Energy.Base.Table table = new Energy.Base.Table();
 
@@ -759,6 +864,7 @@ namespace Energy.Source
             }
 
             command.Cancel();
+
             reader.Close();
 
             return table;
@@ -773,20 +879,30 @@ namespace Energy.Source
         }
 
         /// <summary>
-        /// Fetch query results into Energy.Base.Table
+        /// Fetch query results into Energy.Base.Table.
+        /// Return null on error.
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
         /// <returns></returns>
-        public Energy.Base.Table Fetch(string query)
+        public Energy.Base.Table Fetch(string query, out string error)
         {
-            ClearError();
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
+            error = ClearError();
             int repeat = Repeat;
             while (repeat-- >= 0)
             {
                 if (Persistent)
                 {
-                    if (!Active && Open() == null)
+                    if (!Active && null == Open())
+                    {
+                        error = GetErrorText("Connection error");
                         return null;
+                    }
                     try
                     {
                         lock (_Lock)
@@ -796,9 +912,11 @@ namespace Energy.Source
                     }
                     catch (Exception x)
                     {
-                        SetError(x);
+                        error = SetError(x);
                         if (!Catch(x))
+                        {
                             return null;
+                        }
                     }
                 }
                 else
@@ -806,21 +924,38 @@ namespace Energy.Source
                     using (IDbConnection connection = Open())
                     {
                         if (connection == null)
+                        {
+                            error = GetErrorText("Connection error");
                             return null;
+                        }
                         try
                         {
                             return Fetch(connection, query);
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Fetch query results into Energy.Base.Table.
+        /// Return null on error.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <returns></returns>
+        public Energy.Base.Table Fetch(string query)
+        {
+            string _;
+            return Fetch(query, out _);
         }
 
         #endregion
@@ -847,20 +982,30 @@ namespace Energy.Source
         }
 
         /// <summary>
-        /// Load data from query into DataTable
+        /// Load data from query into DataTable.
+        /// Return null on error.
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
         /// <returns></returns>
-        public DataTable Load(string query)
+        public DataTable Load(string query, out string error)
         {
-            ClearError();
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
+            error = ClearError();
             int attempt = Repeat;
             while (attempt-- >= 0)
             {
                 if (Persistent)
                 {
-                    if (!Active && Open() == null)
+                    if (!Active && null == Open())
+                    {
+                        error = GetErrorText("Connection error");
                         return null;
+                    }
                     try
                     {
                         lock (_Lock)
@@ -870,9 +1015,11 @@ namespace Energy.Source
                     }
                     catch (Exception x)
                     {
-                        SetError(x);
+                        error = SetError(x);
                         if (!Catch(x))
+                        {
                             return null;
+                        }
                     }
                 }
                 else
@@ -880,16 +1027,20 @@ namespace Energy.Source
                     using (IDbConnection connection = Open())
                     {
                         if (connection == null)
+                        {
                             return null;
+                        }
                         try
                         {
                             return Load(connection, query);
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                 }
@@ -897,15 +1048,22 @@ namespace Energy.Source
             return null;
         }
 
+        /// <summary>
+        /// Load data from query into DataTable.
+        /// Return null on error.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <returns></returns>
+        public DataTable Load(string query)
+        {
+            string _;
+            return Load(query, out _);
+        }
+
         #endregion
 
         #region Read
 
-        /// <summary>
-        /// Read query results into DataTable.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
         private DataTable Read(IDbCommand command)
         {
             using (IDataReader reader = command.ExecuteReader())
@@ -914,17 +1072,19 @@ namespace Energy.Source
 
                 try
                 {
-                    reader.GetSchemaTable();
+                    schema = reader.GetSchemaTable();
                 }
-                catch (Exception eSchema)
+                catch (Exception x)
                 {
-                    Energy.Core.Bug.Write(eSchema);
+                    Energy.Core.Bug.Write(x);
                 }
 
                 if (schema == null)
+                {
                     return null;
+                }
 
-                DataTable table = new DataTable();
+                DataTable table = new DataTable("Table");
 
                 List<DataColumn> list = new List<DataColumn>();
                 foreach (DataRow row in schema.Rows)
@@ -951,18 +1111,13 @@ namespace Energy.Source
                 }
 
                 command.Cancel();
+
                 reader.Close();
 
                 return table;
             }
         }
 
-        /// <summary>
-        /// Read query results into DataTable.
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
         private DataTable Read(IDbConnection connection, string query)
         {
             using (IDbCommand command = Prepare(connection, query))
@@ -973,12 +1128,20 @@ namespace Energy.Source
 
         /// <summary>
         /// Read query results into DataTable.
+        /// Return null on error.
+        /// This function will populate values in a loop using IDataReader. 
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
         /// <returns></returns>
-        public DataTable Read(string query)
+        public DataTable Read(string query, out string error)
         {
-            ClearError();
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
+            error = ClearError();
             int attempt = Repeat;
             int repeat = 0;
             try
@@ -987,8 +1150,11 @@ namespace Energy.Source
                 {
                     if (Persistent)
                     {
-                        if (!Active && Open() == null)
+                        if (!Active && null == Open())
+                        {
+                            error = GetErrorText("Connection error");
                             return null;
+                        }
                         try
                         {
                             lock (_Lock)
@@ -998,9 +1164,11 @@ namespace Energy.Source
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                     else
@@ -1008,36 +1176,66 @@ namespace Energy.Source
                         using (IDbConnection connection = Open())
                         {
                             if (connection == null)
+                            {
+                                error = GetErrorText("Connection error");
                                 return null;
+                            }
                             try
                             {
                                 return Read(connection, query);
                             }
                             catch (Exception x)
                             {
-                                SetError(x);
+                                error = SetError(x);
                                 if (!Catch(x))
+                                {
                                     return null;
+                                }
                             }
                         }
                     }
                     repeat++;
                 }
             }
+            catch (Exception x)
+            {
+                error = SetError(x);
+            }
             finally
             {
                 if (repeat > 0)
                 {
-                    Energy.Core.Bug.Write("C084", "Command repeated in Read");
+                    Energy.Core.Bug.Write("Energy.Source.Connection.Read"
+                        , string.Format("Command repeat ({0})", repeat)
+                        );
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Read query results into DataTable.
+        /// Return null on error.
+        /// This function will populate values in a loop using IDataReader. 
+        /// </summary>
+        /// <param name="query">Query string</param>
+        /// <returns></returns>
+        public DataTable Read(string query)
+        {
+            string _;
+            return Read(query, out _);
         }
 
         #endregion
 
         #region Prepare
 
+        /// <summary>
+        /// Prepare IDbCommand object with query string for IDbConnection object.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public IDbCommand Prepare(IDbConnection connection, string query)
         {
             IDbCommand command = connection.CreateCommand();
@@ -1063,16 +1261,33 @@ namespace Energy.Source
             }
         }
 
-        public int Execute(string query)
+        /// <summary>
+        /// Execute SQL query.
+        /// For UPDATE, INSERT, and DELETE statements, the return value is the number of rows affected by the command. 
+        /// For all other types of statements, the return value is -1.
+        /// On error, return value is -2.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
+        /// <returns></returns>
+        public int Execute(string query, out string error)
         {
-            ClearError();
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return -2;
+            }
+            error = ClearError();
             int repeat = Repeat;
             while (repeat-- >= 0)
             {
                 if (Persistent)
                 {
-                    if (!Active && Open() == null)
-                        return -1;
+                    if (!Active && null == Open())
+                    {
+                        error = GetErrorText("Connection error");
+                        return -2;
+                    }
                     try
                     {
                         lock (_Lock)
@@ -1082,9 +1297,11 @@ namespace Energy.Source
                     }
                     catch (Exception x)
                     {
-                        SetError(x);
+                        error = SetError(x);
                         if (!Catch(x))
-                            return -1;
+                        {
+                            return -2;
+                        }
                     }
                 }
                 else
@@ -1092,21 +1309,40 @@ namespace Energy.Source
                     using (IDbConnection connection = Open())
                     {
                         if (connection == null)
-                            return -1;
+                        {
+                            error = GetErrorText("Connection error");
+                            return -2;
+                        }
                         try
                         {
                             return Execute(connection, query);
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
+                            error = SetError(x);
                             if (!Catch(x))
-                                return -1;
+                            {
+                                return -2;
+                            }
                         }
                     }
                 }
             }
-            return -1;
+            return -2;
+        }
+
+        /// <summary>
+        /// Execute SQL query.
+        /// For UPDATE, INSERT, and DELETE statements, the return value is the number of rows affected by the command. 
+        /// For all other types of statements, the return value is -1.
+        /// On error, return value is -2.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public int Execute(string query)
+        {
+            string _;
+            return Execute(query, out _);
         }
 
         #endregion
@@ -1129,6 +1365,17 @@ namespace Energy.Source
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
             Close();
         }
 
@@ -1150,12 +1397,25 @@ namespace Energy.Source
             }
         }
 
-        public object Scalar(string query)
+        /// <summary>
+        /// Execute SQL query and read scalar value as a result.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
+        /// <returns></returns>
+        public object Scalar(string query, out string error)
         {
-            ClearError();
+            if (string.IsNullOrEmpty(query))
+            {
+                error = SetError("Empty query");
+                return null;
+            }
+            error = ClearError();
             int attempt = Repeat;
             if (attempt < 0)
+            {
                 attempt = 0;
+            }
             int repeat = 0;
             try
             {
@@ -1163,9 +1423,11 @@ namespace Energy.Source
                 {
                     if (Persistent)
                     {
-                        if (!Active)
-                            if (null == Open())
-                                return null;
+                        if (!Active && null == Open())
+                        {
+                            error = GetErrorText("Connection error");
+                            return null;
+                        }
                         try
                         {
                             lock (_Lock)
@@ -1175,10 +1437,11 @@ namespace Energy.Source
                         }
                         catch (Exception x)
                         {
-                            SetError(x);
-
+                            error = SetError(x);
                             if (!Catch(x))
+                            {
                                 return null;
+                            }
                         }
                     }
                     else
@@ -1186,16 +1449,21 @@ namespace Energy.Source
                         using (IDbConnection connection = Open())
                         {
                             if (connection == null)
+                            {
+                                error = GetErrorText("Connection error");
                                 return null;
+                            }
                             try
                             {
                                 return Scalar(connection, query);
                             }
                             catch (Exception x)
                             {
-                                SetError(x);
+                                error = SetError(x);
                                 if (!Catch(x))
+                                {
                                     return null;
+                                }
                             }
                             finally
                             {
@@ -1216,9 +1484,38 @@ namespace Energy.Source
             return null;
         }
 
+        /// <summary>
+        /// Execute SQL query and read scalar value as a result.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <returns></returns>
+        public object Scalar(string query)
+        {
+            string _;
+            return Scalar(query, out _);
+        }
+
+        /// <summary>
+        /// Execute SQL query and read scalar value as a result.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <param name="error">Error text</param>
+        /// <returns></returns>
+        public T Scalar<T>(string query, out string error)
+        {
+            object value = Scalar(query, out error);
+            return Energy.Base.Cast.As<T>(value);
+        }
+
+        /// <summary>
+        /// Execute SQL query and read scalar value as a result.
+        /// </summary>
+        /// <param name="query">Query text</param>
+        /// <returns></returns>
         public T Scalar<T>(string query)
         {
-            object value = Scalar(query);
+            string _;
+            object value = Scalar(query, out _);
             return Energy.Base.Cast.As<T>(value);
         }
 
@@ -1250,6 +1547,10 @@ namespace Energy.Source
 
         #region Clone
 
+        /// <summary>
+        /// Return copy of object.
+        /// </summary>
+        /// <returns></returns>
         public object Clone()
         {
             return Copy();
@@ -1261,7 +1562,6 @@ namespace Energy.Source
 
         public override string ToString()
         {
-
             return base.ToString();
         }
 

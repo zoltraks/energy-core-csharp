@@ -1,14 +1,11 @@
-﻿using System;
+﻿using Energy.Enumeration;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using Energy.Base;
 
 namespace Energy.Query
 {
     /// <summary>
-    /// Value formatter class for SQL queries.
+    /// Value formatter for SQL
     /// </summary>
     public class Format
     {
@@ -40,12 +37,18 @@ namespace Energy.Query
 
         #region Accessor
 
+        // TODO Check if this property is needed anywhere. Maybe it should be removed?
+
+#if !NETCF
+
         public Format this[string dialect]
         {
             get
             {
                 if (string.IsNullOrEmpty(dialect))
+                {
                     return null;
+                }
                 Energy.Query.Format findFormat = null;
                 if (_DialectFormatDictionary == null)
                 {
@@ -76,6 +79,8 @@ namespace Energy.Query
 
             }
         }
+
+#endif
 
         #endregion
 
@@ -279,7 +284,9 @@ namespace Energy.Query
         public string Text(string value)
         {
             if (value == null)
+            {
                 return "NULL";
+            }
             return Bracket.Literal.Quote(value);
         }
 
@@ -294,7 +301,9 @@ namespace Energy.Query
         public string Text(string value, bool nullify)
         {
             if (nullify && value == null)
+            {
                 return "NULL";
+            }
             return Bracket.Literal.Quote(value);
         }
 
@@ -331,7 +340,9 @@ namespace Energy.Query
         public string Text(object value)
         {
             if (value == null)
+            {
                 return "NULL";
+            }
             return Text(Energy.Base.Cast.ObjectToString(value));
         }
 
@@ -344,7 +355,9 @@ namespace Energy.Query
         public string[] Text(string[] array)
         {
             if (null == array || 0 == array.Length)
+            {
                 return array;
+            }
             List<string> list = new List<string>();
             for (int i = 0; i < array.Length; i++)
             {
@@ -363,7 +376,9 @@ namespace Energy.Query
         public string[] Text(string[] array, int limit)
         {
             if (null == array || 0 == array.Length)
+            {
                 return array;
+            }
             List<string> list = new List<string>();
             for (int i = 0; i < array.Length; i++)
             {
@@ -384,7 +399,9 @@ namespace Energy.Query
         public string[] Text(string[] array, int limit, bool nullify)
         {
             if (null == array || 0 == array.Length)
+            {
                 return array;
+            }
             List<string> list = new List<string>();
             for (int i = 0; i < array.Length; i++)
             {
@@ -402,9 +419,13 @@ namespace Energy.Query
         public string[] Text(object[] array)
         {
             if (null == array)
+            {
                 return null;
+            }
             if (0 == array.Length)
+            {
                 return new string[] { };
+            }
             List<string> list = new List<string>();
             for (int i = 0; i < array.Length; i++)
             {
@@ -506,38 +527,68 @@ namespace Energy.Query
         public string Number(object value, bool nullify)
         {
             if (value == null)
+            {
                 return nullify ? "NULL" : "0";
+            }
             if (value is bool)
+            {
                 return (bool)value ? "1" : "0";
-            if (value is long || value is Int64)
+            }
+            if (value is long)
+            {
                 return ((long)value).ToString();
-            if (value is int || value is Int32)
+            }
+            if (value is int)
+            {
                 return ((int)value).ToString();
-            if (value is short || value is Int16)
+            }
+            if (value is short)
+            {
                 return ((short)value).ToString();
-            if (value is SByte)
-                return ((SByte)value).ToString();
-            if (value is ulong || value is UInt64)
+            }
+            if (value is sbyte)
+            {
+                return ((sbyte)value).ToString();
+            }
+            if (value is ulong)
+            {
                 return ((ulong)value).ToString();
-            if (value is uint || value is UInt32)
+            }
+            if (value is uint)
+            {
                 return ((uint)value).ToString();
-            if (value is ushort || value is UInt16)
+            }
+            if (value is ushort)
+            {
                 return ((ushort)value).ToString();
+            }
             if (value is byte)
+            {
                 return ((byte)value).ToString();
+            }
             if (value is double)
+            {
                 return ((double)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            if (value is float)
+            {
+                return ((float)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
             if (value is decimal)
+            {
                 return ((decimal)value).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
 
             string s = value is string ? (string)value : value.ToString();
             s = Energy.Base.Text.Trim(s);
             if (Energy.Base.Cast.IsLong(s, true))
+            {
                 return Number((long)Energy.Base.Cast.StringToLong(s));
+            }
             else
-                return Number((double)Energy.Base.Cast.StringToDouble(s));
-
-            //return nullify ? "NULL" : "0";
+            {
+                return Number((decimal)Energy.Base.Cast.StringToDecimal(s));
+            }
         }
 
         #endregion
@@ -551,7 +602,12 @@ namespace Energy.Query
         /// <returns>string</returns>
         public string Integer(decimal number)
         {
+#if !NETCF
             return Number(Math.Floor(number));
+#endif
+#if NETCF
+            return Number(Math.Floor((double)number));
+#endif
         }
 
         /// <summary>
@@ -639,15 +695,42 @@ namespace Energy.Query
         /// Format as INTEGER.
         /// </summary>
         /// <param name="number"></param>
+        /// <returns>string</returns>
+        public string Integer(object number)
+        {
+            return Integer(number, false);
+        }
+
+        /// <summary>
+        /// Format as INTEGER.
+        /// </summary>
+        /// <param name="number"></param>
         /// <param name="nullify"></param>
         /// <returns>string</returns>
         public string Integer(object number, bool nullify)
         {
             if (number == null)
-                return Number(number, nullify);
+            {
+                return nullify ? "NULL" : "0";
+            }
             if (number is decimal)
-                return Number((decimal)number, nullify);
-            return Number(Energy.Base.Cast.ObjectToLong(number), nullify);
+            {
+#if !NETCF
+                return Number(Math.Floor((decimal)number));
+#endif
+#if NETCF
+                return Number(Math.Floor((double)(decimal)number));
+#endif
+            }
+            if (number is float)
+            {
+                return Number(Math.Floor((float)number));
+            }
+            if (number is double)
+            {
+                return Number(Math.Floor((double)number));
+            }
+            return Number(Energy.Base.Cast.ObjectToLong(number));
         }
 
         #endregion
@@ -809,6 +892,67 @@ namespace Energy.Query
         public string Now()
         {
             return this.CurrentStamp;
+        }
+
+        #endregion
+
+        #region Null
+
+        /// <summary>
+        /// Format as NULL.
+        /// </summary>
+        /// <returns></returns>
+        public string Null()
+        {
+            return "NULL";
+        }
+
+        #endregion
+
+        #region Value
+
+        /// <summary>
+        /// Format value as desired type. 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <param name="unicode"></param>
+        /// <returns></returns>
+        public string Value(object value, FormatType type, bool unicode)
+        {
+            switch (type)
+            {
+                default:
+                    if (unicode)
+                    {
+                        return this.Unicode(value);
+                    }
+                    else
+                    {
+                        return this.Text(value);
+                    }
+
+                case Energy.Enumeration.FormatType.Number:
+                    return this.Number(value);
+
+                case Energy.Enumeration.FormatType.Integer:
+                    return this.Integer(value);
+
+                case Energy.Enumeration.FormatType.Date:
+                    return this.Date(value);
+
+                case Energy.Enumeration.FormatType.Time:
+                    return this.Time(value);
+
+                case Energy.Enumeration.FormatType.Stamp:
+                    return this.Stamp(value);
+
+                case Enumeration.FormatType.Binary:
+                    return this.Binary(value);
+
+                case Enumeration.FormatType.Plain:
+                    return Energy.Base.Cast.ObjectToString(value);
+            }
         }
 
         #endregion

@@ -403,20 +403,37 @@ namespace Energy.Base
 
         #endregion
 
-        #region Static utility functions
+        #region Static
 
-        private static readonly string[] characterReplacementArray = new string[]{
+        #region Private
+
+        private static readonly string[] _EscapeReplacementArray = new string[]{
             "\b", "\\b",
             "\f", "\\f",
             "\n", "\\n",
             "\r", "\\r",
+            "\t", "\\t",
             "\"", "\\\"",
-            "\\", "\\\\",
+            "\\", "\\\\", // escape character must be last, order matters :-(
         };
 
+        private static readonly string[] _UnescapeReplacementArray = new string[]{
+            "\b", "\\b",
+            "\f", "\\f",
+            "\n", "\\n",
+            "\r", "\\r",
+            "\t", "\\t",
+            "\"", "\\\"",
+            "\\", "\\\\",
+            "/",  "\\/",
+        };
+
+        #endregion
+
+        #region Escape
+
         /// <summary>
-        /// Escape JSON characters and include string in double quotes.
-        /// Null strings will be represented as "null".
+        /// Escape special characters for JSON value.
         /// 
         /// Backspace is replaced with '\b'.
         /// Form feed is replaced with '\f'.
@@ -426,61 +443,107 @@ namespace Energy.Base
         /// Double quote is replaced with '\"'.
         /// Backslash is replaced with '\\'.
         /// 
+        /// Escaped text must be surrounded with double quotes.
         /// </summary>
-        /// <param name="text">Text to be escaped for JSON string</param>
+        /// <param name="text">Text to be escaped</param>
         /// <returns>JSON string</returns>
         public static string Escape(string text)
         {
-            if (text == null)
-                return "null";
-            if (text == "")
-                return "\"\"";
-            for (int i = characterReplacementArray.Length - 2; i >= 0; i -= 2)
+            if (string.IsNullOrEmpty(text))
             {
-                if (text.Contains(characterReplacementArray[i]))
-                    text = text.Replace(characterReplacementArray[i], characterReplacementArray[i + 1]);
+                return text;
+            }
+            for (int i = _EscapeReplacementArray.Length - 2; i >= 0; i -= 2)
+            {
+                if (text.Contains(_EscapeReplacementArray[i]))
+                {
+                    text = text.Replace(_EscapeReplacementArray[i], _EscapeReplacementArray[i + 1]);
+                }
             }
             return text;
         }
 
+        #endregion
+
+        #region Unescape
+
         /// <summary>
-        /// Strip quotes and unescapes JSON string to text.
+        /// Strip backslashes from previously escaped value.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Unescape(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            for (int i = 0; i < _UnescapeReplacementArray.Length; i += 2)
+            {
+                if (text.Contains(_UnescapeReplacementArray[i + 1]))
+                {
+                    text = text.Replace(_UnescapeReplacementArray[i + 1], _UnescapeReplacementArray[i]);
+                }
+            }
+            return text;
+        }
+
+        #endregion
+
+        #region Strip
+
+        /// <summary>
+        /// Strip double quotes and unescapes string.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         public static string Strip(string text)
         {
             if (text == null)
+            {
                 return null;
+            }
             if (text == "null")
+            {
                 return null;
+            }
             if (text == "")
+            {
                 return "";
+            }
             if (text.StartsWith("\"") && text.EndsWith("\""))
             {
                 text = text.Substring(1, text.Length - 2);
-                for (int i = 0; i < characterReplacementArray.Length; i += 2)
-                {
-                    if (text.Contains(characterReplacementArray[i + 1]))
-                        text = text.Replace(characterReplacementArray[i + 1], characterReplacementArray[i]);
-                }
-                return text;
+                text = Energy.Base.Json.Unescape(text);
+            }
+            return text;
+        }
+
+        #endregion
+
+        #region Quote
+
+        /// <summary>
+        /// Quote text. 
+        /// Represents text in double quotes and escapes special characters.
+        /// Null strings are represented as single word "null".
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Quote(string text)
+        {
+            //return text == null ? "null" : "\"" + Escape(text) + "\"";
+            if (null == text)
+            {
+                return "null";
             }
             else
             {
-                return text;
+                return "\"" + Escape(text) + "\"";
             }
         }
 
-        /// <summary>
-        /// Quote
-        /// </summary>
-        /// <param name="jsonString"></param>
-        /// <returns></returns>
-        public static string Quote(string jsonString)
-        {
-            return "\"" + Escape(jsonString) + "\"";
-        }
+        #endregion
 
         #endregion
     }

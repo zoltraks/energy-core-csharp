@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Text;
-using System.Xml;
+using System.Globalization;
 using System.IO;
-using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Energy.Base
 {
@@ -61,15 +61,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Pattern
-
-        public class Pattern
-        {
-            public static string InformalXmlTagLine = @"<\s*(?<name>[\?!a-zA-Z:_][a-zA-Z0-9:.\-\u00B7\u0300-\u036F\u203F-\u2040_]*)(?<attribute>(?:(?:\s+(?:""(?:""""|\\""|[^""])*""|[^=>/?\s]+)(?:\s*=\s*(?:""(?:""""|\\""|[^""])*)""|[^>/?\s]+)))*)(?<end>\s*(?:[/?]?\s*)>)?";
-        }
-
-        #endregion
-
         #region Serialize
 
         /// <summary>
@@ -81,12 +72,14 @@ namespace Energy.Base
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
         /// </code>
         /// </summary>
-        /// <param name="data">Object</param>
-        /// <param name="root">XML root</param>
-        /// <param name="space">XML namespace</param>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="space">Namespace</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
         /// <returns>XML string</returns>
-        public static string Serialize(object data, string root, string space)
+        public static string Serialize(object data, string root, string space, out string error)
         {
+            error = "";
             string xml = null;
             try
             {
@@ -107,6 +100,14 @@ namespace Energy.Base
             }
             catch (Exception x)
             {
+                if (null != x.InnerException)
+                {
+                    error = x.InnerException.Message;
+                }
+                else
+                {
+                    error = x.Message;
+                }
                 Energy.Core.Bug.Catch(x);
             }
             return xml;
@@ -121,11 +122,48 @@ namespace Energy.Base
         /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
         /// </code>
         /// </summary>
-        /// <param name="data">Object</param>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="space">Namespace</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root, string space)
+        {
+            string _;
+            return Serialize(data, root, space, out _);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, out string error)
+        {
+            return Serialize(data, "", "", out error);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
         /// <returns>XML string</returns>
         public static string Serialize(object data)
         {
-            return Serialize(data, "", "");
+            string _;
+            return Serialize(data, "", "", out _);
         }
 
         /// <summary>
@@ -142,7 +180,26 @@ namespace Energy.Base
         /// <returns>XML string</returns>
         public static string Serialize(object data, string root)
         {
-            return Serialize(data, root, "");
+            string _;
+            return Serialize(data, root, "", out _);
+        }
+
+        /// <summary>
+        /// Serialize object to XML.
+        /// <para>
+        /// Object class must implement IXmlSerializable interface.
+        /// </para>
+        /// <code>
+        /// string xml = Energy.Base.Xml.Serialize(myObject, "Root", "org.example.xns");
+        /// </code>
+        /// </summary>
+        /// <param name="data">Object to serialize</param>
+        /// <param name="root">Root element</param>
+        /// <param name="error">Serialization error message. Empty when no error.</param>
+        /// <returns>XML string</returns>
+        public static string Serialize(object data, string root, out string error)
+        {
+            return Serialize(data, root, "", out error);
         }
 
         #endregion
@@ -379,7 +436,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static Class.XmlTagLine ExtractRootNodeLine(string xml)
         {
-            Match m = Regex.Match(xml, Pattern.InformalXmlTagLine, RegexOptions.IgnorePatternWhitespace);
+            Match m = Regex.Match(xml, Energy.Base.Expression.XmlTagLineInformal, RegexOptions.IgnorePatternWhitespace);
             while (true)
             {
                 if (!m.Success)
@@ -409,9 +466,13 @@ namespace Energy.Base
         {
             Match match = Regex.Match(xml, Energy.Base.Expression.XmlRootName);
             if (!match.Success)
+            {
                 return "";
+            }
             else
+            {
                 return match.Groups[1].Value;
+            }
         }
 
         /// <summary>
@@ -423,8 +484,304 @@ namespace Energy.Base
         {
             string root = ExtractRoot(xml);
             if (string.IsNullOrEmpty(root) || !root.Contains(":"))
+            {
                 return root;
-            return root.Substring(root.LastIndexOf(":") + 1);
+            }
+            else
+            {
+                return root.Substring(root.LastIndexOf(":") + 1);
+            }
+        }
+
+        #endregion
+
+        #region Encode
+
+        /// <summary>
+        /// Encode special characters with valid XML entities.
+        /// <br/><br/>
+        /// Only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Encode(string text)
+        {
+            return Energy.Base.Xml.Encode(text, null);
+        }
+
+        /// <summary>
+        /// Encode special characters with valid XML entities.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.UTF-8 then only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.ASCII then additionaly all characters with codes higher that 126 will be encoded as character entities.
+        /// <br /><br />
+        /// When encoding parameter is set to Encoding.Unicode then Unicode surrogate pairs (i.e. emoji) will also be encoded as character entities.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string Encode(string text, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            if (null == encoding)
+            {
+                encoding = Encoding.UTF8;
+            }
+            bool ascii = encoding == Encoding.ASCII;
+            bool surrogate = encoding == Encoding.UTF8;
+            int n = text.Length;
+            char c = '\0';
+            int i;
+            for (i = 0; i < n; i++)
+            {
+                c = text[i];
+                if (c == 9 || c == 10 || c == 13)
+                {
+                    continue;
+                }
+                if (c >= 0 && c < 32 || c == 127)
+                {
+                    break;
+                }
+                if (c == '<' || c == '>' || c == '"' || c == '\'' || c == '&')
+                {
+                    break;
+                }
+                // non ASCII characters
+                if (ascii && c > 127)
+                {
+                    break;
+                }
+                // unicode surrogate pairs
+                if (!surrogate && c >= 0xd800 && c <= 0xdfff)
+                {
+                    break;
+                }
+            }
+            if (i == n)
+            {
+                return text;
+            }
+            StringBuilder s = new StringBuilder(n + 16);
+            s.Append(text.Substring(0, i));
+            for (; i < n; i++, c = i < n ? text[i] : c)
+            {
+                if (c == 9 || c == 10 || c == 13)
+                {
+                    s.Append(c);
+                    continue;
+                }
+                if (!surrogate && c >= 0xd800 && c <= 0xdfff)
+                {
+                    if (i + 1 < n)
+                    {
+                        char d = text[i + 1];
+                        if (c >= 0xd800 && c <= 0xdbff && d >= 0xdc00 && d <= 0xdfff)
+                        {
+                            int p = 0x10000 + (c - 0xd800 << 10) + d - 0xdc00;
+                            s.Append("&#x");
+                            s.Append(p.ToString("X"));
+                            s.Append(";");
+                            i++;
+                            continue;
+                        }
+                    }
+                    s.Append("&#x");
+                    s.Append((int)c);
+                    s.Append(";");
+                    continue;
+                }
+                if (c >= 0 && c < 32 || c == 127 || ascii && c > 127)
+                {
+                    s.Append("&#");
+                    s.Append((int)c);
+                    s.Append(";");
+                    continue;
+                }
+                switch (c)
+                {
+                    case '<':
+                        s.Append("&lt;");
+                        continue;
+                    case '>':
+                        s.Append("&gt;");
+                        continue;
+                    case '"':
+                        s.Append("&quot;");
+                        continue;
+                    case '&':
+                        s.Append("&amp;");
+                        continue;
+                    case '\'':
+                        s.Append("&apos;");
+                        continue;
+                }
+                s.Append(c);
+            }
+            return s.ToString();
+        }
+
+        #endregion
+
+        #region Decode
+
+        /// <summary>
+        /// Decode named or numeric character XML entities with corresponding characters.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Decode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            string replace = Regex.Replace(text, "&#?(?:[xX][0-9a-fA-F]+|[0-9]+|[a-zA-Z]+);", delegate(Match match) 
+            {
+                string check = match.Value;
+                if (false) { }
+                else if (check.StartsWith("&#"))
+                {
+                    int code = 0;
+                    if ('x' == check[2] || 'X' == check[2])
+                    {
+                        string hex = check.Substring(3, check.Length - 4);
+                        if (!Energy.Base.Hex.IsHex(hex))
+                        {
+                            return check;
+                        }
+                        code = Energy.Base.Hex.HexToInteger(hex); 
+                        //if (!int.TryParse(check.Substring(3, check.Length - 4),
+                        //    NumberStyles.HexNumber, CultureInfo.InvariantCulture, out code))
+                        //{
+                        //    return check;
+                        //}
+                    }
+                    else
+                    {
+                        if (!Energy.Base.Text.TryParse<int>(check.Substring(2, check.Length - 3), out code))
+                        {
+                            return check;
+                        }
+                        //if (!int.TryParse(check.Substring(2, check.Length - 3), out code))
+                        //{
+                        //    return check;
+                        //}
+                    }
+                    if (code < 65536)
+                    {
+                        return new string((char)code, 1);
+                    }
+                    else
+                    {
+                        int p = code - 0x10000;
+                        int c = 0xd800 + (p >> 10);
+                        int d = 0xdc00 + (p & 0x3ff);
+                        return string.Concat((char)c, (char)d);
+                    }
+                }
+                else if (0 == string.Compare(check, "&lt;", true))
+                {
+                    return "<";
+                }
+                else if (0 == string.Compare(check, "&gt;", true))
+                {
+                    return ">";
+                }
+                else if (0 == string.Compare(check, "&amp;", true))
+                {
+                    return "&";
+                }
+                else if (0 == string.Compare(check, "&quot;", true))
+                {
+                    return "\"";
+                }
+                else if (0 == string.Compare(check, "&apos;", true))
+                {
+                    return "'";
+                }
+                else
+                {
+                    return check;
+                }
+            });
+            return replace;
+        }
+
+        #endregion
+
+        #region Escape
+
+        /// <summary>
+        /// Escape special characters with valid XML entities.
+        /// <br/><br/>
+        /// Only ASCII control codes and XML special characters will be encoded.
+        /// All other valid UTF-8 characters will remain untouched.
+        /// Control characters like new line, carriage return, and tab will not be encoded either.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Escape(string text)
+        {
+            return Encode(text);
+        }
+
+        #endregion
+
+        #region Unescape
+
+        /// <summary>
+        /// Unescape XML from named or numeric character entities.
+        /// </summary>
+        /// <param name="text"></param>
+        public static string Unescape(string text)
+        {
+            return Decode(text);
+        }
+
+        #endregion
+
+        #region CDATA
+
+        /// <summary>
+        /// Utitlity class for handling XML CDATA sections.
+        /// </summary>
+        public static class CData
+        {
+            /// <summary>
+            /// Quote text inside XML CDATA section.
+            /// <br/><br/>
+            /// Text must not contain "]]&gt;" neither "&lt;![CDATA[" although this function doesn't check that.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public static string Quote(string text)
+            {
+                return "<![CDATA[" + text + "]]>";
+            }
+
+            /// <summary>
+            /// Strip text from one or more XML CDATA sections.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public static string Strip(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                {
+                    return text;
+                }
+                string pattern = @"<!\s*\[\s*CDATA\s*\[(.+?)]\s*]\s*>";
+                return Regex.Replace(text, pattern, "$1");
+            }
         }
 
         #endregion

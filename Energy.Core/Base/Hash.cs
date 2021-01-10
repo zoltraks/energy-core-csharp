@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Energy.Base
@@ -10,6 +12,8 @@ namespace Energy.Base
     // TODO Implement PBKDF2, Bcrypt, HMAC/SHA1 and possibly legacy DES or AES 3
     public class Hash
     {
+        #region CRC
+
         /// <summary>
         /// For each characters do a 5-bit left circular shift
         /// and XOR in character numeric value (CRC variant).
@@ -25,6 +29,10 @@ namespace Energy.Base
             }
             return h;
         }
+
+        #endregion
+
+        #region CRC2
 
         /// <summary>
         /// For each characters do a 5-bit left circular shift
@@ -55,6 +63,10 @@ namespace Energy.Base
             return h;
         }
 
+        #endregion
+
+        #region PJW
+
         /// <summary>
         /// For each characters add character numeric value and left shift by 4 bits (PJW hash).
         /// </summary>
@@ -73,13 +85,15 @@ namespace Energy.Base
                 if ((g = h & 0xf0000000) != 0)
                 {
                     // move them to the low end of h
-                    h = h ^ (g >> 24);
+                    h ^= (g >> 24);
                     // zero top 4 bits of h
-                    h = h ^ g;
+                    h ^= g;
                 }
             }
             return h;
         }
+
+        #endregion
 
         #region MD5
 
@@ -92,11 +106,13 @@ namespace Energy.Base
         public static string MD5(string text, Encoding encoding)
         {
             if (text == null || encoding == null)
+            {
                 return null;
+            }
             using (System.Security.Cryptography.MD5CryptoServiceProvider md5 = new System.Security.Cryptography.MD5CryptoServiceProvider())
             {
                 byte[] array = md5.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -123,11 +139,13 @@ namespace Energy.Base
         public static string SHA1(string text, Encoding encoding)
         {
             if (text == null || encoding == null)
+            {
                 return null;
+            }
             using (System.Security.Cryptography.SHA1 sha = new System.Security.Cryptography.SHA1CryptoServiceProvider())
             {
                 byte[] array = sha.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
         }
 
@@ -154,12 +172,19 @@ namespace Energy.Base
         public static string SHA256(string text, Encoding encoding)
         {
             if (text == null)
+            {
                 return null;
+            }
+#if !NETCF
             using (System.Security.Cryptography.SHA256 cipher = System.Security.Cryptography.SHA256.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>
@@ -185,12 +210,19 @@ namespace Energy.Base
         public static string SHA384(string text, Encoding encoding)
         {
             if (text == null)
+            {
                 return null;
+            }
+#if !NETCF
             using (System.Security.Cryptography.SHA384 cipher = System.Security.Cryptography.SHA384.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>
@@ -216,12 +248,19 @@ namespace Energy.Base
         public static string SHA512(string text, Encoding encoding)
         {
             if (text == null)
+            {
                 return null;
+            }
+#if !NETCF
             using (System.Security.Cryptography.SHA512 cipher = System.Security.Cryptography.SHA512.Create())
             {
                 byte[] array = cipher.ComputeHash(encoding.GetBytes(text));
-                return Energy.Base.Hex.ByteArrayToHex(array);
+                return Energy.Base.Hex.ArrayToHex(array).ToLower();
             }
+#endif
+#if NETCF
+            return null;
+#endif
         }
 
         /// <summary>
@@ -235,6 +274,5 @@ namespace Energy.Base
         }
 
         #endregion
-
     }
 }
