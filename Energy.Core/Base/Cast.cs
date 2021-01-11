@@ -778,33 +778,93 @@ namespace Energy.Base
         /// <returns></returns>
         public static int StringToInt(string text)
         {
-            text = Energy.Base.Text.Trim(text);
-            if (string.IsNullOrEmpty(text))
-            {
-                return 0;
-            }
-            int result;
-            if (!int.TryParse(text, out result))
-            {
-                return 0;
-            }
-            else
-            {
-                return result;
-            }
+            //text = Energy.Base.Text.Trim(text);
+            //if (string.IsNullOrEmpty(text))
+            //{
+            //    return 0;
+            //}
+            //int result;
+            //if (!int.TryParse(text, out result))
+            //{
+            //    return 0;
+            //}
+            //else
+            //{
+            //    return result;
+            //}
+            int r = Energy.Base.Text.TryParse<int>(text);
+            return r;
         }
 
         /// <summary>
-        /// Convert string to integer value without exception.
-        /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Returns zero on overflow.
+        /// Convert text to signed 32-bit integer number without exception
+        /// ignoring leading and trailing whitespace characters.
+        /// <br/><br/>
+        /// If conversion cannot be performed, default value 0 is returned.
         /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static int StringToInteger(string value)
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int StringToInt32(string text)
         {
-            return StringToInteger(value, true);
+            //text = Energy.Base.Text.Trim(text);
+            //if (string.IsNullOrEmpty(text))
+            //{
+            //    return 0;
+            //}
+            //int result;
+            //if (!int.TryParse(text, out result))
+            //{
+            //    return 0;
+            //}
+            //else
+            //{
+            //    return result;
+            //}
+            int r = Energy.Base.Text.TryParse<int>(text);
+            return r;
+        }
+
+
+        /// <summary>
+        /// Convert text to signed 32-bit integer number without exception
+        /// ignoring leading and trailing whitespace characters.
+        /// <br/><br/>
+        /// If conversion cannot be performed, default value 0 is returned.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static uint StringToUInt32(string text)
+        {
+            //text = Energy.Base.Text.Trim(text);
+            //if (string.IsNullOrEmpty(text))
+            //{
+            //    return 0;
+            //}
+            //int result;
+            //if (!int.TryParse(text, out result))
+            //{
+            //    return 0;
+            //}
+            //else
+            //{
+            //    return result;
+            //}
+            uint r = Energy.Base.Text.TryParse<uint>(text);
+            return r;
+        }
+
+        /// <summary>
+        /// Convert text to signed 32-bit integer number without exception
+        /// ignoring leading and trailing whitespace characters.
+        /// <br/><br/>
+        /// If conversion cannot be performed, default value 0 is returned.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int StringToInteger(string text)
+        {
+            int r = Energy.Base.Text.TryParse<int>(text);
+            return r; 
         }
 
         /// <summary>
