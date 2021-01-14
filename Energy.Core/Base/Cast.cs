@@ -4462,23 +4462,32 @@ namespace Energy.Base
                 return true;
             if (text == "false")
                 return false;
-            int intValue = 0;
-            if (int.TryParse(text, out intValue))
-                return intValue;
-            long longValue = 0;
-            if (long.TryParse(text, out longValue))
-                return longValue;
-            ulong ulongValue = 0;
-            if (ulong.TryParse(text, out ulongValue))
+            int _int;
+            if (Energy.Base.Text.TryParse<int>(text, out _int))
             {
-                return ulongValue;
+                return _int;
             }
-            double doubleValue = 0;
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
-                return doubleValue;
-            decimal decimalValue = 0;
-            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimalValue))
-                return decimalValue;
+            long _long;
+            if (Energy.Base.Text.TryParse<long>(text, out _long))
+            {
+                return _long;
+            }
+            ulong _ulong;
+            if (Energy.Base.Text.TryParse<ulong>(text, out _ulong))
+            {
+                return _ulong;
+            }
+            decimal _decimal = 0;
+            if (Energy.Base.Text.TryParse<decimal>(text, out _decimal))
+            {
+                return _decimal;
+            }
+            double _double = 0;
+            if (Energy.Base.Text.TryParse<double>(text, out _double))
+            {
+                return _double;
+            }
+
             return Energy.Base.Json.Strip(text);
         }
 
