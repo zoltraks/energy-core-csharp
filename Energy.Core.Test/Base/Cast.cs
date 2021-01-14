@@ -102,16 +102,21 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void CastStringToInteger()
         {
-            string str1 = "15,001";
-            int num1 = Energy.Base.Cast.StringToInteger(str1);
+            string str1;
+            int num1;
+            str1 = "\v\r\n\t 15 \v\r\n\t";
+            num1 = Energy.Base.Cast.StringToInteger(str1);
+            Assert.AreEqual(15, num1);
+            str1 = "15,001";
+            num1 = Energy.Base.Cast.StringToInteger(str1, true);
             Assert.AreEqual(15, num1);
             int num101 = Energy.Base.Cast.StringToInteger(str1, false);
             Assert.AreEqual(0, num101);
-            string str2 = " 15.000000001 ";
-            double num2 = Energy.Base.Cast.StringToInteger(str2);
+            string str2 = " 15.999000001 ";
+            double num2 = Energy.Base.Cast.StringToInteger(str2, true);
             Assert.AreEqual(15, num2);
-            string str3 = " -1,234 ";
-            double num3 = Energy.Base.Cast.StringToInteger(str3);
+            string str3 = " -1,934 ";
+            double num3 = Energy.Base.Cast.StringToInteger(str3, true);
             Assert.AreEqual(-1, num3);
             string str4 = " 81985529216486895 ";
             double num4 = Energy.Base.Cast.StringToInteger(str4);
@@ -158,20 +163,6 @@ namespace Energy.Core.Test.Base
             expect = 0;
             result = Energy.Base.Cast.ObjectToInteger(source);
             Assert.AreEqual(expect, result);
-        }
-
-        [TestMethod]
-        public void CastStringToDoubleSmart()
-        {
-            string str1 = "15,001_002";
-            double num1 = Energy.Base.Cast.StringToDoubleSmart(str1);
-            Assert.AreEqual(15.001002, num1);
-            string str2 = " 15.000_000_001 ";
-            double num2 = Energy.Base.Cast.StringToDoubleSmart(str2);
-            Assert.AreEqual(15.000000001, num2);
-            string str3 = " -1'000,234 ";
-            double num3 = Energy.Base.Cast.StringToDoubleSmart(str3);
-            Assert.AreEqual(-1000.234, num3);
         }
 
         [TestMethod]
@@ -256,7 +247,8 @@ namespace Energy.Core.Test.Base
             string _double;
             string _decimal;
             string _float;
-            foreach (object test in new object[] { "123.456", "123,456 " })
+
+            foreach (object test in new object[] { "123.456 ", "123,456 \r\n " })
             {
                 Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
                 Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
@@ -264,12 +256,12 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(test));
                 Assert.AreEqual(123.456, Energy.Base.Cast.As<double>(test));
                 Assert.AreEqual(123.456m, Energy.Base.Cast.As<decimal>(test));
-                Assert.AreEqual((Int16)123, Energy.Base.Cast.As<Int16>(test));
-                Assert.AreEqual((UInt16)123, Energy.Base.Cast.As<UInt16>(test));
-                Assert.AreEqual((Int32)123, Energy.Base.Cast.As<Int32>(test));
-                Assert.AreEqual((UInt32)123, Energy.Base.Cast.As<UInt32>(test));
-                Assert.AreEqual((Int64)123, Energy.Base.Cast.As<Int64>(test));
-                Assert.AreEqual((UInt64)123, Energy.Base.Cast.As<UInt64>(test));
+                Assert.AreEqual(123, Energy.Base.Cast.As<Int16>(test));
+                Assert.AreEqual(123, Energy.Base.Cast.As<UInt16>(test));
+                Assert.AreEqual(123, Energy.Base.Cast.As<Int32>(test));
+                Assert.AreEqual((uint)123, Energy.Base.Cast.As<UInt32>(test));
+                Assert.AreEqual((long)123, Energy.Base.Cast.As<Int64>(test));
+                Assert.AreEqual((ulong)123, Energy.Base.Cast.As<UInt64>(test));
                 Assert.IsTrue(Energy.Base.Cast.As<bool>(test));
 
                 _double = test as string;
@@ -279,6 +271,31 @@ namespace Energy.Core.Test.Base
                 _float = test as string;
                 Assert.AreEqual(123.456f, Energy.Base.Cast.As<float>(_float));
             }
+
+            foreach (object test in new object[] { "123", "123 " })
+            {
+                Assert.AreEqual((byte)123, Energy.Base.Cast.As<byte>(test));
+                Assert.AreEqual((sbyte)123, Energy.Base.Cast.As<sbyte>(test));
+                Assert.AreEqual('1', Energy.Base.Cast.As<char>(test));
+                Assert.AreEqual(123.0f, Energy.Base.Cast.As<float>(test));
+                Assert.AreEqual(123.0, Energy.Base.Cast.As<double>(test));
+                Assert.AreEqual(123.0m, Energy.Base.Cast.As<decimal>(test));
+                Assert.AreEqual((Int16)123, Energy.Base.Cast.As<Int16>(test));
+                Assert.AreEqual((UInt16)123, Energy.Base.Cast.As<UInt16>(test));
+                Assert.AreEqual((Int32)123, Energy.Base.Cast.As<Int32>(test));
+                Assert.AreEqual((UInt32)123, Energy.Base.Cast.As<UInt32>(test));
+                Assert.AreEqual((Int64)123, Energy.Base.Cast.As<Int64>(test));
+                Assert.AreEqual((UInt64)123, Energy.Base.Cast.As<UInt64>(test));
+                Assert.IsTrue(Energy.Base.Cast.As<bool>(test));
+
+                _double = test as string;
+                Assert.AreEqual(123, Energy.Base.Cast.As<double>(_double));
+                _decimal = test as string;
+                Assert.AreEqual(123m, Energy.Base.Cast.As<decimal>(_decimal));
+                _float = test as string;
+                Assert.AreEqual(123f, Energy.Base.Cast.As<float>(_float));
+            }
+
 
             // bool
 
@@ -403,11 +420,11 @@ namespace Energy.Core.Test.Base
             int _int;
             _int = int.MaxValue; // test for +‭2147483647‬ $7FFFFFFF
             Assert.AreEqual("2147483647", Energy.Base.Cast.IntegerToString(_int));
-            Assert.AreEqual("+2147483647", Energy.Base.Cast.IntegerToStringSign(_int));
-            Assert.AreEqual(".2147483647", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
+            //Assert.AreEqual("+2147483647", Energy.Base.Cast.IntegerToStringSign(_int));
+            //Assert.AreEqual(".2147483647", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
             _int = int.MinValue; // test for -2147483648 $FFFFFFFF
             Assert.AreEqual("-2147483648", Energy.Base.Cast.IntegerToString(_int));
-            Assert.AreEqual("$2147483648", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
+            //Assert.AreEqual("$2147483648", Energy.Base.Cast.IntegerToStringSign(_int, ".$"));
         }
 
         [TestMethod]
@@ -706,10 +723,119 @@ namespace Energy.Core.Test.Base
             s = " \t\n1000\r\v";
             i = Energy.Base.Cast.StringToInteger(s);
             Assert.AreEqual(1000, i);
+
+            s = " \t\n10000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToInteger(s);
+            Assert.AreEqual(1000, i);
+
+            s = " \t\n+50000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToInteger(s, true, false);
+            Assert.AreEqual(0, i);
+            i = Energy.Base.Cast.StringToInteger(s, true, true);
+            Assert.AreEqual(int.MaxValue, i);
+
+            s = " \t\n-50000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToInteger(s, true, false);
+            Assert.AreEqual(0, i);
+            i = Energy.Base.Cast.StringToInteger(s, true, true);
+            Assert.AreEqual(int.MinValue, i);
         }
 
         [TestMethod]
-        public void StringToInt()
+        public void StringToUnsignedInteger()
+        {
+            string s;
+            uint i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToUnsignedInteger(s);
+            Assert.AreEqual((uint)1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToUnsignedInteger(s);
+            Assert.AreEqual((uint)1000, i);
+
+            s = " \t\n10000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedInteger(s);
+            Assert.AreEqual((uint)1000, i);
+
+            s = " \t\n+50000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedInteger(s, true, false);
+            Assert.AreEqual((uint)0, i);
+            i = Energy.Base.Cast.StringToUnsignedInteger(s, true, true);
+            Assert.AreEqual(uint.MaxValue, i);
+
+            s = " \t\n-50000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedInteger(s, true, false);
+            Assert.AreEqual((uint)0, i);
+            i = Energy.Base.Cast.StringToUnsignedInteger(s, true, true);
+            Assert.AreEqual((uint)0, i);
+        }
+
+        [TestMethod]
+        public void StringToLong()
+        {
+            string s;
+            long i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToLong(s);
+            Assert.AreEqual((long)1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToLong(s);
+            Assert.AreEqual((long)1000, i);
+
+            s = " \t\n10000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToLong(s);
+            Assert.AreEqual((long)1000, i);
+
+            s = " \t\n+99000000000000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToLong(s, true, false);
+            Assert.AreEqual((long)0, i);
+            i = Energy.Base.Cast.StringToLong(s, true, true);
+            Assert.AreEqual(long.MaxValue, i);
+
+            s = " \t\n-99000000000000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToLong(s, true, false);
+            Assert.AreEqual((long)0, i);
+            i = Energy.Base.Cast.StringToLong(s, true, true);
+            Assert.AreEqual(long.MinValue, i);
+        }
+
+        [TestMethod]
+        public void StringToUnsignedLong()
+        {
+            string s;
+            ulong i;
+
+            s = "1000";
+            i = Energy.Base.Cast.StringToUnsignedLong(s);
+            Assert.AreEqual((ulong)1000, i);
+
+            s = " \t\n1000\r\v";
+            i = Energy.Base.Cast.StringToUnsignedLong(s);
+            Assert.AreEqual((ulong)1000, i);
+
+            s = " \t\n10000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedLong(s);
+            Assert.AreEqual((ulong)1000, i);
+
+            s = " \t\n+990000000000000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedLong(s, true, false);
+            Assert.AreEqual((ulong)0, i);
+            i = Energy.Base.Cast.StringToUnsignedLong(s, true, true);
+            Assert.AreEqual(ulong.MaxValue, i);
+
+            s = " \t\n-990000000000000000000.99999e-1\r\v";
+            i = Energy.Base.Cast.StringToUnsignedLong(s, true, false);
+            Assert.AreEqual((ulong)0, i);
+            i = Energy.Base.Cast.StringToUnsignedLong(s, true, true);
+            Assert.AreEqual((ulong)0, i);
+        }
+
+        [TestMethod]
+        public void StringToIntBenchmark()
         {
             string s;
             int i;
