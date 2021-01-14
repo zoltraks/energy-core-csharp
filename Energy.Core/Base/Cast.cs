@@ -4457,33 +4457,38 @@ namespace Energy.Base
         public static object JsonValueToObject(string text)
         {
             if (text == "null")
-                return null;
-            if (text == "true")
-                return true;
-            if (text == "false")
-                return false;
-            int _int;
-            if (Energy.Base.Text.TryParse<int>(text, out _int))
             {
-                return _int;
+                return null;
+            }
+            if (text == "true")
+            {
+                return true;
+            }
+            if (text == "false")
+            {
+                return false;
             }
             long _long;
             if (Energy.Base.Text.TryParse<long>(text, out _long))
             {
+                if (_long >= int.MinValue && _long <= int.MaxValue)
+                {
+                    return (int)_long;
+                }
                 return _long;
             }
-            ulong _ulong;
-            if (Energy.Base.Text.TryParse<ulong>(text, out _ulong))
+            string number = text;
+            if (number.IndexOf(',') >= 0)
             {
-                return _ulong;
+                number = number.Replace(',', '.');
             }
             decimal _decimal = 0;
-            if (Energy.Base.Text.TryParse<decimal>(text, out _decimal))
+            if (Energy.Base.Text.TryParse<decimal>(number, out _decimal))
             {
                 return _decimal;
             }
             double _double = 0;
-            if (Energy.Base.Text.TryParse<double>(text, out _double))
+            if (Energy.Base.Text.TryParse<double>(number, out _double))
             {
                 return _double;
             }
