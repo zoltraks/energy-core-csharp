@@ -13,6 +13,38 @@ namespace Energy.Base
     /// </summary>
     public static class Cast
     {
+        #region Private
+
+        #region Truncate
+
+        private static decimal Truncate(decimal number)
+        {
+
+#if !NETCF
+            number = Math.Truncate(number);
+#endif
+#if NETCF
+            number = (decimal)(number < 0 ? Math.Ceiling((double)number) : Math.Floor((double)number));
+#endif
+            return number;
+        }
+
+        private static double Truncate(double number)
+        {
+
+#if !NETCF
+            number = Math.Truncate(number);
+#endif
+#if NETCF
+            number = number < 0 ? Math.Ceiling(number) : Math.Floor(number));
+#endif
+            return number;
+        }
+
+        #endregion
+
+        #endregion
+
         #region As
 
         #region Generic
@@ -1719,14 +1751,7 @@ namespace Energy.Base
             {
                 return result;
             }
-
-#if !NETCF
-            _decimal = Math.Truncate(_decimal);
-#endif
-#if NETCF
-            _decimal = (decimal)(_decimal < 0 ? Math.Ceiling((double)_decimal) : Math.Floor((double)_decimal));
-#endif
-
+            _decimal = Truncate(_decimal);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
@@ -1780,14 +1805,7 @@ namespace Energy.Base
             {
                 return result;
             }
-
-#if !NETCF
-            _decimal = Math.Truncate(_decimal);
-#endif
-#if NETCF
-            _decimal = (decimal)(_decimal < 0 ? Math.Ceiling((double)_decimal) : Math.Floor((double)_decimal));
-#endif
-
+            _decimal = Truncate(_decimal);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
