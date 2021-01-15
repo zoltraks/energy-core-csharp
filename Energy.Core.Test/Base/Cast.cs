@@ -924,5 +924,21 @@ namespace Energy.Core.Test.Base
             result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void StringToDecimal()
+        {
+            decimal d, r;
+            string s;
+
+            s = null;
+            Assert.AreEqual(0m, Energy.Base.Cast.StringToDecimal(s));
+
+            s = "\t\v\r\n -1 \t\v\r\n";
+            Assert.AreEqual(-1m, Energy.Base.Cast.StringToDecimal(s));
+
+            s = "\t\v\r\n -143423424,342424114 \t\v\r\n";
+            Assert.AreEqual(-143423424.342424114m, Energy.Base.Cast.StringToDecimal(s));
+        }
     }
 }

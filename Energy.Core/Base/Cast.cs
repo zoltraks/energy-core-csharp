@@ -2223,63 +2223,30 @@ namespace Energy.Base
 
         #region Decimal
 
-        /// <summary>
-        /// Convert string to decimal value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <returns>decimal</returns>
-        public static decimal StringToDecimal(string value)
+        private static decimal RealStringToDecimal(string value)
         {
-            return StringToDecimal(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
-        }
-
-        /// <summary>
-        /// Convert string to decimal value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <param name="numberStyles"></param>
-        /// <returns>decimal</returns>
-        public static decimal StringToDecimal(string value, NumberStyles numberStyles)
-        {
-            if (null == value || 0 == value.Length)
-                return 0;
-            decimal result;
-            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
-                return result;
-            string trim = Energy.Base.Text.Trim(value);
-            bool hasComma = value.IndexOf(',') >= 0;
-            if (trim.Length == value.Length && !hasComma)
-                return 0;
-            if (hasComma)
-                value = value.Replace(',', '.');
-            if (decimal.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
-                return result;
-            double _double = 0;
-            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out _double))
+            if (string.IsNullOrEmpty(value))
             {
-                if (_double < (double)decimal.MinValue)
-                    return decimal.MinValue;
-                if (_double > (double)decimal.MaxValue)
-                    return decimal.MaxValue;
-                else
-                    return 0;
+                return 0;
             }
-            return 0;
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal result = Energy.Base.Text.TryParse<decimal>(value);
+            return result;
         }
 
         /// <summary>
-        /// Convert string to decimal value without exception.
-        /// Remove numerical differences from text representation of number.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Ignore space, underscore and apostrophes between digits.
+        /// Convert string to decimal value without exception ignoring leading and trailing whitespace.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static decimal StringToDecimalSmart(string value)
+        public static decimal StringToDecimal(string text)
         {
-            return StringToDecimal(RemoveNumericalDifferences(value));
+            return RealStringToDecimal(text);
         }
 
         /// <summary>
@@ -2289,28 +2256,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string DecimalToString(decimal value)
         {
-            return value.ToString();
-        }
-
-        /// <summary>
-        /// Represent decimal number as text with positive sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string DecimalToStringSign(decimal value)
-        {
-            return NumberToStringSign(DecimalToString(value), null);
-        }
-
-        /// <summary>
-        /// Represent decimal number as text with positive sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sign"></param>
-        /// <returns></returns>
-        public static string DecimalToStringSign(decimal value, string sign)
-        {
-            return NumberToStringSign(DecimalToString(value), sign);
+            return value.ToString(CultureInfo.InvariantCulture);
         }
 
         #endregion
