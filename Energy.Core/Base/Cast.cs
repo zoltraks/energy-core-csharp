@@ -1695,63 +1695,177 @@ namespace Energy.Base
 
         #region Short
 
-        /// <summary>
-        /// Convert string to short integer value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="point">Allow decimal point in numbers</param>
-        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
-        /// <returns>Short number</returns>
-        public static short StringToShort(string value, bool point, bool exceed)
+        private static short RealStringToInt16(string value, bool point, bool overflow, bool exceed)
         {
-            if (value == null || value.Length == 0)
-                return 0;
             short result = 0;
-            if (short.TryParse(value, out result))
+            if (value == null || value.Length == 0)
             {
                 return result;
             }
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
+            if (Energy.Base.Text.TryParse<short>(value, out result))
             {
-                if (short.TryParse(value, out result))
-                {
-                    return result;
-                }
+                return result;
             }
-            if (exceed)
+            if (!point && !overflow && !exceed)
             {
-                long _;
-                if (long.TryParse(value, out _))
-                {
-                    return (short)(_ % (1 + short.MaxValue));
-                }
-            }
-            if (!point)
-            {
-                return 0;
+                return result;
             }
             if (value.IndexOf(',') >= 0)
             {
                 value = value.Replace(',', '.');
             }
-            decimal number;
-            if (decimal.TryParse(value, out number))
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
             {
-                if (number < short.MinValue || number > short.MaxValue)
+                return result;
+            }
+            _decimal = Math.Truncate(_decimal);
+            if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
+            {
+                if (exceed)
                 {
-                    if (exceed)
+                    if (0 > _decimal) // negative
                     {
-                        return (short)(number % (1 + short.MaxValue));
+                        result = (short)(_decimal % (short.MinValue - 1));
                     }
-                    return 0;
+                    if (0 < _decimal) // positive
+                    {
+                        result = (short)(_decimal % (short.MaxValue + 1));
+                    }
+                    return result;
                 }
-                else
+                if (overflow)
                 {
-                    return (short)number;
+                    if (_decimal < short.MinValue)
+                    {
+                        return short.MinValue;
+                    }
+                    if (_decimal > short.MaxValue)
+                    {
+                        return short.MaxValue;
+                    }
                 }
             }
-            return 0;
+            return result;
+        }
+
+        private static ushort RealStringToUInt16(string value, bool point, bool overflow, bool exceed)
+        {
+            ushort result = 0;
+            if (value == null || value.Length == 0)
+            {
+                return result;
+            }
+            if (Energy.Base.Text.TryParse<ushort>(value, out result))
+            {
+                return result;
+            }
+            if (!point && !overflow && !exceed)
+            {
+                return result;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
+            {
+                return result;
+            }
+            _decimal = Math.Truncate(_decimal);
+            if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
+            {
+                if (exceed)
+                {
+                    if (0 > _decimal) // negative
+                    {
+                        result = (ushort)(ushort.MaxValue + 1 + (_decimal % (ushort.MaxValue + 1)));
+                    }
+                    if (0 < _decimal) // positive
+                    {
+                        result = (ushort)(0 + _decimal % (ushort.MaxValue + 1));
+                    }
+                    return result;
+                }
+                if (overflow)
+                {
+                    if (_decimal < ushort.MinValue)
+                    {
+                        return ushort.MinValue;
+                    }
+                    if (_decimal > ushort.MaxValue)
+                    {
+                        return ushort.MaxValue;
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <param name="exceed">
+        /// Allow to exceed value.
+        /// <br/><br/>
+        /// Modulo reminder will be returned on overflow.
+        /// <br/><br/>
+        /// This parameter takes precedence over overflow option.
+        /// </param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point, bool overflow, bool exceed)
+        {
+            return RealStringToInt16(value, point, overflow, exceed);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point, bool overflow)
+        {
+            return RealStringToInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point)
+        {
+            return RealStringToInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static short StringToInt16(string value, bool point, bool overflow)
+        {
+            return RealStringToInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static short StringToInt16(string value, bool point)
+        {
+            return RealStringToInt16(value, point, false, false);
         }
 
         /// <summary>
@@ -1759,141 +1873,146 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">String value</param>
         /// <param name="point">Allow decimal point in numbers</param>
-        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <param name="exceed">
+        /// Allow to exceed value.
+        /// <br/><br/>
+        /// Modulo reminder will be returned on overflow.
+        /// <br/><br/>
+        /// This parameter takes precedence over overflow option.
+        /// </param>
         /// <returns>Short number</returns>
-        public static ushort StringToUnsignedShort(string value, bool point, bool exceed)
+        public static ushort StringToUnsignedShort(string value, bool point, bool overflow, bool exceed)
         {
-            if (value == null || value.Length == 0)
-            {
-                return 0;
-            }
-            ushort result = 0;
-            if (ushort.TryParse(value, out result))
-            {
-                return result;
-            }
-            string trim = Energy.Base.Text.Trim(value);
-            if (0 == trim.Length)
-            {
-                return 0;
-            }
-            if (trim.Length != value.Length)
-            {
-                if (ushort.TryParse(value, out result))
-                {
-                    return result;
-                }
-            }
-            if (exceed)
-            {
-                if (value.StartsWith("-"))
-                {
-                    long _;
-                    if (long.TryParse(value, out _))
-                    {
-                        return (ushort)(-_ % (1 + ushort.MaxValue));
-                    }
-                }
-                else
-                {
-                    ulong _;
-                    if (ulong.TryParse(value, out _))
-                    {
-                        return (ushort)(_ % (1 + ushort.MaxValue));
-                    }
-                }
-            }
-            if (!point)
-            {
-                return 0;
-            }
-            if (value.IndexOf(',') >= 0)
-            {
-                value = value.Replace(',', '.');
-            }
-            decimal number;
-            if (decimal.TryParse(value, out number))
-            {
-                if (false)
-                { }
-                else if (number < 0)
-                {
-                    if (exceed)
-                    {
-                        return (ushort)(-number % (1 + ushort.MaxValue));
-                    }
-                    return 0;
-                }
-                else if (number > ushort.MaxValue)
-                {
-                    if (exceed)
-                    {
-                        return (ushort)(number % (1 + ushort.MaxValue));
-                    }
-                    return 0;
-                }
-                else
-                {
-                    return (ushort)number;
-                }
-            }
-            return 0;
+            return RealStringToUInt16(value, point, overflow, exceed);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception.
-        /// Allows decimal numbers by default.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
         /// </summary>
         /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
         /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value, bool point)
+        {
+            return RealStringToUInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUShort(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUShort(string value, bool point)
+        {
+            return RealStringToUInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
         public static short StringToShort(string value)
         {
-            return StringToShort(value
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception.
-        /// Allows decimal numbers by default.
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
+        /// <returns></returns>
+        public static short StringToInt16(string value)
+        {
+            return RealStringToInt16(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
         public static ushort StringToUnsignedShort(string value)
         {
-            return StringToUnsignedShort(value
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception 
-        /// removing numerical differences.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
-        public static short StringToShortSmart(string value)
+        /// <returns></returns>
+        public static ushort StringToUShort(string value)
         {
-            return StringToShort(RemoveNumericalDifferences(value)
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to unsigned short integer value without exception 
-        /// removing numerical differences.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
-        public static ushort StringToUsignedShortSmart(string value)
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value)
         {
-            return StringToUnsignedShort(RemoveNumericalDifferences(value)
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
@@ -3631,7 +3750,7 @@ namespace Energy.Base
             {
                 return (byte)(byte)value;
             }
-            
+
             if (value is char)
             {
                 return (byte)(char)value;

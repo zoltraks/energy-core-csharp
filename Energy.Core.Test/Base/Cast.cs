@@ -654,10 +654,16 @@ namespace Energy.Core.Test.Base
             expect = 0;
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToShort(needle, false, true);
+            expect = short.MaxValue;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, false, false, true);
+            expect = 22151;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToShort(needle, false, true, true);
             expect = 22151;
             Assert.AreEqual(expect, result);
 
-            needle = " \t1234567.9999999 \r\n ";
+            needle = " \t-1234567.9999999 \r\n ";
             result = Energy.Base.Cast.StringToShort(needle, false, false);
             expect = 0;
             Assert.AreEqual(expect, result);
@@ -665,10 +671,10 @@ namespace Energy.Core.Test.Base
             expect = 0;
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToShort(needle, false, true);
-            expect = 0;
+            expect = short.MinValue;
             Assert.AreEqual(expect, result);
-            result = Energy.Base.Cast.StringToShort(needle, true, true);
-            expect = 22151;
+            result = Energy.Base.Cast.StringToShort(needle, true, true, true);
+            expect = -22114; // should -22151 be considered instead of -22114?
             Assert.AreEqual(expect, result);
         }
 
@@ -684,6 +690,9 @@ namespace Energy.Core.Test.Base
             expect = 0;
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
+            expect = ushort.MaxValue;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true, true);
             expect = 54919;
             Assert.AreEqual(expect, result);
 
@@ -695,10 +704,15 @@ namespace Energy.Core.Test.Base
             expect = 0;
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
-            expect = 0;
+            expect = ushort.MaxValue;
             Assert.AreEqual(expect, result);
-            result = Energy.Base.Cast.StringToUnsignedShort(needle, true, true);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, true, false, true);
             expect = 54919;
+            Assert.AreEqual(expect, result);
+
+            needle = "-1";
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, false, true);
+            expect = ushort.MaxValue;
             Assert.AreEqual(expect, result);
 
             needle = "-67";
@@ -706,7 +720,10 @@ namespace Energy.Core.Test.Base
             expect = 0;
             Assert.AreEqual(expect, result);
             result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true);
-            expect = 67;
+            expect = 0;
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Cast.StringToUnsignedShort(needle, false, true, true);
+            expect = 65469; // should 67 be considered instead of 65469?
             Assert.AreEqual(expect, result);
         }
         
