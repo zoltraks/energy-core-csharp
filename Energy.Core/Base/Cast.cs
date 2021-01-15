@@ -1719,7 +1719,8 @@ namespace Energy.Base
             {
                 return result;
             }
-            _decimal = Math.Truncate(_decimal);
+            //_decimal = Math.Truncate(_decimal);
+            _decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
@@ -1773,7 +1774,8 @@ namespace Energy.Base
             {
                 return result;
             }
-            _decimal = Math.Truncate(_decimal);
+            //_decimal = Math.Truncate(_decimal);
+            _decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
