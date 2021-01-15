@@ -1264,5 +1264,30 @@ Another
 
             #endregion
         }
+
+        [TestMethod]
+        public void SingleLine()
+        {
+            string a, r;
+            a = null;
+            r = Energy.Base.Text.SingleLine(a, null, false);
+            Assert.IsNull(r);
+            a = "";
+            r = Energy.Base.Text.SingleLine(a, null, false);
+            Assert.IsNotNull(r);
+            Assert.AreEqual("", r);
+            a = "\r";
+            r = Energy.Base.Text.SingleLine(a, null, false);
+            Assert.IsNotNull(r);
+            Assert.AreEqual("", r);
+            r = Energy.Base.Text.SingleLine(a, "\t", false);
+            Assert.AreEqual("\t", r);
+            a = "\r\r";
+            r = Energy.Base.Text.SingleLine(a, null, false);
+            Assert.IsNotNull(r);
+            Assert.AreEqual("", r);
+            r = Energy.Base.Text.SingleLine(a, "\t", false);
+            Assert.AreEqual("\t\t", r);
+        }
     }
 }

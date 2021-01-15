@@ -905,6 +905,64 @@ namespace Energy.Base
 
         #endregion
 
+        #region SingleLine
+
+        /// <summary>
+        /// Join multiple lines of text into one single string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="join"></param>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public static string SingleLine(string text, string join, bool trim)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            string[] array = Regex.Split(text, @"\r\n|\n|\r");
+            if (trim)
+            {
+                for (int i = 0, n = array.Length; i < n; i++)
+                {
+                    if (null == array[i])
+                    {
+                        continue;
+                    }
+                    array[i] = array[i].Trim();
+                }
+            }
+            if (null == join)
+            {
+                join = "";
+            }
+            text = string.Join(join, array);
+            return text;
+        }
+
+        /// <summary>
+        /// Join multiple lines of text into one single string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="join"></param>
+        /// <returns></returns>
+        public static string SingleLine(string text, string join)
+        {
+            return SingleLine(text, join, false);
+        }
+
+        /// <summary>
+        /// Join multiple lines of text into one single string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string SingleLine(string text)
+        {
+            return SingleLine(text, " ", false);
+        }
+
+        #endregion
+
         #region SplitLine
 
         /// <summary>

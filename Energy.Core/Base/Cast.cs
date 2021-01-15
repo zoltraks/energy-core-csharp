@@ -2995,21 +2995,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Text
-
-        /// <summary>
-        /// Join multiline text into single string.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string SingleLine(string text)
-        {
-            return string.Join(" ", (new System.Collections.Generic.List<string>(text.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None)))
-                .ConvertAll<string>(delegate (string s) { return s.Trim(); }).ToArray());
-        }
-
-        #endregion
-
         #region DateTime
 
         /// <summary>
