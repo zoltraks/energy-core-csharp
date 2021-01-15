@@ -13,6 +13,38 @@ namespace Energy.Base
     /// </summary>
     public static class Cast
     {
+        #region Private
+
+        #region Truncate
+
+        private static decimal Truncate(decimal number)
+        {
+
+#if !NETCF
+            number = Math.Truncate(number);
+#endif
+#if NETCF
+            number = (decimal)(number < 0 ? Math.Ceiling((double)number) : Math.Floor((double)number));
+#endif
+            return number;
+        }
+
+        private static double Truncate(double number)
+        {
+
+#if !NETCF
+            number = Math.Truncate(number);
+#endif
+#if NETCF
+            number = number < 0 ? Math.Ceiling(number) : Math.Floor(number));
+#endif
+            return number;
+        }
+
+        #endregion
+
+        #endregion
+
         #region As
 
         #region Generic
@@ -768,104 +800,442 @@ namespace Energy.Base
 
         #region Integer
 
+        #region Int32
+
+        private static int RealStringToInt32(string value, bool allowReal, bool allowOverflow)
+        {
+            if (null == value || 0 == value.Length)
+            {
+                return 0;
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                return 0;
+            }
+            int result;
+            if (Energy.Base.Text.TryParse<int>(value, out result))
+            {
+                return result;
+            }
+            if (!allowReal)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number = 0;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out number))
+            {
+                return 0;
+            }
+            if (number < int.MinValue)
+            {
+                if (allowOverflow)
+                {
+                    return int.MinValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            if (number > int.MaxValue)
+            {
+                if (allowOverflow)
+                {
+                    return int.MaxValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            try
+            {
+                result = (int)number;
+            }
+            catch (System.OverflowException)
+            {
+                Debug.Write(null);
+            }
+            catch (Exception)
+            {
+                Debug.Write(null);
+            }
+            return result;
+        }
+
         /// <summary>
-        /// Convert text to signed 32-bit integer number without exception
-        /// ignoring leading and trailing whitespace characters.
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
         /// <br/><br/>
-        /// If conversion cannot be performed, default value 0 is returned.
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInt32(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInt32(string text, bool allowReal)
+        {
+            return RealStringToInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int StringToInt32(string text)
+        {
+            return RealStringToInt32(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInteger(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInteger(string text, bool allowReal)
+        {
+            return RealStringToInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int StringToInteger(string text)
+        {
+            return RealStringToInt32(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInt(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static int StringToInt(string text, bool allowReal)
+        {
+            return RealStringToInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         public static int StringToInt(string text)
         {
-            text = Energy.Base.Text.Trim(text);
-            if (string.IsNullOrEmpty(text))
-            {
-                return 0;
-            }
-            int result;
-            if (!int.TryParse(text, out result))
-            {
-                return 0;
-            }
-            else
-            {
-                return result;
-            }
+            return RealStringToInt32(text, true, false);
         }
 
-        /// <summary>
-        /// Convert string to integer value without exception.
-        /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Returns zero on overflow.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static int StringToInteger(string value)
-        {
-            return StringToInteger(value, true);
-        }
+        #endregion
 
-        /// <summary>
-        /// Convert string to integer value without exception.
-        /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Returns zero on overflow.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="allowDecimal">Allow decimal numbers</param>
-        /// <returns>Integer number</returns>
-        public static int StringToInteger(string value, bool allowDecimal)
+        #region UInt32
+
+        private static uint RealStringToUInt32(string value, bool allowReal, bool allowOverflow)
         {
             if (null == value || 0 == value.Length)
+            {
                 return 0;
-            int result;
-            if (int.TryParse(value, out result))
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                return 0;
+            }
+            uint result;
+            if (Energy.Base.Text.TryParse<uint>(value, out result))
+            {
                 return result;
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
-                if (int.TryParse(value, out result))
-                    return result;
-            if (!allowDecimal)
+            }
+            if (!allowReal)
+            {
                 return 0;
+            }
             if (value.IndexOf(',') >= 0)
+            {
                 value = value.Replace(',', '.');
+            }
             decimal number = 0;
-            if (decimal.TryParse(value, out number))
-                if (number < int.MinValue || number > int.MaxValue)
-                    return 0;
-                else
-                    return (int)number;
-            return 0;
-        }
-
-        /// <summary>
-        /// Convert string to integer value removing numerical differences without exception.
-        /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Returns zero on overflow.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static int StringToIntegerSmart(string value)
-        {
-            return StringToInteger(RemoveNumericalDifferences(value), true);
-        }
-
-        /// <summary>
-        /// Convert string to long integer value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Long number</returns>
-        public static uint StringToUnsignedInteger(string value)
-        {
-            long x = StringToLong(value, true);
-            if (x < uint.MinValue || x > uint.MaxValue)
+            if (!Energy.Base.Text.TryParse<decimal>(value, out number))
+            {
                 return 0;
-            else
-                return (uint)x;
+            }
+            if (number < 0)
+            {
+                return 0;
+            }
+            if (number > uint.MaxValue)
+            {
+                if (allowOverflow)
+                {
+                    return uint.MaxValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            try
+            {
+                result = (uint)number;
+            }
+            catch (System.OverflowException)
+            {
+                Debug.Write(null);
+            }
+            catch (Exception)
+            {
+                Debug.Write(null);
+            }
+            return result;
         }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUInt32(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUInt32(string text, bool allowReal)
+        {
+            return RealStringToUInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static uint StringToUInt32(string text)
+        {
+            return RealStringToUInt32(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUnsignedInteger(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUnsignedInteger(string text, bool allowReal)
+        {
+            return RealStringToUInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static uint StringToUnsignedInteger(string text)
+        {
+            return RealStringToUInt32(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUInt(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt32(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static uint StringToUInt(string text, bool allowReal)
+        {
+            return RealStringToUInt32(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static uint StringToUInt(string text)
+        {
+            return RealStringToUInt32(text, true, false);
+        }
+
+        #endregion
 
         /// <summary>
         /// Represent integer number as text.
@@ -875,27 +1245,6 @@ namespace Energy.Base
         public static string IntegerToString(int value)
         {
             return value.ToString();
-        }
-
-        /// <summary>
-        /// Represent integer number as text with positive sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string IntegerToStringSign(int value)
-        {
-            return NumberToStringSign(value.ToString(), null);
-        }
-
-        /// <summary>
-        /// Represent integer number as text with positive sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sign"></param>
-        /// <returns></returns>
-        public static string IntegerToStringSign(int value, string sign)
-        {
-            return NumberToStringSign(value.ToString(), sign);
         }
 
         /// <summary>
@@ -919,7 +1268,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert integer to hexadecimal value.
-        /// 
+        /// <br/><br/>
         /// Resulting string will have always 8 digits or letters (A-F).
         /// </summary>
         /// <param name="value"></param>
@@ -931,7 +1280,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert integer to hexadecimal value.
-        /// 
+        /// <br/><br/>
         /// Resulting string will have count specified by size of digits or letters (A-F).
         /// If number representation will be larger than size, it will be truncated to the last characters.
         /// Example: IntegerToHex(100000, 4) will result with "86a0" instead of "186a0" or "186a".
@@ -988,253 +1337,567 @@ namespace Energy.Base
 
         #region Long
 
-        /// <summary>
-        /// Convert string to long integer value without exception.
-        /// Allows decimal numbers by default.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Long number</returns>
-        public static long StringToLong(string value)
-        {
-            return StringToLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
-        }
+        #region Int64
 
-        /// <summary>
-        /// Convert string to long integer value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="allowDecimal">Allow decimal numbers</param>
-        /// <returns>Long number</returns>
-        public static long StringToLong(string value, bool allowDecimal)
+        private static long RealStringToInt64(string value, bool allowReal, bool allowOverflow)
         {
-            if (value == null || value.Length == 0)
-                return 0;
-            long result = 0;
-            if (long.TryParse(value, out result))
-                return result;
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
-                if (long.TryParse(value, out result))
-                    return result;
-            if (!allowDecimal)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal number = 0;
-            if (decimal.TryParse(value, out number))
-                if (number < long.MinValue || number > long.MaxValue)
-                    return 0;
-                else
-                    return (long)number;
-            return 0;
-        }
-
-        /// <summary>
-        /// Convert string to long integer value without exception.
-        /// Allows decimal numbers by default.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Long number</returns>
-        public static ulong StringToUnsignedLong(string value)
-        {
-            return StringToUnsignedLong(value, Energy.Base.Cast.Behaviour.INTEGER_COMMA);
-        }
-
-        /// <summary>
-        /// Convert string to long integer value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="allowDecimal">Allow decimal number</param>
-        /// <returns>Long number</returns>
-        public static ulong StringToUnsignedLong(string value, bool allowDecimal)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            ulong result = 0;
-            if (ulong.TryParse(value, out result))
-                return result;
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
-                if (ulong.TryParse(value, out result))
-                    return result;
-            if (!allowDecimal)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal number = 0;
-            if (decimal.TryParse(value, out number))
-                if (number < 0 || number > ulong.MaxValue)
-                    return 0;
-                else
-                    return (ulong)number;
-            return 0;
-        }
-
-        /// <summary>
-        /// Convert string to long integer value without exception 
-        /// removing numerical differences.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Long number</returns>
-        public static long StringToLongSmart(string value)
-        {
-            return StringToLong(RemoveNumericalDifferences(value), true);
-        }
-
-        /// <summary>
-        /// Convert string to unsigned long integer value without exception 
-        /// removing numerical differences.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Long number</returns>
-        public static ulong StringToUsignedLongSmart(string value)
-        {
-            return StringToUnsignedLong(RemoveNumericalDifferences(value), true);
-        }
-
-        /// <summary>
-        /// Check if value is long number with or without negative minus sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="negative"></param>
-        /// <returns></returns>
-        public static bool IsLong(string value, bool negative)
-        {
-            if (negative)
+            if (null == value || 0 == value.Length)
             {
-                long _;
-                return long.TryParse(value, out _);
+                return 0;
             }
-            else
+            if (string.IsNullOrEmpty(value))
             {
-                ulong _;
-                return ulong.TryParse(value, out _);
+                return 0;
             }
+            long result;
+            if (Energy.Base.Text.TryParse<long>(value, out result))
+            {
+                return result;
+            }
+            if (!allowReal)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number = 0;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out number))
+            {
+                return 0;
+            }
+            if (number < long.MinValue)
+            {
+                if (allowOverflow)
+                {
+                    return long.MinValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            if (number > long.MaxValue)
+            {
+                if (allowOverflow)
+                {
+                    return long.MaxValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            try
+            {
+                result = (long)number;
+            }
+            catch (System.OverflowException)
+            {
+                Debug.Write(null);
+            }
+            catch (Exception)
+            {
+                Debug.Write(null);
+            }
+            return result;
         }
 
         /// <summary>
-        /// Represent long number as text.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string LongToString(long value)
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static long StringToInt64(string text, bool allowReal, bool allowOverflow)
         {
-            return value.ToString();
+            return RealStringToInt64(text, allowReal, allowOverflow);
         }
 
         /// <summary>
-        /// Represent long number as text with positive sign.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string LongToStringSign(long value)
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static long StringToInt64(string text, bool allowReal)
         {
-            return NumberToStringSign(value.ToString(), null);
+            return RealStringToInt64(text, allowReal, false);
         }
 
         /// <summary>
-        /// Represent long number as text with positive sign.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sign"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static string LongToStringSign(long value, string sign)
+        public static long StringToInt64(string text)
         {
-            return NumberToStringSign(value.ToString(), sign);
+            return RealStringToInt64(text, true, false);
         }
 
         /// <summary>
-        /// Represent unsigned number as text.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string UnsignedLongToString(ulong value)
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static long StringToLong(string text, bool allowReal, bool allowOverflow)
         {
-            return value.ToString();
+            return RealStringToInt64(text, allowReal, allowOverflow);
         }
 
         /// <summary>
-        /// Represent unsigned number as text with positive sign.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string UnsignedLongToStringSign(ulong value)
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static long StringToLong(string text, bool allowReal)
         {
-            return NumberToStringSign(value.ToString(), null);
+            return RealStringToInt64(text, allowReal, false);
         }
 
         /// <summary>
-        /// Represent unsigned long number as text with positive sign.
+        /// Convert string to signed 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sign"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static string UnsignedLongToStringSign(ulong value, string sign)
+        public static long StringToLong(string text)
         {
-            return NumberToStringSign(value.ToString(), sign);
+            return RealStringToInt64(text, true, false);
         }
+
+        #endregion
+
+        #region UInt32
+
+        private static ulong RealStringToUInt64(string value, bool allowReal, bool allowOverflow)
+        {
+            if (null == value || 0 == value.Length)
+            {
+                return 0;
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                return 0;
+            }
+            ulong result;
+            if (Energy.Base.Text.TryParse<ulong>(value, out result))
+            {
+                return result;
+            }
+            if (!allowReal)
+            {
+                return 0;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal number = 0;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out number))
+            {
+                return 0;
+            }
+            if (number < 0)
+            {
+                return 0;
+            }
+            if (number > ulong.MaxValue)
+            {
+                if (allowOverflow)
+                {
+                    return ulong.MaxValue;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            try
+            {
+                result = (ulong)number;
+            }
+            catch (System.OverflowException)
+            {
+                Debug.Write(null);
+            }
+            catch (Exception)
+            {
+                Debug.Write(null);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToUInt64(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt64(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToUInt64(string text, bool allowReal)
+        {
+            return RealStringToUInt64(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static ulong StringToUInt64(string text)
+        {
+            return RealStringToUInt64(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToUnsignedLong(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt64(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToUnsignedLong(string text, bool allowReal)
+        {
+            return RealStringToUInt64(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static ulong StringToUnsignedLong(string text)
+        {
+            return RealStringToUInt64(text, true, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used</param>
+        /// <param name="allowOverflow">Return values exceeding minimum or maximum as MinValue or MaxValue istead of 0</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToULong(string text, bool allowReal, bool allowOverflow)
+        {
+            return RealStringToUInt64(text, allowReal, allowOverflow);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text">String value</param>
+        /// <param name="allowReal">Allow real numbers to be used (with decimal point or scientific notation)</param>
+        /// <returns>Integer number</returns>
+        public static ulong StringToULong(string text, bool allowReal)
+        {
+            return RealStringToUInt64(text, allowReal, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit integer without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static ulong StringToULong(string text)
+        {
+            return RealStringToUInt64(text, true, false);
+        }
+
+        #endregion
 
         #endregion
 
         #region Short
 
-        /// <summary>
-        /// Convert string to short integer value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="point">Allow decimal point in numbers</param>
-        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
-        /// <returns>Short number</returns>
-        public static short StringToShort(string value, bool point, bool exceed)
+        private static short RealStringToInt16(string value, bool point, bool overflow, bool exceed)
         {
-            if (value == null || value.Length == 0)
-                return 0;
             short result = 0;
-            if (short.TryParse(value, out result))
+            if (value == null || value.Length == 0)
             {
                 return result;
             }
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
+            if (Energy.Base.Text.TryParse<short>(value, out result))
             {
-                if (short.TryParse(value, out result))
-                {
-                    return result;
-                }
+                return result;
             }
-            if (exceed)
+            if (!point && !overflow && !exceed)
             {
-                long _;
-                if (long.TryParse(value, out _))
-                {
-                    return (short)(_ % (1 + short.MaxValue));
-                }
-            }
-            if (!point)
-            {
-                return 0;
+                return result;
             }
             if (value.IndexOf(',') >= 0)
             {
                 value = value.Replace(',', '.');
             }
-            decimal number;
-            if (decimal.TryParse(value, out number))
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
             {
-                if (number < short.MinValue || number > short.MaxValue)
+                return result;
+            }
+            _decimal = Truncate(_decimal);
+            if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
+            {
+                if (exceed)
                 {
-                    if (exceed)
+                    if (0 > _decimal) // negative
                     {
-                        return (short)(number % (1 + short.MaxValue));
+                        result = (short)(_decimal % (short.MinValue - 1));
                     }
-                    return 0;
+                    if (0 < _decimal) // positive
+                    {
+                        result = (short)(_decimal % (short.MaxValue + 1));
+                    }
+                    return result;
                 }
-                else
+                if (overflow)
                 {
-                    return (short)number;
+                    if (_decimal < short.MinValue)
+                    {
+                        return short.MinValue;
+                    }
+                    if (_decimal > short.MaxValue)
+                    {
+                        return short.MaxValue;
+                    }
                 }
             }
-            return 0;
+            return result;
+        }
+
+        private static ushort RealStringToUInt16(string value, bool point, bool overflow, bool exceed)
+        {
+            ushort result = 0;
+            if (value == null || value.Length == 0)
+            {
+                return result;
+            }
+            if (Energy.Base.Text.TryParse<ushort>(value, out result))
+            {
+                return result;
+            }
+            if (!point && !overflow && !exceed)
+            {
+                return result;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
+            {
+                return result;
+            }
+            _decimal = Truncate(_decimal);
+            if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
+            {
+                if (exceed)
+                {
+                    if (0 > _decimal) // negative
+                    {
+                        result = (ushort)(ushort.MaxValue + 1 + (_decimal % (ushort.MaxValue + 1)));
+                    }
+                    if (0 < _decimal) // positive
+                    {
+                        result = (ushort)(0 + _decimal % (ushort.MaxValue + 1));
+                    }
+                    return result;
+                }
+                if (overflow)
+                {
+                    if (_decimal < ushort.MinValue)
+                    {
+                        return ushort.MinValue;
+                    }
+                    if (_decimal > ushort.MaxValue)
+                    {
+                        return ushort.MaxValue;
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <param name="exceed">
+        /// Allow to exceed value.
+        /// <br/><br/>
+        /// Modulo reminder will be returned on overflow.
+        /// <br/><br/>
+        /// This parameter takes precedence over overflow option.
+        /// </param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point, bool overflow, bool exceed)
+        {
+            return RealStringToInt16(value, point, overflow, exceed);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point, bool overflow)
+        {
+            return RealStringToInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static short StringToShort(string value, bool point)
+        {
+            return RealStringToInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static short StringToInt16(string value, bool point, bool overflow)
+        {
+            return RealStringToInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static short StringToInt16(string value, bool point)
+        {
+            return RealStringToInt16(value, point, false, false);
         }
 
         /// <summary>
@@ -1242,141 +1905,146 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">String value</param>
         /// <param name="point">Allow decimal point in numbers</param>
-        /// <param name="exceed">Allow value to exceed maximum (reminder will be returned)</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <param name="exceed">
+        /// Allow to exceed value.
+        /// <br/><br/>
+        /// Modulo reminder will be returned on overflow.
+        /// <br/><br/>
+        /// This parameter takes precedence over overflow option.
+        /// </param>
         /// <returns>Short number</returns>
-        public static ushort StringToUnsignedShort(string value, bool point, bool exceed)
+        public static ushort StringToUnsignedShort(string value, bool point, bool overflow, bool exceed)
         {
-            if (value == null || value.Length == 0)
-            {
-                return 0;
-            }
-            ushort result = 0;
-            if (ushort.TryParse(value, out result))
-            {
-                return result;
-            }
-            string trim = Energy.Base.Text.Trim(value);
-            if (0 == trim.Length)
-            {
-                return 0;
-            }
-            if (trim.Length != value.Length)
-            {
-                if (ushort.TryParse(value, out result))
-                {
-                    return result;
-                }
-            }
-            if (exceed)
-            {
-                if (value.StartsWith("-"))
-                {
-                    long _;
-                    if (long.TryParse(value, out _))
-                    {
-                        return (ushort)(-_ % (1 + ushort.MaxValue));
-                    }
-                }
-                else
-                {
-                    ulong _;
-                    if (ulong.TryParse(value, out _))
-                    {
-                        return (ushort)(_ % (1 + ushort.MaxValue));
-                    }
-                }
-            }
-            if (!point)
-            {
-                return 0;
-            }
-            if (value.IndexOf(',') >= 0)
-            {
-                value = value.Replace(',', '.');
-            }
-            decimal number;
-            if (decimal.TryParse(value, out number))
-            {
-                if (false)
-                { }
-                else if (number < 0)
-                {
-                    if (exceed)
-                    {
-                        return (ushort)(-number % (1 + ushort.MaxValue));
-                    }
-                    return 0;
-                }
-                else if (number > ushort.MaxValue)
-                {
-                    if (exceed)
-                    {
-                        return (ushort)(number % (1 + ushort.MaxValue));
-                    }
-                    return 0;
-                }
-                else
-                {
-                    return (ushort)number;
-                }
-            }
-            return 0;
+            return RealStringToUInt16(value, point, overflow, exceed);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception.
-        /// Allows decimal numbers by default.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
         /// </summary>
         /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
         /// <returns>Short number</returns>
+        public static ushort StringToUnsignedShort(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value, bool point)
+        {
+            return RealStringToUInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUShort(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt16(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns>Short number</returns>
+        public static ushort StringToUShort(string value, bool point)
+        {
+            return RealStringToUInt16(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
         public static short StringToShort(string value)
         {
-            return StringToShort(value
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception.
-        /// Allows decimal numbers by default.
+        /// Convert string to signed 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
+        /// <returns></returns>
+        public static short StringToInt16(string value)
+        {
+            return RealStringToInt16(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
         public static ushort StringToUnsignedShort(string value)
         {
-            return StringToUnsignedShort(value
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to short integer value without exception 
-        /// removing numerical differences.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
-        public static short StringToShortSmart(string value)
+        /// <returns></returns>
+        public static ushort StringToUShort(string value)
         {
-            return StringToShort(RemoveNumericalDifferences(value)
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to unsigned short integer value without exception 
-        /// removing numerical differences.
+        /// Convert string to unsigned 16-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Short number</returns>
-        public static ushort StringToUsignedShortSmart(string value)
+        /// <returns></returns>
+        public static ushort StringToUInt16(string value)
         {
-            return StringToUnsignedShort(RemoveNumericalDifferences(value)
-                , Energy.Base.Cast.Behaviour.INTEGER_COMMA
-                , Energy.Base.Cast.Behaviour.INTEGER_EXCEED
-                );
+            return RealStringToUInt16(value, true, false, false);
         }
 
         /// <summary>
@@ -1641,28 +2309,9 @@ namespace Energy.Base
 
         #region Double
 
-        /// <summary>
-        /// Convert string to double value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <returns>double</returns>
-        public static double StringToDouble(string value)
+        private static double RealStringToDouble(string value)
         {
-            return StringToDouble(value, Energy.Base.Cast.Behaviour.DECIMAL_NUMBER_STYLES);
-        }
-
-        /// <summary>
-        /// Convert string to double value without exception.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <param name="numberStyles"></param>
-        /// <returns>double</returns>
-        public static double StringToDouble(string value, NumberStyles numberStyles)
-        {
-            value = Energy.Base.Text.Trim(value);
-            if (null == value || 0 == value.Length)
+            if (string.IsNullOrEmpty(value))
             {
                 return 0;
             }
@@ -1670,31 +2319,24 @@ namespace Energy.Base
             {
                 value = value.Replace(',', '.');
             }
-            double result;
-            if (double.TryParse(value, numberStyles, System.Globalization.CultureInfo.InvariantCulture, out result))
-            {
-                return result;
-            }
-            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MIN_STRING, value, true))
-                return double.MinValue;
-            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING, value, true))
-                return double.MaxValue;
-            if (0 == string.Compare(Energy.Base.Cast.Behaviour.DOUBLE_MAX_STRING_PLUS, value, true))
-                return double.MaxValue;
-            return 0;
+            double result = Energy.Base.Text.TryParse<double>(value);
+            return result;
         }
 
         /// <summary>
-        /// Convert string to double value without exception.
-        /// Remove numerical differences from text representation of number.
-        /// Treat comma "," the same as dot "." as decimal point.
-        /// Ignore space, underscore and apostrophes between digits.
+        /// Convert string to double precision real value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Converts text representation of real values (with decimal point or scientific notation) returning integer part.
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point for real values.
+        /// <br/><br/>
+        /// Returns 0 when conversion cannot be performed.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
-        public static double StringToDoubleSmart(string value)
+        public static double StringToDouble(string text)
         {
-            return StringToDouble(RemoveNumericalDifferences(value));
+            return RealStringToDouble(text);
         }
 
         /// <summary>
@@ -1868,36 +2510,17 @@ namespace Energy.Base
         {
             double number = StringToDouble(value);
             if (number < float.MinValue)
+            {
                 return float.MinValue;
+            }
             else if (number > float.MaxValue)
+            {
                 return float.MaxValue;
+            }
             else
+            {
                 return (float)number;
-        }
-
-        /// <summary>
-        /// Convert string to float value without exception.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <param name="numberStyles"></param>
-        /// <returns>double</returns>
-        public static float StringToFloat(string value, NumberStyles numberStyles)
-        {
-            double number = StringToDouble(value, numberStyles);
-            if (number < float.MinValue || number > float.MaxValue)
-                return 0;
-            else
-                return (float)number;
-        }
-
-        /// <summary>
-        /// Smart convert string to float value without exception.
-        /// </summary>
-        /// <param name="value">string</param>
-        /// <returns>double</returns>
-        public static float StringToFloatSmart(string value)
-        {
-            return StringToFloat(RemoveNumericalDifferences(value));
+            }
         }
 
         /// <summary>
@@ -2995,46 +3618,96 @@ namespace Energy.Base
         public static int ObjectToInteger(object value)
         {
             if (value == null)
+            {
                 return 0;
-
+            }
             if (value is Int32)
-                return (int)(Int32)value;
-
+            {
+                return (int)value;
+            }
+            if (value is bool)
+            {
+                return (bool)value ? 1 : 0;
+            }
             if (value is Int16)
+            {
                 return (int)(Int16)value;
-            if (value is Int64)
-                return (int)(Int64)value;
+            }
             if (value is UInt16)
+            {
                 return (int)(UInt16)value;
-
-            try
+            }
+            if (value is Int64)
             {
-                if (value is UInt32)
-                    return (int)(UInt32)value;
-                if (value is UInt64)
+                if ((Int64)value < int.MinValue || (Int64)value > int.MaxValue)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(Int64)value;
+                }
+            }
+            if (value is UInt64)
+            {
+                if ((UInt64)value > int.MaxValue)
+                {
+                    return 0;
+                }
+                else
+                {
                     return (int)(UInt64)value;
-                if (value is double)
-                    return (int)(double)value;
-                if (value is float)
-                    return (int)(float)value;
-                if (value is decimal)
-                    return (int)(decimal)value;
+                }
             }
-            catch (OverflowException)
+            if (value is decimal)
             {
-                return 0;
+                if ((decimal)value < int.MinValue || (decimal)value > int.MaxValue)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(decimal)value;
+                }
             }
-
+            if (value is double)
+            {
+                if ((double)value < int.MinValue || (double)value > int.MaxValue)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(double)value;
+                }
+            }
+            if (value is float)
+            {
+                if ((float)value < int.MinValue || (float)value > int.MaxValue)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(float)value;
+                }
+            }
             if (value is byte)
+            {
                 return (int)(byte)value;
+            }
             if (value is sbyte)
+            {
                 return (int)(sbyte)value;
+            }
             if (value is char)
+            {
                 return (int)(char)value;
+            }
 
             string s = value is string ? (string)value : value.ToString();
 
-            return StringToInteger(s);
+            return Energy.Base.Cast.StringToInt32(s, true, false);
         }
 
         /// <summary>
@@ -3109,7 +3782,7 @@ namespace Energy.Base
             {
                 return (byte)(byte)value;
             }
-            
+
             if (value is char)
             {
                 return (byte)(char)value;
@@ -3935,28 +4608,42 @@ namespace Energy.Base
         public static object JsonValueToObject(string text)
         {
             if (text == "null")
-                return null;
-            if (text == "true")
-                return true;
-            if (text == "false")
-                return false;
-            int intValue = 0;
-            if (int.TryParse(text, out intValue))
-                return intValue;
-            long longValue = 0;
-            if (long.TryParse(text, out longValue))
-                return longValue;
-            ulong ulongValue = 0;
-            if (ulong.TryParse(text, out ulongValue))
             {
-                return ulongValue;
+                return null;
             }
-            double doubleValue = 0;
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
-                return doubleValue;
-            decimal decimalValue = 0;
-            if (decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimalValue))
-                return decimalValue;
+            if (text == "true")
+            {
+                return true;
+            }
+            if (text == "false")
+            {
+                return false;
+            }
+            long _long;
+            if (Energy.Base.Text.TryParse<long>(text, out _long))
+            {
+                if (_long >= int.MinValue && _long <= int.MaxValue)
+                {
+                    return (int)_long;
+                }
+                return _long;
+            }
+            string number = text;
+            if (number.IndexOf(',') >= 0)
+            {
+                number = number.Replace(',', '.');
+            }
+            decimal _decimal = 0;
+            if (Energy.Base.Text.TryParse<decimal>(number, out _decimal))
+            {
+                return _decimal;
+            }
+            double _double = 0;
+            if (Energy.Base.Text.TryParse<double>(number, out _double))
+            {
+                return _double;
+            }
+
             return Energy.Base.Json.Strip(text);
         }
 

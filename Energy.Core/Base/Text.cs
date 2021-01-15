@@ -2823,31 +2823,31 @@ namespace Energy.Base
 
         private const string PATTERN_SBYTE_WHITE = @"\s*(?:" + PATTERN_SBYTE + @")\s*";
 
-        private const string PATTERN_SBYTE_ALL = "^" + PATTERN_SBYTE_WHITE + "$";
+        private const string PATTERN_SBYTE_EXACT = "^" + PATTERN_SBYTE_WHITE + "$";
 
         private const string PATTERN_USHORT = @"\+?(?:[0-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[012][0-9]|6553[0-5]|[0-9]{1,4})";
 
         private const string PATTERN_USHORT_WHITE = @"\s*" + PATTERN_USHORT + @"\s*";
 
-        private const string PATTERN_USHORT_ALL = "^" + PATTERN_USHORT_WHITE + "$";
+        private const string PATTERN_USHORT_EXACT = "^" + PATTERN_USHORT_WHITE + "$";
 
         private const string PATTERN_SHORT = @"\-(?:[012][0-9]{4}|3[01][0-9]{3}|32[0-6][0-9]{2}|327[012][0-9]|3276[0-8]|[0-9]{1,4})|\+?(?:[0-2][0-9]{4}|3[0-1][0-9]{3}|32[0-6][0-9]{2}|327[0-2][0-9]|3276[0-7]|[0-9]{1,4})";
 
         private const string PATTERN_SHORT_WHITE = @"\s*(?:" + PATTERN_SHORT + @")\s*";
 
-        private const string PATTERN_SHORT_ALL = "^" + PATTERN_SHORT_WHITE + "$";
+        private const string PATTERN_SHORT_EXACT = "^" + PATTERN_SHORT_WHITE + "$";
 
         private const string PATTERN_UINT = @"\+?(?:[0-3][0-9]{9}|4[01][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[01][0-9]{2}|42949672[0-8][0-9]|429496729[0-5]|[0-9]{1,9})";
 
         private const string PATTERN_UINT_WHITE = @"\s*" + PATTERN_UINT + @"\s*";
 
-        private const string PATTERN_UINT_ALL = "^" + PATTERN_UINT_WHITE + "$";
+        private const string PATTERN_UINT_EXACT = "^" + PATTERN_UINT_WHITE + "$";
 
         private const string PATTERN_INT = @"\-(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-8]|[0-9]{1,9})|\+?(?:[01][0-9]{9}|20[0-9]{8}|21[0-3][0-9]{7}|214[0-6][0-9]{6}|2147[0-3][0-9]{5}|21474[0-7][0-9]{4}|214748[012][0-9]{3}|2147483[0-5][0-9]{2}|21474836[0-3][0-9]|214748364[0-7]|[0-9]{1,9})";
 
         private const string PATTERN_INT_WHITE = @"\s*(?:" + PATTERN_INT + @")\s*";
 
-        private const string PATTERN_INT_ALL = "^" + PATTERN_INT_WHITE + "$";
+        private const string PATTERN_INT_EXACT = "^" + PATTERN_INT_WHITE + "$";
 
         private const string PATTERN_ULONG_MAX = @"0[0-9]{19}|1[0-7][0-9]{18}|18[0-3][0-9]{17}|184[0-3][0-9]{16}|1844[0-5][0-9]{15}|18446[0-6][0-9]{14}|184467[0-3][0-9]{13}|1844674[0-3][0-9]{12}|184467440[0-6][0-9]{10}|1844674407[012][0-9]{9}|18446744073[0-6][0-9]{8}|1844674407370[0-8][0-9]{6}|18446744073709[0-4][0-9]{5}|184467440737095[0-4][0-9]{4}|18446744073709550[0-9]{3}|18446744073709551[0-5][0-9]{3}|1844674407370955160[0-9]|1844674407370955161[0-5]|[0-9]{1,19}";
 
@@ -2855,13 +2855,25 @@ namespace Energy.Base
 
         private const string PATTERN_ULONG_WHITE = @"\s*" + PATTERN_ULONG + @"\s*";
 
-        private const string PATTERN_ULONG_ONLY = "^" + PATTERN_ULONG_WHITE + "$";
+        private const string PATTERN_ULONG_EXACT = "^" + PATTERN_ULONG_WHITE + "$";
 
         private const string PATTERN_LONG = @"\-(?:" + @"[0-8][0-9]{18}|9[01][0-9]{17}|92[01][0-9]{16}|922[012][0-9]{15}|9223[012][0-9]{14}|92233[0-6][0-9]{13}|922337[01][0-9]{12}|92233720[012][0-9]{10}|922337203[0-5][0-9]{9}|9223372036[0-7][0-9]{8}|92233720368[0-4][0-9]{7}|922337203685[0-3][0-9]{6}|9223372036854[0-6][0-9]{5}|92233720368547[0-6][0-9]{4}|922337203685477[0-4][0-9]{3}|9223372036854775[0-7][0-9]{2}|922337203685477580[0-8]|[0-9]{1,18}" + @")|\+?(?:" + @"[0-8][0-9]{18}|9[01][0-9]{17}|92[01][0-9]{16}|922[012][0-9]{15}|9223[012][0-9]{14}|92233[0-6][0-9]{13}|922337[01][0-9]{12}|92233720[012][0-9]{10}|922337203[0-5][0-9]{9}|9223372036[0-7][0-9]{8}|92233720368[0-4][0-9]{7}|922337203685[0-3][0-9]{6}|9223372036854[0-6][0-9]{5}|92233720368547[0-6][0-9]{4}|922337203685477[0-4][0-9]{3}|9223372036854775[0-7][0-9]{2}|922337203685477580[0-7]|[0-9]{1,18}" + ")";
 
         private const string PATTERN_LONG_WHITE = @"\s*(?:" + PATTERN_LONG + @")\s*";
 
-        private const string PATTERN_LONG_ALL = "^" + PATTERN_LONG_WHITE + "$";
+        private const string PATTERN_LONG_EXACT = "^" + PATTERN_LONG_WHITE + "$";
+
+        private const string PATTERN_REAL = @"[+-]?[0-9]+(?:.[0-9]{0,})?(?:[eE][+-]?[0-9]+)?";
+
+        private const string PATTERN_REAL_WHITE = @"\s*" + PATTERN_REAL + @"\s*";
+
+        private const string PATTERN_REAL_EXACT = "^" + PATTERN_REAL_WHITE + "$";
+
+        private const System.Globalization.NumberStyles RealNumberNumberStyles = System.Globalization.NumberStyles.AllowExponent | System.Globalization.NumberStyles.AllowDecimalPoint | System.Globalization.NumberStyles.AllowLeadingSign | System.Globalization.NumberStyles.AllowLeadingWhite | System.Globalization.NumberStyles.AllowTrailingWhite;
+
+        private const string PATTERN_MIN_DOUBLE = @"^\s*" + @"-1\.79769313486232[eE]\+308" + @"\s*$";
+
+        private const string PATTERN_MAX_DOUBLE = @"^\s*" + @"\+?1\.79769313486232[eE]\+308" + @"\s*$";
 
         public static bool TryParse(Type type, string value, ref object result)
         {
@@ -2886,7 +2898,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(sbyte))
                 {
-                    if (Regex.IsMatch(value, PATTERN_SBYTE_ALL))
+                    if (Regex.IsMatch(value, PATTERN_SBYTE_EXACT))
                     {
                         result = sbyte.Parse(value);
                         return true;
@@ -2894,7 +2906,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(ushort))
                 {
-                    if (Regex.IsMatch(value, PATTERN_USHORT_ALL))
+                    if (Regex.IsMatch(value, PATTERN_USHORT_EXACT))
                     {
                         result = ushort.Parse(value);
                         return true;
@@ -2902,7 +2914,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(short))
                 {
-                    if (Regex.IsMatch(value, PATTERN_SHORT_ALL))
+                    if (Regex.IsMatch(value, PATTERN_SHORT_EXACT))
                     {
                         result = short.Parse(value);
                         return true;
@@ -2910,7 +2922,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(uint))
                 {
-                    if (Regex.IsMatch(value, PATTERN_UINT_ALL))
+                    if (Regex.IsMatch(value, PATTERN_UINT_EXACT))
                     {
                         result = uint.Parse(value);
                         return true;
@@ -2918,7 +2930,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(int))
                 {
-                    if (Regex.IsMatch(value, PATTERN_INT_ALL))
+                    if (Regex.IsMatch(value, PATTERN_INT_EXACT))
                     {
                         result = int.Parse(value);
                         return true;
@@ -2926,7 +2938,7 @@ namespace Energy.Base
                 }
                 else if (type == typeof(ulong))
                 {
-                    if (Regex.IsMatch(value, PATTERN_ULONG_ONLY))
+                    if (Regex.IsMatch(value, PATTERN_ULONG_EXACT))
                     {
                         result = ulong.Parse(value);
                         return true;
@@ -2934,9 +2946,55 @@ namespace Energy.Base
                 }
                 else if (type == typeof(long))
                 {
-                    if (Regex.IsMatch(value, PATTERN_LONG_ALL))
+                    if (Regex.IsMatch(value, PATTERN_LONG_EXACT))
                     {
                         result = long.Parse(value);
+                        return true;
+                    }
+                }
+                else if (type == typeof(decimal))
+                {
+                    if (!Regex.IsMatch(value, PATTERN_REAL_EXACT))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        result = decimal.Parse(value, RealNumberNumberStyles, NumberFormatInfo.InvariantInfo);
+                        return true;
+                    }
+                }
+                else if (type == typeof(float))
+                {
+                    if (!Regex.IsMatch(value, PATTERN_REAL_EXACT))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        result = float.Parse(value, RealNumberNumberStyles, NumberFormatInfo.InvariantInfo);
+                        return true;
+                    }
+                }
+                else if (type == typeof(double))
+                {
+                    if (!Regex.IsMatch(value, PATTERN_REAL_EXACT))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (Regex.IsMatch(value, PATTERN_MIN_DOUBLE))
+                        {
+                            result = double.MinValue;
+                            return true;
+                        }
+                        if (Regex.IsMatch(value, PATTERN_MAX_DOUBLE))
+                        {
+                            result = double.MaxValue;
+                            return true;
+                        }
+                        result = double.Parse(value, RealNumberNumberStyles, NumberFormatInfo.InvariantInfo);
                         return true;
                     }
                 }

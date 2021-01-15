@@ -580,15 +580,28 @@ namespace Energy.Query
             }
 
             string s = value is string ? (string)value : value.ToString();
-            s = Energy.Base.Text.Trim(s);
-            if (Energy.Base.Cast.IsLong(s, true))
+
+            if (!string.IsNullOrEmpty(s))
             {
-                return Number((long)Energy.Base.Cast.StringToLong(s));
+                long _long;
+                if (Energy.Base.Text.TryParse<long>(s, out _long))
+                {
+                    return Number(_long);
+                }
+
+                if (s.Contains(","))
+                {
+                    s = s.Replace(',', '.');
+                }
+
+                decimal _decimal;
+                if (Energy.Base.Text.TryParse<decimal>(s, out _decimal))
+                {
+                    return Number(_decimal);
+                }
             }
-            else
-            {
-                return Number((decimal)Energy.Base.Cast.StringToDecimal(s));
-            }
+
+            return nullify ? "NULL" : "0";
         }
 
         #endregion

@@ -1213,7 +1213,7 @@ namespace Energy.Base
 
         #region Storage
 
-        public class Storage : Energy.Interface.IFileSystem, IDisposable
+        private class Storage : Energy.Interface.IFileSystem, IDisposable
         {
             private List<string> _Files = new List<string>();
             

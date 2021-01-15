@@ -121,9 +121,10 @@ namespace Energy.Base
                     {
                         object o = table.Rows[r][i];
                         string value = Energy.Base.Cast.ObjectToString(o) ?? "";
-                        if (format.FormatInteger.Length > 0 && Energy.Base.Cast.IsLong(value, true))
+                        long _long;
+                        if (format.FormatInteger.Length > 0 && Energy.Base.Text.TryParse<long>(value, out _long))
                         {
-                            value = Energy.Base.Cast.AsLong(value).ToString(format.FormatInteger).Trim();
+                            value = _long.ToString(format.FormatInteger).Trim();
                         }
 
                         int limit = columnDictionary[i].Length;
