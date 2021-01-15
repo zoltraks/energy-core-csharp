@@ -111,10 +111,15 @@ namespace Energy.Base
             private string GetCharset()
             {
                 if (_Charset != null)
+                {
                     return _Charset;
+                }
                 if (_Encoding == null)
+                {
                     return null;
-                return _Encoding.EncodingName;
+                }
+                //return _Encoding.EncodingName;
+                return _Encoding.WebName; // will return "utf-8" instead of "Unicode (UTF-8)"
             }
 
             private void SetCharset(string value)

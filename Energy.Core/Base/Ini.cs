@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -57,7 +58,12 @@ namespace Energy.Base
 
             public bool Parse(string content)
             {
-                string[] lines = content.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+                if (null == content)
+                {
+                    return false;
+                }
+                //string[] lines = content.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+                string[] lines = Regex.Split(content, @"\r\n|\n|\r");
                 string section = "";
                 List<string> left = new List<string>();
                 List<string> right = new List<string>();

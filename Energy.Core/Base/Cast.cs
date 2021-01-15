@@ -2180,7 +2180,7 @@ namespace Energy.Base
             }
             else
             {
-                return encoding.GetString(data);
+                return encoding.GetString(data, 0, data.Length);
             }
         }
 
@@ -2215,7 +2215,7 @@ namespace Energy.Base
             }
             else
             {
-                return encoding.GetString(data);
+                return encoding.GetString(data, 0, data.Length);
             }
         }
 
