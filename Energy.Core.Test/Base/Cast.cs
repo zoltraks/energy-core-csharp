@@ -928,7 +928,7 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void StringToDecimal()
         {
-            decimal d, r;
+            decimal d;
             string s;
 
             s = null;
@@ -939,6 +939,17 @@ namespace Energy.Core.Test.Base
 
             s = "\t\v\r\n -143423424,342424114 \t\v\r\n";
             Assert.AreEqual(-143423424.342424114m, Energy.Base.Cast.StringToDecimal(s));
+        }
+
+        [TestMethod]
+        public void DecimalToString()
+        {
+            decimal d;
+
+            Assert.AreEqual("", Energy.Base.Cast.DecimalToString(null));
+            Assert.AreEqual("0", Energy.Base.Cast.DecimalToString(0m));
+            Assert.AreEqual("99999999999999999999", Energy.Base.Cast.DecimalToString(99999999999999999999m));
+            Assert.AreEqual("9999999999.9999999999", Energy.Base.Cast.DecimalToString(9999999999.9999999999m));
         }
     }
 }

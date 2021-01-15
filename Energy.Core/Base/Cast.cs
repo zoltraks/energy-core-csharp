@@ -2259,6 +2259,16 @@ namespace Energy.Base
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Represent decimal number as text.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string DecimalToString(decimal? value)
+        {
+            return null == value ? "" : ((decimal)value).ToString(CultureInfo.InvariantCulture);
+        }
+
         #endregion
 
         #region Double
