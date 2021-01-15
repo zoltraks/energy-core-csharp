@@ -1752,7 +1752,7 @@ namespace Energy.Base
                 return result;
             }
             _decimal = Truncate(_decimal);
-            if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
+            if (_decimal < short.MinValue || _decimal > short.MaxValue)
             {
                 if (exceed)
                 {
@@ -1777,6 +1777,10 @@ namespace Energy.Base
                         return short.MaxValue;
                     }
                 }
+            }
+            else
+            {
+                result = (short)_decimal;
             }
             return result;
         }
@@ -1831,6 +1835,10 @@ namespace Energy.Base
                         return ushort.MaxValue;
                     }
                 }
+            }
+            else
+            {
+                result = (ushort)_decimal;
             }
             return result;
         }
@@ -2580,100 +2588,309 @@ namespace Energy.Base
 
         #region Byte
 
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// Allows decimal numbers by default.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByte(string value)
+        private static sbyte RealStringToInt8(string value, bool point, bool overflow, bool exceed)
         {
-            return StringToByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
-        }
-
-        /// <summary>
-        /// Convert string to byte value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="allowDecimal">Allow decimal numbers</param>
-        /// <returns>Integer number</returns>
-        public static byte StringToByte(string value, bool allowDecimal)
-        {
+            sbyte result = 0;
             if (value == null || value.Length == 0)
-            {
-                return 0;
-            }
-            byte result = 0;
-            if (byte.TryParse(value, out result))
             {
                 return result;
             }
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
+            if (Energy.Base.Text.TryParse<sbyte>(value, out result))
             {
-                if (byte.TryParse(value, out result))
+                return result;
+            }
+            if (!point && !overflow && !exceed)
+            {
+                return result;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
+            {
+                return result;
+            }
+            _decimal = Truncate(_decimal);
+            if (_decimal < sbyte.MinValue || _decimal > sbyte.MaxValue)
+            {
+                if (exceed)
                 {
+                    if (0 > _decimal) // negative
+                    {
+                        result = (sbyte)(_decimal % (sbyte.MinValue - 1));
+                    }
+                    if (0 < _decimal) // positive
+                    {
+                        result = (sbyte)(_decimal % (sbyte.MaxValue + 1));
+                    }
                     return result;
                 }
+                if (overflow)
+                {
+                    if (_decimal < sbyte.MinValue)
+                    {
+                        return sbyte.MinValue;
+                    }
+                    if (_decimal > sbyte.MaxValue)
+                    {
+                        return sbyte.MaxValue;
+                    }
+                }
             }
-            if (!allowDecimal)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal number = 0;
-            if (decimal.TryParse(value, out number))
+            else
             {
-                if (number < byte.MinValue || number > byte.MaxValue)
-                    return 0;
-                else
-                    return (byte)number;
+                result = (sbyte)_decimal;
             }
-            return 0;
+            return result;
         }
 
+        private static byte RealStringToUInt8(string value, bool point, bool overflow, bool exceed)
+        {
+            byte result = 0;
+            if (value == null || value.Length == 0)
+            {
+                return result;
+            }
+            if (Energy.Base.Text.TryParse<byte>(value, out result))
+            {
+                return result;
+            }
+            if (!point && !overflow && !exceed)
+            {
+                return result;
+            }
+            if (value.IndexOf(',') >= 0)
+            {
+                value = value.Replace(',', '.');
+            }
+            decimal _decimal;
+            if (!Energy.Base.Text.TryParse<decimal>(value, out _decimal))
+            {
+                return result;
+            }
+            _decimal = Truncate(_decimal);
+            if (_decimal < byte.MinValue || _decimal > byte.MaxValue)
+            {
+                if (exceed)
+                {
+                    if (0 > _decimal) // negative
+                    {
+                        result = (byte)(byte.MaxValue + 1 + (_decimal % (byte.MaxValue + 1)));
+                    }
+                    if (0 < _decimal) // positive
+                    {
+                        result = (byte)(0 + _decimal % (byte.MaxValue + 1));
+                    }
+                    return result;
+                }
+                if (overflow)
+                {
+                    if (_decimal < byte.MinValue)
+                    {
+                        return byte.MinValue;
+                    }
+                    if (_decimal > byte.MaxValue)
+                    {
+                        return byte.MaxValue;
+                    }
+                }
+            }
+            else
+            {
+                result = (byte)_decimal;
+            }
+            return result;
+        }
 
         /// <summary>
-        /// Convert string to byte value without exception.
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
         /// </summary>
         /// <param name="value">String value</param>
-        /// <returns>Integer number</returns>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static byte StringToUInt8(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt8(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static byte StringToUInt8(string value, bool point)
+        {
+            return RealStringToUInt8(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static byte StringToUInt8(string value)
+        {
+            return RealStringToUInt8(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static byte StringToByte(string value, bool point, bool overflow)
+        {
+            return RealStringToUInt8(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static byte StringToByte(string value, bool point)
+        {
+            return RealStringToUInt8(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static byte StringToByte(string value)
+        {
+            return RealStringToUInt8(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static sbyte StringToInt8(string value, bool point, bool overflow)
+        {
+            return RealStringToInt8(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static sbyte StringToInt8(string value, bool point)
+        {
+            return RealStringToInt8(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static sbyte StringToInt8(string value)
+        {
+            return RealStringToInt8(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static sbyte StringToSbyte(string value, bool point, bool overflow)
+        {
+            return RealStringToInt8(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static sbyte StringToSbyte(string value, bool point)
+        {
+            return RealStringToInt8(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static sbyte StringToSbyte(string value)
+        {
+            return RealStringToInt8(value, true, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <param name="overflow">Allow overflow resulting MinValue or MaxValue or modulo reminder</param>
+        /// <returns></returns>
+        public static sbyte StringToSignedByte(string value, bool point, bool overflow)
+        {
+            return RealStringToInt8(value, point, overflow, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <param name="point">Allow decimal point in numbers</param>
+        /// <returns></returns>
+        public static sbyte StringToSignedByte(string value, bool point)
+        {
+            return RealStringToInt8(value, point, false, false);
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
         public static sbyte StringToSignedByte(string value)
         {
-            return StringToSignedByte(value, Energy.Base.Cast.Behaviour.BYTE_COMMA);
+            return RealStringToInt8(value, true, false, false);
         }
 
         /// <summary>
-        /// Convert string to byte value without exception.
-        /// </summary>
-        /// <param name="value">String value</param>
-        /// <param name="allowDecimal">Allow decimal numbers</param>
-        /// <returns>Integer number</returns>
-        public static sbyte StringToSignedByte(string value, bool allowDecimal)
-        {
-            if (value == null || value.Length == 0)
-                return 0;
-            sbyte result = 0;
-            if (sbyte.TryParse(value, out result))
-                return result;
-            string trim = Energy.Base.Text.Trim(value);
-            if (trim.Length != value.Length)
-                if (sbyte.TryParse(value, out result))
-                    return result;
-            if (!allowDecimal)
-                return 0;
-            if (value.IndexOf(',') >= 0)
-                value = value.Replace(',', '.');
-            decimal number = 0;
-            if (decimal.TryParse(value, out number))
-                if (number < sbyte.MinValue || number > sbyte.MaxValue)
-                    return 0;
-                else
-                    return (sbyte)number;
-            return 0;
-        }
-
-        /// <summary>
-        /// Represent byte as decimal text.
+        /// Represent unsinged 8-bit integer (byte) as decimal number string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2683,32 +2900,37 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent byte as decimal text with positive sign.
+        /// Represent singed 8-bit integer (sbyte) as decimal number string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        [Obsolete]
-        [Energy.Attribute.Code.Obsolete]
-        public static string ByteToStringSign(byte value)
+        public static string SByteToString(sbyte value)
         {
-            return NumberToStringSign(value.ToString(), null);
+            return value.ToString();
         }
 
         /// <summary>
-        /// Represent byte as decimal text with positive sign.
+        /// Represent unsinged 8-bit integer (byte) as hexadecimal number string.
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="sign"></param>
         /// <returns></returns>
-        [Obsolete]
-        [Energy.Attribute.Code.Obsolete]
-        public static string ByteToStringSign(byte value, string sign)
+        public static string ByteToHex(byte value)
         {
-            return NumberToStringSign(value.ToString(), sign);
+            return value.ToString("X2");
         }
 
         /// <summary>
-        /// Represent signed byte as decimal text.
+        /// Represent singed 8-bit integer (sbyte) as hexadecimal number string.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string SByteToHex(sbyte value)
+        {
+            return value.ToString("X2");
+        }
+
+        /// <summary>
+        /// Represent singed 8-bit integer (sbyte) as decimal number string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -2718,24 +2940,13 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Represent signed byte as decimal text with positive sign.
+        /// Represent singed 8-bit integer (sbyte) as hexadecimal number string.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string SignedByteToStringSign(sbyte value)
+        public static string SignedByteToHex(sbyte value)
         {
-            return NumberToStringSign(value.ToString(), null);
-        }
-
-        /// <summary>
-        /// Represent signed byte as decimal text with positive sign.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sign"></param>
-        /// <returns></returns>
-        public static string SignedByteToStringSign(sbyte value, string sign)
-        {
-            return NumberToStringSign(value.ToString(), sign);
+            return value.ToString("X2");
         }
 
         #endregion
