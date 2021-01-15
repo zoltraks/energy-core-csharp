@@ -36,7 +36,7 @@ namespace Energy.Base
             number = Math.Truncate(number);
 #endif
 #if NETCF
-            number = number < 0 ? Math.Ceiling(number) : Math.Floor(number));
+            number = number < 0 ? Math.Ceiling(number) : Math.Floor(number);
 #endif
             return number;
         }
