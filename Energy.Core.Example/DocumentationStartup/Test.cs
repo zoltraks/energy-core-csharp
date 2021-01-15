@@ -74,8 +74,8 @@ namespace DocumentationStartup
 
         internal static void Test3()
         {
-            string s = " 1'133'244 ";
-            double d = Energy.Base.Cast.StringToDoubleSmart(s);
+            string s = " 1133244 ";
+            double d = Energy.Base.Cast.StringToDouble(s);
             Console.WriteLine(Energy.Base.Cast.DoubleToString(d));
         }
 
