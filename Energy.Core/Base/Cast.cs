@@ -1720,7 +1720,8 @@ namespace Energy.Base
                 return result;
             }
             //_decimal = Math.Truncate(_decimal);
-            _decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
+            //_decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
+            _decimal = _decimal < 0 ? Math.Ceiling(_decimal) : Math.Floor(_decimal);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
@@ -1775,7 +1776,8 @@ namespace Energy.Base
                 return result;
             }
             //_decimal = Math.Truncate(_decimal);
-            _decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
+            //_decimal = Math.Floor(Math.Abs(_decimal)) * (_decimal > 0 ? 1 : -1);
+            _decimal = _decimal < 0 ? Math.Ceiling(_decimal) : Math.Floor(_decimal);
             if (_decimal < ushort.MinValue || _decimal > ushort.MaxValue)
             {
                 if (exceed)
