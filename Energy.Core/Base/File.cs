@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -1262,13 +1263,23 @@ namespace Energy.Base
 
         #region ReadText
 
+        // 2021-01-16 03:54 !?!
+        // 2021-01-16 04:00 Change ReadAllText to "portable" version
+        // 2021-01-15 04:04 Final commit with "Nevermind" from wify :-D
+
         public static string ReadText(string fileName)
         {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
             string result = null;
             try
             {
-                // 2021-01-16 03:54
-                result = System.IO.File.ReadAllText(fileName);
+                using (StreamReader sr = new StreamReader(fileName))
+                {
+                    result = sr.ReadToEnd();
+                }
             }
             catch
             {
@@ -1279,10 +1290,17 @@ namespace Energy.Base
 
         public static string ReadText(string fileName, Encoding encoding)
         {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return null;
+            }
             string result = null;
             try
             {
-                result = System.IO.File.ReadAllText(fileName, encoding);
+                using (StreamReader sr = new StreamReader(fileName, encoding))
+                {
+                    result = sr.ReadToEnd();
+                }
             }
             catch
             {
