@@ -4830,8 +4830,11 @@ namespace Energy.Base
         /// <returns></returns>
         public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
         {
+            // according to C# standards, we are using everything we can in curly braces... IMHO :-)
             if (sizeInBytes <= 0)
+            {
                 return "0 " + _MemorySizeSuffix[0];
+            }
             int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
             double number = sizeInBytes / Math.Pow(1024, exponent);
             int p = 1;
