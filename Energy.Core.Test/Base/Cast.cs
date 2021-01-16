@@ -951,5 +951,21 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("99999999999999999999", Energy.Base.Cast.DecimalToString(99999999999999999999m));
             Assert.AreEqual("9999999999.9999999999", Energy.Base.Cast.DecimalToString(9999999999.9999999999m));
         }
+
+        [TestMethod]
+        public void EnumToStringArray()
+        {
+            Mock.StupidEnum a;
+            a = Energy.Base.Cast.StringToEnum<Mock.StupidEnum>("idiot", true);
+            Assert.AreEqual(Mock.StupidEnum.Idiot, a);
+        }
+
+        public class Mock
+        {
+            public enum StupidEnum
+            {
+                Idiot,
+            }
+        }
     }
 }
