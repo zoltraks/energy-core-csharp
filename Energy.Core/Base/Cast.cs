@@ -4523,8 +4523,10 @@ namespace Energy.Base
             {
                 return 0;
             }
-            // 2021-01-16 we know now that GetNames might not work in "ancient" .NET (like CF, even v3.5#if !NETCF
 
+            // 2021-01-16 we know now that GetNames might not work in "ancient" .NET like CFv35
+
+#if !NETCF
             string[] names = Enum.GetNames(type);
             for (int i = 0; i < names.Length; i++)
             {
