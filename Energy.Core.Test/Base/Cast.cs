@@ -967,5 +967,18 @@ namespace Energy.Core.Test.Base
                 Idiot,
             }
         }
+
+        [TestMethod]
+
+        public void MemorySizeToString()
+        {
+            string s;
+            s = Energy.Base.Cast.MemorySizeToString(0);
+            Assert.AreEqual("0 B", s);
+            s = Energy.Base.Cast.MemorySizeToString(1024, 0);
+            Assert.AreEqual("0 B", s);
+            s = Energy.Base.Cast.MemorySizeToString(1024 * 1024);
+            Assert.AreEqual("1 MB", s);
+        }
     }
 }

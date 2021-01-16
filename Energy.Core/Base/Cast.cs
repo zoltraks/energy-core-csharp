@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -4822,6 +4821,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// <br/><br/>
         /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
         /// </summary>
         /// <param name="sizeInBytes"></param>
@@ -4831,26 +4831,72 @@ namespace Energy.Base
         public static string MemorySizeToString(long sizeInBytes, int decimalPlaces, bool numberCeiling)
         {
             // according to C# standards, we are using everything we can in curly braces... IMHO :-)
+
             if (sizeInBytes <= 0)
             {
                 return "0 " + _MemorySizeSuffix[0];
             }
-            int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
+            long m = sizeInBytes;
+            int en = 0;
+            while (true)
+            {
+                long x = m / 1024;
+                if (x == 0)
+                {
+                    break;
+                }
+                en++;
+            }
+            //int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
+            int exponent = en;
             double number = sizeInBytes / Math.Pow(1024, exponent);
             int p = 1;
             for (int i = 0; i < decimalPlaces; i++)
             {
                 p *= 10;
             }
+
+            // could be changed with elvis operator ?: but still nice :-)
+
             if (numberCeiling)
+            {
                 number = Math.Ceiling(number * p);
+            }
             else
+            {
                 number = Math.Floor(number * p);
+            }
 
             number /= p;
 
             return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
                 , _MemorySizeSuffix[exponent]);
+        }
+
+        /// <summary>
+        /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// <br/><br/>
+        /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
+        /// </summary>
+        /// <param name="sizeInBytes"></param>
+        /// <param name="decimalPlaces"></param>
+        /// <returns></returns>
+        public static string MemorySizeToString(long sizeInBytes, int decimalPlaces)
+        {
+            return MemorySizeToString(sizeInBytes, decimalPlaces, true);
+        }
+
+        /// <summary>
+        /// Represents memory size as a string containing a numeric value with an attached size unit.
+        /// <br/><br/>
+        /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
+        /// </summary>
+        /// <param name="sizeInBytes"></param>
+        /// <param name="decimalPlaces"></param>
+        /// <returns></returns>
+        public static string MemorySizeToString(long sizeInBytes)
+        {
+            return MemorySizeToString(sizeInBytes, 0, true);
         }
 
         #endregion
