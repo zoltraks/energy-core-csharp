@@ -236,6 +236,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(ProjectDir)\nuget\build\netcf\</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\nuget\build\netcf\</PostBuildEvent>
   </PropertyGroup>
 </Project>
