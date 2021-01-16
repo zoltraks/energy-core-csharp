@@ -45,13 +45,15 @@ namespace Energy.Base
 
             public bool Load(string fileName)
             {
-                string content = System.IO.File.ReadAllText(fileName);
+                //string content = System.IO.File.ReadAllText(fileName);
+                string content = Energy.Base.File.ReadText(fileName);
                 return Parse(content);
             }
 
             public bool Load(string fileName, Encoding encoding)
             {
-                string content = System.IO.File.ReadAllText(fileName, encoding);
+                //string content = System.IO.File.ReadAllText(fileName, encoding);
+                string content = Energy.Base.File.ReadText(fileName, encoding);
                 Clear();
                 return Parse(content);
             }

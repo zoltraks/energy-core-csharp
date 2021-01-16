@@ -936,6 +936,10 @@ namespace Energy.Base
         /// <returns></returns>
         public static string[] Environment(string variable, char separator)
         {
+#if NETCF
+            return new string [] { };
+#endif
+#if !NETCF
             string value = System.Environment.GetEnvironmentVariable(variable);
             if (string.IsNullOrEmpty(value))
             {
@@ -954,6 +958,7 @@ namespace Energy.Base
             }
             string[] array = list.ToArray();
             return array;
+#endif
         }
 
         /// <summary>

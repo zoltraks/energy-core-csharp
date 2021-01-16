@@ -1239,5 +1239,59 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region AppendText
+
+        public static bool AppendText(string file, string content)
+        {
+            try
+            {
+#if !NETCF
+                System.IO.File.AppendAllText(file, content);
+#endif
+                return true;
+            }
+            catch
+            {
+                Debug.Write(null);
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region ReadText
+
+        public static string ReadText(string fileName)
+        {
+            string result = null;
+            try
+            {
+                // 2021-01-16 03:54
+                result = System.IO.File.ReadAllText(fileName);
+            }
+            catch
+            {
+                Debug.Write(null);
+            }
+            return result;
+        }
+
+        public static string ReadText(string fileName, Encoding encoding)
+        {
+            string result = null;
+            try
+            {
+                result = System.IO.File.ReadAllText(fileName, encoding);
+            }
+            catch
+            {
+                Debug.Write(null);
+            }
+            return result;
+        }
+
+        #endregion
+
     }
 }

@@ -663,7 +663,8 @@ namespace Energy.Core
                         string content = sb.ToString();
                         try
                         {
-                            System.IO.File.AppendAllText(file, content);
+                            Energy.Base.File.AppendText(file, content);
+                            //System.IO.File.AppendAllText(file, content);
                         }
                         catch (Exception exception)
                         {
