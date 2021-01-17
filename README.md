@@ -20,6 +20,8 @@ Install-Package Energy.Core
 
 Installation package contains versions for **.NET 4**, **.NET Standard** / **.NET Core** and legacy **.NET 2**. Nuget should choose apropriate version automatically.
 
+For Windows CE development package needs to be downloaded manually from [download section](download/).
+
 Documentation
 -------------
 
