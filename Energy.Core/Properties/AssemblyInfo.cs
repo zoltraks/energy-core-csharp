@@ -1,11 +1,11 @@
-﻿#if CFNET
+﻿#if NETCF
     //
 #elif WindowsCE || PocketPC || WINDOWS_PHONE
     //
-#define CFNET
+#define NETCF
 #elif COMPACT_FRAMEWORK
 //
-#define CFNET
+#define NETCF
 #else
     //
 #endif
@@ -45,6 +45,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("20.12.11")]
-#if !CFNET
-[assembly: AssemblyFileVersion("18.01.1")]
+#if !NETCF
+[assembly: AssemblyFileVersion("20.12.11")]
 #endif
