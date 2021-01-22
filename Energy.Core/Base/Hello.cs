@@ -10,5 +10,10 @@ namespace Energy.Base
         {
             return "Hello, World.";
         }
+
+        public static string World(char exclamation)
+        {
+            return "Hello, World" + exclamation.ToString();
+        }
     }
 }

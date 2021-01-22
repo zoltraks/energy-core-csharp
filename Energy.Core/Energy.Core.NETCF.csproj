@@ -85,6 +85,7 @@
     <Compile Include="Base\Format.cs" />
     <Compile Include="Base\Geo.cs" />
     <Compile Include="Base\Hash.cs" />
+    <Compile Include="Base\Hello.cs" />
     <Compile Include="Base\Hex.cs" />
     <Compile Include="Base\History.cs" />
     <Compile Include="Base\Http.cs" />
