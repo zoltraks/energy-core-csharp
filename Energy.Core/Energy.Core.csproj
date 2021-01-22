@@ -10,9 +10,18 @@
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
     <Product />
-    <Description>This package contains class library which boosts your program with functionality covering various type conversions, utility classes, database abstraction layer, object mapping and simple application framework.
+    <Description>Boost your program with "Swiss Army knife" functionality covering various type conversions, utility classes, database abstraction layer, object mapping, and more.
 
-Meant to be used by wide range of applications, services, web or console programs.</Description>
+Meant to be used anywhere if possible. 
+
+Above statement includes desktop applications, services, console programs running on any runtime.
+
+Runtimes .NET (2.0 + above) and .NET Core (2.0 + later) are supported. 
+CF.NET support is available as separate download.
+
+Browse project page for more details.
+
+Brought to you by "Happy Code".</Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
