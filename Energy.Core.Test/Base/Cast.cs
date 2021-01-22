@@ -976,7 +976,7 @@ namespace Energy.Core.Test.Base
             s = Energy.Base.Cast.MemorySizeToString(0);
             Assert.AreEqual("0 B", s);
             s = Energy.Base.Cast.MemorySizeToString(1024, 0);
-            Assert.AreEqual("0 B", s);
+            Assert.AreEqual("1 KB", s);
             s = Energy.Base.Cast.MemorySizeToString(1024 * 1024);
             Assert.AreEqual("1 MB", s);
         }

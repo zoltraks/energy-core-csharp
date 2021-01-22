@@ -4837,7 +4837,7 @@ namespace Energy.Base
                 return "0 " + _MemorySizeSuffix[0];
             }
             long m = sizeInBytes;
-            int en = 0;
+            int exp = 0;
             while (true)
             {
                 long x = m / 1024;
@@ -4845,11 +4845,11 @@ namespace Energy.Base
                 {
                     break;
                 }
-                en++;
+                m = x;
+                exp++;
             }
             //int exponent = Convert.ToInt32(Math.Floor(Math.Log(sizeInBytes, 1024)));
-            int exponent = en;
-            double number = sizeInBytes / Math.Pow(1024, exponent);
+            double number = sizeInBytes / Math.Pow(1024, exp);
             int p = 1;
             for (int i = 0; i < decimalPlaces; i++)
             {
@@ -4870,7 +4870,7 @@ namespace Energy.Base
             number /= p;
 
             return string.Concat(number.ToString(CultureInfo.InvariantCulture), " "
-                , _MemorySizeSuffix[exponent]);
+                , _MemorySizeSuffix[exp]);
         }
 
         /// <summary>
