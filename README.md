@@ -7,7 +7,9 @@ object mapping and simple application framework.
 
 To be used by wide range of applications, services, web or console programs.
 
-Filled with radioactive rays and made with love for you...
+☢️ Filled with radioactive rays ☢️
+
+❤️ Made with love for you ❤️
 
 Installation
 ------------
