@@ -95,8 +95,9 @@ namespace Energy.Core
                 return null;
             }
             //string directory = System.IO.Path.GetDirectoryName(assembly.Location);
-            string directory;
-            directory = Energy.Base.Class.GetAssemblyFile(assembly);
+            string file, directory;
+            file = Energy.Base.Class.GetAssemblyFile(assembly);
+            directory = System.IO.Path.GetDirectoryName(file);
             directory = Energy.Base.Path.IncludeTrailingSeparator(directory);
             return directory;
         }

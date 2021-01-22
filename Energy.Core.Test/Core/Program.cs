@@ -7,25 +7,23 @@ namespace Energy.Core.Test.Core
     public class Program
     {
         [TestMethod]
-        public void ProgramClass()
-        {
-            // Energy.Base.Lock doesn't track execution anymore
-
-            //Energy.Base.Lock lock1 = new Energy.Base.Lock();
-            //Assert.IsTrue(Energy.Core.Bug.Last.Code.Equals("C002")); // 
-            //Energy.Core.Bug.Entry emptyEntry = Energy.Core.Bug.Entry.Empty;
-            //Energy.Core.Bug.Last = emptyEntry;
-            //Energy.Core.Bug.Suppress("C002");
-            //Energy.Base.Lock lock2 = new Energy.Base.Lock();
-            //Assert.IsFalse(Energy.Core.Bug.Last.Code.Equals("C002"));
-        }
-
-        [TestMethod]
         public void ProgramGetCommandName()
         {
             System.Reflection.Assembly asm = Energy.Core.Program.GetAssembly();
             string cmd = Energy.Core.Program.GetCommandName();
             Assert.IsNotNull(cmd);
+        }
+
+        [TestMethod]
+        public void ProgramGetExecution()
+        {
+            string directory = Energy.Core.Program.GetExecutionDirectory();
+            string file = Energy.Core.Program.GetExecutionFile();
+            Assert.IsNotNull(directory);
+            Assert.IsNotNull(file);
+            Assert.IsTrue(file.EndsWith(".dll"));
+            Assert.IsTrue(directory.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()));
+            Assert.IsFalse(directory.EndsWith(".dll" + System.IO.Path.DirectorySeparatorChar));
         }
     }
 }
