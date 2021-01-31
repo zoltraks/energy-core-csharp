@@ -4830,5 +4830,85 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region IncludeTrailing
+
+        /// <summary>
+        /// Include trailing character if not already present at the end.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Character to be inserted if missing</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string IncludeTrailing(string text, char missing, bool ignoreCase)
+        {
+            return Energy.Base.Text.IncludeTrailing(text, missing.ToString(), ignoreCase);
+        }
+
+        /// <summary>
+        /// Include trailing character if not already present at the end.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Character to be inserted if missing</param>
+        /// <returns></returns>
+        public static string IncludeTrailing(string text, char missing)
+        {
+            return Energy.Base.Text.IncludeTrailing(text, missing.ToString());
+        }
+
+        /// <summary>
+        /// Include trailing text if not already present at the end.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Text to be inserted if missing</param>
+        /// <returns></returns>
+        public static string IncludeTrailing(string text, string missing)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return missing ?? "";
+            }
+            if (string.IsNullOrEmpty(missing))
+            {
+                return text ?? "";
+            }
+            if (text.EndsWith(missing))
+            {
+                return text;
+            }
+            else
+            {
+                return text + missing;
+            }
+        }
+
+        /// <summary>
+        /// Include trailing text if not already present at the end.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Text to be inserted if missing</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string IncludeTrailing(string text, string missing, bool ignoreCase)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return missing ?? "";
+            }
+            if (string.IsNullOrEmpty(missing))
+            {
+                return text ?? "";
+            }
+            if (text.EndsWith(missing, ignoreCase, CultureInfo.InvariantCulture))
+            {
+                return text;
+            }
+            else
+            {
+                return text + missing;
+            }
+        }
+
+        #endregion
     }
 }
