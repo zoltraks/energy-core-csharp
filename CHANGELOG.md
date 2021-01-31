@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+## 20.12.13 ##
+
+Energy.Base.Text.IncludeTrailing
+
+Energy.Base.Text.IncludeLeading
+
+Energy.Base.Text.Trim for lists and arrays. Regular Trim will no longer ignore null character (code 0).
+
 ## 20.12.11 ##
 
 First published build for Compact Framework.
