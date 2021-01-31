@@ -10,13 +10,30 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void TextTrim()
         {
+            Assert.IsNull(Energy.Base.Text.Trim((string)null));
+            Assert.IsNotNull(Energy.Base.Text.Trim(""));
             Assert.AreEqual("", Energy.Base.Text.Trim(" "));
             Assert.AreEqual("", Energy.Base.Text.Trim("\t"));
             Assert.AreEqual("", Energy.Base.Text.Trim("\v"));
             Assert.AreEqual("", Energy.Base.Text.Trim("\r"));
             Assert.AreEqual("", Energy.Base.Text.Trim("\n"));
             Assert.AreEqual("", Energy.Base.Text.Trim("\f"));
-            Assert.AreEqual("", Energy.Base.Text.Trim("\0"));
+            Assert.AreEqual("\0", Energy.Base.Text.Trim("\0"));
+
+            string[] a1, a2, a3;
+            a1 = new string[] {
+                null,
+                " \tA\t ", "\r\n" + "" + '\0' + 'X' + '\0' + "\r\n",
+                " \t\r\n\v\f",
+                "\v\f" + "" + (char)(2) + '-' + (char)(3) + "\v\f",
+                null,
+            };
+            a2 = Energy.Base.Text.Trim(a1);
+            a3 = new string[] {
+                "A",
+                "" + '\0' + 'X' + '\0', "" + (char)(2) + '-' + (char)(3),
+            };
+            Assert.AreEqual(0, Energy.Base.Collection.Compare(a2, a3));
         }
 
         [TestMethod]
@@ -833,7 +850,7 @@ Another
             a = null;
             x = Energy.Base.Text.FindAnyWord("", a);
             Assert.IsNull(x);
-            a = new string[] { "a|b" , "[]" };
+            a = new string[] { "a|b", "[]" };
             x = Energy.Base.Text.FindAnyWord(null, a);
             Assert.IsNull(x);
             x = Energy.Base.Text.FindAnyWord("", a);
@@ -1310,6 +1327,28 @@ Another
             Assert.AreEqual("/a/", Energy.Base.Text.IncludeTrailing("/a/", "/"));
             Assert.AreEqual("a//", Energy.Base.Text.IncludeTrailing("a//", "/"));
             Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeTrailing("/", '/'));
+        }
+
+        [TestMethod]
+        public void IncludeLeading()
+        {
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading("", null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, ""));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, '\0'));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading(null, null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading("", null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading(null, ""));
+            Assert.AreEqual('\0'.ToString(), Energy.Base.Text.IncludeLeading(null, '\0'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading(null, "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading("", "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading(null, "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeLeading(null, '/'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading("/", "/"));
+            Assert.AreEqual("/a", Energy.Base.Text.IncludeLeading("/a", "/"));
+            Assert.AreEqual("/a/", Energy.Base.Text.IncludeLeading("a/", "/"));
+            Assert.AreEqual("/a//", Energy.Base.Text.IncludeLeading("a//", "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeLeading("/", '/'));
         }
     }
 }
