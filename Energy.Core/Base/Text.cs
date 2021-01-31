@@ -430,31 +430,92 @@ namespace Energy.Base
 
         #region Trim
 
-        private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
+        //private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
+        //private static readonly char[] WHITESPACE_CHARACTERS = new char[] { ' ', '\t', '\n', '\r', '\v', '\f' };
 
         /// <summary>
-        /// Remove all leading and leading whitespace characters from text.
+        /// Remove all trailing and leading whitespace characters from text.
         /// <br/><br/>
         /// Following characters are treated as whitespace: space character " " (code 32),
-        /// horizontal tab "\t" (code 09), line feed "\n" (code 10),
+        /// horizontal tab "\t" (code 9), line feed "\n" (code 10),
         /// carriage return "\r" (code 13), vertical tab "\v" (code 11),
-        /// form feed "\f" (code 12), null character "\0" (code 0).
+        /// form feed "\f" (code 12).
         /// </summary>
         /// <remarks>EBS-0</remarks>
-        /// <param name="text">String value</param>
-        /// <returns>Trimmed string</returns>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Trim(string text)
         {
             if (null == text || 0 == text.Length)
             {
                 return text;
             }
-            if (0 <= text.IndexOfAny(whiteCharacters))
-            {
-                //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f', '\0');
-                text = text.Trim(whiteCharacters);
-            }
+            text = text.Trim();
+            //if (0 <= text.IndexOfAny(WHITESPACE_CHARACTERS))
+            //{
+            //    //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f', '\0');
+            //    //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f' );
+            //    text = text.Trim();
+            //}
             return text;
+        }
+
+        /// <summary>
+        /// Remove all traling and leading whitespace characters for every element in the array.
+        /// <br /><br />
+        /// Remove empty entries from the list.
+        /// <br/><br/>
+        /// Following characters are treated as whitespace: space character " " (code 32),
+        /// horizontal tab "\t" (code 9), line feed "\n" (code 10),
+        /// carriage return "\r" (code 13), vertical tab "\v" (code 11),
+        /// form feed "\f" (code 12).
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="list"></param>
+        public static void Trim(IList<string> list)
+        {
+            if (null == list || 0 == list.Count)
+            {
+                return;
+            }
+            for (int i = -1 + list.Count; i >= 0; --i)
+            {
+                if (string.IsNullOrEmpty(list[i]))
+                {
+                    list.RemoveAt(i);
+                    continue;
+                }
+                string trim = list[i].Trim();
+                if (0 == trim.Length)
+                {
+                    list.RemoveAt(i);
+                    continue;
+                }
+                list[i] = trim;
+            }
+        }
+
+        /// <summary>
+        /// Remove all traling and leading whitespace characters for every element in the array.
+        /// <br /><br />
+        /// Remove empty entries from the list.
+        /// <br/><br/>
+        /// Following characters are treated as whitespace: space character " " (code 32),
+        /// horizontal tab "\t" (code 9), line feed "\n" (code 10),
+        /// carriage return "\r" (code 13), vertical tab "\v" (code 11),
+        /// form feed "\f" (code 12).
+        /// </summary>
+        /// <remarks>EBS-0</remarks>
+        /// <param name="array"></param>
+        public static string[] Trim(string[] array)
+        {
+            if (null == array || 0 == array.Length)
+            {
+                return array;
+            }
+            List<string> list = new List<string>(array);
+            Energy.Base.Text.Trim(list);
+            return list.ToArray();
         }
 
         #endregion
@@ -4833,7 +4894,7 @@ namespace Energy.Base
         #region IncludeTrailing
 
         /// <summary>
-        /// Include leading character if not already present at the end.
+        /// Include trailing character if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Character to be inserted if missing</param>
@@ -4845,7 +4906,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include leading character if not already present at the end.
+        /// Include trailing character if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Character to be inserted if missing</param>
@@ -4856,7 +4917,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include leading text if not already present at the end.
+        /// Include trailing text if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Text to be inserted if missing</param>
@@ -4882,7 +4943,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include leading text if not already present at the end.
+        /// Include trailing text if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Text to be inserted if missing</param>
