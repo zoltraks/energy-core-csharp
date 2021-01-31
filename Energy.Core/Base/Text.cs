@@ -433,7 +433,7 @@ namespace Energy.Base
         private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
 
         /// <summary>
-        /// Remove all leading and trailing whitespace characters from text.
+        /// Remove all leading and leading whitespace characters from text.
         /// <br/><br/>
         /// Following characters are treated as whitespace: space character " " (code 32),
         /// horizontal tab "\t" (code 09), line feed "\n" (code 10),
@@ -2844,7 +2844,6 @@ namespace Energy.Base
 
         #endregion
 
-
         #region TryParse
 
         public static T TryParse<T>(string value)
@@ -4834,7 +4833,7 @@ namespace Energy.Base
         #region IncludeTrailing
 
         /// <summary>
-        /// Include trailing character if not already present at the end.
+        /// Include leading character if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Character to be inserted if missing</param>
@@ -4846,7 +4845,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include trailing character if not already present at the end.
+        /// Include leading character if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Character to be inserted if missing</param>
@@ -4857,7 +4856,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include trailing text if not already present at the end.
+        /// Include leading text if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Text to be inserted if missing</param>
@@ -4883,7 +4882,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Include trailing text if not already present at the end.
+        /// Include leading text if not already present at the end.
         /// </summary>
         /// <param name="text">Actual text value</param>
         /// <param name="missing">Text to be inserted if missing</param>
@@ -4897,7 +4896,7 @@ namespace Energy.Base
             }
             if (string.IsNullOrEmpty(missing))
             {
-                return text ?? "";
+                return text;
             }
             // .NET Compact Framework doesn't have EndsWith with 3 arguments.
             // text.EndsWith(NET Compact Framework(missing, ignoreCase, CultureInfo.InvariantCulture)
@@ -4908,6 +4907,88 @@ namespace Energy.Base
             else
             {
                 return text + missing;
+            }
+        }
+
+        #endregion
+
+        #region IncludeLeading
+
+        /// <summary>
+        /// Include leading character if not already present at the begining.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Character to be inserted if missing</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string IncludeLeading(string text, char missing, bool ignoreCase)
+        {
+            return Energy.Base.Text.IncludeLeading(text, missing.ToString(), ignoreCase);
+        }
+
+        /// <summary>
+        /// Include leading character if not already present at the begining.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Character to be inserted if missing</param>
+        /// <returns></returns>
+        public static string IncludeLeading(string text, char missing)
+        {
+            return Energy.Base.Text.IncludeLeading(text, missing.ToString());
+        }
+
+        /// <summary>
+        /// Include leading text if not already present at the begining.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Text to be inserted if missing</param>
+        /// <returns></returns>
+        public static string IncludeLeading(string text, string missing)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return missing ?? "";
+            }
+            if (string.IsNullOrEmpty(missing))
+            {
+                return text ?? "";
+            }
+            if (text.StartsWith(missing))
+            {
+                return text;
+            }
+            else
+            {
+                return missing + text;
+            }
+        }
+
+        /// <summary>
+        /// Include leading text if not already present at the begining.
+        /// </summary>
+        /// <param name="text">Actual text value</param>
+        /// <param name="missing">Text to be inserted if missing</param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string IncludeLeading(string text, string missing, bool ignoreCase)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return missing ?? "";
+            }
+            if (string.IsNullOrEmpty(missing))
+            {
+                return text ?? "";
+            }
+            // .NET Compact Framework doesn't have EndsWith with 3 arguments.
+            // text.StartsWith(NET Compact Framework(missing, ignoreCase, CultureInfo.InvariantCulture)
+            if (text.StartsWith(missing, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return text;
+            }
+            else
+            {
+                return missing + text;
             }
         }
 

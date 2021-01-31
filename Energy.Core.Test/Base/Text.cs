@@ -1311,5 +1311,27 @@ Another
             Assert.AreEqual("a//", Energy.Base.Text.IncludeTrailing("a//", "/"));
             Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeTrailing("/", '/'));
         }
+
+        [TestMethod]
+        public void IncludeLeading()
+        {
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading("", null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, ""));
+            Assert.IsNotNull(Energy.Base.Text.IncludeLeading(null, '\0'));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading(null, null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading("", null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeLeading(null, ""));
+            Assert.AreEqual('\0'.ToString(), Energy.Base.Text.IncludeLeading(null, '\0'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading(null, "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading("", "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading(null, "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeLeading(null, '/'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeLeading("/", "/"));
+            Assert.AreEqual("/a", Energy.Base.Text.IncludeLeading("/a", "/"));
+            Assert.AreEqual("/a/", Energy.Base.Text.IncludeLeading("a/", "/"));
+            Assert.AreEqual("/a//", Energy.Base.Text.IncludeLeading("a//", "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeLeading("/", '/'));
+        }
     }
 }
