@@ -1289,5 +1289,27 @@ Another
             r = Energy.Base.Text.SingleLine(a, "\t", false);
             Assert.AreEqual("\t\t", r);
         }
+
+        [TestMethod]
+        public void IncludeTrailing()
+        {
+            Assert.IsNotNull(Energy.Base.Text.IncludeTrailing(null, null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeTrailing("", null));
+            Assert.IsNotNull(Energy.Base.Text.IncludeTrailing(null, ""));
+            Assert.IsNotNull(Energy.Base.Text.IncludeTrailing(null, '\0'));
+            Assert.AreEqual("", Energy.Base.Text.IncludeTrailing(null, null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeTrailing("", null));
+            Assert.AreEqual("", Energy.Base.Text.IncludeTrailing(null, ""));
+            Assert.AreEqual('\0'.ToString(), Energy.Base.Text.IncludeTrailing(null, '\0'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeTrailing(null, "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeTrailing("", "/"));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeTrailing(null, "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeTrailing(null, '/'));
+            Assert.AreEqual("/", Energy.Base.Text.IncludeTrailing("/", "/"));
+            Assert.AreEqual("/a/", Energy.Base.Text.IncludeTrailing("/a", "/"));
+            Assert.AreEqual("/a/", Energy.Base.Text.IncludeTrailing("/a/", "/"));
+            Assert.AreEqual("a//", Energy.Base.Text.IncludeTrailing("a//", "/"));
+            Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeTrailing("/", '/'));
+        }
     }
 }
