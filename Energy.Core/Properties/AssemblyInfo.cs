@@ -17,13 +17,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Energy Core Library")]
+[assembly: AssemblyTitle("Energy.Core")]
 [assembly: AssemblyDescription("How much reality can you take?")]
 [assembly: AssemblyConfiguration("Company")]
 [assembly: AssemblyCompany("Filip Golewski <f.golewski@gmail.com>")]
 [assembly: AssemblyProduct("Energy.Core")]
 [assembly: AssemblyCopyright("Filip Golewski <f.golewski@gmail.com>")]
-[assembly: AssemblyTrademark("Energy Studio")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -44,7 +44,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("20.12.11")]
+[assembly: AssemblyVersion("20.12.13")]
 #if !NETCF
 [assembly: AssemblyFileVersion("20.12.11")]
 #endif
