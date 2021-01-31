@@ -4899,7 +4899,9 @@ namespace Energy.Base
             {
                 return text ?? "";
             }
-            if (text.EndsWith(missing, ignoreCase, CultureInfo.InvariantCulture))
+            // .NET Compact Framework doesn't have EndsWith with 3 arguments.
+            // text.EndsWith(NET Compact Framework(missing, ignoreCase, CultureInfo.InvariantCulture)
+            if (text.EndsWith(missing, StringComparison.InvariantCultureIgnoreCase))
             {
                 return text;
             }
