@@ -1671,6 +1671,53 @@ namespace Energy.Base
 
         #endregion
 
+        #region RemoveEmptyElements
+
+        /// <summary>
+        /// Remove empty elements from array of strings.
+        /// <br /><br />
+        /// New array will be returned.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static string[] RemoveEmptyElements(string[] array)
+        {
+            if (null == array)
+            {
+                return null;
+            }
+            else
+            {
+                return RemoveEmptyElements(new List<string>(array)).ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Remove empty elements from list of strings.
+        /// <br /><br />
+        /// List will be modified and returned back.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static List<string> RemoveEmptyElements(List<string> list)
+        {
+            if (null == list)
+            {
+                return null;
+            }
+            for (int i = list.Count; i > 0; )
+            {
+                i--;
+                if (string.IsNullOrEmpty(list[i]))
+                {
+                    list.RemoveAt(i);
+                }
+            }
+            return list;
+        }
+
+        #endregion
+
         #region Escape
 
         #region EscapeExpression

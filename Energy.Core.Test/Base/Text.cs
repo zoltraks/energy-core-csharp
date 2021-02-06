@@ -1350,5 +1350,16 @@ Another
             Assert.AreEqual("/a//", Energy.Base.Text.IncludeLeading("a//", "/"));
             Assert.AreEqual('/'.ToString(), Energy.Base.Text.IncludeLeading("/", '/'));
         }
+
+        [TestMethod]
+        public void RemoveEmptyElements()
+        {
+            Assert.IsNull(Energy.Base.Text.RemoveEmptyElements((List<string>)null));
+            Assert.IsNull(Energy.Base.Text.RemoveEmptyElements((string[])null));
+            Assert.AreEqual(0, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "" }).Length);
+            Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "X" }).Length);
+            Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "" }).Length);
+            Assert.AreEqual(2, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "X" }).Length);
+        }
     }
 }
