@@ -30,8 +30,12 @@ namespace Energy.Core.Test.Base
             };
             a2 = Energy.Base.Text.Trim(a1);
             a3 = new string[] {
+                null,
                 "A",
-                "" + '\0' + 'X' + '\0', "" + (char)(2) + '-' + (char)(3),
+                "" + '\0' + 'X' + '\0', 
+                "",
+                "" + (char)(2) + '-' + (char)(3),
+                null,
             };
             Assert.AreEqual(0, Energy.Base.Collection.Compare(a2, a3));
         }
@@ -1360,6 +1364,23 @@ Another
             Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "X" }).Length);
             Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "" }).Length);
             Assert.AreEqual(2, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "X" }).Length);
+        }
+
+        [TestMethod]
+        public void RemoveEmptyLines()
+        {
+            Assert.IsNull(Energy.Base.Text.RemoveEmptyLines(null));
+            Assert.IsNotNull(Energy.Base.Text.RemoveEmptyLines(""));
+            Assert.AreEqual("", Energy.Base.Text.RemoveEmptyLines(""));
+            Assert.AreEqual("", Energy.Base.Text.RemoveEmptyLines("\n"));
+            Assert.AreEqual("", Energy.Base.Text.RemoveEmptyLines("\r\n"));
+            Assert.AreEqual("", Energy.Base.Text.RemoveEmptyLines("\r\n\r\n"));
+            Assert.AreEqual("A\n", Energy.Base.Text.RemoveEmptyLines("\nA\n"));
+            Assert.AreEqual("A", Energy.Base.Text.RemoveEmptyLines("\r\nA"));
+            Assert.AreEqual("A\r\n", Energy.Base.Text.RemoveEmptyLines("\r\nA\r\n"));
+            Assert.AreEqual("A\r\nB\r\n", Energy.Base.Text.RemoveEmptyLines("A\r\nB\r\n"));
+            Assert.AreEqual("A\r\nB\r\n", Energy.Base.Text.RemoveEmptyLines("\r\nA\r\nB\r\n"));
+            Assert.AreEqual("A\r\nB\n", Energy.Base.Text.RemoveEmptyLines("\n\r\nA\r\n\nB\n\r\n"));
         }
     }
 }

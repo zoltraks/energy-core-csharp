@@ -462,8 +462,6 @@ namespace Energy.Base
 
         /// <summary>
         /// Remove all traling and leading whitespace characters for every element in the array.
-        /// <br /><br />
-        /// Remove empty entries from the list.
         /// <br/><br/>
         /// Following characters are treated as whitespace: space character " " (code 32),
         /// horizontal tab "\t" (code 9), line feed "\n" (code 10),
@@ -472,27 +470,32 @@ namespace Energy.Base
         /// </summary>
         /// <remarks>EBS-0</remarks>
         /// <param name="list"></param>
-        public static void Trim(IList<string> list)
+        public static IList<string> Trim(IList<string> list)
         {
             if (null == list || 0 == list.Count)
             {
-                return;
+                return list;
             }
-            for (int i = -1 + list.Count; i >= 0; --i)
+            for (int i = 0, c = list.Count; i < c; i++)
             {
-                if (string.IsNullOrEmpty(list[i]))
-                {
-                    list.RemoveAt(i);
-                    continue;
-                }
-                string trim = list[i].Trim();
-                if (0 == trim.Length)
-                {
-                    list.RemoveAt(i);
-                    continue;
-                }
-                list[i] = trim;
+                list[i] = null == list[i] ? null : list[i].Trim();
             }
+            return list;
+            //for (int i = -1 + list.Count; i >= 0; --i)
+            //{
+            //    if (string.IsNullOrEmpty(list[i]))
+            //    {
+            //        list.RemoveAt(i);
+            //        continue;
+            //    }
+            //    string trim = list[i].Trim();
+            //    if (0 == trim.Length)
+            //    {
+            //        list.RemoveAt(i);
+            //        continue;
+            //    }
+            //    list[i] = trim;
+            //}
         }
 
         /// <summary>
@@ -1656,16 +1659,21 @@ namespace Energy.Base
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        [Energy.Attribute.Code.Verify]
         public static string RemoveEmptyLines(string text)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return text;
-            bool eol = text.EndsWith("\r\n") || text.EndsWith("\n") || text.EndsWith("\r");
+            }
+            //string eol = Regex.Match(text, "\r?\n$", RegexOptions.None).Value;
+            //bool eol = text.EndsWith("\r\n") || text.EndsWith("\n") || text.EndsWith("\r");
             string pattern = @"^[\s\t\v\ ]*(?:\r\n|\n|\r)+";
             string result = Regex.Replace(text, pattern, "", RegexOptions.Multiline);
-            if (eol)
-                result += Energy.Base.Text.NL;
+            //if (eol)
+            //{
+            //    result += Energy.Base.Text.NL;
+            //}
+            //result += eol;
             return result;
         }
 
