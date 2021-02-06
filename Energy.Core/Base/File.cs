@@ -1310,6 +1310,5 @@ namespace Energy.Base
         }
 
         #endregion
-
     }
 }
