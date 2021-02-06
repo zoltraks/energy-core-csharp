@@ -1718,8 +1718,6 @@ namespace Energy.Base
 
         #endregion
 
-        #region Escape
-
         #region EscapeExpression
 
         private static string[] _EscapeExpressionStringArray;
@@ -1824,8 +1822,6 @@ namespace Energy.Base
         {
             return EscapeExpression(character.ToString());
         }
-
-        #endregion
 
         #endregion
 
