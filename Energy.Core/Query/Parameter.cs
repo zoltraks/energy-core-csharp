@@ -549,7 +549,7 @@ namespace Energy.Query
                 {
                     l.Add(o.Key + glue + format.Value(o.Value, GetType(o.Key), unicode));
                 }
-                return string.Join(Environment.NewLine, l.ToArray());
+                return string.Join(Energy.Base.Text.NL, l.ToArray());
             }
 
             #endregion

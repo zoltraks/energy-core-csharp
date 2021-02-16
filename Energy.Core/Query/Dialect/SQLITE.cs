@@ -48,8 +48,9 @@ namespace Energy.Query.Dialect
             StringBuilder s = new StringBuilder();
             s.Append("CREATE TABLE IF NOT EXISTS ");
             s.Append(Format.Object(table.Schema, table.Name));
-            s.AppendLine();
-            s.AppendLine("(");
+            s.Append(Energy.Base.Text.NL);
+            s.Append("(");
+            s.Append(Energy.Base.Text.NL);
 
             string identity = Energy.Base.Text.Select(table.Identity, table.Columns.GetPrimaryName());
 

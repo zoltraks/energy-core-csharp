@@ -719,7 +719,7 @@ namespace Energy.Base
                     text.Add("");
                 }
 
-                return string.Join(Environment.NewLine, text.ToArray());
+                return string.Join(Energy.Base.Text.NL, text.ToArray());
             }
 
             #endregion

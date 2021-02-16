@@ -324,7 +324,7 @@ namespace Energy.Base
                 {
                     if (layout.Indent)
                     {
-                        sb.AppendLine();
+                        sb.Append(Energy.Base.Text.NL);
                         sb.Append(layout.IndentString ?? "");
                     }
                     sb.Append(string.Join(glue, list.ToArray()));

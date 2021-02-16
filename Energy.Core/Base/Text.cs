@@ -33,9 +33,13 @@ namespace Energy.Base
                 if (_NL == null)
                 {
                     if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+                    {
                         _NL = "\r\n";
+                    }
                     else
+                    {
                         _NL = "\n";
+                    }
                 }
                 return _NL;
             }
@@ -75,6 +79,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Regular expressions pattern for new line.
+        /// <br /><br />
         /// Greedy version.
         /// </summary>
         public const string NEWLINE_GREEDY_PATTERN = "(?:\r\n|\n|\r)+";
@@ -1257,10 +1262,14 @@ namespace Energy.Base
         public static bool Contains(object o, string search)
         {
             if (o == null)
+            {
                 return false;
+            }
             string str = o as string;
             if (str == null)
+            {
                 str = o.ToString();
+            }
             return str.Contains(search);
         }
 

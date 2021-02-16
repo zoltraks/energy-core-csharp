@@ -444,7 +444,7 @@ namespace Energy.Base
                     {
                         l.Add(item.ToString());
                     }
-                    return string.Join(Environment.NewLine, l.ToArray());
+                    return string.Join(Energy.Base.Text.NL, l.ToArray());
                 }
             }
         }

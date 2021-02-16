@@ -496,11 +496,15 @@ namespace Energy.Core
                 public override bool Write(Energy.Base.Log.Entry[] log)
                 {
                     if (log == null)
+                    {
                         return false;
+                    }
                     for (int i = 0; i < log.Length; i++)
                     {
                         if (log[i].Store.Contains(this))
+                        {
                             continue;
+                        }
                         if (Accept(log[i]))
                         {
                             System.Diagnostics.Trace.WriteLine(log[i].ToString());
