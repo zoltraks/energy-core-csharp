@@ -111,7 +111,7 @@ namespace Energy.Query
             int half = quote.Length >> 1;
             string prefix = quote.Substring(0, half);
             string suffix = quote.Substring(half);
-            if (value.Contains(suffix))
+            if (Energy.Base.Text.Contains(value, suffix))
             {
                 string replacement = suffix + suffix;
                 value = value.Replace(suffix, replacement);
