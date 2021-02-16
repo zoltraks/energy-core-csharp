@@ -1249,19 +1249,81 @@ namespace Energy.Base
         #region Contains
 
         /// <summary>
-        /// Check if object as string contains searched string.
+        /// Check if text representation of object contains searched string.
         /// </summary>
-        /// <param name="o">Object</param>
+        /// <param name="o"></param>
         /// <param name="search"></param>
         /// <returns></returns>
         public static bool Contains(object o, string search)
         {
-            if (o == null)
+            if (o == null || search == null)
+            {
                 return false;
-            string str = o as string;
-            if (str == null)
-                str = o.ToString();
-            return str.Contains(search);
+            }
+            var text = o as string;
+            if (text == null)
+            {
+                text = o.ToString();
+            }
+            bool result = 0 <= text.IndexOf(search);
+            return result;
+        }
+
+        /// <summary>
+        /// Check if text representation of object contains searched string.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="search"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool Contains(object o, string search, bool ignoreCase)
+        {
+            if (o == null || search == null)
+            {
+                return false;
+            }
+            var text = o as string;
+            if (text == null)
+            {
+                text = o.ToString();
+            }
+            var comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+            bool result = 0 <= text.IndexOf(search, comparison);
+            return result;
+        }
+
+        /// <summary>
+        /// Check if text contains searched string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="search"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static bool Contains(string text, string search, bool ignoreCase)
+        {
+            if (text == null || search == null)
+            {
+                return false;
+            }
+            var comparison = ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+            bool result = 0 <= text.IndexOf(search, comparison);
+            return result;
+        }
+
+        /// <summary>
+        /// Check if text contains searched string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        public static bool Contains(string text, string search)
+        {
+            if (text == null || search == null)
+            {
+                return false;
+            }
+            bool result = 0 <= text.IndexOf(search);
+            return result;
         }
 
         #endregion
