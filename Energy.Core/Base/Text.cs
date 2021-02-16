@@ -331,7 +331,7 @@ namespace Energy.Base
                     return value;
                 }
             }
-            else if (value.Contains(delimiter))
+            else if (Energy.Base.Text.Contains(value, delimiter))
             {
                 quote = true;
             }
@@ -340,7 +340,7 @@ namespace Energy.Base
             {
                 for (int i = 0; i < special.Length; i++)
                 {
-                    if (value.Contains(special[i]))
+                    if (Energy.Base.Text.Contains(value, special[i]))
                     {
                         quote = true;
                         break;
@@ -525,6 +525,8 @@ namespace Energy.Base
 
         #region Is
 
+        private readonly static char[] WILD_CHARS = new char[] { '*', '?' };
+ 
         /// <summary>
         /// Check if string contains one of wild characters ("*" or "?").
         /// </summary>
@@ -532,9 +534,16 @@ namespace Energy.Base
         /// <returns>bool</returns>
         public static bool IsWild(string text)
         {
-            return text.Contains("*") || text.Contains("?");
+            if (null == text)
+            {
+                return false;
+            }
+            bool result = 0 <= text.IndexOfAny(WILD_CHARS);
+            return result;
         }
 
+        private readonly static char[] LIKE_CHARS = new char[] { '%', '_' };
+ 
         /// <summary>
         /// Check if string contains one of characters used in LIKE ("%" or "_").
         /// </summary>
@@ -542,7 +551,12 @@ namespace Energy.Base
         /// <returns>bool</returns>
         public static bool IsLike(string text)
         {
-            return text.Contains("%") || text.Contains("_");
+            if (null == text)
+            {
+                return false;
+            }
+            bool result = 0 <= text.IndexOfAny(LIKE_CHARS);
+            return result;
         }
 
         /// <summary>
@@ -553,11 +567,17 @@ namespace Energy.Base
         public static bool IsWhite(string text)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return true;
-            else if (0 == text.Trim(new char[] { ' ', '\r', '\n', '\t', '\v' }).Length)
+            }
+            else if (0 == text.Trim().Length)
+            {
                 return true;
+            }
             else
+            {
                 return false;
+            }
         }
 
         #endregion
@@ -1871,7 +1891,7 @@ namespace Energy.Base
             System.Text.StringBuilder s = null;
             foreach (KeyValuePair<string, string> _ in EscapeExpressionStringDictionary)
             {
-                if (input.Contains(_.Key))
+                if (Energy.Base.Text.Contains(input, _.Key))
                 {
                     if (s == null)
                     {
@@ -3262,7 +3282,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Quote(string text, bool optional)
         {
-            if (optional && !text.Contains("\""))
+            if (optional && !Energy.Base.Text.Contains(text, "\""))
             {
                 return text;
             }
@@ -3292,7 +3312,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Quote(string text, string with, bool optional)
         {
-            if (optional && !text.Contains(with))
+            if (optional && !Energy.Base.Text.Contains(text, with))
             {
                 return text;
             }
@@ -3314,7 +3334,7 @@ namespace Energy.Base
                 return string.Concat(with, with);
             }
 
-            if (text.Contains(with))
+            if (Energy.Base.Text.Contains(text, with))
             {
                 return string.Concat(with, text.Replace(with, escape + with), with);
             }
@@ -3336,7 +3356,7 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Quote(string text, string with, string escape, bool optional)
         {
-            if (optional && !text.Contains(with))
+            if (optional && !Energy.Base.Text.Contains(text, with))
             {
                 return text;
             }
@@ -3501,7 +3521,7 @@ namespace Energy.Base
             if (!string.IsNullOrEmpty(escape))
             {
                 string e = escape + end;
-                if (text.Contains(e))
+                if (Energy.Base.Text.Contains(text, e))
                 {
                     change = true;
                     text = text.Replace(e, end);

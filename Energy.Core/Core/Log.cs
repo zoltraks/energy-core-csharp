@@ -659,7 +659,8 @@ namespace Energy.Core
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < log.Length; i++)
                     {
-                        sb.AppendLine(log[i].ToString());
+                        sb.Append(log[i].ToString());
+                        sb.Append(Energy.Base.Text.NL);
                     }
                     if (sb.Length != 0)
                     {

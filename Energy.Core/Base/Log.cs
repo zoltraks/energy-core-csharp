@@ -227,13 +227,13 @@ namespace Energy.Base
             {
                 StringBuilder sb = new StringBuilder(format);
                 DateTime stamp = this.Stamp != DateTime.MinValue ? this.Stamp : DateTime.Now;
-                if (format.Contains("{{DATE}}"))
+                if (Energy.Base.Text.Contains(format, "{{DATE}}"))
                     sb.Replace("{{DATE}}", stamp.ToString("yyyy-MM-dd"));
-                if (format.Contains("{{TIME}}"))
+                if (Energy.Base.Text.Contains(format, "{{TIME}}"))
                     sb.Replace("{{TIME}}", stamp.ToString("HH:mm:ss.fff").PadRight(12, '0'));
-                if (format.Contains("{{MESSAGE}}"))
+                if (Energy.Base.Text.Contains(format, "{{MESSAGE}}"))
                     sb.Replace("{{MESSAGE}}", Message);
-                if (format.Contains("{{EXCEPTION}}"))
+                if (Energy.Base.Text.Contains(format, "{{EXCEPTION}}"))
                     sb.Replace("{{EXCEPTION}}", Energy.Core.Bug.GetExceptionMessage(Exception, true, true));
                 return sb.ToString();
             }

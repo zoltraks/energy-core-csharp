@@ -117,7 +117,7 @@ namespace Energy.Base
                     for (int i = 0; i < KeyValueSeparators.Length; i++)
                     {
                         string separator = KeyValueSeparators[i];
-                        if (line.Contains(separator))
+                        if (Energy.Base.Text.Contains(line, separator))
                         {
                             int p = line.IndexOf(separator);
                             string key = line.Substring(0, p);

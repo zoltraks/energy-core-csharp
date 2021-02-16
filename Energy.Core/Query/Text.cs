@@ -172,7 +172,7 @@ namespace Energy.Query
                 {
                     value = value.Substring(1, value.Length - 2);
                 }
-                if (value.Contains(quote))
+                if (Energy.Base.Text.Contains(value, quote))
                 {
                     value = value.Replace(quote + quote, quote);
                 }
@@ -188,7 +188,7 @@ namespace Energy.Query
             if (value.StartsWith(prefix) && value.EndsWith(suffix))
             {
                 value = value.Substring(prefix.Length, value.Length - prefix.Length - suffix.Length);
-                if (value.Contains(suffix))
+                if (Energy.Base.Text.Contains(value, suffix))
                 {
                     string replacement = suffix + suffix;
                     value = value.Replace(replacement, suffix);

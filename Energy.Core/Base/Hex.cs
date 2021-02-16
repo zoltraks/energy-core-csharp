@@ -644,7 +644,7 @@ namespace Energy.Base
             for (int o = 0, n = 0; n < lineCount; n++)
             {
                 if (n > 0)
-                    b.AppendLine();
+                    b.Append(Energy.Base.Text.NL);
                 if (offsetSize > 0)
                 {
                     b.Append(IntegerToHex(o, offsetSize, upperCase));

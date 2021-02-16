@@ -135,7 +135,7 @@ namespace Energy.Core
             string[] nll = Energy.Base.Text.NEWLINE_ARRAY;
             if (nll == null || nll.Length == 0)
             {
-                nll = new string[] { Environment.NewLine };
+                nll = new string[] { Energy.Base.Text.NL };
             }
             if (string.IsNullOrEmpty(text))
             {

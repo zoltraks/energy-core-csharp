@@ -54,9 +54,9 @@ namespace Energy.Query.Dialect
             string tableName = table.Name;
 
             script.Append("CREATE TABLE IF NOT EXISTS " + Format.Object(tableName));
-            script.AppendLine();
+            script.Append(Energy.Base.Text.NL);
             script.Append("(");
-            script.AppendLine();
+            script.Append(Energy.Base.Text.NL);
 
             Energy.Source.Structure.Column primary = null;
 
@@ -98,12 +98,12 @@ namespace Energy.Query.Dialect
 
             script.Append(string.Concat("\t", string.Join(" ," + Energy.Base.Text.NL + "\t", list.ToArray()), Energy.Base.Text.NL));
             script.Append(")");
-            script.AppendLine();
+            script.Append(Energy.Base.Text.NL);
             string engine = string.IsNullOrEmpty(table.Engine) ? DefaultEngine : table.Engine;
             if (!string.IsNullOrEmpty(engine))
                 script.Append("ENGINE = " + engine);
             script.Append(";");
-            script.AppendLine();
+            script.Append(Energy.Base.Text.NL);
 
             return script.ToString();
         }

@@ -370,7 +370,7 @@ namespace Energy.Base
                 x.Password = password;
             }
             url = x.ToString();
-            if (value != null && url.Contains("{0}"))
+            if (value != null && Energy.Base.Text.Contains(url, "{0}"))
             {
                 url = url.Replace("{0}", value);
             }

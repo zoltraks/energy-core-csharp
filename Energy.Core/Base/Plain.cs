@@ -44,7 +44,7 @@ namespace Energy.Base
                 s.Append(format.FrameSuffix);
                 if (format.Tilde)
                     s.Append("~0~");
-                s.AppendLine();
+                s.Append(Energy.Base.Text.NL);
             }
 
             // header //
@@ -82,7 +82,7 @@ namespace Energy.Base
                 s.Append(format.RowSuffix);
                 if (format.Tilde)
                     s.Append("~0~");
-                s.AppendLine();
+                s.Append(Energy.Base.Text.NL);
             }
 
             // frame //
@@ -103,7 +103,7 @@ namespace Energy.Base
                 s.Append(format.InnerSuffix);
                 if (format.Tilde)
                     s.Append("~0~");
-                s.AppendLine();
+                s.Append(Energy.Base.Text.NL);
             }
 
             // content //
@@ -155,7 +155,7 @@ namespace Energy.Base
                     s.Append(format.RowSuffix);
                     if (format.Tilde)
                         s.Append("~0~");
-                    s.AppendLine();
+                    s.Append(Energy.Base.Text.NL);
                 }
             }
 
@@ -175,7 +175,7 @@ namespace Energy.Base
                 s.Append(format.FrameSuffix);
                 if (format.Tilde)
                     s.Append("~0~");
-                s.AppendLine();
+                s.Append(Energy.Base.Text.NL);
             }
 
             return s.ToString();

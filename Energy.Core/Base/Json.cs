@@ -258,7 +258,7 @@ namespace Energy.Base
                     else
                     {
                         s.Append("[");
-                        s.AppendLine();
+                        s.Append(Energy.Base.Text.NL);
                         layout.IndentLevel++;
                         for (int i = 0; i < Array.Count; i++)
                         {
@@ -272,7 +272,7 @@ namespace Energy.Base
                                 s.Append(Array[i].GetText(layout));
                             if (i < Array.Count - 1)
                                 s.Append(",");
-                            s.AppendLine();
+                            s.Append(Energy.Base.Text.NL);
                         }
                         layout.IndentLevel--;
                         for (int n = 0; n < layout.IndentLevel; n++)
@@ -455,7 +455,7 @@ namespace Energy.Base
             }
             for (int i = _EscapeReplacementArray.Length - 2; i >= 0; i -= 2)
             {
-                if (text.Contains(_EscapeReplacementArray[i]))
+                if (Energy.Base.Text.Contains(text, _EscapeReplacementArray[i]))
                 {
                     text = text.Replace(_EscapeReplacementArray[i], _EscapeReplacementArray[i + 1]);
                 }
@@ -480,7 +480,7 @@ namespace Energy.Base
             }
             for (int i = 0; i < _UnescapeReplacementArray.Length; i += 2)
             {
-                if (text.Contains(_UnescapeReplacementArray[i + 1]))
+                if (Energy.Base.Text.Contains(text, _UnescapeReplacementArray[i + 1]))
                 {
                     text = text.Replace(_UnescapeReplacementArray[i + 1], _UnescapeReplacementArray[i]);
                 }

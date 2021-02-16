@@ -336,15 +336,15 @@ namespace Energy.Base
         /// <returns></returns>
         public static string Escape(string key)
         {
-            if (key.Contains("\""))
+            if (Energy.Base.Text.Contains(key, "\""))
             {
                 return "'" + key.Replace("'", "''") + "'";
             }
-            if (key.Contains("'"))
+            if (Energy.Base.Text.Contains(key, "'"))
             {
                 return "\"" + key.Replace("\"", "\"\"") + "\"";
             }
-            if (key.Contains(";"))
+            if (Energy.Base.Text.Contains(key, ";"))
             {
                 return "{" + key + "}";
             }
@@ -357,19 +357,21 @@ namespace Energy.Base
 
         /// <summary>
         /// Quote connection string value if needed.
+        /// <br /><br />
         /// This method will affect on values containing space, semicolon, apostrophe or quotation mark.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static string Quote(string value)
         {
-            if (value.Contains(" ") || value.Contains(";") || value.Contains("'") || value.Contains("\""))
+            if (Energy.Base.Text.Contains(value, " ") || Energy.Base.Text.Contains(value, ";")
+                || Energy.Base.Text.Contains(value, "'") || Energy.Base.Text.Contains(value, "\""))
             {
-                if (value.Contains("'"))
+                if (Energy.Base.Text.Contains(value, "'"))
                 {
                     return "\"" + value.Replace("\"", "\"\"") + "\"";
                 }
-                if (value.Contains("\""))
+                if (Energy.Base.Text.Contains(value, "\""))
                 {
                     return "'" + value.Replace("'", "''") + "'";
                 }

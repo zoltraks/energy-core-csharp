@@ -488,7 +488,7 @@ namespace Energy.Base
             {
                 return path;
             }
-            else if (!path.Contains("/"))
+            else if (!Energy.Base.Text.Contains(path, "/"))
             {
                 return path;
             }
@@ -509,7 +509,7 @@ namespace Energy.Base
             {
                 return path;
             }
-            else if (!path.Contains("\\"))
+            else if (!Energy.Base.Text.Contains(path, "\\"))
             {
                 return path;
             }
@@ -554,7 +554,7 @@ namespace Energy.Base
             {
                 return path;
             }
-            else if (!path.Contains("\""))
+            else if (!Energy.Base.Text.Contains(path, "\""))
             {
                 return path;
             }

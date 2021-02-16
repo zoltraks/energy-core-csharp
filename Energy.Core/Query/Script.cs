@@ -125,17 +125,17 @@ namespace Energy.Query
                 //    update.Add("[" + key + "] = '" + value + "'");
                 //}
                 script.Append("IF NOT EXISTS ( SELECT 1 FROM " + name + " WHERE " + String.Join(" AND ", where.ToArray()) + " )");
-                if (!compact) script.AppendLine();
+                if (!compact) script.Append(Energy.Base.Text.NL);
                 script.Append(compact ? " " : "\t");
                 script.Append("INSERT INTO " + name + " ( " + String.Join(" , ", column.ToArray())
                     + " ) VALUES ( " + String.Join(" , ", insert.ToArray()) + " )");
-                if (!compact) script.AppendLine();
+                if (!compact) script.Append(Energy.Base.Text.NL);
                 if (compact) script.Append(" ");
                 script.Append("UPDATE " + name + " SET " + String.Join(" , ", update.ToArray()));
-                if (!compact) script.AppendLine();
+                if (!compact) script.Append(Energy.Base.Text.NL);
                 script.Append(compact ? " " : "\t");
                 script.Append("WHERE " + String.Join(" AND ", where.ToArray()));
-                script.AppendLine();
+                script.Append(Energy.Base.Text.NL);
             }
 
             return script.ToString().Trim();

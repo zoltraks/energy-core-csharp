@@ -589,7 +589,7 @@ namespace Energy.Query
                     return Number(_long);
                 }
 
-                if (s.Contains(","))
+                if (Energy.Base.Text.Contains(s, ","))
                 {
                     s = s.Replace(',', '.');
                 }

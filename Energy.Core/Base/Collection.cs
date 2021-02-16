@@ -1074,7 +1074,7 @@ namespace Energy.Base
 
             private string XmlEscapeName(string value)
             {
-                if (value.Contains(_XmlParentSeparator))
+                if (Energy.Base.Text.Contains(value, _XmlParentSeparator))
                 {
                     return value.Replace(_XmlParentSeparator, _XmlEscapeString);
                 }

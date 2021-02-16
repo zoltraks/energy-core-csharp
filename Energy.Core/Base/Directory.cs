@@ -64,12 +64,12 @@ namespace Energy.Base
         {
             if (!String.IsNullOrEmpty(path))
             {
-                if ('/' != System.IO.Path.DirectorySeparatorChar && path.Contains("/"))
+                if ('/' != System.IO.Path.DirectorySeparatorChar && Energy.Base.Text.Contains(path, "/"))
                 {
                     path = path.Replace('/', System.IO.Path.DirectorySeparatorChar);
                 }
 
-                if ('\\' != System.IO.Path.DirectorySeparatorChar && path.Contains("\\"))
+                if ('\\' != System.IO.Path.DirectorySeparatorChar && Energy.Base.Text.Contains(path, "\\"))
                 {
                     path = path.Replace('\\', System.IO.Path.DirectorySeparatorChar);
                 }

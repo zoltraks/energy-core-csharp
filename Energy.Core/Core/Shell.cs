@@ -167,7 +167,7 @@ namespace Energy.Core
                             continue;
                         }
                         s = s.Substring(1);
-                        if (style.Multiple && s.Contains("/"))
+                        if (style.Multiple && Energy.Base.Text.Contains(s, "/"))
                         {
                             string[] a = s.Split('/');
                             o.AddRange(a);
@@ -220,14 +220,14 @@ namespace Energy.Core
                     {
                         s = o[n];
                         if (false) { }
-                        else if (style.Colon && s.Contains(":"))
+                        else if (style.Colon && Energy.Base.Text.Contains(s, ":"))
                         {
                             int x = s.IndexOf(":");
                             string v = s.Substring(x + 1);
                             s = s.Substring(0, x - 1);
                             list.Values[s] = v;
                         }
-                        else if (style.Equal && s.Contains("="))
+                        else if (style.Equal && Energy.Base.Text.Contains(s, "="))
                         {
                             int x = s.IndexOf("=");
                             string v = s.Substring(x + 1);

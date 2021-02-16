@@ -483,7 +483,7 @@ namespace Energy.Base
         public static string ExtractRootShort(string xml)
         {
             string root = ExtractRoot(xml);
-            if (string.IsNullOrEmpty(root) || !root.Contains(":"))
+            if (string.IsNullOrEmpty(root) || !Energy.Base.Text.Contains(root, ":"))
             {
                 return root;
             }
