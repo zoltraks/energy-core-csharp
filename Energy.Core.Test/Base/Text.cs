@@ -1382,5 +1382,21 @@ Another
             Assert.AreEqual("A\r\nB\r\n", Energy.Base.Text.RemoveEmptyLines("\r\nA\r\nB\r\n"));
             Assert.AreEqual("A\r\nB\n", Energy.Base.Text.RemoveEmptyLines("\n\r\nA\r\n\nB\n\r\n"));
         }
+
+        [TestMethod]
+        public void Contains()
+        {
+            Assert.IsFalse(Energy.Base.Text.Contains(null, null));
+            Assert.IsFalse(Energy.Base.Text.Contains("", null));
+            Assert.IsFalse(Energy.Base.Text.Contains(null, null, false));
+            Assert.IsFalse(Energy.Base.Text.Contains("", null, true));
+            int _int = 123;
+            Assert.IsFalse(Energy.Base.Text.Contains(_int, null));
+            Assert.IsFalse(Energy.Base.Text.Contains(_int, "4"));
+            Assert.IsTrue(Energy.Base.Text.Contains(_int, "3", true));
+            string _string = "abc";
+            Assert.IsFalse(Energy.Base.Text.Contains(_string, "A", false));
+            Assert.IsTrue(Energy.Base.Text.Contains(_string, "A", true));
+        }
     }
 }

@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+## 20.12.14 ##
+
+Energy.Base.Text.Trim(IList<>)
+
+Energy.Base.Text.RemoveEmptyElements
+
 ## 20.12.13 ##
 
 Energy.Base.Text.IncludeTrailing
