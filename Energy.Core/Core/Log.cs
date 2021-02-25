@@ -507,7 +507,9 @@ namespace Energy.Core
                         }
                         if (Accept(log[i]))
                         {
+#if !NETCF20
                             System.Diagnostics.Trace.WriteLine(log[i].ToString());
+#endif
                         }
                         log[i].Store.Add(this);
                     }

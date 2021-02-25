@@ -158,7 +158,9 @@ namespace Energy.Base
             if (_Stream != null)
             {
                 _Stream.Close();
+#if !NETCF20
                 _Stream.Dispose();
+#endif
                 _Stream = null;
             }
         }
@@ -173,7 +175,9 @@ namespace Energy.Base
         public void Clear()
         {
             _Stream.Close();
+#if !NETCF20
             _Stream.Dispose();
+#endif
             _Stream = new System.IO.MemoryStream();
         }
 
