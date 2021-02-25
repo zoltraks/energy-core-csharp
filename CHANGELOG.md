@@ -1,9 +1,11 @@
 CHANGES
 =======
 
-## CURRENT ##
+## 20.12.15 ##
 
 Changes in Energy.Base.Clock.Parse allowing usage of parsing date part written in numeric format using exactly 8 digits in YYYYMMDDD form.
+
+Experimental build for legacy Compact Framework v2.0.
 
 ## 20.12.14 ##
 
