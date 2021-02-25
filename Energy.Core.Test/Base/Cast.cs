@@ -411,6 +411,58 @@ namespace Energy.Core.Test.Base
 
             var enumAB = Energy.Base.Cast.As<SomeEnum>("AB");
             Assert.AreEqual(SomeEnum.AB, enumAB);
+
+            Assert.AreEqual(0, DateTime.Compare(Energy.Base.Cast.As<DateTime>("20201212"),
+                new DateTime(2020, 12, 12)));
+            Assert.AreEqual(0, DateTime.Compare(Energy.Base.Cast.As<DateTime>("20201212 00:00:00"),
+                new DateTime(2020, 12, 12)));
+            Assert.AreEqual(0, DateTime.Compare(Energy.Base.Cast.As<DateTime>("20201212T 00:00:00"),
+                new DateTime(2020, 12, 12)));
+            Assert.AreEqual(0, DateTime.Compare(Energy.Base.Cast.As<DateTime>("DDD20201212TTT"),
+                new DateTime(2020, 12, 12)));
+
+            object[] testDateTime = new object[]
+            {
+                "_20210229_", DateTime.MinValue,
+                "-2020-02-29-", new DateTime(2020, 2, 29),
+                "|9999-01-21|", new DateTime(9999, 1, 21),
+                "|0001-01-01|", new DateTime(1, 1, 1),
+                ".0000-01-01.", DateTime.MinValue,
+                ":0000-00-00:", DateTime.MinValue,
+                "-1700-02-29-", DateTime.MinValue,
+                "-2000-02-29-", new DateTime(2000, 2, 29),
+                "-2100-02-29-", DateTime.MinValue,
+                "-1600-02-29-", new DateTime(1600, 2, 29),
+                "-2000-01-32-", DateTime.MinValue,
+                "-2000-03-32-", DateTime.MinValue,
+                "-2000-04-31-", DateTime.MinValue,
+                "-2000-05-32-", DateTime.MinValue,
+                "-2000-06-31-", DateTime.MinValue,
+                "-2000-07-32-", DateTime.MinValue,
+                "-2000-08-32-", DateTime.MinValue,
+                "-2000-09-31-", DateTime.MinValue,
+                "-2000-10-32-", DateTime.MinValue,
+                "-2000-11-31-", DateTime.MinValue,
+                "-2000-12-32-", DateTime.MinValue,
+            };
+
+            for (int i = 0; i < testDateTime.Length; i += 2)
+            {
+                DateTime needle = (DateTime)testDateTime[i + 1];
+                DateTime result = Energy.Base.Cast.As<DateTime>(testDateTime[i]);
+                Assert.AreEqual(0, DateTime.Compare(result, needle), $"Comparisation failed between {needle.ToString()} and {result.ToString()}");
+            }
+
+            DateTime dt;
+            dt = new DateTime(2000, 1, 1);
+            for (int i = 0; i < 3652; i++)
+            {
+                var s = dt.ToString("yyyy-MM-dd");
+                var r = Energy.Base.Cast.As<DateTime>(s);
+                Assert.AreEqual(0, DateTime.Compare(r, dt), $"Comparisation failed between {dt} and {r}");
+                Debug.WriteLine(s);
+                dt = dt.AddDays(1);
+            }
         }
 
 
@@ -921,6 +973,16 @@ namespace Energy.Core.Test.Base
 
             needle = "03.05.2010 6";
             expect = new DateTime(2010, 5, 3, 0, 0, 0);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "20000101";
+            expect = new DateTime(2000, 1, 1);
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
+
+            needle = "\r\n21001231\t\v\r\n";
+            expect = new DateTime(2100, 12, 31);
             result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
         }

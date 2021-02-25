@@ -148,6 +148,14 @@ namespace Energy.Base
             {
                 return ObjectToStream(value);
             }
+            else if (r == typeof(DateTime))
+            {
+                return ObjectToDateTime(value);
+            }
+            //else if (r == typeof(TimeSpan))
+            //{
+            //    return ObjectToTimeSpan(value);
+            //}
 
             if (r.IsEnum)
             {

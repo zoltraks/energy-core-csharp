@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+## CURRENT ##
+
+Changes in Energy.Base.Clock.Parse allowing usage of parsing date part written in numeric format using exactly 8 digits in YYYYMMDDD form.
+
 ## 20.12.14 ##
 
 Energy.Base.Text.Trim(IList<>)

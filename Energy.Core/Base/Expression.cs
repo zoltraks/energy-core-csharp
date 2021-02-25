@@ -70,6 +70,11 @@ namespace Energy.Base
         public static readonly string Time = @"(((?<hour>\d{1,2}):)?(?<minute>\d{1,2}):)?(?<second>\d{1,2})[,\.](?<fraction>\d{1,7})|((?<hour>\d{1,2}):(?<minute>\d{1,2}))(:(?<second>\d{1,2}))?";
 
         /// <summary>
+        /// Date pattern for YYYYMMDD format.
+        /// </summary>
+        public static readonly string NumericDate = @"(?:\b|[^0-9])(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?:\b|[^0-9])";
+
+        /// <summary>
         /// URI pattern (scheme + : + // + user + : + password + @ + host + : + port + / + path + ? + query + # + fragment).
         /// </summary>
         public static readonly string Url = @"(?:(?<scheme>\w+):(?<slash>//)?)?(?:(?<user>[^:@\r\n]*)(?::(?<password>[^@\r\n]*))?@)?(?!\d+(?:[\r\n]|$))(?<host>[\w\d_\-\.=]+)(?:\:(?<port>\d+))?(?<path>/[^?#\r\n]*)?(?:\?(?<query>[^#\r\n]*))?(?:\#(?<fragment>[^\r\n]*))?";

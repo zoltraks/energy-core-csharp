@@ -485,7 +485,7 @@ namespace Energy.Base
         private static readonly object _RegexLock = new object();
 
         private static Regex _DateRegex;
-        /// <summary>Singleton</summary>
+        /// <summary></summary>
         public static Regex DateRegex
         {
             get
@@ -505,7 +505,7 @@ namespace Energy.Base
         }
 
         private static Regex _TimeRegex;
-        /// <summary>Singleton</summary>
+        /// <summary></summary>
         public static Regex TimeRegex
         {
             get
@@ -521,6 +521,26 @@ namespace Energy.Base
                     }
                 }
                 return _TimeRegex;
+            }
+        }
+
+        private static Regex _NumericDateRegex;
+        /// <summary></summary>
+        public static Regex NumericDateRegex
+        {
+            get
+            {
+                if (_NumericDateRegex == null)
+                {
+                    lock (_RegexLock)
+                    {
+                        if (_NumericDateRegex == null)
+                        {
+                            _NumericDateRegex = new Regex(Energy.Base.Expression.NumericDate, RegexOptions.Compiled);
+                        }
+                    }
+                }
+                return _NumericDateRegex;
             }
         }
 
@@ -547,10 +567,23 @@ namespace Energy.Base
             Match match;
             string s;
 
-            //match = Regex.Match(text, Energy.Base.Pattern.Date);
             match = DateRegex.Match(text);
 
-            if (match.Success)
+            if (!match.Success)
+            {
+                match = null;
+            }
+
+            if (null == match)
+            {
+                match = NumericDateRegex.Match(text);
+                if (!match.Success)
+                {
+                    match = null;
+                }
+            }
+
+            if (null != match)
             {
                 s = match.Groups["year"].Value;
                 if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
@@ -560,29 +593,51 @@ namespace Energy.Base
                 s = match.Groups["month"].Value;
                 if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
+                    if (n > 12)
+                    {
+                        return DateTime.MinValue;
+                    }
                     result = result.AddMonths(n - 1);
                 }
                 s = match.Groups["day"].Value;
                 if (!string.IsNullOrEmpty(s) && 0 < (n = int.Parse(s)))
                 {
+                    switch (result.Month)
+                    {
+                        case 1:
+                        case 3:
+                        case 5:
+                        case 7:
+                        case 8:
+                        case 10:
+                        case 12:
+                            if (n > 31)
+                            {
+                                return DateTime.MinValue;
+                            }
+                            break;
+                        case 2:
+                            bool leap = (0 == result.Year % 4) && (0 < result.Year % 100 || 0 == result.Year % 400);
+                            if (n > 28 + (leap ? 1 : 0))
+                            {
+                                return DateTime.MinValue;
+                            }
+                            break;
+                        case 4:
+                        case 6:
+                        case 9:
+                        case 11:
+                            if (n > 30)
+                            {
+                                return DateTime.MinValue;
+                            }
+                            break;
+                    }
                     result = result.AddDays(n - 1);
                 }
-                //if (int.TryParse(match.Groups["year"].ToString(), out n))
-                //{
-                //    result = result.AddYears(n - 1);
-                //}
-                //if (int.TryParse(match.Groups["month"].ToString(), out n))
-                //{
-                //    result = result.AddMonths(n - 1);
-                //}
-                //if (int.TryParse(match.Groups["day"].ToString(), out n))
-                //{
-                //    result = result.AddDays(n - 1);
-                //}
                 text = text.Substring(0, match.Index) + text.Substring(match.Index + match.Length);
             }
 
-            //match = Regex.Match(text, Energy.Base.Pattern.Time);
             match = TimeRegex.Match(text);
 
             if (match.Success)
