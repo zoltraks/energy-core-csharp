@@ -4530,20 +4530,8 @@ namespace Energy.Base
             {
                 return 0;
             }
-
-            // 2021-01-16 we know now that GetNames might not work in "ancient" .NET like CFv35
-
-#if !NETCF
-            string[] names = Enum.GetNames(type);
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (0 == string.Compare(value, names[i], ignoreCase))
-                {
-                    return Enum.Parse(type, value, ignoreCase);
-                }
-            }
-#endif
 #if NETCF
+            // 2021-01-16 we know now that GetNames might not work in "ancient" .NET like CFv35
             try
             {
                 return Enum.Parse(type, value, ignoreCase);
@@ -4553,7 +4541,17 @@ namespace Energy.Base
                 return Enum.Parse(type, "", true);
             }
 #endif
+#if !NETCF
+            string[] names = Enum.GetNames(type);
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (0 == string.Compare(value, names[i], ignoreCase))
+                {
+                    return Enum.Parse(type, value, ignoreCase);
+                }
+            }
             return 0;
+#endif
         }
 
         /// <summary>
