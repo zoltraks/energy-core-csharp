@@ -65,6 +65,66 @@ namespace Energy.Base
 
         #endregion
 
+        #region CRC16CCITT
+
+        /// <summary>
+        /// Calculate 16-bit CRC-CCITT checksum with specified polynominal and initial value.
+        /// </summary>
+        /// <param name="array">Input byte array</param>
+        /// <param name="poly">Truncated polynomial (default is 0x1021)</param>
+        /// <param name="init">Initial value (default is 0xffff)</param>
+        /// <returns></returns>
+        public static ushort CRC16CCITT(byte[] array, ushort poly, ushort init)
+        {
+            ushort[] t = new ushort[256];
+            ushort x;
+            ushort y;
+            ushort c;
+            c = init;
+            for (int i = 0; i < t.Length; ++i)
+            {
+                x = 0;
+                y = (ushort)(i << 8);
+                for (int j = 0; j < 8; ++j)
+                {
+                    if (((x ^ y) & 0x8000) != 0)
+                    {
+                        x = (ushort)((x << 1) ^ poly);
+                    }
+                    else
+                    {
+                        x <<= 1;
+                    }
+                    y <<= 1;
+                }
+                t[i] = x;
+            }
+            for (int i = 0; i < array.Length; ++i)
+            {
+                c = (ushort)((c << 8) ^ t[(c >> 8) ^ (0xff & array[i])]);
+            }
+            return c;
+        }
+
+        /// <summary>
+        /// Calculate 16-bit CRC-CCITT checksum with specified polynominal and initial value.
+        /// </summary>
+        /// <param name="text">Input text (UTF-8)</param>
+        /// <param name="poly">Truncated polynomial (default is 0x1021)</param>
+        /// <param name="init">Initial value (default is 0xffff)</param>
+        /// <returns></returns>
+        public static ushort CRC16CCITT(string text, ushort poly, ushort init)
+        {
+            if (null == text)
+            {
+                text = "";
+            }
+            byte[] array = Encoding.UTF8.GetBytes(text);
+            return CRC16CCITT(array, poly, init);
+        }
+
+        #endregion
+
         #region PJW
 
         /// <summary>

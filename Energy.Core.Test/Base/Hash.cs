@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -74,6 +75,34 @@ namespace Energy.Core.Test.Base
             hash = Energy.Base.Hash.SHA512(text);
             must = "70E06D64116978A3C4615635C1EBE149822AF49602F897C960C80E91D8819E0A94B3F357AA776488B28A02550B71D6397D5B124AC9AE7762471BD5B2104142E9";
             Assert.IsTrue(0 == string.Compare(must, hash, true));
+        }
+
+        [TestMethod]
+        public void HashCRC16CCITT()
+        {
+            string s;
+            byte[] b;
+            ushort c;
+            s = "123456789";
+            b = Encoding.ASCII.GetBytes(s);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0x0000);
+            Assert.AreEqual(0x31c3, c);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0xffff);
+            Assert.AreEqual(0x29b1, c);
+            s = "";
+            b = Encoding.ASCII.GetBytes(s);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0x0000);
+            Assert.AreEqual(0x0000, c);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0xffff);
+            Assert.AreEqual(0xffff, c);
+            s = "Aa";
+            b = Encoding.ASCII.GetBytes(s);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0x0000);
+            Assert.AreEqual(0x427a, c);
+            c = Energy.Base.Hash.CRC16CCITT(b, 0x1021, 0xffff);
+            Assert.AreEqual(0x5f75, c);
+            c = Energy.Base.Hash.CRC16CCITT("!@#$%^&*()_+=-0123456789.,;:'[]{}abcdefghijklmnopqrstuvwxyz", 0x1021, 0xffff);
+            Assert.AreEqual(0x7dc2, c);
         }
     }
 }
