@@ -252,6 +252,11 @@ namespace Energy.Base
                 }
             }
 
+            public static bool IsNullOrEmpty(T array)
+            {
+                return null == array || 0 == array.Length;
+            }
+
             /// <summary>
             /// Get sub array from an existing one.
             /// </summary>
@@ -513,6 +518,11 @@ namespace Energy.Base
                     check.Add(array[i]);
                 }
                 return false;
+            }
+
+            public static bool IsNullOrEmpty(string[] array)
+            {
+                return null == array || 0 == array.Length;
             }
 
             /// <summary>
@@ -1933,6 +1943,12 @@ namespace Energy.Base
                     return false;
                 }
             }
+
+            public static bool IsNullOrEmpty(Table<TKey, TValue> array)
+            {
+                return null == array || 0 == array.Length;
+            }
+
 
             public void Add(Energy.Interface.IRow<TKey, TValue> item) 
             {
