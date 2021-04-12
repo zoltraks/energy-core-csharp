@@ -252,9 +252,9 @@ namespace Energy.Base
                 }
             }
 
-            public static bool IsNullOrEmpty(T array)
+            public static bool IsNullOrEmpty(Array<T> array)
             {
-                return null == array || 0 == array.Length;
+                return null == array || 0 == array.Count;
             }
 
             /// <summary>
@@ -1946,9 +1946,8 @@ namespace Energy.Base
 
             public static bool IsNullOrEmpty(Table<TKey, TValue> array)
             {
-                return null == array || 0 == array.Length;
+                return null == array || 0 == array.Count;
             }
-
 
             public void Add(Energy.Interface.IRow<TKey, TValue> item) 
             {
