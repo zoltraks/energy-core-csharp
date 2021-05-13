@@ -944,6 +944,17 @@ namespace Energy.Core
             Write(Escape(value));
         }
 
+        /// <summary>
+        /// Write plain text with line break at ending without formatting.
+        /// <br/><br/>
+        /// Remember that line break is different on Windows (CR and LF characers) and other platforms (one LF character).
+        /// </summary>
+        /// <param name="value"></param>
+        public static void WritePlainLine(string value)
+        {
+            Write(Escape(value + Energy.Base.Text.NL));
+        }
+
         #endregion
 
         #region Line
