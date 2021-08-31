@@ -21,6 +21,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Return current time as time string with millisecond part in 24h format.
+        /// <br /><br />
         /// Example: "17:33:15.176".
         /// </summary>
         public static string CurrentTime
@@ -33,6 +34,7 @@ namespace Energy.Base
 
         /// <summary>
         /// Return current time as time string with millisecond part in 24h format and trailing space.
+        /// <br /><br />
         /// Example: "17:33:15.176 ".
         /// </summary>
         public static string CurrentTimeSpace
@@ -968,6 +970,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region IsValidDateTimeString
+
         /// <summary>
         /// Check if string is valid date and time string.
         /// Examples for positive match: "2019-01-20T00:00:01.345Z", " 2019-01-20 T 00:00:00.123456 Z + 03:30 ".
@@ -980,15 +984,25 @@ namespace Energy.Base
             return Regex.Match(input, pattern).Success;
         }
 
+        #endregion
+
+        #region IsValidDateString
+
         public static bool IsValidDateString(string text, bool allowTime)
         {
             throw new NotImplementedException();
         }
 
+        #endregion
+
+        #region IsValidTimeString
+
         public static bool IsValidTimeString(string text, bool allowDate)
         {
             throw new NotImplementedException();
         }
+
+        #endregion
 
         #region Floor
 
