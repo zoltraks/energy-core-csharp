@@ -1220,7 +1220,11 @@ namespace Energy.Base
             
             private string _Root;
 
+            public string Root { get { return _Root; } set { _Root = value; } }
+
             private bool _Persistent;
+
+            public bool Persistent { get { return _Persistent; } set { _Persistent = value; } }
 
             public void Dispose()
             {

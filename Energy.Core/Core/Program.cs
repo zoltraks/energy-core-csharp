@@ -7,8 +7,6 @@ namespace Energy.Core
     /// </summary>
     public class Program
     {
-        #region Utility
-
         #region GetAssembly
 
         /// <summary>
@@ -64,7 +62,7 @@ namespace Energy.Core
                     assembly = System.Reflection.Assembly.GetCallingAssembly();
                 }
             }
-            catch {}
+            catch { }
 
             try
             {
@@ -73,7 +71,7 @@ namespace Energy.Core
                     assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 }
             }
-            catch {}
+            catch { }
 
             return Energy.Base.Class.GetAssemblyFile(assembly);
         }
@@ -84,6 +82,7 @@ namespace Energy.Core
 
         /// <summary>
         /// Get execution directory from the assembly location.
+        /// <br /><br />
         /// Resulting directory will contain trailing path separator.
         /// </summary>
         /// <param name="assembly"></param>
@@ -94,7 +93,6 @@ namespace Energy.Core
             {
                 return null;
             }
-            //string directory = System.IO.Path.GetDirectoryName(assembly.Location);
             string file, directory;
             file = Energy.Base.Class.GetAssemblyFile(assembly);
             directory = System.IO.Path.GetDirectoryName(file);
@@ -104,13 +102,13 @@ namespace Energy.Core
 
         /// <summary>
         /// Get execution directory from current executing assembly location.
+        /// <br /><br />
         /// Resulting directory will contain trailing path separator.
         /// </summary>
         /// <returns></returns>
         public static string GetExecutionDirectory()
         {
             System.Reflection.Assembly assembly;
-
             try
             {
                 assembly = System.Reflection.Assembly.GetCallingAssembly();
@@ -121,7 +119,6 @@ namespace Energy.Core
             }
             catch
             { }
-
             try
             {
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -132,7 +129,61 @@ namespace Energy.Core
             }
             catch
             { }
+            return null;
+        }
 
+        #endregion
+
+        #region GetExecutionPath
+
+        /// <summary>
+        /// Get execution directory from the assembly location.
+        /// <br /><br />
+        /// Resulting directory will not contain trailing path separator.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        public static string GetExecutionPath(System.Reflection.Assembly assembly)
+        {
+            if (null == assembly)
+            {
+                return null;
+            }
+            string file, directory;
+            file = Energy.Base.Class.GetAssemblyFile(assembly);
+            directory = System.IO.Path.GetDirectoryName(file);
+            return directory;
+        }
+
+        /// <summary>
+        /// Get execution directory from current executing assembly location.
+        /// <br /><br />
+        /// Resulting directory will not contain trailing path separator.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetExecutionPath()
+        {
+            System.Reflection.Assembly assembly;
+            try
+            {
+                assembly = System.Reflection.Assembly.GetCallingAssembly();
+                if (null != assembly)
+                {
+                    return GetExecutionPath(assembly);
+                }
+            }
+            catch
+            { }
+            try
+            {
+                assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                if (null != assembly)
+                {
+                    return GetExecutionPath(assembly);
+                }
+            }
+            catch
+            { }
             return null;
         }
 
@@ -232,6 +283,8 @@ namespace Energy.Core
 
         #endregion
 
+        #region GetCultureInfo
+
         public static System.Globalization.CultureInfo GetCultureInfo()
         {
             System.Globalization.CultureInfo cultureInfo;
@@ -246,6 +299,8 @@ namespace Energy.Core
                 throw;
             }
         }
+
+        #endregion
 
         #region SetConsoleEncoding
 
@@ -287,8 +342,6 @@ namespace Energy.Core
         {
             return SetConsoleEncoding(System.Text.Encoding.UTF8);
         }
-
-        #endregion
 
         #endregion
     }

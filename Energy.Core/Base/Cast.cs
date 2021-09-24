@@ -4898,7 +4898,6 @@ namespace Energy.Base
         /// Units used are: "B", "KB", "MB", "GB", "TB", "PB", "EB".
         /// </summary>
         /// <param name="sizeInBytes"></param>
-        /// <param name="decimalPlaces"></param>
         /// <returns></returns>
         public static string MemorySizeToString(long sizeInBytes)
         {
