@@ -1326,10 +1326,15 @@ namespace Energy.Base
             if (null == _HomeDirectory)
             {
                 string path;
+#if !NETCF
                 if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
                     path = Environment.GetEnvironmentVariable("HOME");
                 else
                     path = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+#endif
+#if NETCF
+                path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+#endif
                 path = Energy.Base.File.IncludeTrailingPathSeparator(path);
                 _HomeDirectory = path;
             }

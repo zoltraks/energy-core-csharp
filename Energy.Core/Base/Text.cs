@@ -390,10 +390,7 @@ namespace Energy.Base
                 if (!text.StartsWith(prefix))
                     text = prefix + text;
                 if (!text.EndsWith(suffix))
-                    // Warning code IDE0054 is invalid number in Visual Studio 2008
-#pragma warning disable IDE0054 // Use compound assignment
                     text = text + suffix;
-#pragma warning restore IDE0054 // Use compound assignment
                 return text;
             }
         }

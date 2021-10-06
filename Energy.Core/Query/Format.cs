@@ -31,7 +31,7 @@ namespace Energy.Query
 
         #region Private
 
-        private Dictionary<string, Format> _DialectFormatDictionary;
+        //private Dictionary<string, Format> _DialectFormatDictionary;
 
         #endregion
 

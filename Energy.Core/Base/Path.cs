@@ -56,10 +56,7 @@ namespace Energy.Base
             }
             if (0 == path.Length)
             {
-// Warning code CA1825 is invalid number in Visual Studio 2008
-#pragma warning disable CA1825 // Avoid zero-length array allocations.
                 return new string[] { };
-#pragma warning restore CA1825 // Avoid zero-length array allocations.
             }
             if (format == null)
             {
