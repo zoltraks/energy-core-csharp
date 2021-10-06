@@ -1318,7 +1318,7 @@ namespace Energy.Base
         /// <summary>
         /// Get absolute path of home directory for current user.
         /// <br /><br />
-        /// Includes trailing directory separator.
+        /// Resulting path will include trailing directory separator.
         /// </summary>
         /// <returns></returns>
         public static string GetHomeDirectory()
