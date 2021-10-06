@@ -57,5 +57,12 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(state.IsChanged());
             Assert.IsTrue(state.DeleteFile());
         }
+
+        [TestMethod]
+        public void GetHomeDirectory()
+        {
+            var home = Energy.Base.File.GetHomeDirectory();
+            Assert.IsNotNull(home);
+        }
     }
 }

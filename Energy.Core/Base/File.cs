@@ -1267,10 +1267,6 @@ namespace Energy.Base
 
         #region ReadText
 
-        // 2021-01-16 03:54 !?!
-        // 2021-01-16 04:00 Change ReadAllText to "portable" version
-        // 2021-01-15 04:04 Final commit with "Nevermind" from wify :-D
-
         public static string ReadText(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -1311,6 +1307,33 @@ namespace Energy.Base
                 Debug.Write(null);
             }
             return result;
+        }
+
+        #endregion
+
+        #region GetHomeDirectory
+
+        private static string _HomeDirectory;
+
+        /// <summary>
+        /// Get absolute path of home directory for current user.
+        /// <br /><br />
+        /// Includes trailing directory separator.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetHomeDirectory()
+        {
+            if (null == _HomeDirectory)
+            {
+                string path;
+                if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+                    path = Environment.GetEnvironmentVariable("HOME");
+                else
+                    path = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+                path = Energy.Base.File.IncludeTrailingPathSeparator(path);
+                _HomeDirectory = path;
+            }
+            return _HomeDirectory;
         }
 
         #endregion
