@@ -158,6 +158,23 @@ namespace Energy.Base
 
         #endregion
 
+        #region CurrentDate
+
+        /// <summary>
+        /// Return current date in ISO format.
+        /// <br /><br />
+        /// Example: "2020-01-01".
+        /// </summary>
+        public static string CurrentDate
+        {
+            get
+            {
+                return DateTime.Now.ToString("yyyy-MM-dd");
+            }
+        }
+
+        #endregion
+
         #region Unix
 
         /// <summary>
