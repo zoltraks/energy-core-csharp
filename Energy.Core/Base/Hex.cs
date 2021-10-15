@@ -480,6 +480,76 @@ namespace Energy.Base
 
         #endregion
 
+        #region StringToHex
+
+        public static string StringToHex(string text, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            byte[] data = encoding.GetBytes(text);
+            string hex = Energy.Base.Hex.ArrayToHex(data);
+            return hex;
+        }
+
+        public static string StringToHex(string hex, string encoding)
+        {
+            return StringToHex(hex, Energy.Base.Text.Encoding(encoding));
+        }
+
+        public static string StringToHex(string hex)
+        {
+            return StringToHex(hex, Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region HexToString
+
+        public static string HexToString(string hex, Encoding encoding)
+        {
+            if (null == hex)
+            {
+                return null;
+            }
+            if (0 == hex.Length)
+            {
+                return "";
+            }
+            hex = Trim(hex);
+            byte[] data = Energy.Base.Hex.HexToArray(hex);
+            string text = encoding.GetString(data);
+            return text;
+        }
+
+        public static string HexToString(string hex, string encoding)
+        {
+            return HexToString(hex, Energy.Base.Text.Encoding(encoding));
+        }
+
+        public static string HexToString(string hex)
+        {
+            return HexToString(hex, Encoding.UTF8);
+        }
+
+        #endregion
+
+        #region Trim
+
+        /// <summary>
+        /// Strip text from characters that are not part of hexadecimal notation.
+        /// <br /><br />
+        /// Only digits 0-9 and letters A-F will be left.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string Trim(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            string output = Regex.Replace(input, @"[^a-fA-F0-9]", "");
+            return output;
+        }
+        
+        #endregion
+
         #region Parse
 
         /// <summary>

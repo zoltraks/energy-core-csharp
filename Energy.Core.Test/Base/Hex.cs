@@ -245,5 +245,40 @@ namespace Energy.Core.Test.Base
             hex = "  10000000000000000  ";
             Assert.AreEqual(0, Energy.Base.Hex.HexToLong(hex));
         }
+
+        [TestMethod]
+        public void Trim()
+        {
+            Assert.AreEqual(null, Energy.Base.Hex.Trim(null));
+            Assert.AreEqual("Abc123", Energy.Base.Hex.Trim("y A bgg-nc.1.2.3.."));
+        }
+
+        [TestMethod]
+        public void StringToHex()
+        {
+            Assert.IsNull(Energy.Base.Hex.StringToHex(null));
+            string txt;
+            string exp;
+            byte[] dta;
+            txt = "Cypress Hills Front";
+            exp = "437970726573732048696C6C732046726F6E74";
+            txt = Energy.Base.Hex.StringToHex(txt);
+            Assert.AreEqual(exp, txt);
+        }
+
+        [TestMethod]
+        public void HexToString()
+        {
+            Assert.IsNull(Energy.Base.Hex.HexToString(null));
+            string hex;
+            string txt;
+            string exp;
+            byte[] dta;
+            exp = "Cypress Hills Front";
+            dta = Encoding.ASCII.GetBytes(exp);
+            hex = Energy.Base.Hex.ArrayToHex(dta);
+            txt = Energy.Base.Hex.HexToString(hex);
+            Assert.AreEqual(exp, txt);
+        }
     }
 }
