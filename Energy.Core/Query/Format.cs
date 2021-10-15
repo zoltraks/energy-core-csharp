@@ -29,11 +29,15 @@ namespace Energy.Query
 
         #endregion
 
+#if !NETCF
+
         #region Private
 
-        //private Dictionary<string, Format> _DialectFormatDictionary;
+        private Dictionary<string, Format> _DialectFormatDictionary;
 
         #endregion
+
+#endif
 
         #region Accessor
 
