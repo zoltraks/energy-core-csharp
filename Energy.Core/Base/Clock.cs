@@ -990,7 +990,8 @@ namespace Energy.Base
         #region IsValidDateTimeString
 
         /// <summary>
-        /// Check if string is valid date and time string.
+        /// Check if string is valid ISO 8601 date and time string.
+        /// <br /><br />
         /// Examples for positive match: "2019-01-20T00:00:01.345Z", " 2019-01-20 T 00:00:00.123456 Z + 03:30 ".
         /// </summary>
         /// <param name="input"></param>

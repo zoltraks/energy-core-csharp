@@ -169,5 +169,12 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(dt1, Energy.Base.Clock.SelectLater(dt1, dt2));
             Assert.AreEqual(dt1, Energy.Base.Clock.SelectLater(dt2, dt1));
         }
+
+        [TestMethod]
+        public void IsValidDateTimeString()
+        {
+            Assert.IsTrue(Energy.Base.Clock.IsValidDateTimeString("2001-01-01 00:00"));
+            Assert.IsTrue(Energy.Base.Clock.IsValidDateTimeString("2001-01-01 15:34:23.123"));
+        }
     }
 }

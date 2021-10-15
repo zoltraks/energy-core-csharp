@@ -465,6 +465,21 @@ namespace Energy.Core.Test.Base
             }
         }
 
+        [TestMethod]
+        public void CastAsNullable()
+        {
+            byte? _byte;
+            _byte = Energy.Base.Cast.As<byte?>(" 23 ");
+            Assert.AreEqual((byte)23, _byte);
+            _byte = Energy.Base.Cast.As<byte?>(" -1 ");
+            Assert.IsNull(_byte);
+            _byte = Energy.Base.Cast.As<byte?>((int)255);
+            Assert.AreEqual((byte)255, _byte);
+            _byte = Energy.Base.Cast.As<byte?>((int)256);
+            Assert.IsNull(_byte);
+            int? _intN = Energy.Base.Cast.As<int?>(" 23 ");
+            Assert.AreEqual(23, _intN);
+        }
 
         [TestMethod]
         public void CastIntegerToString()

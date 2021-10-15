@@ -96,6 +96,10 @@ namespace Energy.Base
             {
                 return ObjectToByte(value);
             }
+            else if (r == typeof(byte?))
+            {
+                return ObjectToNullableByte(value);
+            }
             else if (r == typeof(sbyte))
             {
                 return ObjectToSignedByte(value);
@@ -151,6 +155,10 @@ namespace Energy.Base
             else if (r == typeof(DateTime))
             {
                 return ObjectToDateTime(value);
+            }
+            else if (r == typeof(DateTime?))
+            {
+                return ObjectToNullableDateTime(value);
             }
             //else if (r == typeof(TimeSpan))
             //{
@@ -2742,6 +2750,34 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static byte? StringToNullableByte(string value)
+        {
+#if !NETCF
+            byte x;
+            if (!byte.TryParse(value, out x)) return null;
+            return x;
+#endif
+#if NETCF
+            try
+            {
+                return byte.Parse(value);
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
         /// Convert string to signed 8-bit integer value without exception ignoring leading and trailing whitespace.
         /// </summary>
         /// <param name="value">String value</param>
@@ -3924,8 +3960,11 @@ namespace Energy.Base
 
         /// <summary>
         /// Convert string to byte value without exception.
+        /// <br /><br />
         /// Allows to convert floating point values resulting in decimal part.
-        /// Treat comma "," the same as dot "." as decimal point.     
+        /// <br /><br />
+        /// Treats comma "," the same as dot "." as decimal point.
+        /// <br /><br />
         /// Returns zero on overflow.
         /// </summary>
         /// <param name="value"></param>
@@ -3978,6 +4017,115 @@ namespace Energy.Base
             string s = value is string ? (string)value : value.ToString();
 
             return StringToByte(s);
+        }
+
+        /// <summary>
+        /// Convert string to nullable byte value.
+        /// <br /><br />
+        /// Returns null on overflow or error conversion.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static byte? ObjectToNullableByte(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is byte)
+            {
+                return (byte?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (byte?)(char)value;
+            }
+
+            if (value is Int16)
+            {
+                if ((Int16)value < byte.MinValue || (Int16)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(Int16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < byte.MinValue || (Int32)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < byte.MinValue || (Int64)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(Int64)value;
+            }
+
+            if (value is UInt16)
+            {
+                if ((UInt16)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(UInt16)value;
+            }
+
+            if (value is UInt32)
+            {
+                if ((UInt32)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                if ((double)value < byte.MinValue || (double)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(double)value;
+            }
+
+            if (value is float)
+            {
+                if ((float)value < byte.MinValue || (float)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(float)value;
+            }
+
+            if (value is decimal)
+            {
+                if ((decimal)value < byte.MinValue || (decimal)value > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(decimal)value;
+            }
+
+            if (value is sbyte)
+            {
+                if ((sbyte)value < byte.MinValue)
+                    return null;
+                else
+                    return (byte?)(sbyte)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableByte(s);
         }
 
         /// <summary>
@@ -4377,6 +4525,35 @@ namespace Energy.Base
             }
             string text = o is string ? (string)o : o.ToString();
             return Energy.Base.Clock.Parse(text);
+        }
+
+        /// <summary>
+        /// Convert object to DateTime value.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static DateTime? ObjectToNullableDateTime(object o)
+        {
+            if (null == o)
+            {
+                return null;
+            }
+            if (o is DateTime)
+            {
+                return (DateTime)o;
+            }
+            if (o is string)
+            {
+                if (string.IsNullOrEmpty((string)o))
+                {
+                    return null;
+                }
+                else
+                {
+                    return StringToDateTime((string)o);
+                }
+            }
+            return StringToDateTime(o.ToString());
         }
 
         /// <summary>
