@@ -2788,8 +2788,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static byte? StringToNullableByte(string value)
         {
-            byte x;
 #if !NETCF
+            byte x;
             if (byte.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -2805,8 +2805,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -2817,7 +2817,7 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var _number = double.Parse(value, numberStyles, CultureInfo.InvariantCulture);
                 var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
                 if (round < byte.MinValue || round > byte.MaxValue)
                     return null; 
@@ -2841,8 +2841,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static Int16? StringToNullableShort(string value)
         {
-            Int16 x;
 #if !NETCF
+            Int16 x;
             if (Int16.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -2858,8 +2858,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -2870,7 +2870,7 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var _number = double.Parse(value, numberStyles, CultureInfo.InvariantCulture);
                 var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
                 if (round < Int16.MinValue || round > Int16.MaxValue)
                     return null;
@@ -2894,8 +2894,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static UInt16? StringToNullableUnsignedShort(string value)
         {
-            UInt16 x;
 #if !NETCF
+            UInt16 x;
             if (UInt16.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -2911,8 +2911,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -2923,7 +2923,7 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var _number = double.Parse(value, numberStyles, CultureInfo.InvariantCulture);
                 var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
                 if (round < UInt16.MinValue || round > UInt16.MaxValue)
                     return null;
@@ -2947,8 +2947,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static UInt32? StringToNullableUnsignedInteger(string value)
         {
-            UInt32 x;
 #if !NETCF
+            UInt32 x;
             if (UInt32.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -2964,8 +2964,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -2976,7 +2976,7 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var _number = double.Parse(value, numberStyles, CultureInfo.InvariantCulture);
                 var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
                 if (round < 0 || round > UInt32.MaxValue)
                     return null;
@@ -3000,8 +3000,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static UInt64? StringToNullableUnsignedLong(string value)
         {
-            UInt64 x;
 #if !NETCF
+            UInt64 x;
             if (UInt64.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -3017,8 +3017,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -3029,8 +3029,8 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
-                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                var _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling((double)_number) : Math.Floor((double)_number);
                 if (round < 0 || round > UInt64.MaxValue)
                     return null;
                 return (UInt64?)_number;
@@ -3053,8 +3053,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static Int32? StringToNullableInteger(string value)
         {
-            Int32 x;
 #if !NETCF
+            Int32 x;
             if (Int32.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -3070,8 +3070,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -3082,8 +3082,8 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
-                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                var _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var floor = _number < 0 ? Math.Ceiling((double)_number) : Math.Floor((double)_number);
                 if (floor < Int32.MinValue || floor > Int32.MaxValue)
                     return null;
                 return (Int32?)_number;
@@ -3106,8 +3106,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static Int64? StringToNullableLong(string value)
         {
-            Int64 x;
 #if !NETCF
+            Int64 x;
             if (Int64.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -3136,7 +3136,7 @@ namespace Energy.Base
             try
             {
                 _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
-                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                var floor = _number < 0 ? Math.Ceiling((double)_number) : Math.Floor((double)_number);
                 if (floor < Int64.MinValue || floor > Int64.MaxValue)
                     return null;
                 return (Int64?)_number;
@@ -3159,8 +3159,8 @@ namespace Energy.Base
         /// <returns></returns>
         public static sbyte? StringToNullableSignedByte(string value)
         {
-            sbyte x;
 #if !NETCF
+            sbyte x;
             if (sbyte.TryParse(value, out x)) return x;
 #endif
 #if NETCF
@@ -3176,8 +3176,8 @@ namespace Energy.Base
             NumberStyles numberStyles;
             numberStyles = NumberStyles.Any;
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
-            decimal _number;
 #if !NETCF
+            decimal _number;
             if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
                 return null;
             var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
@@ -3188,8 +3188,8 @@ namespace Energy.Base
 #if NETCF
             try
             {
-                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
-                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                var _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var floor = _number < 0 ? Math.Ceiling((double)_number) : Math.Floor((double)_number);
                 if (floor < sbyte.MinValue || floor > sbyte.MaxValue)
                     return null;
                 return (sbyte?)_number;
@@ -4526,7 +4526,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF                
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < byte.MinValue || round > byte.MaxValue)
                     return null;
                 else
@@ -4635,7 +4640,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < ushort.MinValue || round > ushort.MaxValue)
                     return null;
                 else
@@ -4746,7 +4756,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < 0 || round > ulong.MaxValue)
                     return null;
                 else
@@ -4853,7 +4868,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < 0 || round > uint.MaxValue)
                     return null;
                 else
@@ -4965,7 +4985,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < sbyte.MinValue || round > sbyte.MaxValue)
                     return null;
                 else
@@ -5433,7 +5458,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < Int16.MinValue || round > Int16.MaxValue)
                     return null;
                 else
@@ -5521,7 +5551,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < Int32.MinValue || round > Int32.MaxValue)
                     return null;
                 else
@@ -5603,7 +5638,12 @@ namespace Energy.Base
 
             if (value is decimal)
             {
+#if !NETCF
                 var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+#endif
+#if NETCF
+                var round = (decimal)value < 0 ? Math.Ceiling((double)(decimal)value) : Math.Floor((double)(decimal)value);
+#endif
                 if (round < Int64.MinValue || round > Int64.MaxValue)
                     return null;
                 else

@@ -516,7 +516,7 @@ namespace Energy.Base
             }
             hex = Trim(hex);
             byte[] data = Energy.Base.Hex.HexToArray(hex);
-            string text = encoding.GetString(data);
+            string text = encoding.GetString(data, 0, data.Length);
             return text;
         }
 
