@@ -104,6 +104,10 @@ namespace Energy.Base
             {
                 return ObjectToSignedByte(value);
             }
+            else if (r == typeof(sbyte?))
+            {
+                return ObjectToNullableSignedByte(value);
+            }
             else if (r == typeof(char))
             {
                 return ObjectToChar(value);
@@ -122,27 +126,51 @@ namespace Energy.Base
             }
             else if (r == typeof(Int16))
             {
-                return ObjectToWord(value);
+                return ObjectToShort(value);
+            }
+            else if (r == typeof(Int16?))
+            {
+                return ObjectToNullableShort(value);
             }
             else if (r == typeof(UInt16))
             {
-                return ObjectToUnsignedWord(value);
+                return ObjectToUnsignedShort(value);
+            }
+            else if (r == typeof(UInt16?))
+            {
+                return ObjectToNullableUnsignedShort(value);
             }
             else if (r == typeof(Int32))
             {
                 return ObjectToInteger(value);
             }
+            else if (r == typeof(Int32?))
+            {
+                return ObjectToNullableInteger(value);
+            }
             else if (r == typeof(UInt32))
             {
                 return ObjectToUnsignedInteger(value);
+            }
+            else if (r == typeof(UInt32?))
+            {
+                return ObjectToNullableUnsignedInteger(value);
             }
             else if (r == typeof(Int64))
             {
                 return ObjectToLong(value);
             }
+            else if (r == typeof(Int64?))
+            {
+                return ObjectToNullableLong(value);
+            }
             else if (r == typeof(UInt64))
             {
                 return ObjectToUnsignedLong(value);
+            }
+            else if (r == typeof(UInt64?))
+            {
+                return ObjectToNullableUnsignedLong(value);
             }
             else if (r == typeof(bool))
             {
@@ -2750,7 +2778,7 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Convert string to unsigned 8-bit integer value without exception ignoring leading and trailing whitespace.
+        /// Convert string to unsigned 8-bit unsigned integer value without exception ignoring leading and trailing whitespace.
         /// <br /><br />
         /// Allows numbers with decimal point or scientific notation.
         /// <br /><br />
@@ -2760,15 +2788,411 @@ namespace Energy.Base
         /// <returns></returns>
         public static byte? StringToNullableByte(string value)
         {
-#if !NETCF
             byte x;
-            if (!byte.TryParse(value, out x)) return null;
-            return x;
+#if !NETCF
+            if (byte.TryParse(value, out x)) return x;
 #endif
 #if NETCF
             try
             {
                 return byte.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (round < byte.MinValue || round > byte.MaxValue)
+                return null; 
+            return (byte?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (round < byte.MinValue || round > byte.MaxValue)
+                    return null; 
+                return (byte?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit signed integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static Int16? StringToNullableShort(string value)
+        {
+            Int16 x;
+#if !NETCF
+            if (Int16.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return Int16.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (round < Int16.MinValue || round > Int16.MaxValue)
+                return null;
+            return (Int16?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (round < Int16.MinValue || round > Int16.MaxValue)
+                    return null;
+                return (Int16?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 16-bit unsigned integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static UInt16? StringToNullableUnsignedShort(string value)
+        {
+            UInt16 x;
+#if !NETCF
+            if (UInt16.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return UInt16.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (round < UInt16.MinValue || round > UInt16.MaxValue)
+                return null;
+            return (UInt16?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (round < UInt16.MinValue || round > UInt16.MaxValue)
+                    return null;
+                return (UInt16?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit unsigned integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static UInt32? StringToNullableUnsignedInteger(string value)
+        {
+            UInt32 x;
+#if !NETCF
+            if (UInt32.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return UInt32.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (round < 0 || round > UInt32.MaxValue)
+                return null;
+            return (UInt32?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (round < 0 || round > UInt32.MaxValue)
+                    return null;
+                return (UInt32?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit unsigned integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static UInt64? StringToNullableUnsignedLong(string value)
+        {
+            UInt64 x;
+#if !NETCF
+            if (UInt64.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return UInt64.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (round < 0 || round > UInt64.MaxValue)
+                return null;
+            return (UInt64?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (round < 0 || round > UInt64.MaxValue)
+                    return null;
+                return (UInt64?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 32-bit signed integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static Int32? StringToNullableInteger(string value)
+        {
+            Int32 x;
+#if !NETCF
+            if (Int32.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return Int32.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (floor < Int32.MinValue || floor > Int32.MaxValue)
+                return null;
+            return (Int32?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (floor < Int32.MinValue || floor > Int32.MaxValue)
+                    return null;
+                return (Int32?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to unsigned 64-bit signed integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static Int64? StringToNullableLong(string value)
+        {
+            Int64 x;
+#if !NETCF
+            if (Int64.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return Int64.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (floor < Int64.MinValue || floor > Int64.MaxValue)
+                return null;
+            return (Int64?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (floor < Int64.MinValue || floor > Int64.MaxValue)
+                    return null;
+                return (Int64?)_number;
+            }
+            catch
+            {
+                return null;
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Convert string to signed 8-bit signed integer value without exception ignoring leading and trailing whitespace.
+        /// <br /><br />
+        /// Allows numbers with decimal point or scientific notation.
+        /// <br /><br />
+        /// Only the integer part will be considered on real numbers.
+        /// </summary>
+        /// <param name="value">String value</param>
+        /// <returns></returns>
+        public static sbyte? StringToNullableSignedByte(string value)
+        {
+            sbyte x;
+#if !NETCF
+            if (sbyte.TryParse(value, out x)) return x;
+#endif
+#if NETCF
+            try
+            {
+                return sbyte.Parse(value);
+            }
+            catch
+            {
+            }
+#endif
+            value = RemoveNumericalDifferences(value);
+            NumberStyles numberStyles;
+            numberStyles = NumberStyles.Any;
+            //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
+            decimal _number;
+#if !NETCF
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+                return null;
+            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+            if (floor < sbyte.MinValue || floor > sbyte.MaxValue)
+                return null;
+            return (sbyte?)_number;
+#endif
+#if NETCF
+            try
+            {
+                _number = decimal.Parse(value, numberStyles, CultureInfo.InvariantCulture);
+                var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
+                if (floor < sbyte.MinValue || floor > sbyte.MaxValue)
+                    return null;
+                return (sbyte?)_number;
             }
             catch
             {
@@ -4093,26 +4517,29 @@ namespace Energy.Base
 
             if (value is double)
             {
-                if ((double)value < byte.MinValue || (double)value > byte.MaxValue)
+                var round = (double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value);
+                if (round < byte.MinValue || round > byte.MaxValue)
                     return null;
                 else
                     return (byte?)(double)value;
             }
 
-            if (value is float)
-            {
-                if ((float)value < byte.MinValue || (float)value > byte.MaxValue)
-                    return null;
-                else
-                    return (byte?)(float)value;
-            }
-
             if (value is decimal)
             {
-                if ((decimal)value < byte.MinValue || (decimal)value > byte.MaxValue)
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < byte.MinValue || round > byte.MaxValue)
                     return null;
                 else
                     return (byte?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value);
+                if (round < byte.MinValue || round > byte.MaxValue)
+                    return null;
+                else
+                    return (byte?)(float)value;
             }
 
             if (value is sbyte)
@@ -4126,6 +4553,437 @@ namespace Energy.Base
             string s = value is string ? (string)value : value.ToString();
 
             return StringToNullableByte(s);
+        }
+
+        /// <summary>
+        /// Convert string to nullable unsigned short integer value.
+        /// <br /><br />
+        /// Returns null on overflow or error conversion.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ushort? ObjectToNullableUnsignedShort(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is ushort)
+            {
+                return (ushort?)(ushort)value;
+            }
+
+            if (value is byte)
+            {
+                return (ushort?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (ushort?)(char)value;
+            }
+
+            if (value is Int16)
+            {
+                if ((Int16)value < ushort.MinValue)
+                    return null;
+                else
+                    return (ushort?)(Int16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < ushort.MinValue || (Int32)value > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < ushort.MinValue || (Int64)value > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(Int64)value;
+            }
+
+            if (value is UInt32)
+            {
+                if ((UInt32)value > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                var round = (decimal)((double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value));
+                if (round < ushort.MinValue || round > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < ushort.MinValue || round > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (decimal)((float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value));
+                if (round < ushort.MinValue || round > ushort.MaxValue)
+                    return null;
+                else
+                    return (ushort?)(float)value;
+            }
+
+            if (value is sbyte)
+            {
+                if ((sbyte)value < ushort.MinValue)
+                    return null;
+                else
+                    return (ushort?)(sbyte)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableUnsignedShort(s);
+        }
+
+        /// <summary>
+        /// Convert string to nullable unsigned long integer value.
+        /// <br /><br />
+        /// Returns null on overflow or error conversion.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ulong? ObjectToNullableUnsignedLong(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is ulong)
+            {
+                return (ulong?)(ulong)value;
+            }
+
+            if (value is uint)
+            {
+                return (ulong?)(uint)value;
+            }
+
+            if (value is ushort)
+            {
+                return (ulong?)(ushort)value;
+            }
+
+            if (value is byte)
+            {
+                return (ulong?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (ulong?)(char)value;
+            }
+
+            if (value is Int16)
+            {
+                if ((Int16)value < 0)
+                    return null;
+                else
+                    return (ulong?)(Int16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < 0)
+                    return null;
+                else
+                    return (ulong?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < 0)
+                    return null;
+                else
+                    return (ulong?)(Int64)value;
+            }
+
+            if (value is sbyte)
+            {
+                if ((sbyte)value < 0)
+                    return null;
+                else
+                    return (ulong?)(sbyte)value;
+            }
+
+            if (value is double)
+            {
+                var round = (decimal)((double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value));
+                if (round < 0 || round > ulong.MaxValue)
+                    return null;
+                else
+                    return (ulong?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < 0 || round > ulong.MaxValue)
+                    return null;
+                else
+                    return (ulong?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (decimal)((float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value));
+                if (round < 0 || round > ulong.MaxValue)
+                    return null;
+                else
+                    return (ulong?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableUnsignedLong(s);
+        }
+
+
+        /// <summary>
+        /// Convert string to nullable unsigned integer value.
+        /// <br /><br />
+        /// Returns null on overflow or error conversion.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static uint? ObjectToNullableUnsignedInteger(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is uint)
+            {
+                return (uint?)(uint)value;
+            }
+
+            if (value is ushort)
+            {
+                return (uint?)(ushort)value;
+            }
+
+            if (value is byte)
+            {
+                return (uint?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (uint?)(char)value;
+            }
+
+            if (value is Int16)
+            {
+                if ((Int16)value < 0)
+                    return null;
+                else
+                    return (uint?)(Int16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < 0)
+                    return null;
+                else
+                    return (uint?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < 0 || (Int64)value > uint.MaxValue)
+                    return null;
+                else
+                    return (uint?)(Int64)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > uint.MaxValue)
+                    return null;
+                else
+                    return (uint?)(UInt64)value;
+            }
+
+            if (value is sbyte)
+            {
+                if ((sbyte)value < 0)
+                    return null;
+                else
+                    return (uint?)(sbyte)value;
+            }
+
+            if (value is double)
+            {
+                var round = (decimal)((double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value));
+                if (round < 0 || round > uint.MaxValue)
+                    return null;
+                else
+                    return (uint?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < 0 || round > uint.MaxValue)
+                    return null;
+                else
+                    return (uint?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (decimal)((float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value));
+                if (round < 0 || round > uint.MaxValue)
+                    return null;
+                else
+                    return (uint?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableUnsignedInteger(s);
+        }
+
+        /// <summary>
+        /// Convert string to nullable signed byte value.
+        /// <br /><br />
+        /// Returns null on overflow or error conversion.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static sbyte? ObjectToNullableSignedByte(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is sbyte)
+            {
+                return (sbyte?)(sbyte)value;
+            }
+
+            if (value is byte)
+            {
+                if ((byte)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (sbyte?)(char)value;
+            }
+
+            if (value is Int16)
+            {
+                if ((Int16)value < sbyte.MinValue || (Int16)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(Int16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < sbyte.MinValue || (Int32)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < sbyte.MinValue || (Int64)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(Int64)value;
+            }
+
+            if (value is UInt16)
+            {
+                if ((UInt16)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(UInt16)value;
+            }
+
+            if (value is UInt32)
+            {
+                if ((UInt32)value > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > (int)sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                var round = (double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value);
+                if (round < sbyte.MinValue || round > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < sbyte.MinValue || round > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value);
+                if (round < sbyte.MinValue || round > sbyte.MaxValue)
+                    return null;
+                else
+                    return (sbyte?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableSignedByte(s);
         }
 
         /// <summary>
@@ -4486,7 +5344,7 @@ namespace Energy.Base
             return StringToDecimal(s);
         }
 
-        public static Int16 ObjectToWord(object value)
+        public static Int16 ObjectToShort(object value)
         {
             int number = ObjectToInteger(value);
             if (number < Int16.MinValue)
@@ -4497,7 +5355,276 @@ namespace Energy.Base
                 return (Int16)number;
         }
 
-        public static UInt16 ObjectToUnsignedWord(object value)
+        public static Int16? ObjectToNullableShort(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is Int16)
+            {
+                return (Int16?)(Int16)value;
+            }
+
+            if (value is byte)
+            {
+                return (Int16?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (Int16?)(char)value;
+            }
+
+            if (value is sbyte)
+            {
+                return (Int16?)(sbyte)value;
+            }
+
+            if (value is UInt16)
+            {
+                if ((UInt16)value > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(UInt16)value;
+            }
+
+            if (value is Int32)
+            {
+                if ((Int32)value < Int16.MinValue || (Int32)value > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(Int32)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < Int16.MinValue || (Int64)value > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(Int64)value;
+            }
+
+            if (value is UInt32)
+            {
+                if ((UInt32)value > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > (Int32)Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                var round = (double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value);
+                if (round < Int16.MinValue || round > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < Int16.MinValue || round > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value);
+                if (round < Int16.MinValue || round > Int16.MaxValue)
+                    return null;
+                else
+                    return (Int16?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableShort(s);
+        }
+
+        public static Int32? ObjectToNullableInteger(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is Int32)
+            {
+                return (Int32?)(Int32)value;
+            }
+
+            if (value is byte)
+            {
+                return (Int32?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (Int32?)(char)value;
+            }
+
+            if (value is sbyte)
+            {
+                return (Int32?)(sbyte)value;
+            }
+
+            if (value is UInt16)
+            {
+                return (Int32?)(UInt16)value;
+            }
+
+            if (value is Int64)
+            {
+                if ((Int64)value < Int32.MinValue || (Int64)value > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(Int64)value;
+            }
+
+            if (value is UInt32)
+            {
+                if ((UInt32)value > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                var round = (double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value);
+                if (round < Int32.MinValue || round > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < Int32.MinValue || round > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value);
+                if (round < Int32.MinValue || round > Int32.MaxValue)
+                    return null;
+                else
+                    return (Int32?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableInteger(s);
+        }
+
+        public static Int64? ObjectToNullableLong(object value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is Int64)
+            {
+                return (Int64?)(Int64)value;
+            }
+
+            if (value is byte)
+            {
+                return (Int64?)(byte)value;
+            }
+
+            if (value is char)
+            {
+                return (Int64?)(char)value;
+            }
+
+            if (value is sbyte)
+            {
+                return (Int64?)(sbyte)value;
+            }
+
+            if (value is Int32)
+            {
+                return (Int64?)(Int32)value;
+            }
+
+            if (value is UInt16)
+            {
+                return (Int64?)(UInt16)value;
+            }
+
+            if (value is UInt32)
+            {
+                return (Int64?)(UInt32)value;
+            }
+
+            if (value is UInt64)
+            {
+                if ((UInt64)value > Int64.MaxValue)
+                    return null;
+                else
+                    return (Int64?)(UInt64)value;
+            }
+
+            if (value is double)
+            {
+                var round = (decimal)((double)value < 0 ? Math.Ceiling((double)value) : Math.Floor((double)value));
+                if (round < Int64.MinValue || round > Int64.MaxValue)
+                    return null;
+                else
+                    return (Int64?)(double)value;
+            }
+
+            if (value is decimal)
+            {
+                var round = (decimal)value < 0 ? Math.Ceiling((decimal)value) : Math.Floor((decimal)value);
+                if (round < Int64.MinValue || round > Int64.MaxValue)
+                    return null;
+                else
+                    return (Int64?)(decimal)value;
+            }
+
+            if (value is float)
+            {
+                var round = (decimal)((float)value < 0 ? Math.Ceiling((float)value) : Math.Floor((float)value));
+                if (round < Int64.MinValue || round > Int64.MaxValue)
+                    return null;
+                else
+                    return (Int64?)(float)value;
+            }
+
+            string s = value is string ? (string)value : value.ToString();
+
+            return StringToNullableLong(s);
+        }
+
+        public static UInt16 ObjectToUnsignedShort(object value)
         {
             int number = ObjectToInteger(value);
             if (number <= 0)

@@ -471,14 +471,188 @@ namespace Energy.Core.Test.Base
             byte? _byte;
             _byte = Energy.Base.Cast.As<byte?>(" 23 ");
             Assert.AreEqual((byte)23, _byte);
+            _byte = Energy.Base.Cast.As<byte?>(" -0.00001 ");
+            Assert.AreEqual((byte)0, _byte);
             _byte = Energy.Base.Cast.As<byte?>(" -1 ");
             Assert.IsNull(_byte);
+            _byte = Energy.Base.Cast.As<byte?>((byte?)255);
+            Assert.AreEqual((byte)255, _byte);
             _byte = Energy.Base.Cast.As<byte?>((int)255);
+            Assert.AreEqual((byte)255, _byte);
+            _byte = Energy.Base.Cast.As<byte?>((long)255);
+            Assert.AreEqual((byte)255, _byte);
+            _byte = Energy.Base.Cast.As<byte?>(255.99999m);
+            Assert.AreEqual((byte)255, _byte);
+            _byte = Energy.Base.Cast.As<byte?>(255.99999);
+            Assert.AreEqual((byte)255, _byte);
+            _byte = Energy.Base.Cast.As<byte?>(255.99999f);
             Assert.AreEqual((byte)255, _byte);
             _byte = Energy.Base.Cast.As<byte?>((int)256);
             Assert.IsNull(_byte);
-            int? _intN = Energy.Base.Cast.As<int?>(" 23 ");
-            Assert.AreEqual(23, _intN);
+
+            sbyte? _sbyte;
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" -1 ");
+            Assert.AreEqual((sbyte)-1, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" 127.9 ");
+            Assert.AreEqual((sbyte)127, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" -128 ");
+            Assert.AreEqual((sbyte)-128, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" 128 ");
+            Assert.IsNull(_sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" -129 ");
+            Assert.IsNull(_sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(" -128.9999 ");
+            Assert.AreEqual((sbyte)-128, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(127.99999);
+            Assert.AreEqual((sbyte)127, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(-128.99999);
+            Assert.AreEqual((sbyte)-128, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(127.99999m);
+            Assert.AreEqual((sbyte)127, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(-128.99999m);
+            Assert.AreEqual((sbyte)-128, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(127.99999f);
+            Assert.AreEqual((sbyte)127, _sbyte);
+            _sbyte = Energy.Base.Cast.As<sbyte?>(-128.99999f);
+            Assert.AreEqual((sbyte)-128, _sbyte);
+
+            short? _short;
+            _short = Energy.Base.Cast.As<short?>(" -1 ");
+            Assert.AreEqual((short)-1, _short);
+            _short = Energy.Base.Cast.As<short?>(" 32767.99999 ");
+            Assert.AreEqual((short)32767, _short);
+            _short = Energy.Base.Cast.As<short?>(" -32768.99999 ");
+            Assert.AreEqual((short)-32768, _short);
+            _short = Energy.Base.Cast.As<short?>(" 32768 ");
+            Assert.IsNull(_short);
+            _short = Energy.Base.Cast.As<short?>(" -32769 ");
+            Assert.IsNull(_short);
+            _short = Energy.Base.Cast.As<short?>(32767.99999);
+            Assert.AreEqual((short)32767, _short);
+            _short = Energy.Base.Cast.As<short?>(-32768.99999);
+            Assert.AreEqual((short)-32768, _short);
+            _short = Energy.Base.Cast.As<short?>(32767.99999m);
+            Assert.AreEqual((short)32767, _short);
+            _short = Energy.Base.Cast.As<short?>(-32768.99999m);
+            Assert.AreEqual((short)-32768, _short);
+            _short = Energy.Base.Cast.As<short?>(32767.999f);
+            Assert.AreEqual((short)32767, _short);
+            _short = Energy.Base.Cast.As<short?>(-32768.998f);
+            Assert.AreEqual((short)-32768, _short);
+
+            int? _int;
+            _int = Energy.Base.Cast.As<int?>(" -1 ");
+            Assert.AreEqual((int)-1, _int);
+            _int = Energy.Base.Cast.As<int?>(" 2147483647.99999 ");
+            Assert.AreEqual((int)2147483647, _int);
+            _int = Energy.Base.Cast.As<int?>(" -2147483648.99999 ");
+            Assert.AreEqual((int)-2147483648, _int);
+            _int = Energy.Base.Cast.As<int?>(" 2147483648 ");
+            Assert.IsNull(_int);
+            _int = Energy.Base.Cast.As<int?>(" -2147483649 ");
+            Assert.IsNull(_int);
+            _int = Energy.Base.Cast.As<int?>(2147483647.99999);
+            Assert.AreEqual((int)2147483647, _int);
+            _int = Energy.Base.Cast.As<int?>(-2147483648.99999);
+            Assert.AreEqual((int)-2147483648, _int);
+            _int = Energy.Base.Cast.As<int?>(2147483647.99999m);
+            Assert.AreEqual((int)2147483647, _int);
+            _int = Energy.Base.Cast.As<int?>(-2147483648.99999m);
+            Assert.AreEqual((int)-2147483648, _int);
+            _int = Energy.Base.Cast.As<int?>(2147483000f);
+            Assert.AreEqual((int)2147483008, _int);
+            _int = Energy.Base.Cast.As<int?>(-2147483648.997f);
+            Assert.AreEqual((int)-2147483648, _int);
+
+            long? _long;
+            _long = Energy.Base.Cast.As<long?>(" -1 ");
+            Assert.AreEqual((long)-1, _long);
+            _long = Energy.Base.Cast.As<long?>(" 9223372036854775807.99999 ");
+            Assert.AreEqual((long)9223372036854775807, _long);
+            _long = Energy.Base.Cast.As<long?>(" -9223372036854775808.99999 ");
+            Assert.AreEqual((long)-9223372036854775808, _long);
+            _long = Energy.Base.Cast.As<long?>(" 9223372036854775808 ");
+            Assert.IsNull(_long);
+            _long = Energy.Base.Cast.As<long?>(" -9223372036854775809 ");
+            Assert.IsNull(_long);
+            _long = Energy.Base.Cast.As<long?>(9223372036854770000.99999);
+            Assert.AreEqual((long)9223372036854769664, _long);
+            _long = Energy.Base.Cast.As<long?>(-9223372036854774100.99999);
+            Assert.AreEqual((long)-9223372036854773760, _long);
+            _long = Energy.Base.Cast.As<long?>(9223372036854775807.99999m);
+            Assert.AreEqual((long)9223372036854775807, _long);
+            _long = Energy.Base.Cast.As<long?>(-9223372036854775808.99999m);
+            Assert.AreEqual((long)-9223372036854775808, _long);
+            _long = Energy.Base.Cast.As<long?>(9223369837831520256f);
+            Assert.AreEqual((long)9223369837831520256, _long);
+            _long = Energy.Base.Cast.As<long?>(-9223369837831520256f);
+            Assert.AreEqual((long)-9223369837831520256, _long);
+
+            ushort? _ushort;
+            _ushort = Energy.Base.Cast.As<ushort?>(" 65535.99999 ");
+            Assert.AreEqual((ushort)65535, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(" -0.00001 ");
+            Assert.AreEqual((ushort)0, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(" 65536 ");
+            Assert.IsNull(_ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(" -1 ");
+            Assert.IsNull(_ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(65535.99999);
+            Assert.AreEqual((ushort)65535, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(65535.99999m);
+            Assert.AreEqual((ushort)65535, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(65535.97f);
+            Assert.AreEqual((ushort)65535, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(-0.99999);
+            Assert.AreEqual((ushort)0, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(-0.99999m);
+            Assert.AreEqual((ushort)0, _ushort);
+            _ushort = Energy.Base.Cast.As<ushort?>(-0.998f);
+            Assert.AreEqual((ushort)0, _ushort);
+
+            uint? _uint;
+            _uint = Energy.Base.Cast.As<uint?>(" 4294967295.99999 ");
+            Assert.AreEqual((uint)4294967295, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(" -0.00001 ");
+            Assert.AreEqual((uint)0, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(" 4294967296 ");
+            Assert.IsNull(_uint);
+            _uint = Energy.Base.Cast.As<uint?>(" -1 ");
+            Assert.IsNull(_uint);
+            _uint = Energy.Base.Cast.As<uint?>(4294967295.99999);
+            Assert.AreEqual((uint)4294967295, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(4294967295.99999m);
+            Assert.AreEqual((uint)4294967295, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(4294960128.97f);
+            Assert.AreEqual((uint)4294960128, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(-0.99999);
+            Assert.AreEqual((uint)0, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(-0.99999m);
+            Assert.AreEqual((uint)0, _uint);
+            _uint = Energy.Base.Cast.As<uint?>(-0.998f);
+            Assert.AreEqual((uint)0, _uint);
+
+            ulong? _ulong;
+            _ulong = Energy.Base.Cast.As<ulong?>(" 18446744073709551615.99999 ");
+            Assert.AreEqual((ulong)18446744073709551615, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(" -0.00001 ");
+            Assert.AreEqual((ulong)0, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(" 18446744073709551616 ");
+            Assert.IsNull(_ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(" -1 ");
+            Assert.IsNull(_ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(18446744073709500416.99999);
+            Assert.AreEqual((ulong)18446744073709500416, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(18446744073709551615.99999m);
+            Assert.AreEqual((ulong)18446744073709551615, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(18446739675663040512.97f);
+            Assert.AreEqual((ulong)18446739675663040512, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(-0.99999);
+            Assert.AreEqual((ulong)0, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(-0.99999m);
+            Assert.AreEqual((ulong)0, _ulong);
+            _ulong = Energy.Base.Cast.As<ulong?>(-0.998f);
+            Assert.AreEqual((ulong)0, _ulong);
         }
 
         [TestMethod]
@@ -823,6 +997,27 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, i);
             i = Energy.Base.Cast.StringToInteger(s, true, true);
             Assert.AreEqual(int.MinValue, i);
+        }
+
+        [TestMethod]
+        public void StringToByte()
+        {
+            string s;
+            byte? n;
+
+            s = "100";
+            n = Energy.Base.Cast.StringToByte(s);
+            Assert.AreEqual((byte?)100, n);
+
+            s = " \t\n100\r\v";
+            n = Energy.Base.Cast.StringToByte(s);
+            Assert.AreEqual((byte?)100, n);
+
+            s = "-1";
+            n = Energy.Base.Cast.StringToByte(s);
+            Assert.AreEqual((byte?)0, n);
+            n = Energy.Base.Cast.StringToNullableByte(s);
+            Assert.IsNull(n);
         }
 
         [TestMethod]
