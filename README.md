@@ -9,8 +9,6 @@ To be used by wide range of applications, services, web or console programs.
 
 ☢️ Filled with radioactive rays ☢️
 
-❤️ Made with love for you ❤️
-
 Installation
 ------------
 
@@ -122,3 +120,5 @@ Greetings
 ---------
 
 To be continued...
+
+❤️ Made with love for you ❤️
