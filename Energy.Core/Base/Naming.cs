@@ -329,6 +329,52 @@ namespace Energy.Base
 
         #endregion
 
+        #region TitleCase
+
+        /// <summary>
+        /// Return words capitalized.
+        /// <br/><br/>
+        /// PascalCase
+        /// </summary>
+        /// <param name="words">Array of words</param>
+        /// <returns>String</returns>
+        public static string TitleCase(string[] words)
+        {
+            if (null == words)
+            {
+                return null;
+            }
+            else if (0 == words.Length)
+            {
+                return "";
+            }
+            else
+            {
+                for (int i = 0; i < words.Length; i++)
+                {
+                    words[i] = Energy.Base.Text.Capitalize(words[i]);
+                }
+                return string.Join("", words);
+            }
+        }
+
+        /// <summary>
+        /// Check if text is valid identifier written in TitleCase.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool IsTitleCase(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+            string pattern = @"^(?:\p{Lu}\p{Ll}*)(?:\p{Lu}\p{Ll}*|\d+)*$";
+            return Regex.Match(text, pattern, RegexOptions.CultureInvariant).Success;
+        }
+
+        #endregion
+
         #region SnakeCase
 
         /// <summary>
