@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using System.Globalization;
 #if !NETCF
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
@@ -1215,8 +1216,8 @@ namespace Energy.Base
             foreach (FieldInfo fi in t.GetFields(bindingAttr))
             {
                 if (false
-                    || 0 == string.Compare(name, fi.Name, ignoreCase)
-                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase)
+                    || 0 == string.Compare(name, fi.Name, ignoreCase, CultureInfo.InvariantCulture)
+                    || 0 == string.Compare(name, Energy.Base.Text.Match(fi.Name, regex, 1), ignoreCase, CultureInfo.InvariantCulture)
                     )
                 {
                     try

@@ -44,6 +44,8 @@ namespace Energy.Attribute
 
         #endregion
 
+        #region Temporary
+
         /// <summary>
         /// Code is temporary here and should be moved to another location
         /// </summary>
@@ -74,6 +76,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Misplaced
 
         /// <summary>
         /// Code is probably misplaced and should exist in another location
@@ -108,6 +114,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Obsolete
 
         /// <summary>
         /// Code is obsolete and should be removed
@@ -148,6 +158,10 @@ namespace Energy.Attribute
                 this.Error = error;
             }
         }
+
+        #endregion
+
+        #region Future
 
         /// <summary>
         /// Code is to be written in future
@@ -201,6 +215,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Bad
+
         /// <summary>
         /// Code is bad
         /// </summary>
@@ -231,6 +249,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Verify
 
         /// <summary>
         /// Code needs some additional verification
@@ -272,6 +294,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Extend
+
         /// <summary>
         /// Code needs to be extended
         /// </summary>
@@ -312,6 +338,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Wrapper
+
         /// <summary>
         /// Code is a wrapper function which purpose is to call another funtion
         /// </summary>
@@ -342,6 +372,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Duplication
 
         /// <summary>
         /// Code may be a reproduction of another one, which probably needs special attention
@@ -374,6 +408,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Attention
+
         /// <summary>
         /// Code needs special attention
         /// </summary>
@@ -405,6 +443,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Benchmark
+
         /// <summary>
         /// Benchmark should be done with this code
         /// </summary>
@@ -435,6 +477,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Safety
 
         /// <summary>
         /// Code safety warning
@@ -510,6 +556,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Origin
+
         /// <summary>
         /// Code was originally used somewhere else
         /// </summary>
@@ -542,6 +592,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Rename
 
         /// <summary>
         /// Should be renamed
@@ -591,6 +645,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Draft
+
         /// <summary>
         /// Code is just a draft and should yet to be written
         /// </summary>
@@ -621,6 +679,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Implement
 
         /// <summary>
         /// Code needs to be written
@@ -653,6 +715,10 @@ namespace Energy.Attribute
             }
         }
 
+        #endregion
+
+        #region Abandoned
+
         /// <summary>
         /// Code was abandoned and should be removed
         /// </summary>
@@ -683,6 +749,10 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region Improve
 
         /// <summary>
         /// Improve that thing
@@ -724,5 +794,97 @@ namespace Energy.Attribute
                 this.Help = help;
             }
         }
+
+        #endregion
+
+        #region NotWorking
+
+        /// <summary>
+        /// Code is not working
+        /// </summary>
+        public class NotWorkingAttribute : CodeAttribute
+        {
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public NotWorkingAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public NotWorkingAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public NotWorkingAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        #endregion
+
+        #region WorkInProgress
+
+        /// <summary>
+        /// Work in progress
+        /// </summary>
+        public class WorkInProgressAttribute : CodeAttribute
+        {
+            private string expected;
+
+            /// <summary>
+            /// Expected version or date to be done
+            /// </summary>
+            public string Expected { get { return expected; } set { expected = value; } }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            public WorkInProgressAttribute()
+            {
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            public WorkInProgressAttribute(string description)
+                : this()
+            {
+                this.Description = description;
+            }
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="description"></param>
+            /// <param name="help"></param>
+            public WorkInProgressAttribute(string description, string help)
+                : this(description)
+            {
+                this.Help = help;
+            }
+        }
+
+        #endregion
     }
 }

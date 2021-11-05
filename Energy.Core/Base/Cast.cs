@@ -741,17 +741,26 @@ namespace Energy.Base
 
         /// <summary>
         /// Get first character from a string without exception.
+        /// <br /><br />
         /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static char StringToChar(string value)
         {
-            return string.IsNullOrEmpty(value) ? '\0' : value[0];
+            if (string.IsNullOrEmpty(value))
+            {
+                return '\0';
+            }
+            else
+            {
+                return value[0];
+            }
         }
 
         /// <summary>
         /// Get character at specified position from a string without exception.
+        /// <br /><br />
         /// If value is null or empty string, function will result '\0'. 
         /// </summary>
         /// <param name="value"></param>
@@ -760,9 +769,13 @@ namespace Energy.Base
         private static char StringToChar(string value, int position)
         {
             if (string.IsNullOrEmpty(value) || value.Length <= position)
+            {
                 return '\0';
+            }
             else
+            {
                 return value[position];
+            }
         }
 
         #endregion
@@ -3419,6 +3432,18 @@ namespace Energy.Base
         #endregion
 
         #region DateTime
+
+        /// <summary>
+        /// Convert date text to DateTime value.
+        /// <br /><br />
+        /// Takes date part only if text is date and time.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>DateTime containing date part</returns>
+        public static DateTime StringToDate(string text)
+        {
+            return Clock.Parse(text).Date;
+        }
 
         /// <summary>
         /// Convert date and time text to DateTime value.

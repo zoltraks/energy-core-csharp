@@ -568,7 +568,37 @@ namespace Energy.Base
         #region Parse
 
         /// <summary>
-        /// Parse stamp string
+        /// Parse date and time string
+        /// <br /><br />
+        /// May return DateTime.MinValue when text contains anything but date or time.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="validate">Ensure that text contains only date or time</param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.WorkInProgress]
+        public static DateTime Parse(string text, bool validate) 
+        {
+            return Parse(text);
+        }
+
+        /// <summary>
+        /// Parse date and time string.
+        /// <br /><br />
+        /// May return DateTime.MinValue when text contains anything but allowed formats.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="validate">List of formats allowed. </param>
+        /// <returns></returns>
+        [Energy.Attribute.Code.WorkInProgress]
+        public static DateTime Parse(string text, string[] validate)
+        {
+            if (null == validate || 0 == validate.Length)
+                return Parse(text);
+            return Parse(text);
+        }
+
+        /// <summary>
+        /// Parse date and time string
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
