@@ -190,5 +190,61 @@ namespace Energy.Core.Test.Base
             Energy.Base.Class.SetObjectFieldOrPropertyValue(o1, "Name", "Name1");
             Assert.AreEqual("Name1", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
         }
+
+        class TestClass5
+        {
+            public string number;
+            private string GetNumber => number;
+        }
+
+        class TestClass6
+        {
+            public int Number;
+            private int getnumber
+            {
+                get
+                {
+                    return Number;
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ClassIsEqualByFieldValue()
+        {
+            object o1, o2;
+            o1 = null;
+            o2 = null;
+            Assert.IsTrue(Energy.Base.Class.IsEqualByFieldValue(o1, o2, true, false, false));
+            o1 = new TestClass5();
+            Assert.IsFalse(Energy.Base.Class.IsEqualByFieldValue(o1, o2, true, false, false));
+            o2 = new TestClass5();
+            Assert.IsTrue(Energy.Base.Class.IsEqualByFieldValue(o1, o2, true, false, false));
+            o2 = new TestClass6();
+            Assert.IsTrue(Energy.Base.Class.IsEqualByFieldValue(o1, o2, true, false, false));
+            ((TestClass5)o1).number = "1234";
+            ((TestClass6)o2).Number = 1234;
+            Assert.IsTrue(Energy.Base.Class.IsEqualByFieldValue(o1, o2, true, false, false));
+            Assert.IsFalse(Energy.Base.Class.IsEqualByFieldValue(o1, o2, false, false, false));
+        }
+
+        [TestMethod]
+        public void ClassIsEqualByPropertyValue()
+        {
+            object o1, o2;
+            o1 = null;
+            o2 = null;
+            Assert.IsTrue(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, true, false, false));
+            o1 = new TestClass5();
+            Assert.IsFalse(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, true, false, false));
+            o2 = new TestClass5();
+            Assert.IsTrue(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, true, false, false));
+            o2 = new TestClass6();
+            Assert.IsTrue(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, true, false, false));
+            ((TestClass5)o1).number = "1234";
+            ((TestClass6)o2).Number = 1234;
+            Assert.IsTrue(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, true, false, false));
+            Assert.IsTrue(Energy.Base.Class.IsEqualByPropertyValue(o1, o2, false, false, false));
+        }
     }
 }

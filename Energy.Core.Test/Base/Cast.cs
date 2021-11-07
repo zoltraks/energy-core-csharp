@@ -1241,7 +1241,6 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-
         public void MemorySizeToString()
         {
             string s;
@@ -1251,6 +1250,22 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("1 KB", s);
             s = Energy.Base.Cast.MemorySizeToString(1024 * 1024);
             Assert.AreEqual("1 MB", s);
+        }
+
+        [TestMethod]
+        public void StringToTime()
+        {
+            string s;
+            TimeSpan t;
+            TimeSpan r;
+            t = TimeSpan.FromSeconds(123.5);
+            s = "  2001-01-01   00:02:03.500  ";
+            r = Energy.Base.Cast.StringToTime(s);
+            Assert.AreEqual(t, r);
+            t = TimeSpan.FromSeconds(123.5);
+            s = "  2001-01-01   00:02:03.500001  ";
+            r = Energy.Base.Cast.StringToTime(s);
+            Assert.AreNotEqual(t, r);
         }
     }
 }

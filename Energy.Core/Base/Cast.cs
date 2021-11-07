@@ -74,7 +74,7 @@ namespace Energy.Base
         {
             if (null == value)
             {
-                return null;
+                return Energy.Base.Class.GetDefault(type);
             }
 
             Type r = type;
@@ -3443,6 +3443,18 @@ namespace Energy.Base
         public static DateTime StringToDate(string text)
         {
             return Clock.Parse(text).Date;
+        }
+
+        /// <summary>
+        /// Convert date text to TimeSpan value.
+        /// <br /><br />
+        /// Takes time part only if text is date and time.
+        /// </summary>
+        /// <param name="text">string</param>
+        /// <returns>TimeSpan containing time part</returns>
+        public static TimeSpan StringToTime(string text)
+        {
+            return Clock.Parse(text).TimeOfDay;
         }
 
         /// <summary>

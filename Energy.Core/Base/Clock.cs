@@ -706,33 +706,15 @@ namespace Energy.Base
                 {
                     result = result.AddSeconds(n);
                 }
-                //if (int.TryParse(match.Groups["hour"].ToString(), out n))
-                //{
-                //    result = result.AddHours(n);
-                //}
-                //if (int.TryParse(match.Groups["minute"].ToString(), out n))
-                //{
-                //    result = result.AddMinutes(n);
-                //}
-                //if (int.TryParse(match.Groups["second"].ToString(), out n))
-                //{
-                //    result = result.AddSeconds(n);
-                //}
                 if (!string.IsNullOrEmpty(match.Groups["fraction"].Value))
                 {
-                    //double d;
-                    //if (double.TryParse(string.Concat("0.", match.Groups["fraction"])
-                    //    , System.Globalization.NumberStyles.AllowDecimalPoint
-                    //    , System.Globalization.CultureInfo.InvariantCulture, out d))
-                    //{
-                    //    result = result.AddSeconds(d);
-                    //}
                     double d = double.Parse(string.Concat("0.", match.Groups["fraction"])
                         , System.Globalization.NumberStyles.AllowDecimalPoint
                         , System.Globalization.CultureInfo.InvariantCulture);
                     if (d > 0)
                     {
-                        result = result.AddSeconds(d);
+                        long t = (long)(TimeSpan.TicksPerSecond * d);
+                        result = result.AddTicks(t);
                     }
                 }
             }
