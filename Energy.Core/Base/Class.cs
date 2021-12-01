@@ -2147,55 +2147,65 @@ namespace Energy.Base
 
         #region Resource management
 
-        public static object GetResourceObjectByName(Assembly assembly, string name, bool ignoreCase)
+        public static byte[] GetResourceBytes(Assembly assembly, string name, bool ignoreCase)
         {
             if (assembly == null) return null;
-            string[] names = assembly.GetManifestResourceNames();
-            foreach (var s in names)
+            string[] resources = assembly.GetManifestResourceNames();
+            string assemblyName = assembly.GetName().Name;
+            string[] aliases = new string[]
             {
-                var rm = new ResourceManager(s, assembly);
-
-                var rs = rm.GetResourceSet(CultureInfo.InvariantCulture, true, true);
-
-                foreach (DictionaryEntry de in rs)
+                assemblyName + ".Resources." + name,
+                assemblyName + "." + name,
+                name,
+            };
+            string found = null;
+            foreach (string alias in aliases)
+            {
+                foreach (string resource in resources)
                 {
-                    var val = de.Value.ToString();
-                    var key = de.Key.ToString();
-                    string[] array = new string[]
+                    if (0 == string.Compare(resource, alias, ignoreCase))
                     {
-                        s + "." + key,
-                        key,
-                    };
-                    foreach (var check in array)
-                    {
-                        if (0 == string.Compare(check, name, ignoreCase))
-                        {
-                            return val;
-                        }
+                        found = resource;
+                        break;
                     }
                 }
+                if (found != null) break;
+                foreach (string resource in resources)
+                {
+                    int index = resource.LastIndexOf('.');
+                    if (index < 1) continue;
+                    string check = resource.Substring(0, index);
+                    if (0 == string.Compare(check, alias, ignoreCase))
+                    {
+                        found = resource;
+                        break;
+                    }
+                }
+                if (found != null) break;
             }
-            return null;
+            if (string.IsNullOrEmpty(found)) return null;
+            using (Stream stream = assembly.GetManifestResourceStream(found))
+            {
+                if (stream.Length > int.MaxValue) return null;
+                int size = (int)stream.Length;
+                using (MemoryStream memory = new MemoryStream(size))
+                {
+                    byte[] buffer = new byte[4096];
+                    int count;
+                    while (0 < (count = stream.Read(buffer, 0, buffer.Length)))
+                    {
+                        memory.Write(buffer, 0, count);
+                    }
+                    return memory.ToArray();
+                }
+            }
         }
 
-        public static string[] GetResourceObjectNameSet(Assembly assembly)
+        public static string[] GetResourceNames(Assembly assembly)
         {
             if (assembly == null) return null;
             string[] names = assembly.GetManifestResourceNames();
-            List<string> strings = new List<string>();
-            foreach (var s in names)
-            {
-                var rm = new ResourceManager(s, assembly);
-
-                var rs = rm.GetResourceSet(CultureInfo.CurrentCulture, true, true);
-
-                foreach (DictionaryEntry de in rs)
-                {
-                    var key = de.Key.ToString();
-                    strings.Add(s + "." + key);
-                }
-            }
-            return strings.ToArray();
+            return names;
         }
 
         #endregion

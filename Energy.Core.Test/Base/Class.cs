@@ -248,12 +248,25 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void GetResourceObjectNameSet()
+        public void GetResourceNames()
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            string[] names = Energy.Base.Class.GetResourceObjectNameSet(assembly);
+            string[] names = Energy.Base.Class.GetResourceNames(assembly);
             Assert.IsNotNull(names);
             Assert.AreNotEqual(0, names.Length);
+        }
+
+        [TestMethod]
+        public void GetResourceBytes()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            byte[] o;
+            o = Energy.Base.Class.GetResourceBytes(assembly, "Lorem.txt", true);
+            Assert.IsNotNull(o);
+            Assert.AreNotEqual(0, o.Length);
+            o = Energy.Base.Class.GetResourceBytes(assembly, "BOAR", true);
+            Assert.IsNotNull(o);
+            Assert.AreNotEqual(0, o.Length);
         }
     }
 }
