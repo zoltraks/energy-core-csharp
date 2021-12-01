@@ -30,7 +30,15 @@ namespace Energy.Base
         /// <returns></returns>
         public static object GetDefault(System.Type type)
         {
-            object o = Activator.CreateInstance(type);
+            object o;
+            if (type.IsValueType)
+            {
+                o = Activator.CreateInstance(type);
+            }
+            else
+            {
+                o = null;
+            }
             return o;
         }
 
@@ -1435,6 +1443,147 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #endregion
+
+        #region IsEqualByFieldValue
+
+        public static bool IsEqualByFieldValue(object object1, object object2, bool ignoreCase, bool includePrivate, bool ignoreMissing)
+        {
+            if (object1 == null || object2 == null)
+            {
+                bool check = object1 == null && object2 == null;
+                return check;
+            }
+
+            Type type1 = object1.GetType();
+            Type type2 = object2.GetType();
+
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate) bindingAttr |= BindingFlags.NonPublic;
+
+            var fields1 = type1.GetFields(bindingAttr);
+            if (0 == fields1.Length) return true;
+
+            if (type1 == type2)
+            {
+                foreach (var f in fields1)
+                {
+                    var value1 = f.GetValue(object1);
+                    var value2 = f.GetValue(object2);
+                    if (value1 == value2) continue;
+                    return false;
+                }
+            }
+            else
+            {
+                var fields2 = type2.GetFields(bindingAttr);
+                var map2 = new Dictionary<string, FieldInfo>();
+                foreach (var f in fields2)
+                {
+                    var name = f.Name;
+                    if (ignoreCase) name = name.ToUpper(CultureInfo.InvariantCulture);
+                    map2[name] = f;
+                }
+
+                foreach (var f in fields1)
+                {
+                    var name = f.Name;
+                    if (ignoreCase) name = name.ToUpper(CultureInfo.InvariantCulture);
+                    if (!map2.ContainsKey(name))
+                    {
+                        if (ignoreMissing) continue;
+                        else return false;
+                    }
+                    var value1 = f.GetValue(object1);
+                    var value2 = map2[name].GetValue(object2);
+                    if (value1 == value2) continue;
+                    if (map2[name].FieldType != f.GetType())
+                    {
+                        var value3 = Energy.Base.Cast.As(map2[name].FieldType, value1);
+                        if (value3 == value2) continue;
+                        if (value3 != null && value3.Equals(value2)) continue;
+                    }
+                    return false;
+                }
+
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region IsEqualByPropertyValue
+
+        public static bool IsEqualByPropertyValue(object object1, object object2, bool ignoreCase, bool includePrivate, bool ignoreMissing)
+        {
+            if (object1 == null || object2 == null)
+            {
+                bool check = object1 == null && object2 == null;
+                return check;
+            }
+
+            Type type1 = object1.GetType();
+            Type type2 = object2.GetType();
+
+            BindingFlags bindingAttr = default(BindingFlags);
+            bindingAttr |= BindingFlags.Instance;
+            bindingAttr |= BindingFlags.Public;
+            if (includePrivate) bindingAttr |= BindingFlags.NonPublic;
+
+            var properties1 = type1.GetProperties(bindingAttr);
+
+            if (0 == properties1.Length) return true;
+
+            if (type1 == type2)
+            {
+                foreach (var f in properties1)
+                {
+                    var value1 = f.GetValue(object1, null);
+                    var value2 = f.GetValue(object2, null);
+                    if (value1 == value2) continue;
+                    return false;
+                }
+            }
+            else
+            {
+                var properties2 = type2.GetProperties(bindingAttr);
+                var map2 = new Dictionary<string, PropertyInfo>();
+                foreach (var f in properties2)
+                {
+                    var name = f.Name;
+                    if (ignoreCase) name = name.ToUpper(CultureInfo.InvariantCulture);
+                    map2[name] = f;
+                }
+
+                foreach (var f in properties1)
+                {
+                    var name = f.Name;
+                    if (ignoreCase) name = name.ToUpper(CultureInfo.InvariantCulture);
+                    if (!map2.ContainsKey(name))
+                    {
+                        if (ignoreMissing) continue;
+                        else return false;
+                    }
+                    var value1 = f.GetValue(object1, null);
+                    var value2 = map2[name].GetValue(object2, null);
+                    if (value1 == value2) continue;
+                    if (map2[name].PropertyType != f.GetType())
+                    {
+                        var value3 = Energy.Base.Cast.As(map2[name].PropertyType, value1);
+                        if (value3 == value2) continue;
+                        if (value3 != null && value3.Equals(value2)) continue;
+                    }
+                    return false;
+                }
+
+            }
+
+            return true;
+        }
 
         #endregion
 

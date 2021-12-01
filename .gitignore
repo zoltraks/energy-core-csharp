@@ -217,7 +217,6 @@ Documentation/html/
 /Driver
 /Example/ConsoleApplication1
 /Lookup
-/NuGet
 /Old
 /Package/NUnit.3.0.1
 /Schema/xsd
@@ -236,3 +235,5 @@ Documentation/html/
 /.vscode
 
 /Energy.Core.Application/*
+
+nuget/*.cmd
