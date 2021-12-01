@@ -190,5 +190,14 @@ namespace Energy.Core.Test.Base
             Energy.Base.Class.SetObjectFieldOrPropertyValue(o1, "Name", "Name1");
             Assert.AreEqual("Name1", Energy.Base.Class.GetObjectFieldOrPropertyValue(o1, "Name"));
         }
+
+        [TestMethod]
+        public void GetResourceObjectNameSet()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            string[] names = Energy.Base.Class.GetResourceObjectNameSet(assembly);
+            Assert.IsNotNull(names);
+            Assert.AreNotEqual(0, names.Length);
+        }
     }
 }

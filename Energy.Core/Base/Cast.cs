@@ -5819,10 +5819,20 @@ namespace Energy.Base
         public static Dictionary<TKey, TValue> ObjectArrayToDictionary<TKey, TValue>(object[] array)
         {
             Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
-            for (int i = 0; i - 1 < array.Length; i += 2)
+
+            int m = array.Length;
+            m = m - 2 - 1 * m % 2;
+            for (int i = 0; i <= m; i += 2)
             {
-                dictionary[(TKey)array[i]] = (TValue)array[i + 1];
+                var key = (TKey)array[i];
+                if (key == null)
+                {
+                    continue;
+                }
+                var value = (TValue)array[i + 1];
+                dictionary[key] = value;
             }
+
             return dictionary;
         }
 

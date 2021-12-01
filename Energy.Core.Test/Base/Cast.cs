@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1251,6 +1252,39 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("1 KB", s);
             s = Energy.Base.Cast.MemorySizeToString(1024 * 1024);
             Assert.AreEqual("1 MB", s);
+        }
+
+
+        [TestMethod]
+        public void ObjectArrayToDictionary()
+        {
+            Dictionary<string, object> x = null;
+            x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
+            {
+            });
+            Assert.IsNotNull(x);
+            Assert.AreEqual(0, x.Count);
+            x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
+            {
+                null,
+            });
+            Assert.IsNotNull(x);
+            Assert.AreEqual(0, x.Count);
+            x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
+            {
+                null, null, null, "1", "2", "3", "2", null, null,
+            });
+            Assert.IsNotNull(x);
+            Assert.AreEqual(1, x.Count);
+            Assert.AreEqual(x["2"], null);
+            x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
+            {
+                "2", "1", "1", null, "1", "2", "1",
+            });
+            Assert.IsNotNull(x);
+            Assert.AreEqual(2, x.Count);
+            Assert.AreEqual(x["1"], "2");
+            Assert.AreEqual(x["2"], "1");
         }
     }
 }

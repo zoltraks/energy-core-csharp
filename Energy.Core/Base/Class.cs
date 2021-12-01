@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 using System.Globalization;
+using System.Resources;
 #if !NETCF
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
@@ -1981,7 +1982,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region Runtime
+        #region Runtime reflection
 
 #if !NETCF
 
@@ -1992,6 +1993,61 @@ namespace Energy.Base
         }
 
 #endif
+
+        #endregion
+
+        #region Resource management
+
+        public static object GetResourceObjectByName(Assembly assembly, string name, bool ignoreCase)
+        {
+            if (assembly == null) return null;
+            string[] names = assembly.GetManifestResourceNames();
+            foreach (var s in names)
+            {
+                var rm = new ResourceManager(s, assembly);
+
+                var rs = rm.GetResourceSet(CultureInfo.InvariantCulture, true, true);
+
+                foreach (DictionaryEntry de in rs)
+                {
+                    var val = de.Value.ToString();
+                    var key = de.Key.ToString();
+                    string[] array = new string[]
+                    {
+                        s + "." + key,
+                        key,
+                    };
+                    foreach (var check in array)
+                    {
+                        if (0 == string.Compare(check, name, ignoreCase))
+                        {
+                            return val;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static string[] GetResourceObjectNameSet(Assembly assembly)
+        {
+            if (assembly == null) return null;
+            string[] names = assembly.GetManifestResourceNames();
+            List<string> strings = new List<string>();
+            foreach (var s in names)
+            {
+                var rm = new ResourceManager(s, assembly);
+
+                var rs = rm.GetResourceSet(CultureInfo.CurrentCulture, true, true);
+
+                foreach (DictionaryEntry de in rs)
+                {
+                    var key = de.Key.ToString();
+                    strings.Add(s + "." + key);
+                }
+            }
+            return strings.ToArray();
+        }
 
         #endregion
     }
