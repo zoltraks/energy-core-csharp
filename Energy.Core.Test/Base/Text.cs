@@ -1408,5 +1408,49 @@ Another
             Assert.AreEqual(@"a\$b\\c", Energy.Base.Text.EscapeExpression(@"a$b\c"));
             Assert.AreEqual(@"\.\$\^\{\[\(\|\)\*\+\?\\", Energy.Base.Text.EscapeExpression(@".$^{[(|)*+?\"));
         }
+
+        [TestMethod]
+        public void Replace()
+        {
+            var d = new Dictionary<string, string>();
+            d["["] = "]";
+            d["]"] = "[";
+            string needle, expect, result;
+            needle = "-[]+][:";
+            result = needle.Replace("[", "]").Replace("]", "[");
+            expect = "-][+[]:";
+            Assert.AreNotEqual(expect, result);
+            result = Energy.Base.Text.Replace(needle, d, true);
+            Assert.AreEqual(expect, result);
+            d[""] = "a";
+            result = Energy.Base.Text.Replace(needle, d, true);
+            Assert.AreEqual(expect, result);
+            d["-"] = ":";
+            d[":"] = "-";
+            expect = ":][+[]-";
+            result = Energy.Base.Text.Replace(needle, d, true);
+            Assert.AreEqual(expect, result);
+            d["a"] = "b";
+            d["b"] = "a";
+            needle = "ABabAB";
+            result = Energy.Base.Text.Replace(needle, d, false);
+            expect = "ABbaAB";
+            Assert.AreEqual(expect, result);
+            result = Energy.Base.Text.Replace(needle, d, true);
+            expect = "bababa";
+            Assert.AreEqual(expect, result);
+            d.Clear();
+            d["aaa"] = "3";
+            d["a"] = "1";
+            d["aa"] = "2";
+            needle = "aaaaaaa";
+            expect = "331";
+            result = Energy.Base.Text.Replace(needle, d, false);
+            Assert.AreEqual(expect, result);
+            needle = "aa";
+            expect = "2";
+            result = Energy.Base.Text.Replace(needle, d, false);
+            Assert.AreEqual(expect, result);
+        }
     }
 }

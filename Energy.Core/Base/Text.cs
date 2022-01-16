@@ -5131,5 +5131,50 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Replace
+
+        /// <summary>
+        /// Replace text with string dictionary containing matches as keys and replacements as values.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="dictionary"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static string Replace(string text, IDictionary<string, string> dictionary, bool ignoreCase)
+        {
+            if (dictionary == null || dictionary.Count == 0 || string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+            int count = dictionary.Count;
+            string[] values = new string[count];
+            dictionary.Values.CopyTo(values, 0);
+            List<string> map = new List<string>(count);
+            List<string> join = new List<string>(count);
+            foreach (string key in dictionary.Keys)
+            {
+                map.Add(ignoreCase ? key.ToUpperInvariant() : key);
+                if (key.Length > 0)
+                {
+                    join.Add(Energy.Base.Text.EscapeExpression(key));
+                }
+            }
+            join.Sort((string s1, string s2) => s2.Length.CompareTo(s1.Length));
+            string pattern = "(" + string.Join("|", join.ToArray()) + ")";
+            RegexOptions options = RegexOptions.None;
+            if (ignoreCase)
+            {
+                options |= RegexOptions.IgnoreCase;
+            }
+            string result = Regex.Replace(text, pattern, delegate (Match m)
+            {
+                string value = ignoreCase ? m.Value.ToUpperInvariant() : m.Value;
+                return values[map.IndexOf(value)];
+            }, options);
+            return result;
+        }
+
+        #endregion
     }
 }
