@@ -1398,5 +1398,15 @@ Another
             Assert.IsFalse(Energy.Base.Text.Contains(_string, "A", false));
             Assert.IsTrue(Energy.Base.Text.Contains(_string, "A", true));
         }
+
+        [TestMethod]
+        public void EscapeExpression()
+        {
+            Assert.IsNull(Energy.Base.Text.EscapeExpression((string)null));
+            Assert.AreEqual("", Energy.Base.Text.EscapeExpression(""));
+            Assert.AreEqual("abc", Energy.Base.Text.EscapeExpression("abc"));
+            Assert.AreEqual(@"a\$b\\c", Energy.Base.Text.EscapeExpression(@"a$b\c"));
+            Assert.AreEqual(@"\.\$\^\{\[\(\|\)\*\+\?\\", Energy.Base.Text.EscapeExpression(@".$^{[(|)*+?\"));
+        }
     }
 }

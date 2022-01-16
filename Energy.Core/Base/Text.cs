@@ -523,7 +523,7 @@ namespace Energy.Base
         #region Is
 
         private readonly static char[] WILD_CHARS = new char[] { '*', '?' };
- 
+
         /// <summary>
         /// Check if string contains one of wild characters ("*" or "?").
         /// </summary>
@@ -540,7 +540,7 @@ namespace Energy.Base
         }
 
         private readonly static char[] LIKE_CHARS = new char[] { '%', '_' };
- 
+
         /// <summary>
         /// Check if string contains one of characters used in LIKE ("%" or "_").
         /// </summary>
@@ -1792,7 +1792,7 @@ namespace Energy.Base
             {
                 return null;
             }
-            for (int i = list.Count; i > 0; )
+            for (int i = list.Count; i > 0;)
             {
                 i--;
                 if (string.IsNullOrEmpty(list[i]))
@@ -1807,55 +1807,29 @@ namespace Energy.Base
 
         #region EscapeExpression
 
-        private static string[] _EscapeExpressionStringArray;
-
-        private static string[] EscapeExpressionStringArray
+        private static readonly char[] ESCAPE_EXPRESSION_ARRAY = new char[]
         {
-            get
-            {
-                if (_EscapeExpressionStringArray == null)
-                {
-                    _EscapeExpressionStringArray = new string[]
-                    {
-                        ".", "$", "^", "{", "[", "(", "|", ")", "*", "+", "?", "|", "\\",
-                    };
-                }
-                return _EscapeExpressionStringArray;
-            }
-        }
+            '.', '$', '^', '{', '[', '(', '|', ')' , '*', '+', '?', '\\'
+        };
 
-        private static Dictionary<string, string> _EscapeExpressionStringDictionary;
+        private static readonly string ESCAPE_EXPRESSION_MATCH = @"(\.|\$|\^|\{|\[|\(|\||\)|\*|\+|\?|\\)";
 
-        private static Dictionary<string, string> EscapeExpressionStringDictionary
+        /// <summary>
+        /// Escape special regular expression language characters in text.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string EscapeExpression(string input)
         {
-            get
+            if (string.IsNullOrEmpty(input))
             {
-                if (_EscapeExpressionStringDictionary == null)
-                {
-                    _EscapeExpressionStringDictionary = new Dictionary<string, string>();
-                    _EscapeExpressionStringDictionary.Add("\\", @"\\");
-                    _EscapeExpressionStringDictionary.Add("#", @"\#");
-                    _EscapeExpressionStringDictionary.Add(".", @"\.");
-                    _EscapeExpressionStringDictionary.Add(" ", @"\ ");
-                    _EscapeExpressionStringDictionary.Add("\t", @"\t");
-                    _EscapeExpressionStringDictionary.Add("\r", @"\r");
-                    _EscapeExpressionStringDictionary.Add("\n", @"\n");
-                    _EscapeExpressionStringDictionary.Add("\v", @"\v");
-                    _EscapeExpressionStringDictionary.Add("$", @"\$");
-                    _EscapeExpressionStringDictionary.Add("^", @"\^");
-                    _EscapeExpressionStringDictionary.Add("*", @"\*");
-                    _EscapeExpressionStringDictionary.Add("?", @"\?");
-                    _EscapeExpressionStringDictionary.Add("+", @"\+");
-                    _EscapeExpressionStringDictionary.Add("|", @"\|");
-                    _EscapeExpressionStringDictionary.Add("[", @"\[");
-                    _EscapeExpressionStringDictionary.Add("]", @"\]");
-                    _EscapeExpressionStringDictionary.Add("(", @"\(");
-                    _EscapeExpressionStringDictionary.Add(")", @"\)");
-                    _EscapeExpressionStringDictionary.Add("{", @"\{");
-                    _EscapeExpressionStringDictionary.Add("}", @"\}");
-                }
-                return _EscapeExpressionStringDictionary;
+                return input;
             }
+            string text = Regex.Replace(input, ESCAPE_EXPRESSION_MATCH, delegate (Match m)
+            {
+                return @"\" + m.Value;
+            });
+            return text;
         }
 
         /// <summary>
@@ -1871,33 +1845,6 @@ namespace Energy.Base
                 list.Add(EscapeExpression(array[i]));
             }
             return list.ToArray();
-        }
-
-        /// <summary>
-        /// Escape text for regular expression pattern.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        [Energy.Attribute.Code.Benchmark("Check versus building string from characters one by one replacing specials with equivalents.")]
-        public static string EscapeExpression(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return input;
-            }
-            System.Text.StringBuilder s = null;
-            foreach (KeyValuePair<string, string> _ in EscapeExpressionStringDictionary)
-            {
-                if (Energy.Base.Text.Contains(input, _.Key))
-                {
-                    if (s == null)
-                    {
-                        s = new System.Text.StringBuilder(input);
-                    }
-                    s.Replace(_.Key, _.Value);
-                }
-            }
-            return s == null ? input : s.ToString();
         }
 
         /// <summary>
