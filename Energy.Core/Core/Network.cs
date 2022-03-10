@@ -269,13 +269,17 @@ namespace Energy.Core
             {
                 return false;
             }
-            else if (socket.Available == 0 && socket.Poll(1, SelectMode.SelectRead))
+            else if (socket.Available > 0)
             {
-                return false;
+                return true;
+            }
+            else if (socket.Poll(-1, SelectMode.SelectRead))
+            {
+                return true;
             }
             else
             {
-                return true;
+                return false;
             }
         }
 
