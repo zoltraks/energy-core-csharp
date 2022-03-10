@@ -273,11 +273,11 @@ namespace Energy.Core
             {
                 return true;
             }
-            else if (socket.Poll(-1, SelectMode.SelectRead))
+            try
             {
-                return true;
+                return !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
             }
-            else
+            catch (SocketException)
             {
                 return false;
             }
