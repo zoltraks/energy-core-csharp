@@ -6437,6 +6437,42 @@ namespace Energy.Base
             return Energy.Base.Cast.ByteArrayToHex(data);
         }
 
+        /// <summary>
+        /// Convert array of bytes to text using specified encoding
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public static string ByteArrayToString(byte[] data, System.Text.Encoding encoding)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            else
+            {
+                return encoding.GetString(data);
+            }
+        }
+
+        /// <summary>
+        /// Convert array of bytes to text using UTF-8 encoding
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ByteArrayToString(byte[] data)
+        {
+            if (data == null)
+            {
+                return null;
+            }
+            else
+            {
+                System.Text.Encoding encoding = System.Text.Encoding.UTF8;
+                return encoding.GetString(data);
+            }
+        }
+
         #endregion
     }
 }

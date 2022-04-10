@@ -1277,7 +1277,6 @@ namespace Energy.Core.Test.Base
             Assert.AreNotEqual(t, r);
         }
 
-
         [TestMethod]
         public void ObjectArrayToDictionary()
         {
@@ -1308,6 +1307,19 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(2, x.Count);
             Assert.AreEqual(x["1"], "2");
             Assert.AreEqual(x["2"], "1");
+        }
+
+        [TestMethod]
+        public void ByteArrayToString()
+        {
+            byte[] needle;
+            string result;
+            needle = null;
+            result = Energy.Base.Cast.ByteArrayToString(needle);
+            Assert.IsNull(result);
+            needle = new byte[] { };
+            result = Energy.Base.Cast.ByteArrayToString(needle);
+            Assert.IsNotNull(result);
         }
     }
 }

@@ -54,7 +54,8 @@ namespace Energy.Core.Test.Base
             Energy.Base.File.State clone = state.Clone() as Energy.Base.File.State;
             Assert.IsNotNull(clone);
             Assert.IsTrue(clone.SetWriteStamp()); // execution file might not be changed
-            Assert.IsTrue(state.IsChanged());
+                                                  // 2023-04-07 running tests may fail here
+            Assert.IsTrue(state.IsChanged(), "2023-04-07 Running tests may fail here");
             Assert.IsTrue(state.DeleteFile());
         }
 
