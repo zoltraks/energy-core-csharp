@@ -1452,5 +1452,15 @@ Another
             result = Energy.Base.Text.Replace(needle, d, false);
             Assert.AreEqual(expect, result);
         }
+
+        [TestMethod]
+        public void TextCoalesce()
+        {
+            Assert.AreEqual("", Energy.Base.Text.Coalesce());
+            Assert.AreEqual("", Energy.Base.Text.Coalesce(null));
+            Assert.AreEqual("", Energy.Base.Text.Coalesce(null, null));
+            Assert.AreEqual("", Energy.Base.Text.Coalesce(null, "", null));
+            Assert.AreEqual("-", Energy.Base.Text.Coalesce(null, "-"));
+        }
     }
 }

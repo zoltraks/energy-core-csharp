@@ -57,6 +57,14 @@ namespace Energy.Base
 
             private bool _Strict = false;
 
+            private string _Title = "";
+
+            private string _About = "";
+
+            private string _Usage = "";
+
+            private string _Greetings = "";
+
             private bool _UnknownAsParameter = false;
 
             #endregion
@@ -462,6 +470,66 @@ namespace Energy.Base
 
             #endregion
 
+            #region Title
+
+            /// <summary>
+            /// Set additional title printed at the begining
+            /// </summary>
+            /// <param name="title"></param>
+            /// <returns></returns>
+            public Arguments Title(string title)
+            {
+                _Title = title;
+                return this;
+            }
+
+            #endregion
+
+            #region About
+
+            /// <summary>
+            /// Set additional information printed after optional title
+            /// </summary>
+            /// <param name="about"></param>
+            /// <returns></returns>
+            public Arguments About(string about)
+            {
+                _About = about;
+                return this;
+            }
+
+            #endregion
+
+            #region Usage
+
+            /// <summary>
+            /// Set usage information printed after optional title and optional about information
+            /// </summary>
+            /// <param name="usage"></param>
+            /// <returns></returns>
+            public Arguments Usage(string usage)
+            {
+                _Usage = usage;
+                return this;
+            }
+
+            #endregion
+
+            #region Greetings
+
+            /// <summary>
+            /// Set greetings information to be printed at the end
+            /// </summary>
+            /// <param name="greetings"></param>
+            /// <returns></returns>
+            public Arguments Greetings(string greetings)
+            {
+                _Greetings = greetings;
+                return this;
+            }
+
+            #endregion
+
             #region Example
 
             /// <summary>
@@ -638,85 +706,138 @@ namespace Energy.Base
             /// <returns></returns>
             public string Print()
             {
-                if (0 == _Option.Count)
-                {
-                    return "";
-                }
                 List<string> text = new List<string>();
-                string indent = "    ";
-                foreach (Option option in _Option)
+                bool empty = false;
+                if (!string.IsNullOrEmpty(_Title))
                 {
-                    List<string> aliases = new List<string>();
-                    aliases.Add(option.Name);
-                    aliases.AddRange(GetAliases(option.Name));
-                    for (int i = 0; i < aliases.Count; i++)
+                    text.Add(_Title.TrimEnd());
+                    empty = false;
+                }
+                if (!string.IsNullOrEmpty(_About))
+                {
+                    if (empty)
                     {
-                        if (1 < aliases[i].Length)
-                        {
-                            aliases[i] = "--" + aliases[i];
-                        }
-                        else
-                        {
-                            aliases[i] = "-" + aliases[i];
-                        }
+                        empty = false;
                     }
-                    string p = "";
-                    if (0 < option.Count)
+                    else
                     {
-                        for (int i = 0; i < option.Count; i++)
+                        text.Add("");
+                    }
+                    Add("ABOUT");
+                    Add("");
+                    text.Add(_About.TrimEnd());
+                }
+                if (!string.IsNullOrEmpty(_Usage))
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    Add("USAGE");
+                    Add("");
+                    text.Add(_Usage.TrimEnd());
+                }
+                if (_Option.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    Add("OPTIONS");
+                    Add("");
+                    string indent = "    ";
+                    foreach (Option option in _Option)
+                    {
+                        List<string> aliases = new List<string>();
+                        aliases.Add(option.Name);
+                        aliases.AddRange(GetAliases(option.Name));
+                        for (int i = 0; i < aliases.Count; i++)
                         {
-                            p += " <?>";
+                            if (1 < aliases[i].Length)
+                            {
+                                aliases[i] = "--" + aliases[i];
+                            }
+                            else
+                            {
+                                aliases[i] = "-" + aliases[i];
+                            }
                         }
+                        string p = "";
+                        if (0 < option.Count)
+                        {
+                            for (int i = 0; i < option.Count; i++)
+                            {
+                                p += " <?>";
+                            }
+                        }
+                        foreach (string alias in aliases)
+                        {
+                            string line = indent + alias + p;
+                            text.Add(line);
+                        }
+                        if (_Option.Help.ContainsKey(option.Name))
+                        {
+                            if (!string.IsNullOrEmpty(_Option.Help[option.Name]))
+                            {
+                                text.Add("");
+                                text.Add(indent + _Option.Help[option.Name]);
+                            }
+                        }
+                        if (_Option.Description.ContainsKey(option.Name) && 0 < _Option.Description[option.Name].Count)
+                        {
+                            bool b = false;
+                            foreach (string e in _Option.Description[option.Name])
+                            {
+                                if (string.IsNullOrEmpty(e))
+                                {
+                                    continue;
+                                }
+                                if (!b)
+                                {
+                                    b = true;
+                                    text.Add("");
+                                }
+                                text.Add(indent + e);
+                            }
+                        }
+                        if (_Option.Example.ContainsKey(option.Name) && 0 < _Option.Example[option.Name].Count)
+                        {
+                            bool b = false;
+                            foreach (string e in _Option.Example[option.Name])
+                            {
+                                if (string.IsNullOrEmpty(e))
+                                {
+                                    continue;
+                                }
+                                if (!b)
+                                {
+                                    b = true;
+                                    text.Add("");
+                                }
+                                text.Add(indent + "--" + option.Name + " " + e);
+                            }
+                        }
+                        text.Add("");
+                        text.Add("");
                     }
-                    foreach (string alias in aliases)
+                    if (!string.IsNullOrEmpty(_Greetings))
                     {
-                        string line = indent + alias + p;
-                        text.Add(line);
-                    }
-                    if (_Option.Help.ContainsKey(option.Name))
-                    {
-                        if (!string.IsNullOrEmpty(_Option.Help[option.Name]))
+                        if (!empty)
                         {
                             text.Add("");
-                            text.Add(indent + _Option.Help[option.Name]);
                         }
+                        Add("GREETINGS");
+                        Add("");
+                        text.Add(_Greetings.TrimEnd());
                     }
-                    if (_Option.Description.ContainsKey(option.Name) && 0 < _Option.Description[option.Name].Count)
-                    {
-                        bool b = false;
-                        foreach (string e in _Option.Description[option.Name])
-                        {
-                            if (string.IsNullOrEmpty(e))
-                            {
-                                continue;
-                            }
-                            if (!b)
-                            {
-                                b = true;
-                                text.Add("");
-                            }
-                            text.Add(indent + e);
-                        }
-                    }
-                    if (_Option.Example.ContainsKey(option.Name) && 0 < _Option.Example[option.Name].Count)
-                    {
-                        bool b = false;
-                        foreach (string e in _Option.Example[option.Name])
-                        {
-                            if (string.IsNullOrEmpty(e))
-                            {
-                                continue;
-                            }
-                            if (!b)
-                            {
-                                b = true;
-                                text.Add("");
-                            }
-                            text.Add(indent + "--" + option.Name + " " + e);
-                        }
-                    }
-                    text.Add("");
-                    text.Add("");
                 }
 
                 return string.Join(Energy.Base.Text.NL, text.ToArray());
@@ -828,6 +949,8 @@ namespace Energy.Base
 
             public bool IsNull { get { return GetIsNull(); } }
 
+            public bool IsTrue { get { return GetIsTrue(); } }
+
             public string GetValue()
             {
                 return GetValue(" ");
@@ -890,7 +1013,7 @@ namespace Energy.Base
                 {
                     return true;
                 }
-                for (int i = 0; i < Values.Length; i++)
+                for (int i = 0, n = Values.Length; i < n; i++)
                 {
                     if (null == Values[i])
                     {
@@ -909,6 +1032,25 @@ namespace Energy.Base
                 if (null == Values)
                 {
                     return true;
+                }
+                return false;
+            }
+
+
+            private bool GetIsTrue()
+            {
+                if (null == Values || 0 == Values.Length)
+                {
+                    return false;
+                } else
+                {
+                    for (int i = 0, n = Values.Length; i < n; i++)
+                    {
+                        if (Energy.Base.Cast.StringToBool(Values[i]))
+                        {
+                            return true;
+                        }
+                    }
                 }
                 return false;
             }

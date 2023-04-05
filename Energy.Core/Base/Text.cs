@@ -5176,5 +5176,39 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region Coalesce
+
+        /// <summary>
+        /// Return first not empty value from array of parameters
+        /// <br/><br/>
+        /// Not nullable, returns empty string instead
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string Coalesce(params string[] text)
+        {
+            if (text == null)
+            {
+                return "";
+            }
+            else if (text.Length == 0)
+            {
+                return "";
+            }
+            else
+            {
+                for (int i = 0, n = text.Length; i < n; i++)
+                {
+                    if (!string.IsNullOrEmpty(text[i]))
+                    {
+                        return text[i];
+                    }
+                }
+            }
+            return "";
+        }
+
+        #endregion
     }
 }

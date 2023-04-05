@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Energy.Interface;
@@ -252,7 +253,7 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Get execution file directory from current working assembly (calling or executing).
+        /// Get execution file directory from current working assembly (calling or executing)
         /// </summary>
         /// <returns></returns>
         [Obsolete("Use Energy.Core.Program.GetExecutionPath instead")]
@@ -264,6 +265,16 @@ namespace Energy.Core
                 assembly = System.Reflection.Assembly.GetExecutingAssembly();
             }
             return Energy.Base.Class.GetAssemblyDirectory(assembly);
+        }
+
+        /// <summary>
+        /// Get name for command taken from shortened executable name
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCommandName()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            return assembly.GetName().Name;
         }
 
         #endregion
