@@ -4249,6 +4249,12 @@ namespace Energy.Base
                 {
                     return ((DateTime)value).ToString("HH:mm:ss");
                 }
+                long micro = ((DateTime)value).Ticks / (TimeSpan.TicksPerMillisecond / 1000);
+                if (micro % 1000 > 0)
+                {
+                    return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.ffffff");
+                }
+
                 if (((DateTime)value).Millisecond > 0)
                 {
                     return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.fff");

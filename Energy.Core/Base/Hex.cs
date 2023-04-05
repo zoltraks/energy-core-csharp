@@ -547,7 +547,7 @@ namespace Energy.Base
             string output = Regex.Replace(input, @"[^a-fA-F0-9]", "");
             return output;
         }
-        
+
         #endregion
 
         #region Parse
@@ -595,13 +595,19 @@ namespace Energy.Base
             public int LineSize;
             /// <summary>Number of bytes in every group</summary>
             public int GroupSize;
+            /// <summary>Put additional empty line after specified amount of lines</summary>
+            public int BreakEvery;
             /// <summary>Use uppercase letters in hexadecimal representation</summary>
             public bool UpperCase;
             /// <summary>Group bytes together, i.e. 2 for 16-bit, 4 for 32-bit, etc.</summary>
             public int WordSize;
             /// <summary>Use offset prefix of hexadecimals length</summary>
             public int OffsetSize;
-            /// <summary>Include optional representation</summary>
+            /// <summary>
+            /// Include optional representation
+            /// <br/><br/>
+            /// Possible values: ASCII
+            /// </summary>
             public string RepresentationMode;
             /// <summary>Element separator</summary>
             public string ElementSeparator;
@@ -613,6 +619,16 @@ namespace Energy.Base
             public string RepresentationSeparator;
 
             /// <summary>
+            /// Return tilde compatible string that can be used with Energy.Core.Tilde
+            /// </summary>
+            public bool TildeOutput;
+
+            /// <summary>
+            /// Optional list of colors used for numbers
+            /// </summary>
+            public string TildeColors;
+
+            /// <summary>
             /// Constructor
             /// </summary>
             public PrintFormatSettings()
@@ -621,12 +637,15 @@ namespace Energy.Base
                 ElementSeparator = " ";
                 WordSize = 1;
                 GroupSize = 4;
+                BreakEvery = 0;
                 GroupSeparator = "  ";
                 OffsetSize = 0;
                 OffsetSeparator = "  ";
                 UpperCase = false;
                 RepresentationMode = "ASCII";
                 RepresentationSeparator = "   ";
+                TildeOutput = false;
+                TildeColors = "~1~ ~2~ ~3~ ~4~ ~5~ ~6~ ~7~ ~8~ ~9~ ~10~ ~11~ ~12~ ~13~ ~14~ ~15~";
             }
         }
 
@@ -641,6 +660,7 @@ namespace Energy.Base
             return Print(array
                 , printFormatSettings.LineSize
                 , printFormatSettings.GroupSize
+                , printFormatSettings.BreakEvery
                 , printFormatSettings.UpperCase
                 , printFormatSettings.WordSize
                 , printFormatSettings.OffsetSize
@@ -649,15 +669,20 @@ namespace Energy.Base
                 , printFormatSettings.GroupSeparator
                 , printFormatSettings.OffsetSeparator
                 , printFormatSettings.RepresentationSeparator
+                , printFormatSettings.TildeOutput
+                , printFormatSettings.TildeColors
                 );
         }
 
         /// <summary>
         /// Pretty print byte array in hexadecimal form
+        /// <br/><br/>
+        /// Public for presentation only, use Print method with PrintFormatSettings instead.
         /// </summary>
         /// <param name="array">Input byte array</param>
         /// <param name="lineSize">Number of bytes in one line</param>
         /// <param name="groupSize">Number of bytes in every group</param>
+        /// <param name="breakEvery">Put additional empty line after specified amount of lines</param>
         /// <param name="upperCase">Use uppercase letters in hexadecimal representation</param>
         /// <param name="wordSize">Group bytes together, i.e. 2 for 16-bit, 4 for 32-bit, etc.</param>
         /// <param name="offsetSize">Use offset prefix of hexadecimals length</param>
@@ -665,11 +690,14 @@ namespace Energy.Base
         /// <param name="elementSeparator">Element separator</param>
         /// <param name="groupSeparator">Group separator</param>
         /// <param name="offsetSeparator">Offset separator</param>
-        /// <param name="representationSeparator">Representation separator</param>
+        /// <param name="representationSeparator">Representation separator<br/><br/>Possible values: ASCII</param>
+        /// <param name="tildeOutput">Return tilde compatible string that can be used with Energy.Core.Tilde</param>
+        /// <param name="tildeColors">Optional list of colors used for numbers</param>
         /// <returns></returns>
         public static string Print(byte[] array
             , int lineSize
             , int groupSize
+            , int breakEvery
             , bool upperCase
             , int wordSize
             , int offsetSize
@@ -678,6 +706,8 @@ namespace Energy.Base
             , string groupSeparator
             , string offsetSeparator
             , string representationSeparator
+            , bool tildeOutput
+            , string tildeColors
             )
         {
             if (array == null || array.Length == 0)
@@ -711,15 +741,48 @@ namespace Energy.Base
 
             int lineCount = (int)Math.Ceiling(1.0 * arrayLength / lineSize);
 
+            List<string> listColor = new List<string>();
+
+            if (tildeOutput && !string.IsNullOrEmpty(tildeColors))
+            {
+                listColor.AddRange(Regex.Split(tildeColors, "\\s+"));
+            }
+
+            Energy.Base.Anonymous.Function<string, int> chooseColor = (index) =>
+            {
+                if (listColor != null && listColor.Count < index && listColor[index] != null)
+                {
+                    return listColor[index];
+                }
+                else
+                {
+                    return "~" + index + "~";
+                }
+            };
+
+            Energy.Base.Anonymous.Function<int, int, int> sum = (x, y) => x + y;
+            sum(1, 2);
+
             for (int o = 0, n = 0; n < lineCount; n++)
             {
                 if (n > 0)
+                {
                     b.Append(Energy.Base.Text.NL);
+                    if (breakEvery > 0 && 0 == n % breakEvery)
+                    {
+                        b.Append(Energy.Base.Text.NL);
+                    }
+                }
+
                 if (offsetSize > 0)
                 {
+                    if (tildeOutput) b.Append(chooseColor(0 == (n / 4) % 2 ? 11 : 3));
                     b.Append(IntegerToHex(o, offsetSize, upperCase));
+                    if (tildeOutput) b.Append(chooseColor(0));
                     if (offsetSeparator.Length > 0)
+                    {
                         b.Append(offsetSeparator);
+                    }
                 }
                 bool empty = false;
                 for (int i = 0; i < lineSize; i++)
@@ -729,7 +792,9 @@ namespace Energy.Base
                         if (groupSize > 0 && 0 == i % groupSize)
                         {
                             if (groupSeparator.Length > 0)
+                            {
                                 b.Append(groupSeparator);
+                            }
                         }
                         else if (wordSize > 1 && 0 != i % wordSize)
                         {
@@ -737,7 +802,9 @@ namespace Energy.Base
                         else
                         {
                             if (elementSeparator.Length > 0)
+                            {
                                 b.Append(elementSeparator);
+                            }
                         }
                     }
                     int a = o + i;
@@ -748,7 +815,18 @@ namespace Energy.Base
                         else
                             empty = true;
                     }
-                    b.Append(empty ? "  " : s.Substring(a << 1, 2));
+                    if (empty)
+                    {
+                        b.Append("  ");
+                    } else
+                    {
+                        if (tildeOutput)
+                        {
+                            b.Append(chooseColor(0 == (n / 4) % 2 ? (0 == i % 2 ? 7 : 15) : (0 == i % 2 ? 6 : 14)));
+                        }
+                        b.Append(s.Substring(a << 1, 2));
+                        if (tildeOutput) b.Append(chooseColor(0));
+                    }
                 }
                 if (includeRepresentation)
                 {
@@ -759,7 +837,12 @@ namespace Energy.Base
                         int a = o + i;
                         if (a >= arrayLength)
                             break;
+                        if (tildeOutput)
+                        {
+                            b.Append(chooseColor(0 == (n / 2) % 2 ? (0 == (i / 4) % 2 ? 12 : 10) : (0 == (i / 4) % 2 ? 10 : 12)));
+                        }
                         b.Append(ByteToPrintable(array[a]));
+                        if (tildeOutput) b.Append(chooseColor(0));
                     }
                 }
                 o += lineSize;

@@ -1196,6 +1196,14 @@ namespace Energy.Core.Test.Base
             expect = new DateTime(2100, 12, 31);
             result = Energy.Base.Cast.StringToDateTime(needle);
             Assert.AreEqual(expect, result);
+
+            needle = "2000-01-01 23:59:59.999111";
+            expect = new DateTime(2000, 1, 1);
+            expect = expect.AddDays(1);
+            expect = expect.AddSeconds(-1);
+            expect = expect.AddTicks((long)(0.999111 * TimeSpan.TicksPerSecond));
+            result = Energy.Base.Cast.StringToDateTime(needle);
+            Assert.AreEqual(expect, result);
         }
 
         [TestMethod]
