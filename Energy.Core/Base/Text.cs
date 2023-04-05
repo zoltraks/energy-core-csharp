@@ -5154,7 +5154,8 @@ namespace Energy.Base
             List<string> join = new List<string>(count);
             foreach (string key in dictionary.Keys)
             {
-                map.Add(ignoreCase ? key.ToUpperInvariant() : key);
+                string s = "".ToUpper();
+                map.Add(ignoreCase ? Energy.Base.Text.Upper(key) : key);
                 if (key.Length > 0)
                 {
                     join.Add(Energy.Base.Text.EscapeExpression(key));
@@ -5169,7 +5170,7 @@ namespace Energy.Base
             }
             string result = Regex.Replace(text, pattern, delegate (Match m)
             {
-                string value = ignoreCase ? m.Value.ToUpperInvariant() : m.Value;
+                string value = ignoreCase ? Energy.Base.Text.Upper(m.Value) : m.Value;
                 return values[map.IndexOf(value)];
             }, options);
             return result;

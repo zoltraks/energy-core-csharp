@@ -237,3 +237,5 @@ Documentation/html/
 /Energy.Core.Application/*
 
 nuget/*.cmd
+
+Thumbs.db
