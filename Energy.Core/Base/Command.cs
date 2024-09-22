@@ -101,6 +101,42 @@ namespace Energy.Base
                 }
             }
 
+            public Enumerator GetEnumerator()
+            {
+                return new Enumerator(this);
+            }
+
+            #endregion
+
+            #region Enumerator
+
+            public class Enumerator
+            {
+                int index;
+
+                Arguments arguments;
+                
+                public Enumerator(Arguments arguments)
+                {
+                    this.arguments = arguments;
+                    index = -1;
+                }
+
+                public bool MoveNext()
+                {
+                    index++;
+                    return index < arguments.Count;
+                }
+
+                public string Current
+                {
+                    get
+                    {
+                        return arguments[index];
+                    }
+                }
+            }
+
             #endregion
 
             #region Property

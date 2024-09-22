@@ -63,5 +63,17 @@ namespace Energy.Core.Test.Base
             argv.Skip(1).Parse();
             Assert.AreEqual(8, argv.Count);
         }
+
+        [TestMethod]
+        public void Enumeration()
+        {
+            var args = new string[] { "first", "--", "second" };
+            var argv = new Energy.Base.Command.Arguments(args);
+            int i = 0;
+            foreach (string arg in argv)
+            {
+                Assert.AreEqual(arg, args[i++]);
+            }
+        }
     }
 }
