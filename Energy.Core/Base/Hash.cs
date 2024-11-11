@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using static Energy.Base.Hash.Algorithm;
 
 namespace Energy.Base
 {
@@ -12,27 +13,76 @@ namespace Energy.Base
     // TODO Implement PBKDF2, Bcrypt, HMAC/SHA1 and possibly legacy DES or AES 3
     public class Hash
     {
-        #region CRC
+        #region Algorithm
 
-        /// <summary>
-        /// For each characters do a 5-bit left circular shift
-        /// and XOR in character numeric value (CRC variant).
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns>32-bit hash value for a string (uint)</returns>
-        public static uint CRC(string value)
+        public class Algorithm
         {
-            uint h = 0;
-            for (int i = 0; i < value.Length; i++)
+            #region Crc32
+
+            public class Crc32 : HashAlgorithm
             {
-                h = (h << 5) ^ ((h & 0xf8000000) >> 27) ^ value[i];
+                public const uint DEFAULT_POLYNOMINAL = 0xedb88320;
+
+                private uint checksum;
+
+                private readonly uint[] table;
+
+                public Crc32() : this(DEFAULT_POLYNOMINAL) { }
+
+                public Crc32(uint polynomial)
+                {
+                    HashSizeValue = 32;
+
+                    Initialize();
+
+                    table = new uint[256];
+
+                    for (uint i = 0; i < 256; i++)
+                    {
+                        uint next = i;
+                        for (uint j = 0; j < 8; j++)
+                        {
+                            if ((next & 1) == 1)
+                            {
+                                next = (next >> 1) ^ polynomial;
+                            }
+                            else
+                            {
+                                next >>= 1;
+                            }
+                        }
+                        table[i] = next;
+                    }
+                }
+
+                public override void Initialize()
+                {
+                    checksum = 0xffffffff;
+                }
+
+                protected override void HashCore(byte[] buffer, int start, int length)
+                {
+                    for (int i = start; i < length; i++)
+                    {
+                        byte next = buffer[i];
+                        byte index = (byte)(checksum ^ next);
+                        checksum = (checksum >> 8) ^ table[index];
+                    }
+                }
+
+                protected override byte[] HashFinal()
+                {
+                    checksum = ~checksum;
+                    return BitConverter.GetBytes(checksum);
+                }
             }
-            return h;
+
+            #endregion
         }
 
         #endregion
 
-        #region CRC2
+        #region CRC32
 
         /// <summary>
         /// For each characters do a 5-bit left circular shift
@@ -40,7 +90,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static uint CRC2(string value)
+        public static uint CRC(string value)
         {
             uint k;
             uint h = 0;
@@ -63,7 +113,63 @@ namespace Energy.Base
             return h;
         }
 
+        /// <summary>
+        /// For each characters do a 5-bit left circular shift
+        /// and XOR in character numeric value (CRC variant).
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static uint CRC(byte[] data)
+        {
+            uint k;
+            uint h = 0;
+            for (int i = 0; i < data.Length; i++)
+            {
+                k = data[i];
+                // extract high-order 5 bits from h
+                // 0xf8000000 is the hexadecimal representation
+                // for the 32-bit number with the first five
+                // bits = 1 and the other bits = 0
+                var s = h & 0xf8000000;
+                // shift h left by 5 bits
+                h = h << 5;
+                // move the highorder 5 bits to the low-order end and XOR into h
+                h = h ^ (s >> 27);
+                //h = h ^ s;
+                // end and XOR into h
+                h = h ^ k;
+            }
+            return h;
+        }
+
         #endregion
+
+        /// <summary>
+        /// Compute CRC32 hash using IEEE 802.3 standard
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static uint CRC32(byte[] data)
+        {
+            Algorithm.Crc32 checksum = new Algorithm.Crc32();
+            byte[] hash = checksum.ComputeHash(data);
+            uint result = BitConverter.ToUInt32(hash, 0);
+            return result;
+        }
+
+        /// <summary>
+        /// Compute CRC32 hash using custom polynominal
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="polynomial"></param>
+        /// <returns></returns>
+        public static uint CRC32(byte[] data, uint polynomial)
+        {
+            Algorithm.Crc32 checksum = new Algorithm.Crc32(polynomial);
+            byte[] hash = checksum.ComputeHash(data);
+            uint result = BitConverter.ToUInt32(hash, 0);
+            return result;
+        }
 
         #region CRC16CCITT
 
