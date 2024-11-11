@@ -259,7 +259,6 @@ namespace Energy.Core.Test.Base
             Assert.IsNull(Energy.Base.Hex.StringToHex(null));
             string txt;
             string exp;
-            byte[] dta;
             txt = "Cypress Hills Front";
             exp = "437970726573732048696C6C732046726F6E74";
             txt = Energy.Base.Hex.StringToHex(txt);
@@ -302,7 +301,6 @@ namespace Energy.Core.Test.Base
             Energy.Base.Hex.PrintFormatSettings printFormatSettings = new Energy.Base.Hex.PrintFormatSettings();
 
             string result;
-            string expect;
 
             result = Energy.Base.Hex.Print(data, printFormatSettings);
 

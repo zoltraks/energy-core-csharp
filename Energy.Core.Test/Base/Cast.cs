@@ -92,11 +92,11 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(15.0001m, d);
 
             o = 15.0001f;
-            d = Energy.Base.Cast.ObjectToDecimal(s);
+            d = Energy.Base.Cast.ObjectToDecimal(o);
             Assert.AreEqual(15.0001m, d);
 
             o = "15,0001";
-            d = Energy.Base.Cast.ObjectToDecimal(s);
+            d = Energy.Base.Cast.ObjectToDecimal(o);
             Assert.AreEqual(15.0001m, d);
         }
 
@@ -218,6 +218,7 @@ namespace Energy.Core.Test.Base
                 );
             DateTime mawsonDateTime = TimeZoneInfo.ConvertTimeFromUtc(dt2, mawson);
             string jsonStringMawson = Energy.Base.Cast.DateTimeToISO8601(mawsonDateTime);
+            Assert.IsNotNull(jsonStringMawson);
         }
 
         [TestMethod]
@@ -451,7 +452,7 @@ namespace Energy.Core.Test.Base
             {
                 DateTime needle = (DateTime)testDateTime[i + 1];
                 DateTime result = Energy.Base.Cast.As<DateTime>(testDateTime[i]);
-                Assert.AreEqual(0, DateTime.Compare(result, needle), $"Comparisation failed between {needle.ToString()} and {result.ToString()}");
+                Assert.AreEqual(0, DateTime.Compare(result, needle), $"Comparisation failed between {needle} and {result}");
             }
 
             DateTime dt;
@@ -1209,7 +1210,6 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void StringToDecimal()
         {
-            decimal d;
             string s;
 
             s = null;
@@ -1225,8 +1225,6 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void DecimalToString()
         {
-            decimal d;
-
             Assert.AreEqual("", Energy.Base.Cast.DecimalToString(null));
             Assert.AreEqual("0", Energy.Base.Cast.DecimalToString(0m));
             Assert.AreEqual("99999999999999999999", Energy.Base.Cast.DecimalToString(99999999999999999999m));
@@ -1280,7 +1278,7 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void ObjectArrayToDictionary()
         {
-            Dictionary<string, object> x = null;
+            Dictionary<string, object> x;
             x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
             {
             });
