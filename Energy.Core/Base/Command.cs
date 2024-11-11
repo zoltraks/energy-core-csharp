@@ -115,7 +115,7 @@ namespace Energy.Base
                 int index;
 
                 Arguments arguments;
-                
+
                 public Enumerator(Arguments arguments)
                 {
                     this.arguments = arguments;
@@ -149,22 +149,22 @@ namespace Energy.Base
             /// <summary>
             /// Represents state of command line options.
             /// </summary>
-            public Option.Array Options 
-            { 
-                get 
+            public Option.Array Options
+            {
+                get
                 {
-                    return _Option; 
+                    return _Option;
                 }
             }
 
             /// <summary>
             /// Number of non option elements from command line argument list.
             /// </summary>
-            public int Count 
-            { 
-                get 
+            public int Count
+            {
+                get
                 {
-                    return _Heap.Count; 
+                    return _Heap.Count;
                 }
             }
 
@@ -909,7 +909,7 @@ namespace Energy.Base
                 public Dictionary<string, List<string>> Example { get { return _Example; } }
 
                 /// <summary>
-                /// Nullify all existing values.
+                /// Nullify all existing values
                 /// </summary>
                 /// <returns></returns>
                 public Array Zero()
@@ -928,7 +928,7 @@ namespace Energy.Base
                 }
 
                 /// <summary>
-                /// Find element by name.
+                /// Find element by name
                 /// </summary>
                 /// <param name="name"></param>
                 /// <returns></returns>
@@ -945,7 +945,7 @@ namespace Energy.Base
                 }
 
                 /// <summary>
-                /// Find target name by checking if it exists or has an alias.
+                /// Find target name by checking if it exists or has an alias
                 /// </summary>
                 /// <param name="name"></param>
                 /// <returns></returns>
@@ -973,6 +973,9 @@ namespace Energy.Base
             /// </summary>
             public string Name;
 
+            /// <summary>
+            /// Value count
+            /// </summary>
             public int Count;
 
             public string Value { get { return GetValue(); } set { SetValue(value); } }
@@ -986,6 +989,8 @@ namespace Energy.Base
             public bool IsNull { get { return GetIsNull(); } }
 
             public bool IsTrue { get { return GetIsTrue(); } }
+
+            public bool IsFalse { get { return GetIsFalse(); } }
 
             public string GetValue()
             {
@@ -1072,13 +1077,13 @@ namespace Energy.Base
                 return false;
             }
 
-
             private bool GetIsTrue()
             {
                 if (null == Values || 0 == Values.Length)
                 {
                     return false;
-                } else
+                }
+                else
                 {
                     for (int i = 0, n = Values.Length; i < n; i++)
                     {
@@ -1089,6 +1094,25 @@ namespace Energy.Base
                     }
                 }
                 return false;
+            }
+
+            private bool GetIsFalse()
+            {
+                if (null == Values || 0 == Values.Length)
+                {
+                    return true;
+                }
+                else
+                {
+                    for (int i = 0, n = Values.Length; i < n; i++)
+                    {
+                        if (Energy.Base.Cast.StringToBool(Values[i]))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             }
         }
 
