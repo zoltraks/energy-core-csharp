@@ -2824,7 +2824,7 @@ namespace Energy.Base
                 return null;
             var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
             if (round < byte.MinValue || round > byte.MaxValue)
-                return null; 
+                return null;
             return (byte?)_number;
 #endif
 #if NETCF
@@ -3937,7 +3937,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours, bool roundUp)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, roundUp);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroHours, roundUp);
         }
 
         /// <summary>
@@ -3950,7 +3950,7 @@ namespace Energy.Base
         public static string TimeSpanToStringMicroseconds(TimeSpan timeSpan, bool omitZeroMicroseconds, bool omitZeroHours)
         {
             double seconds = timeSpan.TotalSeconds;
-            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroMicroseconds, true);
+            return TimeSpanToStringMicroseconds(seconds, omitZeroMicroseconds, omitZeroHours, true);
         }
 
         /// <summary>
