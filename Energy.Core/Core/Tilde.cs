@@ -1518,7 +1518,7 @@ namespace Energy.Core
                     {
                         if (_ReadLineStringBuilder.Length > 0)
                         {
-                            _ReadLineStringBuilder.Length = _ReadLineStringBuilder.Length - 1;
+                            _ReadLineStringBuilder.Length--;
                             Console.Write(" \b");
                         }
                         continue;
@@ -1550,7 +1550,7 @@ namespace Energy.Core
                 {
                     if (stringBuilder.Length > 0)
                     {
-                        stringBuilder.Length = stringBuilder.Length - 1;
+                        stringBuilder.Length--;
                         Console.Write("\b \b");
                     }
                     continue;

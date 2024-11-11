@@ -99,7 +99,9 @@ namespace Energy.Base
                 return HexToColor(value);
             }
             //return new Color(System.Drawing.Color.FromName(value));
+            #pragma warning disable IDE0034 // Simplify 'default' expression
             return default(Color);
+            #pragma warning restore IDE0034 // Simplify 'default' expression
         }
 
         #endregion
@@ -190,7 +192,7 @@ namespace Energy.Base
             }
 
             if (percentage > 1)
-                percentage = percentage / 100;
+                percentage /= 100;
 
             if (percentage > 1)
                 percentage = 1;
