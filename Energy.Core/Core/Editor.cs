@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Energy.Core
+﻿namespace Energy.Core
 {
     /// <summary>
     /// Text editor class.
@@ -124,34 +122,31 @@ namespace Energy.Core
         }
 
         /// <summary>
-        /// Ensure text ends with newline.
-        /// Add newline string to the end if not included even if empty.
-        /// Works with multiple newline strings.
+        /// Ensure not empty text ends with new line marker.
+        /// <br/><br/>
+        /// Add new line to the end of text if not included already.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         public string EnsureNewLineAtEnd(string text)
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
             string[] nll = Energy.Base.Text.NEWLINE_ARRAY;
             if (nll == null || nll.Length == 0)
             {
                 nll = new string[] { Energy.Base.Text.NL };
             }
-            if (string.IsNullOrEmpty(text))
+            foreach (string nl in nll)
             {
-                text = nll[0];
-            }
-            else
-            {
-                foreach (string nl in nll)
+                if (text.EndsWith(nl))
                 {
-                    if (text.EndsWith(nl))
-                    {
-                        return text;
-                    }
+                    return text;
                 }
-                text = string.Concat(text, nll[0]);
             }
+            text = string.Concat(text, nll[0]);
             return text;
         }
 
