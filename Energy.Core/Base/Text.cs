@@ -25,7 +25,7 @@ namespace Energy.Base
         public static string BR { get { return _BR; } private set { _BR = value; } }
 
         private static string _NL;
-        /// <summary>New line "character"</summary>
+        /// <summary>New line character sequence</summary>
         public static string NL
         {
             get
@@ -42,6 +42,15 @@ namespace Energy.Base
             private set
             {
                 _NL = value;
+            }
+        }
+
+        /// <summary>New line character sequence</summary>
+        public static string NewLine
+        {
+            get
+            {
+                return NL;
             }
         }
 

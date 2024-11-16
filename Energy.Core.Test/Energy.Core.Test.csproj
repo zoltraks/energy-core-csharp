@@ -114,6 +114,7 @@
     <Compile Include="Base\Collection.cs" />
     <Compile Include="Base\Http.cs" />
     <Compile Include="Base\Xml.cs" />
+    <Compile Include="Core\Editor.cs" />
     <Compile Include="Core\Network.cs" />
     <Compile Include="Core\Tilde.cs" />
     <Compile Include="Core\Worker.cs" />
