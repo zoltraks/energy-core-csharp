@@ -1215,6 +1215,30 @@ namespace Energy.Base
 
         public class Storage : Energy.Interface.IFileSystem, IDisposable
         {
+            public bool Persistent
+            {
+                get
+                {
+                    return _Persistent;
+                }
+                set
+                {
+                    _Persistent = value;
+                }
+            }
+
+            public string Root
+            {
+                get
+                {
+                    return _Root;
+                }
+                set
+                {
+                    _Root = value;
+                }
+            }
+
             private List<string> _Files = new List<string>();
             
             private string _Root;
