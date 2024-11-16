@@ -67,6 +67,12 @@ namespace Energy.Base
 
             private bool _UnknownAsParameter = false;
 
+            private List<string> _Notes = new List<string>();
+
+            private List<string> _Repositories = new List<string>();
+
+            private List<string> _Copyrights = new List<string>();
+
             #endregion
 
             #region Accessor
@@ -506,6 +512,78 @@ namespace Energy.Base
 
             #endregion
 
+            #region Note
+
+            /// <summary>
+            /// Add help note.
+            /// May be used more than once.
+            /// Use null to clear all notes.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public Arguments Note(string text)
+            {
+                if (null == text)
+                {
+                    _Notes.Clear();
+                }
+                else
+                {
+                    _Notes.Add(text);
+                }
+                return this;
+            }
+
+            #endregion
+
+            #region Repository
+
+            /// <summary>
+            /// Add repository link.
+            /// May be used more than once.
+            /// Use null to clear all links.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public Arguments Repository(string text)
+            {
+                if (null == text)
+                {
+                    _Repositories.Clear();
+                }
+                else
+                {
+                    _Repositories.Add(text);
+                }
+                return this;
+            }
+
+            #endregion
+
+            #region Copyright
+
+            /// <summary>
+            /// Add copyright note.
+            /// May be used more than once.
+            /// Use null to clear all copyright notes.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public Arguments Copyright(string text)
+            {
+                if (null == text)
+                {
+                    _Copyrights.Clear();
+                }
+                else
+                {
+                    _Copyrights.Add(text);
+                }
+                return this;
+            }
+
+            #endregion
+
             #region Title
 
             /// <summary>
@@ -742,13 +820,24 @@ namespace Energy.Base
             /// <returns></returns>
             public string Print()
             {
+                return Print(new Format());
+            }
+
+            /// <summary>
+            /// Pretty format help text for parameters.
+            /// </summary>
+            /// <returns></returns>
+            public string Print(Format format)
+            {
                 List<string> text = new List<string>();
                 bool empty = false;
+
                 if (!string.IsNullOrEmpty(_Title))
                 {
                     text.Add(_Title.TrimEnd());
                     empty = false;
                 }
+
                 if (!string.IsNullOrEmpty(_About))
                 {
                     if (empty)
@@ -759,10 +848,14 @@ namespace Energy.Base
                     {
                         text.Add("");
                     }
-                    Add("ABOUT");
-                    Add("");
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("ABOUT");
+                        text.Add("");
+                    }
                     text.Add(_About.TrimEnd());
                 }
+
                 if (!string.IsNullOrEmpty(_Usage))
                 {
                     if (empty)
@@ -773,10 +866,14 @@ namespace Energy.Base
                     {
                         text.Add("");
                     }
-                    Add("USAGE");
-                    Add("");
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("USAGE");
+                        text.Add("");
+                    }
                     text.Add(_Usage.TrimEnd());
                 }
+
                 if (_Option.Count > 0)
                 {
                     if (empty)
@@ -787,11 +884,24 @@ namespace Energy.Base
                     {
                         text.Add("");
                     }
-                    Add("OPTIONS");
-                    Add("");
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("OPTIONS");
+                        text.Add("");
+                    }
                     string indent = "    ";
+                    empty = true;
                     foreach (Option option in _Option)
                     {
+                        if (empty)
+                        {
+                            empty = false;
+                        }
+                        else
+                        {
+                            text.Add("");
+                            //text.Add("");
+                        }
                         List<string> aliases = new List<string>();
                         aliases.Add(option.Name);
                         aliases.AddRange(GetAliases(option.Name));
@@ -861,22 +971,112 @@ namespace Energy.Base
                                 text.Add(indent + "--" + option.Name + " " + e);
                             }
                         }
-                        text.Add("");
-                        text.Add("");
-                    }
-                    if (!string.IsNullOrEmpty(_Greetings))
-                    {
-                        if (!empty)
-                        {
-                            text.Add("");
-                        }
-                        Add("GREETINGS");
-                        Add("");
-                        text.Add(_Greetings.TrimEnd());
                     }
                 }
 
-                return string.Join(Energy.Base.Text.NL, text.ToArray());
+                if (_Notes.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("NOTES");
+                        text.Add("");
+                    }
+                    for (int i = 0; i < _Notes.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add(_Notes[i]);
+                    }
+                }
+
+                if (_Repositories.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("REPOSITORY");
+                        text.Add("");
+                    }
+                    for (int i = 0; i < _Repositories.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add(_Repositories[i]);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(_Greetings))
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("GREETINGS");
+                        text.Add("");
+                    }
+                    text.Add(_Greetings.TrimEnd());
+                }
+
+                if (_Copyrights.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add("COPYRIGHT");
+                        text.Add("");
+                    }
+                    for (int i = 0; i < _Copyrights.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add(_Copyrights[i]);
+                    }
+                }
+
+                return Energy.Core.Editor.Global.EnsureNewLineAtEnd(string.Join(Energy.Base.Text.NL, text.ToArray()));
+            }
+
+            #endregion
+
+            #region Format
+
+            public class Format
+            {
+                public bool HideSectionName = false;
             }
 
             #endregion
