@@ -6451,7 +6451,7 @@ namespace Energy.Base
             }
             else
             {
-                return encoding.GetString(data);
+                return encoding.GetString(data, 0, data.Length);
             }
         }
 
@@ -6469,7 +6469,7 @@ namespace Energy.Base
             else
             {
                 System.Text.Encoding encoding = System.Text.Encoding.UTF8;
-                return encoding.GetString(data);
+                return encoding.GetString(data, 0, data.Length);
             }
         }
 

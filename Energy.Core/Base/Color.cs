@@ -99,9 +99,14 @@ namespace Energy.Base
                 return HexToColor(value);
             }
             //return new Color(System.Drawing.Color.FromName(value));
+
+            #if !NETCF            
             #pragma warning disable IDE0034 // Simplify 'default' expression
+            #endif
             return default(Color);
+            #if !NETCF            
             #pragma warning restore IDE0034 // Simplify 'default' expression
+            #endif
         }
 
         #endregion
