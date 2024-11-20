@@ -89,6 +89,28 @@ namespace Energy.Core
 #endif
 
         /// <summary>
+        /// Get file version
+        /// </summary>
+        /// <returns></returns>
+        public static string GetFileVersion()
+        {
+            ProcessModule processModule = System.Diagnostics.Process.GetCurrentProcess().MainModule;
+            if (processModule == null) return "";
+            return processModule.FileVersionInfo.FileVersion;
+        }
+
+        /// <summary>
+        /// Get product version
+        /// </summary>
+        /// <returns></returns>
+        public static string GetProductVersion()
+        {
+            ProcessModule processModule = System.Diagnostics.Process.GetCurrentProcess().MainModule;
+            if (processModule == null) return "";
+            return processModule.FileVersionInfo.ProductVersion;
+        }
+
+        /// <summary>
         /// Get compilation date for assembly
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
