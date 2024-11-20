@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -52,7 +47,7 @@ namespace Energy.Core
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
-        private ICommandProgram _CommandProgram;
+        private Interface.ICommandProgram _CommandProgram;
 
         public string[] Arguments { get; private set; }
 
@@ -144,7 +139,7 @@ namespace Energy.Core
         /// <summary>
         /// Run
         /// </summary>
-        public bool Run(ICommandProgram commandProgram, string[] args)
+        public bool Run(Interface.ICommandProgram commandProgram, string[] args)
         {
             try
             {
@@ -273,8 +268,9 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
-            return assembly.GetName().Name;
+            //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            //return assembly.GetName().Name;
+            return System.Diagnostics.Process.GetCurrentProcess().ProcessName;
         }
 
         #endregion
