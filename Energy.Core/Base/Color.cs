@@ -253,7 +253,7 @@ namespace Energy.Base
                 double alpha = double.Parse(matches[3].Value);
                 // Check if the original string has % after the alpha value
                 var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
-                if (alphaMatch.Success && alphaMatch.Value.Contains("%"))
+                if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
                     alpha = alpha / 100.0;
                 
                 if (alpha < 0.0 || alpha > 1.0)
@@ -278,7 +278,7 @@ namespace Energy.Base
                 throw new System.FormatException("HSL string cannot be null or empty");
 
             if (!IsValidHsl(hsl))
-                throw new System.FormatException($"Invalid HSL format: '{hsl}'. Expected format: (H°, S%, L%) or (H°, S%, L%, A)");
+                throw new System.FormatException("Invalid HSL format: '" + hsl + "'. Expected format: (H°, S%, L%) or (H°, S%, L%, A)");
 
             // Extract numeric values
             var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
@@ -295,7 +295,7 @@ namespace Energy.Base
                 alpha = double.Parse(matches[3].Value);
                 // Check if the original string has % after the alpha value
                 var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
-                if (alphaMatch.Success && alphaMatch.Value.Contains("%"))
+                if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
                     alpha = alpha / 100.0;
                 else
                     alpha = System.Math.Min(1.0, System.Math.Max(0.0, alpha));
@@ -315,16 +315,6 @@ namespace Energy.Base
             }
             else
             {
-                double Hue2Rgb(double p1, double q1, double t1)
-                {
-                    if (t1 < 0) t1 += 1;
-                    if (t1 > 1) t1 -= 1;
-                    if (t1 < 1.0 / 6.0) return p1 + (q1 - p1) * 6 * t1;
-                    if (t1 < 1.0 / 2.0) return q1;
-                    if (t1 < 2.0 / 3.0) return p1 + (q1 - p1) * (2.0 / 3.0 - t1) * 6;
-                    return p1;
-                }
-
                 double q = lNormalized < 0.5 ? lNormalized * (1 + sNormalized) : lNormalized + sNormalized - lNormalized * sNormalized;
                 double p = 2 * lNormalized - q;
                 r = Hue2Rgb(p, q, hNormalized + 1.0 / 3.0);
@@ -339,6 +329,23 @@ namespace Energy.Base
             int aByte = (int)System.Math.Round(alpha * 255);
 
             return new Energy.Base.Color((byte)aByte, (byte)rByte, (byte)gByte, (byte)bByte);
+        }
+
+        /// <summary>
+        /// Helper function for HSL to RGB conversion
+        /// </summary>
+        /// <param name="p1">First parameter</param>
+        /// <param name="q1">Second parameter</param>
+        /// <param name="t1">Third parameter</param>
+        /// <returns>RGB component value</returns>
+        private static double Hue2Rgb(double p1, double q1, double t1)
+        {
+            if (t1 < 0) t1 += 1;
+            if (t1 > 1) t1 -= 1;
+            if (t1 < 1.0 / 6.0) return p1 + (q1 - p1) * 6 * t1;
+            if (t1 < 1.0 / 2.0) return q1;
+            if (t1 < 2.0 / 3.0) return p1 + (q1 - p1) * (2.0 / 3.0 - t1) * 6;
+            return p1;
         }
 
         #endregion
