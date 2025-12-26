@@ -27,6 +27,8 @@ Documentation
 
 http://energy-core.readthedocs.io/
 
+For developers working on the library, see [Development Guidelines](docs/GUIDELINES.md) for coding standards, compilation requirements, and platform-specific considerations.
+
 Examples
 --------
 
