@@ -15,6 +15,7 @@ Energy.Core is a .NET class library providing type conversions, utilities, datab
 ### Visual Studio Compatibility
 - **Visual Studio 2008** - Required for Compact Framework support
 - **Visual Studio 2017+** - Modern development and .NET Standard
+- **Visual Studio 2019** - Required for Energy.Core.Test project compatibility
 - **Visual Studio 2022** - Latest features and performance
 
 ### AOT Compilation Support
@@ -120,6 +121,12 @@ Energy.Query      - SQL query building and dialects
 - Integration tests for database functionality
 - Platform-specific test suites
 - Performance benchmarks for critical paths
+
+### Test Project Configuration
+- **Energy.Core.Test** project requires **Visual Studio 2019** minimum
+- Uses MSTest framework with modern SDK-style project format
+- Targets .NET Framework 4.8 for maximum compatibility
+- All 263 tests must pass successfully before release
 
 ## Build Configuration
 - **Debug**: Full debugging info, no optimization
