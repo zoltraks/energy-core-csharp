@@ -110,16 +110,16 @@ namespace Energy.Core.Test.Base
 
             filters = new string[] { "111-" };
 
-            y = x.Filter(Enumeration.MatchStyle.Any, Enumeration.MatchMode.Simple, true, filters);
+            y = x.Filter(Energy.Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, true, filters);
             Assert.AreEqual(3, y.Count);
 
             filters = new string[]
             {
                 "111-222"
             };
-            y = x.Filter(Enumeration.MatchMode.Same, true, filters);
+            y = x.Filter(Energy.Enumeration.MatchMode.Same, true, filters);
             Assert.AreEqual(1, y.Count);
-            y = x.Filter(Enumeration.MatchMode.Simple, true, filters);
+            y = x.Filter(Energy.Enumeration.MatchMode.Simple, true, filters);
             Assert.AreEqual(2, y.Count);
         }
 
