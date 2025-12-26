@@ -29,6 +29,8 @@ http://energy-core.readthedocs.io/
 
 For developers working on the library, see [Development Guidelines](docs/GUIDELINES.md) for coding standards, compilation requirements, and platform-specific considerations.
 
+For information about the project structure and build files, see [Project Structure](docs/STRUCTURE.md).
+
 Examples
 --------
 

@@ -1,9 +1,13 @@
 # Energy Core Library - Code Generation Guidelines
 
 ## Project Overview
+
 Energy.Core is a .NET class library providing type conversions, utilities, database abstraction, object mapping, and application framework functionality for wide-range deployment scenarios.
 
+**IMPORTANT**: Before making any code changes, always read README.md in the project root and follow all guidelines and rules specified there unless specifically instructed to do something differently.
+
 ## Target Frameworks
+
 - **.NET Standard 2.0** - Modern cross-platform support
 - **.NET Framework 4.0** - Windows desktop applications
 - **.NET Framework 3.5** - Legacy Windows support
@@ -27,6 +31,7 @@ Energy.Core is a .NET class library providing type conversions, utilities, datab
 ## Code Structure
 
 ### Namespace Organization
+
 ```
 Energy.Base        - Base utility classes and core functionality
 Energy.Core        - Main library functions and application framework
@@ -38,6 +43,7 @@ Energy.Query      - SQL query building and dialects
 ```
 
 ### Conditional Compilation Directives
+
 ```csharp
 #if NETSTANDARD     // .NET Standard 2.0 specific code
 #elif NET40         // .NET Framework 4.0 specific code
@@ -50,6 +56,7 @@ Energy.Query      - SQL query building and dialects
 ## Coding Standards
 
 ### General Principles
+
 - **AOT-friendly** - Avoid runtime code generation
 - **Cross-platform** - Windows, Linux, macOS compatibility
 - **Backward compatible** - Support .NET 2.0 APIs
@@ -57,6 +64,7 @@ Energy.Query      - SQL query building and dialects
 - **Thread-safe** - Public APIs must be thread-safe
 
 ### .NET Compatibility
+
 - **Avoid .NET 4.0+ features** in main library code for .NET 2.0/3.5/Compact Framework compatibility
 - **Use compatible alternatives**: Replace `string.IsNullOrWhiteSpace()` with `string == null || string.Trim() == ""`
 - **Modern features allowed in test projects**: Test projects can use newer .NET features
@@ -66,18 +74,21 @@ Energy.Query      - SQL query building and dialects
 - **No local functions**: Avoid declaring functions inside other methods - use private methods instead
 
 ### Type Safety
+
 - Use strongly-typed collections over ArrayList
 - Prefer generic methods with constraints
 - Implement explicit interface conversions when needed
 - Use nullable types appropriately for value types
 
 ### Performance Considerations
+
 - Minimize boxing/unboxing operations
 - Use StringBuilder for string concatenation
 - Cache frequently used objects and delegates
 - Avoid reflection in hot paths
 
 ### Compact Framework Limitations
+
 - No LINQ (use manual iteration)
 - Limited generic support
 - No Expression Trees
@@ -87,12 +98,14 @@ Energy.Query      - SQL query building and dialects
 ## API Design
 
 ### Method Naming
+
 - Use **PascalCase** for public methods
 - Use **camelCase** for private methods
 - Prefix boolean methods with **Is/Has/Can**
 - Use descriptive names avoiding abbreviations
 
 ### Error Handling
+
 - Return default values for conversion failures
 - Use Energy.Base.Cast for safe type conversions
 - Implement graceful degradation for unsupported platforms
@@ -103,8 +116,10 @@ Energy.Query      - SQL query building and dialects
 - Include parameter descriptions and return value explanations
 - Add examples for complex functionality
 - Document platform-specific limitations
+- **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
 
 ### Method Organization
+
 - **Use #region/#endregion** to group related methods
 - **Group overloaded methods** in the same region with the function name as region name
 - **Region naming**: Use the function/method name as the region name (e.g., "#region HslToColor")
@@ -114,6 +129,7 @@ Energy.Query      - SQL query building and dialects
 ## Platform-Specific Guidelines
 
 ### Compact Framework
+
 ```csharp
 #if NETCF
     // Compact Framework specific implementation
@@ -127,24 +143,28 @@ Energy.Query      - SQL query building and dialects
 ```
 
 ### AOT Compilation
+
 - Avoid `System.Reflection.Emit`
 - Limit dynamic assembly loading
 - Use compiled delegates over reflection
 - Pre-generate serialization code if needed
 
 ## Testing Requirements
+
 - Unit tests for all public APIs
 - Integration tests for database functionality
 - Platform-specific test suites
 - Performance benchmarks for critical paths
 
 ### Test Project Configuration
+
 - **Energy.Core.Test** project requires **Visual Studio 2019** minimum
 - Uses MSTest framework with modern SDK-style project format
 - Targets .NET Framework 4.8 for maximum compatibility
 - All 263 tests must pass successfully before release
 
 ### Unit Test Maintenance
+
 **After any code change or addition, unit tests must be updated or created:**
 
 - **New functionality**: Create comprehensive unit tests covering all public methods, edge cases, and error conditions
@@ -167,12 +187,14 @@ Energy.Query      - SQL query building and dialects
 - Tests must be maintainable and clearly document the expected behavior
 
 ## Build Configuration
+
 - **Debug**: Full debugging info, no optimization
 - **Release**: Optimized, documentation generation
 - **Platform-specific builds** for each target framework
 - **Conditional symbols** for feature detection
 
 ## Dependencies
+
 - **Minimal external dependencies** for maximum compatibility
 - **NuGet packages** only when absolutely necessary
 - **Version-specific packages** for different target frameworks
