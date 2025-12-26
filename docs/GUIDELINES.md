@@ -56,6 +56,12 @@ Energy.Query      - SQL query building and dialects
 - **Memory efficient** - Minimal allocations, value types where appropriate
 - **Thread-safe** - Public APIs must be thread-safe
 
+### .NET Compatibility
+- **Avoid .NET 4.0+ features** in main library code for .NET 2.0/3.5/Compact Framework compatibility
+- **Use compatible alternatives**: Replace `string.IsNullOrWhiteSpace()` with `string == null || string.Trim() == ""`
+- **Modern features allowed in test projects**: Test projects can use newer .NET features
+- **Conditional compilation**: Use `#if` directives when necessary for platform-specific code
+
 ### Type Safety
 - Use strongly-typed collections over ArrayList
 - Prefer generic methods with constraints
@@ -95,6 +101,13 @@ Energy.Query      - SQL query building and dialects
 - Add examples for complex functionality
 - Document platform-specific limitations
 
+### Method Organization
+- **Use #region/#endregion** to group related methods
+- **Group overloaded methods** in the same region with the function name as region name
+- **Region naming**: Use the function/method name as the region name (e.g., "#region HslToColor")
+- **Logical grouping**: Organize regions by functionality, not just by accessibility
+- **Consistent ordering**: Place regions in a logical order within the class
+
 ## Platform-Specific Guidelines
 
 ### Compact Framework
@@ -127,6 +140,28 @@ Energy.Query      - SQL query building and dialects
 - Uses MSTest framework with modern SDK-style project format
 - Targets .NET Framework 4.8 for maximum compatibility
 - All 263 tests must pass successfully before release
+
+### Unit Test Maintenance
+**After any code change or addition, unit tests must be updated or created:**
+
+- **New functionality**: Create comprehensive unit tests covering all public methods, edge cases, and error conditions
+- **Bug fixes**: Add regression tests to prevent the bug from reoccurring
+- **API changes**: Update existing tests to reflect new method signatures, parameters, or return values
+- **Refactoring**: Ensure all existing tests still pass and cover the refactored code paths
+- **Platform-specific code**: Add tests for each target framework where behavior differs
+- **Performance changes**: Update benchmark tests to validate performance improvements or regressions
+
+**Test Execution Requirements:**
+- **After any code change**: Run all unit tests to verify no regressions
+- **Fix all failing tests**: No code change is complete until all tests pass
+- **Test validation**: Ensure new functionality works as expected before committing
+- **Continuous testing**: Run tests frequently during development to catch issues early
+
+**Test Coverage Requirements:**
+- All public methods must have corresponding unit tests
+- Test coverage should remain at or above current levels
+- Critical paths and error handling must be thoroughly tested
+- Tests must be maintainable and clearly document the expected behavior
 
 ## Build Configuration
 - **Debug**: Full debugging info, no optimization

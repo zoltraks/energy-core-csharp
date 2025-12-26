@@ -576,7 +576,7 @@ namespace Energy.Base
         /// <param name="validate">Ensure that text contains only date or time</param>
         /// <returns></returns>
         [Energy.Attribute.Code.WorkInProgress]
-        public static DateTime Parse(string text, bool validate) 
+        public static DateTime Parse(string text, bool validate)
         {
             return Parse(text);
         }

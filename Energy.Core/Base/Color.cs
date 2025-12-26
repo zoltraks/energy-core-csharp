@@ -100,13 +100,13 @@ namespace Energy.Base
             }
             //return new Color(System.Drawing.Color.FromName(value));
 
-            #if !NETCF            
-            #pragma warning disable IDE0034 // Simplify 'default' expression
-            #endif
+#if !NETCF
+#pragma warning disable IDE0034 // Simplify 'default' expression
+#endif
             return default(Color);
-            #if !NETCF            
-            #pragma warning restore IDE0034 // Simplify 'default' expression
-            #endif
+#if !NETCF
+#pragma warning restore IDE0034 // Simplify 'default' expression
+#endif
         }
 
         #endregion
@@ -209,5 +209,138 @@ namespace Energy.Base
 
             return new Color(a, r, g, b);
         }
+
+        #region IsValidHsl
+
+        /// <summary>
+        /// Validates HSL/HSLA color string format and ranges
+        /// </summary>
+        /// <param name="hsl">HSL color string to validate</param>
+        /// <returns>True if valid, false otherwise</returns>
+        public static bool IsValidHsl(string hsl)
+        {
+            if (hsl == null || hsl.Trim() == "")
+                return false;
+
+            // Validate input format - should contain H, S, L values and optionally A
+            string pattern = @"^\s*\(?\s*(\d+)\s*°?\s*,\s*(\d+)\s*%?\s*,\s*(\d+)\s*%?\s*(?:,\s*(\d+(?:\.\d+)?)(?:%?)\s*)?\)?\s*$";
+
+            if (!Regex.IsMatch(hsl, pattern))
+                return false;
+
+            // Extract numeric values
+            var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
+
+            if (matches.Count < 3)
+                return false;
+
+            // Parse HSL values
+            int h = int.Parse(matches[0].Value);
+            int s = int.Parse(matches[1].Value);
+            int l = int.Parse(matches[2].Value);
+
+            // Validate ranges
+            if (h < 0 || h > 360)
+                return false;
+            if (s < 0 || s > 100)
+                return false;
+            if (l < 0 || l > 100)
+                return false;
+
+            // Validate alpha range if present
+            if (matches.Count >= 4)
+            {
+                double alpha = double.Parse(matches[3].Value);
+                // Check if the original string has % after the alpha value
+                var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
+                if (alphaMatch.Success && alphaMatch.Value.Contains("%"))
+                    alpha = alpha / 100.0;
+                
+                if (alpha < 0.0 || alpha > 1.0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region HslToColor
+
+        /// <summary>
+        /// Converts HSL/HSLA color string to Color object
+        /// </summary>
+        /// <param name="hsl">HSL color string in various formats</param>
+        /// <returns>New Color object with RGB values</returns>
+        public static Energy.Base.Color HslToColor(string hsl)
+        {
+            if (hsl == null || hsl.Trim() == "")
+                throw new System.FormatException("HSL string cannot be null or empty");
+
+            if (!IsValidHsl(hsl))
+                throw new System.FormatException($"Invalid HSL format: '{hsl}'. Expected format: (H°, S%, L%) or (H°, S%, L%, A)");
+
+            // Extract numeric values
+            var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
+
+            // Parse HSL values
+            int h = int.Parse(matches[0].Value);
+            int s = int.Parse(matches[1].Value);
+            int l = int.Parse(matches[2].Value);
+
+            // Parse alpha if present
+            double alpha = 1.0;
+            if (matches.Count >= 4)
+            {
+                alpha = double.Parse(matches[3].Value);
+                // Check if the original string has % after the alpha value
+                var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
+                if (alphaMatch.Success && alphaMatch.Value.Contains("%"))
+                    alpha = alpha / 100.0;
+                else
+                    alpha = System.Math.Min(1.0, System.Math.Max(0.0, alpha));
+            }
+
+            // Convert HSL to RGB
+            double hNormalized = h / 360.0;
+            double sNormalized = s / 100.0;
+            double lNormalized = l / 100.0;
+
+            double r, g, b;
+
+            if (sNormalized == 0)
+            {
+                // Achromatic (gray)
+                r = g = b = lNormalized;
+            }
+            else
+            {
+                double Hue2Rgb(double p1, double q1, double t1)
+                {
+                    if (t1 < 0) t1 += 1;
+                    if (t1 > 1) t1 -= 1;
+                    if (t1 < 1.0 / 6.0) return p1 + (q1 - p1) * 6 * t1;
+                    if (t1 < 1.0 / 2.0) return q1;
+                    if (t1 < 2.0 / 3.0) return p1 + (q1 - p1) * (2.0 / 3.0 - t1) * 6;
+                    return p1;
+                }
+
+                double q = lNormalized < 0.5 ? lNormalized * (1 + sNormalized) : lNormalized + sNormalized - lNormalized * sNormalized;
+                double p = 2 * lNormalized - q;
+                r = Hue2Rgb(p, q, hNormalized + 1.0 / 3.0);
+                g = Hue2Rgb(p, q, hNormalized);
+                b = Hue2Rgb(p, q, hNormalized - 1.0 / 3.0);
+            }
+
+            // Convert to 0-255 range
+            int rByte = (int)System.Math.Round(r * 255);
+            int gByte = (int)System.Math.Round(g * 255);
+            int bByte = (int)System.Math.Round(b * 255);
+            int aByte = (int)System.Math.Round(alpha * 255);
+
+            return new Energy.Base.Color((byte)aByte, (byte)rByte, (byte)gByte, (byte)bByte);
+        }
+
+        #endregion
     }
 }
