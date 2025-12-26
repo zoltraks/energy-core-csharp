@@ -12,13 +12,15 @@ The `Energy.Core` directory contains the source code for the library.
 
 - **Energy.Core.csproj** - The main C# source code project file for the library
 - **Energy.Core.Compact.Legacy.csproj** - Old style C# project file for Compact Framework 2.0
-- **Energy.Core.Compact.csproj** - C# project file for Compact Framework 3.5
+- **Energy.Core.Compact.Library.csproj** - C# project file for Compact Framework 3.5
 
 ## Solution Files
 
 ### Library Solution
 
 - **Energy.Core.sln** - Solution file for the library only
+- **Energy.Core.Compact/Energy.Core.Compact.Library.sln** - Solution file for Compact Framework 3.5 library
+- **Energy.Core.Compact/Energy.Core.Compact.Legacy.sln** - Solution file for Compact Framework 2.0 library
 
 ### Test Solution
 
