@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Text;
-using Energy.Interface;
 
 namespace Energy.Core
 {
@@ -52,7 +47,7 @@ namespace Energy.Core
         /// </summary>
         public Energy.Core.Locale Locale { get; set; }
 
-        private ICommandProgram _CommandProgram;
+        private Interface.ICommandProgram _CommandProgram;
 
         public string[] Arguments { get; private set; }
 
@@ -144,7 +139,7 @@ namespace Energy.Core
         /// <summary>
         /// Run
         /// </summary>
-        public bool Run(ICommandProgram commandProgram, string[] args)
+        public bool Run(Interface.ICommandProgram commandProgram, string[] args)
         {
             try
             {
@@ -215,30 +210,19 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
-            Energy.Core.Program.SetConsoleEncoding(encoding);
-            //try
-            //{
-            //    Console.InputEncoding = encoding;
-            //    Console.OutputEncoding = encoding;
-            //}
-            //catch (System.Security.SecurityException)
-            //{ }
-            //catch (Exception x)
-            //{
-            //    Energy.Core.Bug.Catch(x);
-            //}
+            Energy.Core.Program.SetConsoleEncoding(encoding);            
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(string encoding)
         {
-            SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
+            Energy.Core.Program.SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding()
         {
-            SetConsoleEncoding(System.Text.Encoding.UTF8);
+            Energy.Core.Program.SetConsoleEncoding(System.Text.Encoding.UTF8);
         }
 
         /// <summary>
@@ -273,8 +257,16 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
-            return assembly.GetName().Name;
+#if !NETCF
+            //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
+            //return assembly.GetName().Name;
+            return System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+#endif
+#if NETCF
+            string commandPath = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
+            string commandShortName = System.IO.Path.GetFileNameWithoutExtension(commandPath);
+            return commandShortName;
+#endif
         }
 
         #endregion

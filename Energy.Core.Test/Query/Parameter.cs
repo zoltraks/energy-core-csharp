@@ -53,13 +53,13 @@ namespace Energy.Core.Test.Query
 )
  SELECT SCOPE_IDENTITY()";
             bag.Clear();
-            bag.Set("@EditCode", "ww", Enumeration.FormatType.Text);
-            bag.Set("@EditCount", "12", Enumeration.FormatType.Number);
+            bag.Set("@EditCode", "ww", Energy.Enumeration.FormatType.Text);
+            bag.Set("@EditCount", "12", Energy.Enumeration.FormatType.Number);
             result = bag.Parse(query);
             Assert.IsNotNull(result);
 
             bag.Clear();
-            bag.Set("where", "1=1", Enumeration.FormatType.Plain);
+            bag.Set("where", "1=1", Energy.Enumeration.FormatType.Plain);
             result = bag.Parse("@WHERE");
             Assert.AreEqual("1=1", result);
 

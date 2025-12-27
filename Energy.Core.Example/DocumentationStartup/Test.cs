@@ -49,7 +49,6 @@ namespace DocumentationStartup
         {
             string s = "Hello";
             Console.WriteLine(Energy.Base.Hash.CRC(s));
-            Console.WriteLine(Energy.Base.Hash.CRC2(s));
             Console.WriteLine(Energy.Base.Hash.PJW(s));
             Console.WriteLine(Energy.Base.Hash.MD5(s));
             Console.WriteLine(Energy.Base.Hash.SHA1(s));

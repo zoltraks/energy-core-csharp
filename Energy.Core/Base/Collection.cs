@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using System.Globalization;
 
 namespace Energy.Base
 {
@@ -1764,11 +1764,11 @@ namespace Energy.Base
 
                 public TValue this[TKey key]
                 {
-                    get 
+                    get
                     {
                         return Get(key);
                     }
-                    set 
+                    set
                     {
                         Set(key, value);
                     }
@@ -1776,11 +1776,11 @@ namespace Energy.Base
 
                 public TValue this[int index]
                 {
-                    get 
+                    get
                     {
                         return Get(index);
                     }
-                    set 
+                    set
                     {
                         Set(index, value);
                     }
@@ -1902,11 +1902,11 @@ namespace Energy.Base
 
             public Energy.Interface.IRow<TKey, TValue> this[int index]
             {
-                get 
+                get
                 {
                     return GetByIndex(index);
                 }
-                set 
+                set
                 {
                     SetByIndex(index, value);
                 }
@@ -1914,7 +1914,7 @@ namespace Energy.Base
 
             public IList<Energy.Interface.IRow<TKey, TValue>> Rows
             {
-                get 
+                get
                 {
                     return _Rows;
                 }
@@ -1922,21 +1922,21 @@ namespace Energy.Base
 
             public IList<Energy.Interface.IColumn<TKey, TValue>> Columns
             {
-                get 
+                get
                 {
                     return _Columns;
                 }
             }
 
-            public int Count 
+            public int Count
             {
-                get 
+                get
                 {
                     return _Rows.Count;
                 }
             }
 
-            public bool IsReadOnly 
+            public bool IsReadOnly
             {
                 get
                 {
@@ -1949,7 +1949,7 @@ namespace Energy.Base
                 return null == array || 0 == array.Count;
             }
 
-            public void Add(Energy.Interface.IRow<TKey, TValue> item) 
+            public void Add(Energy.Interface.IRow<TKey, TValue> item)
             {
                 _Rows.Add(item);
             }
@@ -1959,27 +1959,27 @@ namespace Energy.Base
                 _Rows.Clear();
             }
 
-            public bool Contains(Energy.Interface.IRow<TKey, TValue> item) 
+            public bool Contains(Energy.Interface.IRow<TKey, TValue> item)
             {
                 return _Rows.Contains(item);
             }
 
-            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex) 
+            public void CopyTo(Energy.Interface.IRow<TKey, TValue>[] array, int arrayIndex)
             {
                 _Rows.CopyTo(array, arrayIndex);
             }
 
-            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator() 
+            public IEnumerator<Energy.Interface.IRow<TKey, TValue>> GetEnumerator()
             {
                 return _Rows.GetEnumerator();
             }
 
-            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item) 
+            public int IndexOf(Energy.Interface.IRow<TKey, TValue> item)
             {
                 return _Rows.IndexOf(item);
             }
 
-            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item) 
+            public void Insert(int index, Energy.Interface.IRow<TKey, TValue> item)
             {
                 Insert(index, item);
             }
@@ -1989,12 +1989,12 @@ namespace Energy.Base
                 return _Rows.Remove(item);
             }
 
-            public void RemoveAt(int index) 
+            public void RemoveAt(int index)
             {
                 _Rows.RemoveAt(index);
             }
 
-            IEnumerator IEnumerable.GetEnumerator() 
+            IEnumerator IEnumerable.GetEnumerator()
             {
                 return _Rows.GetEnumerator();
             }

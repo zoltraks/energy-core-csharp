@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Compact.Legacy", "Energy.Core\Energy.Core.Compact.Legacy.csproj", "{349011BA-FE91-4B2D-9E73-C8B7FC611385}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energy.Core.Compact.Legacy", "..\Energy.Core\Energy.Core.Compact.Legacy.csproj", "{349011BA-FE91-4B2D-9E73-C8B7FC611385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

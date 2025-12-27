@@ -19,9 +19,7 @@ Above statement includes desktop applications, services, console programs runnin
 Runtimes .NET (2.0 + above) and .NET Core (2.0 + later) are supported. 
 CF.NET support is available as separate download.
 
-Browse project page for more details.
-
-Brought to you by "Happy Code".</Description>
+Browse project page for more details.</Description>
     <Copyright>Filip Golewski &lt;f.golewski@gmail.com&gt;</Copyright>
     <PackageReleaseNotes>How much reality can you take?</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
