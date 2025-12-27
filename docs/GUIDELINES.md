@@ -62,6 +62,7 @@ Energy.Query      - SQL query building and dialects
 - **Backward compatible** - Support .NET 2.0 APIs
 - **Memory efficient** - Minimal allocations, value types where appropriate
 - **Thread-safe** - Public APIs must be thread-safe
+- **Fully qualified references** - When referencing classes or static members declared in another type, use their full namespace (for example `Energy.Base.Binary.BitReader` instead of relying on `using` aliases). This keeps intent explicit and avoids namespace conflicts across multi-targeted builds.
 
 ### .NET Compatibility
 
@@ -116,6 +117,7 @@ Energy.Query      - SQL query building and dialects
 - Include parameter descriptions and return value explanations
 - Add examples for complex functionality
 - Document platform-specific limitations
+- When a `<summary>` comment needs multiple sentences, separate each sentence with `<br/><br/>` (e.g., `First sentence.<br/><br/>Second sentence.`) to keep formatting consistent across viewers.
 - **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
 - **XML comments**: In `<summary>` blocks, omit the trailing period for single-sentence descriptions. For multiple sentences, end each sentence with a period and separate them using `<br/><br/>`.
 

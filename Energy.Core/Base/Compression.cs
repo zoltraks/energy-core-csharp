@@ -428,102 +428,7 @@ namespace Energy.Base
                 WriteBit(state, backwardsMode ? 0 : 1);
             }
 
-            private class BitWriter
-            {
-                private MemoryStream stream;
-                private int bitMask;
-                private int bitValue;
-                private int lastBit;
-
-                public BitWriter(MemoryStream stream)
-                {
-                    this.stream = stream;
-                    this.bitMask = 128;
-                    this.bitValue = 0;
-                    this.lastBit = 0;
-                }
-
-                public void WriteBit(int bit)
-                {
-                    lastBit = bit;
-                    if (bit != 0)
-                        bitValue |= bitMask;
-                    bitMask >>= 1;
-                    if (bitMask == 0)
-                    {
-                        stream.WriteByte((byte)bitValue);
-                        bitMask = 128;
-                        bitValue = 0;
-                    }
-                }
-
-                public int GetLastBit()
-                {
-                    return lastBit;
-                }
-
-                public void WriteByte(byte value)
-                {
-                    // Write byte directly to stream
-                    // In ZX0, literal bytes and bit-packed data are interleaved in the stream
-                    stream.WriteByte(value);
-                }
-
-                public void Flush()
-                {
-                    if (bitMask != 128)
-                        stream.WriteByte((byte)bitValue);
-                }
-            }
-
-            private class BitReader
-            {
-                private byte[] data;
-                private int index;
-                private int bitMask;
-                private int bitValue;
-                private int lastByte;
-                private bool backtrack;
-
-                public BitReader(byte[] data)
-                {
-                    this.data = data;
-                    this.index = 0;
-                    this.bitMask = 0;
-                    this.backtrack = false;
-                }
-
-                public int ReadByte()
-                {
-                    if (index >= data.Length)
-                        throw new InvalidOperationException("Unexpected end of data");
-                    lastByte = data[index++];
-                    return lastByte;
-                }
-
-                public int ReadBit()
-                {
-                    if (backtrack)
-                    {
-                        backtrack = false;
-                        return lastByte & 1;
-                    }
-                    bitMask >>= 1;
-                    if (bitMask == 0)
-                    {
-                        bitMask = 128;
-                        bitValue = ReadByte();
-                    }
-                    return (bitValue & bitMask) != 0 ? 1 : 0;
-                }
-
-                public void SetBacktrack()
-                {
-                    backtrack = true;
-                }
-            }
-
-            private static void WriteInterlacedEliasGamma(BitWriter writer, int value, bool inverted)
+            private static void WriteInterlacedEliasGamma(Energy.Base.Binary.BitWriter writer, int value, bool inverted)
             {
                 int bits = 0;
                 int temp = value;
@@ -542,7 +447,7 @@ namespace Energy.Base
                 writer.WriteBit(1);
             }
 
-            private static int ReadInterlacedEliasGamma(BitReader reader, bool inverted)
+            private static int ReadInterlacedEliasGamma(Energy.Base.Binary.BitReader reader, bool inverted)
             {
                 int value = 1;
                 while (reader.ReadBit() == 0)
@@ -615,7 +520,7 @@ namespace Energy.Base
                     if (data == null) return null;
                     if (data.Length == 0) return new byte[0];
 
-                    BitReader reader = new BitReader(data);
+                    Energy.Base.Binary.BitReader reader = new Energy.Base.Binary.BitReader(data);
                     System.Collections.Generic.List<byte> output = new System.Collections.Generic.List<byte>();
                     int lastOffset = INITIAL_OFFSET;
                     bool classicMode = false;

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Base
@@ -319,6 +320,100 @@ namespace Energy.Core.Test.Base
             d = new byte[] { 0b00000100, 0b00000000, 0b00000000 };
             c = Energy.Base.Binary.Rol(a, 6);
             Assert.AreEqual(0, Energy.Base.Binary.Compare(c, d));
+        }
+
+        [TestMethod]
+        public void Binary_BitWriter_DefaultBitPacking()
+        {
+            byte[] data;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                Energy.Base.Binary.BitWriter writer = new Energy.Base.Binary.BitWriter(stream);
+                int[] bits = new int[] { 1, 0, 1, 1, 0, 1, 0, 0 };
+                for (int i = 0; i < bits.Length; i++)
+                {
+                    writer.WriteBit(bits[i]);
+                }
+
+                writer.WriteByte(0xAA);
+                writer.WriteBit(1);
+                writer.WriteBit(0);
+                writer.Flush();
+
+                Assert.AreEqual(0, writer.GetLastBit(), "Last bit should reflect most recent write");
+                data = stream.ToArray();
+            }
+
+            Assert.AreEqual(3, data.Length, "Stream should contain two full bytes and one flushed partial byte");
+            Assert.AreEqual(0xB4, data[0], "First byte should match MSB-first packed bits");
+            Assert.AreEqual(0xAA, data[1], "Literal byte should be preserved");
+            Assert.AreEqual(0x80, data[2], "Remaining bits should be flushed into high bits of last byte");
+        }
+
+        [TestMethod]
+        public void Binary_BitReader_LsbBacktrack()
+        {
+            byte[] buffer;
+            Energy.Base.Binary.BitWriter.Options writerOptions = new Energy.Base.Binary.BitWriter.Options
+            {
+                MostSignificantBitFirst = false,
+                AllowLiteralInterleave = false,
+                LeaveStreamOpen = true
+            };
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                Energy.Base.Binary.BitWriter writer = new Energy.Base.Binary.BitWriter(stream, writerOptions);
+                int[] bits = new int[] { 1, 0, 1, 1, 0, 1, 0, 0 };
+                for (int i = 0; i < bits.Length; i++)
+                {
+                    writer.WriteBit(bits[i]);
+                }
+
+                writer.WriteByte(0x11);
+
+                int[] trailerBits = new int[] { 1, 0, 1, 0 };
+                for (int i = 0; i < trailerBits.Length; i++)
+                {
+                    writer.WriteBit(trailerBits[i]);
+                }
+
+                writer.Flush();
+                buffer = stream.ToArray();
+            }
+
+            Assert.AreEqual(3, buffer.Length, "Writer should emit two full bytes and one partial byte in LSB mode");
+            Assert.AreEqual(0x2D, buffer[0], "LSB-first packed byte should match expected pattern");
+            Assert.AreEqual(0x11, buffer[1], "Literal byte should match written value");
+            Assert.AreEqual(0x05, buffer[2], "Trailer bits should flush into final byte in LSB order");
+
+            Energy.Base.Binary.BitReader.Options readerOptions = new Energy.Base.Binary.BitReader.Options
+            {
+                MostSignificantBitFirst = false
+            };
+
+            Energy.Base.Binary.BitReader reader = new Energy.Base.Binary.BitReader(buffer, 0, buffer.Length, readerOptions);
+
+            int[] readBits = new int[8];
+            for (int i = 0; i < readBits.Length; i++)
+            {
+                readBits[i] = reader.ReadBit();
+            }
+            CollectionAssert.AreEqual(new int[] { 1, 0, 1, 1, 0, 1, 0, 0 }, readBits, "Reader should reconstruct LSB bit order correctly");
+
+            int literal = reader.ReadByte();
+            Assert.AreEqual(0x11, literal, "Literal round-trip mismatch");
+
+            reader.SetBacktrack();
+            int backtrackBit = reader.ReadBit();
+            Assert.AreEqual(literal & 1, backtrackBit, "Backtrack should surface lowest bit of literal byte");
+
+            int[] trailerRead = new int[4];
+            for (int i = 0; i < trailerRead.Length; i++)
+            {
+                trailerRead[i] = reader.ReadBit();
+            }
+            CollectionAssert.AreEqual(new int[] { 1, 0, 1, 0 }, trailerRead, "Remaining trailer bits should be readable after backtrack");
         }
     }
 }
