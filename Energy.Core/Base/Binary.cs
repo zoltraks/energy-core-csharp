@@ -1012,11 +1012,11 @@ namespace Energy.Base
             public BitReader(byte[] data, int index, int count, Options options)
             {
                 if (data == null)
-                    throw new ArgumentNullException(nameof(data));
+                    throw new ArgumentNullException("data");
                 if (index < 0 || index > data.Length)
-                    throw new ArgumentOutOfRangeException(nameof(index));
+                    throw new ArgumentOutOfRangeException("index");
                 if (count < 0 || index + count > data.Length)
-                    throw new ArgumentOutOfRangeException(nameof(count));
+                    throw new ArgumentOutOfRangeException("count");
 
                 this.buffer = data;
                 this.startIndex = index;
@@ -1043,7 +1043,7 @@ namespace Energy.Base
             public BitReader(Stream stream, Options options)
             {
                 if (stream == null)
-                    throw new ArgumentNullException(nameof(stream));
+                    throw new ArgumentNullException("stream");
 
                 this.stream = stream;
                 this.options = options ?? new Options();
@@ -1226,7 +1226,7 @@ namespace Energy.Base
             public BitWriter(Stream stream, Options options)
             {
                 if (stream == null)
-                    throw new ArgumentNullException(nameof(stream));
+                    throw new ArgumentNullException("stream");
 
                 this.stream = stream;
                 this.options = options ?? new Options();
@@ -1252,7 +1252,7 @@ namespace Energy.Base
                 EnsureNotDisposed();
 
                 if (bit != 0 && bit != 1)
-                    throw new ArgumentOutOfRangeException(nameof(bit), "Bit value must be 0 or 1.");
+                    throw new ArgumentOutOfRangeException("bit", "Bit value must be 0 or 1.");
 
                 PrepareBitMask();
                 lastBit = bit;
@@ -1352,7 +1352,7 @@ namespace Energy.Base
             private void EnsureNotDisposed()
             {
                 if (disposed)
-                    throw new ObjectDisposedException(nameof(BitWriter));
+                    throw new ObjectDisposedException("BitWriter");
             }
         }
 

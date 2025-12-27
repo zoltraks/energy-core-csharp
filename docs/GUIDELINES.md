@@ -70,6 +70,7 @@ Energy.Query      - SQL query building and dialects
 - **Use compatible alternatives**: Replace `string.IsNullOrWhiteSpace()` with `string == null || string.Trim() == ""`
 - **No `string.IsNullOrWhiteSpace` usage**: The method is unavailable on .NET 2.0/3.5/CF, so never call it in production code—always expand to explicit null/trim checks as shown above.
 - **Avoid auto-property initializers**: Syntax such as `public bool Enabled { get; set; } = true;` is not supported on .NET 2.0/3.5/CF. Assign defaults via constructors or explicit initialization logic instead.
+- **Avoid the `nameof` operator**: Older compilers do not support `nameof(...)`. Use literal parameter names in exception constructors and logging.
 - **Modern features allowed in test projects**: Test projects can use newer .NET features
 - **Conditional compilation**: Use `#if` directives when necessary for platform-specific code
 - **No verbatim strings with "$"**: Avoid `$@"..."` interpolated verbatim strings - use string.Format() or regular concatenation instead
@@ -180,7 +181,7 @@ Energy.Query      - SQL query building and dialects
 - **Performance changes**: Update benchmark tests to validate performance improvements or regressions
 
 **Test Execution Requirements:**
-- **After any code change**: Run all unit tests to verify no regressions
+- **After each code change**: Run all unit tests immediately to verify no regressions
 - **Fix all failing tests**: No code change is complete until all tests pass
 - **Test validation**: Ensure new functionality works as expected before committing
 - **Continuous testing**: Run tests frequently during development to catch issues early
