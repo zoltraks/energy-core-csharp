@@ -210,30 +210,19 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
-            Energy.Core.Program.SetConsoleEncoding(encoding);
-            //try
-            //{
-            //    Console.InputEncoding = encoding;
-            //    Console.OutputEncoding = encoding;
-            //}
-            //catch (System.Security.SecurityException)
-            //{ }
-            //catch (Exception x)
-            //{
-            //    Energy.Core.Bug.Catch(x);
-            //}
+            Energy.Core.Program.SetConsoleEncoding(encoding);            
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(string encoding)
         {
-            SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
+            Energy.Core.Program.SetConsoleEncoding(Energy.Base.Text.Encoding(encoding));
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding()
         {
-            SetConsoleEncoding(System.Text.Encoding.UTF8);
+            Energy.Core.Program.SetConsoleEncoding(System.Text.Encoding.UTF8);
         }
 
         /// <summary>
@@ -268,14 +257,14 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
-            #if !NETCF
+#if !NETCF
             //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
             //return assembly.GetName().Name;
             return System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-            #endif
-            #if NETCF
+#endif
+#if NETCF
             return "";
-            #endif
+#endif
         }
 
         #endregion
