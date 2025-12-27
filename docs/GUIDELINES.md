@@ -117,6 +117,7 @@ Energy.Query      - SQL query building and dialects
 - Add examples for complex functionality
 - Document platform-specific limitations
 - **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
+- **XML comments**: In `<summary>` blocks, omit the trailing period for single-sentence descriptions. For multiple sentences, end each sentence with a period and separate them using `<br/><br/>`.
 
 ### Method Organization
 

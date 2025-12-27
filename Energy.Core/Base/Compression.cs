@@ -4,10 +4,12 @@ using System.IO;
 namespace Energy.Base
 {
     /// <summary>
-    /// Compression
+    /// Compression functions
     /// </summary>
     public class Compression
     {
+        #region Deflate
+
         /// <summary>
         /// Deflate
         /// </summary>
@@ -74,6 +76,10 @@ namespace Energy.Base
             }
         }
 
+        #endregion
+
+        #region GZip
+
         /// <summary>
         /// GZip
         /// </summary>
@@ -139,6 +145,10 @@ namespace Energy.Base
                 return array;
             }
         }
+
+        #endregion
+
+        #region ZX0
 
         /// <summary>
         /// ZX0
@@ -669,5 +679,7 @@ namespace Energy.Base
                 }
             }
         }
+
+        #endregion
     }
 }

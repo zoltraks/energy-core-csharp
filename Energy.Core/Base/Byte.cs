@@ -28,14 +28,14 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned int (32-bit)</param>
         /// <returns>Reversed numeric value</returns>
-        public static ulong Reverse(uint value)
+        public static uint Reverse(uint value)
         {
             byte b1 = (byte)((value >> 0) & 0xff);
             byte b2 = (byte)((value >> 8) & 0xff);
             byte b3 = (byte)((value >> 16) & 0xff);
             byte b4 = (byte)((value >> 24) & 0xff);
 
-            return (ulong)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
+            return (uint)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
         }
 
         #region Compare
