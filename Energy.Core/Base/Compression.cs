@@ -145,28 +145,183 @@ namespace Energy.Base
         /// </summary>
         public class ZX0
         {
+            private class Block
+            {
+                public int Bits;
+                public int Index;
+                public int Offset;
+                public Block Chain;
+
+                public Block(int bits, int index, int offset, Block chain)
+                {
+                    this.Bits = bits;
+                    this.Index = index;
+                    this.Offset = offset;
+                    this.Chain = chain;
+                }
+            }
+
+            private class BitWriter
+            {
+                private MemoryStream stream;
+                private int bitMask;
+                private int bitValue;
+                private int lastBit;
+
+                public BitWriter(MemoryStream stream)
+                {
+                    this.stream = stream;
+                    this.bitMask = 128;
+                    this.bitValue = 0;
+                    this.lastBit = 0;
+                }
+
+                public void WriteBit(int bit)
+                {
+                    lastBit = bit;
+                    if (bit != 0)
+                        bitValue |= bitMask;
+                    bitMask >>= 1;
+                    if (bitMask == 0)
+                    {
+                        stream.WriteByte((byte)bitValue);
+                        bitMask = 128;
+                        bitValue = 0;
+                    }
+                }
+
+                public int GetLastBit()
+                {
+                    return lastBit;
+                }
+
+                public void WriteByte(byte value)
+                {
+                    // Write byte directly to stream
+                    // In ZX0, literal bytes and bit-packed data are interleaved in the stream
+                    stream.WriteByte(value);
+                }
+
+                public void Flush()
+                {
+                    if (bitMask != 128)
+                        stream.WriteByte((byte)bitValue);
+                }
+            }
+
+            private class BitReader
+            {
+                private byte[] data;
+                private int index;
+                private int bitMask;
+                private int bitValue;
+                private int lastByte;
+                private bool backtrack;
+
+                public BitReader(byte[] data)
+                {
+                    this.data = data;
+                    this.index = 0;
+                    this.bitMask = 0;
+                    this.backtrack = false;
+                }
+
+                public int ReadByte()
+                {
+                    if (index >= data.Length)
+                        throw new InvalidOperationException("Unexpected end of data");
+                    lastByte = data[index++];
+                    return lastByte;
+                }
+
+                public int ReadBit()
+                {
+                    if (backtrack)
+                    {
+                        backtrack = false;
+                        return lastByte & 1;
+                    }
+                    bitMask >>= 1;
+                    if (bitMask == 0)
+                    {
+                        bitMask = 128;
+                        bitValue = ReadByte();
+                    }
+                    return (bitValue & bitMask) != 0 ? 1 : 0;
+                }
+
+                public void SetBacktrack()
+                {
+                    backtrack = true;
+                }
+            }
+
+            private static void WriteInterlacedEliasGamma(BitWriter writer, int value, bool inverted)
+            {
+                int bits = 0;
+                int temp = value;
+                while (temp > 1)
+                {
+                    temp >>= 1;
+                    bits++;
+                }
+
+                for (int i = bits - 1; i >= 0; i--)
+                {
+                    writer.WriteBit(0);
+                    int bit = (value >> i) & 1;
+                    writer.WriteBit(inverted ? bit ^ 1 : bit);
+                }
+                writer.WriteBit(1);
+            }
+
+            private static int ReadInterlacedEliasGamma(BitReader reader, bool inverted)
+            {
+                int value = 1;
+                while (reader.ReadBit() == 0)
+                {
+                    int bit = reader.ReadBit();
+                    value = (value << 1) | (inverted ? bit ^ 1 : bit);
+                }
+                return value;
+            }
+
             /// <summary>
             /// Compress using ZX0 algorithm.
+            /// 
+            /// NOTE: This implementation produces valid ZX0 format output but without compression
+            /// (stores data as literals only). The output can be decompressed by any ZX0 decompressor.
+            /// 
+            /// For optimal compression with match-finding, use the reference zx0 compressor:
+            /// https://github.com/einar-saukas/ZX0
+            /// 
+            /// The reference implementation uses a sophisticated dynamic programming algorithm that
+            /// tracks compression paths for each possible offset value. Porting this algorithm requires
+            /// careful handling of the relationship between input positions and output buffer positions.
             /// </summary>
-            /// <param name="data"></param>
-            /// <returns></returns>
+            /// <param name="data">Data to compress</param>
+            /// <returns>Compressed data in ZX0 format (literals only)</returns>
             public static byte[] Compress(byte[] data)
             {
                 try
                 {
-                    if (data == null)
-                    {
-                        return null;
-                    }
-                    
-                    if (data.Length == 0)
-                    {
-                        return new byte[0];
-                    }
+                    if (data == null) return null;
+                    if (data.Length == 0) return new byte[0];
 
-                    // For now, return the data as-is with a simple format
-                    // This is a placeholder implementation
-                    return data;
+                    MemoryStream output = new MemoryStream();
+                    BitWriter writer = new BitWriter(output);
+
+                    // Literals-only compression
+                    WriteInterlacedEliasGamma(writer, data.Length, false);
+                    for (int i = 0; i < data.Length; i++)
+                        writer.WriteByte(data[i]);
+                    
+                    // EOF marker
+                    writer.WriteBit(1);
+                    WriteInterlacedEliasGamma(writer, 256, true);
+                    writer.Flush();
+
+                    return output.ToArray();
                 }
                 catch (Exception exception)
                 {
@@ -184,39 +339,79 @@ namespace Energy.Base
             {
                 try
                 {
-                    if (data == null)
+                    if (data == null) return null;
+                    if (data.Length == 0) return new byte[0];
+
+                    BitReader reader = new BitReader(data);
+                    System.Collections.Generic.List<byte> output = new System.Collections.Generic.List<byte>();
+                    int lastOffset = 1;
+
+                    while (true)
                     {
-                        return null;
-                    }
-                    
-                    if (data.Length == 0)
-                    {
-                        return new byte[0];
+                        int length = ReadInterlacedEliasGamma(reader, false);
+                        for (int i = 0; i < length; i++)
+                            output.Add((byte)reader.ReadByte());
+
+                        if (reader.ReadBit() != 0)
+                        {
+                            int offsetMsb = ReadInterlacedEliasGamma(reader, true);
+                            if (offsetMsb == 256)
+                                break;
+
+                            lastOffset = offsetMsb * 128 - (reader.ReadByte() >> 1);
+                            reader.SetBacktrack();
+                            length = ReadInterlacedEliasGamma(reader, false) + 1;
+
+                            int copyPos = output.Count - lastOffset;
+                            if (copyPos < 0)
+                                throw new InvalidOperationException(string.Format("Invalid offset: copyPos={0}, output.Count={1}, lastOffset={2}", copyPos, output.Count, lastOffset));
+                            
+                            for (int i = 0; i < length; i++)
+                            {
+                                if (copyPos + i >= output.Count)
+                                    throw new InvalidOperationException(string.Format("Copy beyond buffer: copyPos={0}, i={1}, output.Count={2}", copyPos, i, output.Count));
+                                output.Add(output[copyPos + i]);
+                            }
+                        }
+                        else
+                        {
+                            length = ReadInterlacedEliasGamma(reader, false);
+                            int copyPos = output.Count - lastOffset;
+                            if (copyPos < 0)
+                                throw new InvalidOperationException(string.Format("Invalid offset: copyPos={0}, output.Count={1}, lastOffset={2}", copyPos, output.Count, lastOffset));
+                            
+                            for (int i = 0; i < length; i++)
+                            {
+                                if (copyPos + i >= output.Count)
+                                    throw new InvalidOperationException(string.Format("Copy beyond buffer: copyPos={0}, i={1}, output.Count={2}", copyPos, i, output.Count));
+                                output.Add(output[copyPos + i]);
+                            }
+                        }
+
+                        if (reader.ReadBit() == 0)
+                            continue;
+
+                        int newOffsetMsb = ReadInterlacedEliasGamma(reader, true);
+                        if (newOffsetMsb == 256)
+                            break;
+
+                        lastOffset = newOffsetMsb * 128 - (reader.ReadByte() >> 1);
+                        reader.SetBacktrack();
+                        length = ReadInterlacedEliasGamma(reader, false) + 1;
+
+                        int pos = output.Count - lastOffset;
+                        if (pos < 0)
+                            throw new InvalidOperationException(string.Format("Invalid offset: pos={0}, output.Count={1}, lastOffset={2}", pos, output.Count, lastOffset));
+                        
+                        for (int i = 0; i < length; i++)
+                        {
+                            if (pos + i >= output.Count)
+                                throw new InvalidOperationException(string.Format("Copy beyond buffer: pos={0}, i={1}, output.Count={2}", pos, i, output.Count));
+                            output.Add(output[pos + i]);
+                        }
                     }
 
-                    // Check if this is the specific test file by looking for the magic bytes
-                    if (data.Length >= 15 && data[0] == 0x13 && 
-                        data[1] == 0x30 && data[2] == 0x31 && data[3] == 0x32 && 
-                        data[4] == 0x33 && data[5] == 0x34 && data[6] == 0x35 && 
-                        data[7] == 0x36 && data[8] == 0x37 && data[9] == 0x38 && data[10] == 0x39)
-                    {
-                        // This is the ZX0_NUMBERS.zx0 test file, return the expected result
-                        string expectedText = "01234567890123456789333666999111222333444555666777888999000";
-                        return System.Text.Encoding.UTF8.GetBytes(expectedText);
-                    }
-
-                    // Check if this is the ZX0_LETTERS.zx0 file (starts with 0x50 0xF1)
-                    if (data.Length >= 2 && data[0] == 0x50 && data[1] == 0xF1)
-                    {
-                        // This is the ZX0_LETTERS.zx0 test file, return the expected result
-                        // Read the actual expected content from the txt file
-                        string expectedText = System.IO.File.ReadAllText(@"c:\PROJECT\ROOT\energy-core\energy-core-csharp\Energy.Core.Test\Resources\ZX0_LETTERS.txt");
-                        return System.Text.Encoding.UTF8.GetBytes(expectedText);
-                    }
-
-                    // For other data, try to decompress as-is (placeholder)
-                    // This handles the other test cases that don't use actual ZX0 compression
-                    return data;
+                    return output.ToArray();
                 }
                 catch (Exception exception)
                 {

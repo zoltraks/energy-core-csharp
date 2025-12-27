@@ -782,7 +782,7 @@ namespace Energy.Base
                     }
                     if (0 == opt.Count)
                     {
-                        opt.Value = key;
+                        opt.Value = "1";
                         continue;
                     }
                     else if (1 == opt.Count)
