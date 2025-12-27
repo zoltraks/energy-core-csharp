@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <AssemblyName>Energy.Core</AssemblyName>
-    <Version>24.11.0</Version>
+    <Version>25.12.0</Version>
     <FileVersion>24.11.0</FileVersion>
     <AssemblyVersion>24.11.0</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
@@ -29,6 +29,10 @@ Browse project page for more details.</Description>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <PackageTags>type-conversion sql database-abstraction-layer class-information utility framework brackets class-library colorful-console query-builder</PackageTags>
     <OldToolsVersion>2.0</OldToolsVersion>
+    <Deterministic>true</Deterministic>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <OutputPath>bin\</OutputPath>
@@ -78,6 +82,9 @@ Browse project page for more details.</Description>
     <None Remove="Energy.Core.NET20.suo" />
     <None Remove="Energy.Core.NET40.suo" />
     <None Remove="Energy.Core.suo" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
