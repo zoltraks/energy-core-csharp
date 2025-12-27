@@ -618,7 +618,7 @@ namespace Energy.Base
             {
                 string digits;
                 if (!TryNormalizeCode(code, out digits))
-                    throw new System.ArgumentException("Invalid RAL code format.", nameof(code));
+                    throw new System.ArgumentException("Invalid RAL code format.", "code");
 
                 for (int i = 0; i < RalPalette.Length; i++)
                 {
@@ -626,7 +626,7 @@ namespace Energy.Base
                         return RalPalette[i].Color;
                 }
 
-                throw new System.ArgumentOutOfRangeException(nameof(code), "Unknown RAL code.");
+                throw new System.ArgumentOutOfRangeException("code", "Unknown RAL code.");
             }
 
             #endregion
