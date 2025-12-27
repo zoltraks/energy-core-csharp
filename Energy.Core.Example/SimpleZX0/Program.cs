@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleZX0
 {
@@ -58,7 +54,14 @@ namespace SimpleZX0
                     Console.WriteLine("Output file exists");
                 }
 
-                var inputData = File.ReadAllBytes(inputFile);
+                byte[] inputData = File.ReadAllBytes(inputFile);
+
+                if (inputData.Length < 1)
+                {
+                    Console.WriteLine($"File {inputFile} contains no data");
+                    return 1;
+                }
+
                 byte[] outputData;
 
                 if (argv["decompress"].IsTrue)
@@ -70,13 +73,20 @@ namespace SimpleZX0
                     outputData = Energy.Base.Compression.ZX0.Compress(inputData);
                 }
 
+                if (outputData == null)
+                {
+                    throw new Exception("Something went wrong");
+                }
+
                 File.WriteAllBytes(outputFile, outputData);
+
+                Console.WriteLine($"Total {outputData.Length} of original {inputData.Length} bytes written to {outputFile}");
 
                 return 0;
             }
             catch (Exception x)
             {
-                Console.WriteLine(x.Message);
+                Console.WriteLine($"Error: {x.Message}");
                 return 1;
             }
             finally
