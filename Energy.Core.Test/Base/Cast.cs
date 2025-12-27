@@ -195,7 +195,7 @@ namespace Energy.Core.Test.Base
             string s7 = Energy.Base.Cast.Base64ToString(s6);
             byte[] b2 = System.Text.Encoding.Unicode.GetBytes(s7);
             byte[] b3 = new byte[] { 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff, 0xfd, 0xff };
-            int c1 = Energy.Base.Bit.Compare(b2, b3);
+            int c1 = Energy.Base.Binary.Compare(b2, b3);
             Assert.AreEqual(0, c1);
         }
 
@@ -723,14 +723,14 @@ namespace Energy.Core.Test.Base
                 buffer = new byte[length];
                 stream.Read(buffer, 0, length);
             }
-            Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 226, 130, 172 }, buffer));
+            Assert.AreEqual(0, Energy.Base.Binary.Compare(new byte[] { 226, 130, 172 }, buffer));
             using (Stream stream = Energy.Base.Cast.StringToStream(needle, encoding: Encoding.Unicode))
             {
                 int length = (int)stream.Length;
                 buffer = new byte[length];
                 stream.Read(buffer, 0, length);
             }
-            Assert.AreEqual(0, Energy.Base.Bit.Compare(new byte[] { 172, 32 }, buffer));
+            Assert.AreEqual(0, Energy.Base.Binary.Compare(new byte[] { 172, 32 }, buffer));
         }
 
         [TestMethod]

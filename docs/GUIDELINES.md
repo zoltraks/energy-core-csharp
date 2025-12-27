@@ -62,11 +62,16 @@ Energy.Query      - SQL query building and dialects
 - **Backward compatible** - Support .NET 2.0 APIs
 - **Memory efficient** - Minimal allocations, value types where appropriate
 - **Thread-safe** - Public APIs must be thread-safe
+- **Fully qualified references** - When referencing classes or static members declared in another type, use their full namespace (for example `Energy.Base.Binary.BitReader` instead of relying on `using` aliases). This keeps intent explicit and avoids namespace conflicts across multi-targeted builds.
 
 ### .NET Compatibility
 
 - **Avoid .NET 4.0+ features** in main library code for .NET 2.0/3.5/Compact Framework compatibility
 - **Use compatible alternatives**: Replace `string.IsNullOrWhiteSpace()` with `string == null || string.Trim() == ""`
+- **No `string.IsNullOrWhiteSpace` usage**: The method is unavailable on .NET 2.0/3.5/CF, so never call it in production code—always expand to explicit null/trim checks as shown above.
+- **Avoid auto-property initializers**: Syntax such as `public bool Enabled { get; set; } = true;` is not supported on .NET 2.0/3.5/CF. Assign defaults via constructors or explicit initialization logic instead.
+- **Avoid the `nameof` operator**: Older compilers do not support `nameof(...)`. Use literal parameter names in exception constructors and logging.
+- **Dispose streams using `Close()`**: Compact Framework builds in Visual Studio 2008 cannot access `Stream.Dispose(bool)`. Call `stream.Close()` (which invokes the public dispose path) unless a specific type offers its own public dispose method.
 - **Modern features allowed in test projects**: Test projects can use newer .NET features
 - **Conditional compilation**: Use `#if` directives when necessary for platform-specific code
 - **No verbatim strings with "$"**: Avoid `$@"..."` interpolated verbatim strings - use string.Format() or regular concatenation instead
@@ -116,7 +121,9 @@ Energy.Query      - SQL query building and dialects
 - Include parameter descriptions and return value explanations
 - Add examples for complex functionality
 - Document platform-specific limitations
+- When a `<summary>` comment needs multiple sentences, separate each sentence with `<br/><br/>` (e.g., `First sentence.<br/><br/>Second sentence.`) to keep formatting consistent across viewers.
 - **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
+- **XML comments**: In `<summary>` blocks, omit the trailing period for single-sentence descriptions. For multiple sentences, end each sentence with a period and separate them using `<br/><br/>`.
 
 ### Method Organization
 
@@ -175,7 +182,7 @@ Energy.Query      - SQL query building and dialects
 - **Performance changes**: Update benchmark tests to validate performance improvements or regressions
 
 **Test Execution Requirements:**
-- **After any code change**: Run all unit tests to verify no regressions
+- **After each code change**: Run all unit tests immediately to verify no regressions
 - **Fix all failing tests**: No code change is complete until all tests pass
 - **Test validation**: Ensure new functionality works as expected before committing
 - **Continuous testing**: Run tests frequently during development to catch issues early

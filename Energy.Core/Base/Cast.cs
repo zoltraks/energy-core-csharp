@@ -3396,7 +3396,7 @@ namespace Energy.Base
         /// <returns>BCD value</returns>
         public static byte ByteToBcd(byte value)
         {
-            return Energy.Base.Bcd.FromByte(value);
+            return Energy.Base.Binary.Bcd.FromByte(value);
         }
 
         /// <summary>
@@ -3406,7 +3406,7 @@ namespace Energy.Base
         /// <returns>BCD value</returns>
         public static ushort WordToBcd(ushort value)
         {
-            return Energy.Base.Bcd.FromWord(value);
+            return Energy.Base.Binary.Bcd.FromWord(value);
         }
 
         /// <summary>
@@ -3416,7 +3416,7 @@ namespace Energy.Base
         /// <returns>Word value</returns>
         public static ushort BcdToByte(byte value)
         {
-            return Energy.Base.Bcd.ToByte(value);
+            return Energy.Base.Binary.Bcd.ToByte(value);
         }
 
         /// <summary>
@@ -3426,7 +3426,7 @@ namespace Energy.Base
         /// <returns>Word value</returns>
         public static ushort BcdToWord(ushort value)
         {
-            return Energy.Base.Bcd.ToWord(value);
+            return Energy.Base.Binary.Bcd.ToWord(value);
         }
 
         #endregion

@@ -63,6 +63,7 @@
     <Compile Include="Attribute\Value.cs" />
     <Compile Include="Base\Anonymous.cs" />
     <Compile Include="Base\Bcd.cs" />
+    <Compile Include="Base\Binary.cs" />
     <Compile Include="Base\Bit.cs" />
     <Compile Include="Base\Bracket.cs" />
     <Compile Include="Base\Byte.cs" />

@@ -32,6 +32,26 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void Compression_ZX0_ZX0500Fixture()
+        {
+            byte[] expectedPlain = ReadEmbeddedResource("Resources.ZX0_500.txt");
+            Assert.IsNotNull(expectedPlain, "Fixture ZX0_500.txt should be embedded");
+            Assert.IsTrue(expectedPlain.Length > 0, "Fixture ZX0_500.txt should not be empty");
+
+            byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_500.zx0");
+            Assert.IsNotNull(expectedCompressed, "Fixture ZX0_500.zx0 should be embedded");
+            Assert.IsTrue(expectedCompressed.Length > 0, "Fixture ZX0_500.zx0 should not be empty");
+
+            byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(expectedPlain);
+            Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
+            CollectionAssert.AreEqual(expectedCompressed, actualCompressed, "ZX0 compression output should match ZX0_500.zx0 fixture");
+
+            byte[] actualPlain = Energy.Base.Compression.ZX0.Decompress(expectedCompressed);
+            Assert.IsNotNull(actualPlain, "ZX0 decompression should not return null");
+            CollectionAssert.AreEqual(expectedPlain, actualPlain, "ZX0 decompression should reproduce ZX0_500.txt exactly");
+        }
+
+        [TestMethod]
         public void Compression_Deflate_EmptyData()
         {
             byte[] emptyData = new byte[0];
