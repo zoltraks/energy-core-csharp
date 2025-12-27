@@ -34,6 +34,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\boar.ico" />
     <EmbeddedResource Include="Resources\Lorem.txt" />
+    <EmbeddedResource Include="Resources\ZX0_LETTERS.txt" />
+    <EmbeddedResource Include="Resources\ZX0_LETTERS.zx0" />
+    <EmbeddedResource Include="Resources\ZX0_NUMBERS.txt" />
+    <EmbeddedResource Include="Resources\ZX0_NUMBERS.zx0" />
   </ItemGroup>
 
 </Project>

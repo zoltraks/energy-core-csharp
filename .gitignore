@@ -240,3 +240,5 @@ Documentation/html/
 nuget/*.cmd
 
 Thumbs.db
+
+/work/
