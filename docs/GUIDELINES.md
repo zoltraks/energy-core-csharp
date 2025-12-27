@@ -71,6 +71,7 @@ Energy.Query      - SQL query building and dialects
 - **No `string.IsNullOrWhiteSpace` usage**: The method is unavailable on .NET 2.0/3.5/CF, so never call it in production code—always expand to explicit null/trim checks as shown above.
 - **Avoid auto-property initializers**: Syntax such as `public bool Enabled { get; set; } = true;` is not supported on .NET 2.0/3.5/CF. Assign defaults via constructors or explicit initialization logic instead.
 - **Avoid the `nameof` operator**: Older compilers do not support `nameof(...)`. Use literal parameter names in exception constructors and logging.
+- **Dispose streams using `Close()`**: Compact Framework builds in Visual Studio 2008 cannot access `Stream.Dispose(bool)`. Call `stream.Close()` (which invokes the public dispose path) unless a specific type offers its own public dispose method.
 - **Modern features allowed in test projects**: Test projects can use newer .NET features
 - **Conditional compilation**: Use `#if` directives when necessary for platform-specific code
 - **No verbatim strings with "$"**: Avoid `$@"..."` interpolated verbatim strings - use string.Format() or regular concatenation instead

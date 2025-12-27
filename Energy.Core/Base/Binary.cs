@@ -1308,7 +1308,7 @@ namespace Energy.Base
                 Flush();
 
                 if (!options.LeaveStreamOpen)
-                    stream.Dispose();
+                    stream.Close();
 
                 disposed = true;
             }
