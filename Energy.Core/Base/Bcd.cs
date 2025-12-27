@@ -1,8 +1,11 @@
-﻿namespace Energy.Base
+﻿using System;
+
+namespace Energy.Base
 {
     /// <summary>
     /// Binary-coded decimal (BCD) class
     /// </summary>
+    [Obsolete("Class moved to Energy.Base.Binary")]
     public class Bcd
     {
         /// <summary>
@@ -10,9 +13,10 @@
         /// </summary>
         /// <param name="value">BCD value</param>
         /// <returns>Byte value</returns>
+        [Obsolete("Use Energy.Base.Binary.Bcd.ToByte")]
         public static byte ToByte(byte value)
         {
-            return (byte)(10 * (value >> 4) + (value & 0xf));
+            return Energy.Base.Binary.Bcd.ToByte(value);
         }
 
         /// <summary>
@@ -20,9 +24,10 @@
         /// </summary>
         /// <param name="value">Byte value</param>
         /// <returns>BCD value</returns>
+        [Obsolete("Use Energy.Base.Binary.Bcd.FromByte")]
         public static byte FromByte(byte value)
         {
-            return (byte)(((value / 10 % 10) << 4) + value % 10);
+            return Energy.Base.Binary.Bcd.FromByte(value);
         }
 
         /// <summary>
@@ -30,9 +35,10 @@
         /// </summary>
         /// <param name="value">BCD value</param>
         /// <returns>Word value</returns>
+        [Obsolete("Use Energy.Base.Binary.Bcd.ToWord")]
         public static ushort ToWord(ushort value)
         {
-            return (ushort)(1000 * ((value >> 12) & 0xf) + 100 * ((value >> 8) & 0xf) + 10 * ((value >> 4) & 0xf) + (value & 0xf));
+            return Energy.Base.Binary.Bcd.ToWord(value);
         }
 
         /// <summary>
@@ -40,9 +46,10 @@
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Bcd.FromWord")]
         public static ushort FromWord(ushort value)
         {
-            return (ushort)(((value / 1000 % 10) << 12) + ((value / 100 % 10) << 8) + ((value / 10 % 10) << 4) + value % 10);
+            return Energy.Base.Binary.Bcd.FromWord(value);
         }
     }
 }

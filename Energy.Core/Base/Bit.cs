@@ -5,8 +5,10 @@ namespace Energy.Base
     /// <summary>
     /// Collection of binary utility functions.
     /// </summary>
+    [Obsolete("Class moved to Energy.Base.Binary")]
     public class Bit
     {
+
         #region Reverse
 
         /// <summary>
@@ -17,9 +19,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned short (16-bit)</param>
         /// <returns>Reversed numeric value</returns>
+        [Obsolete("Use Energy.Base.Binary.Reverse")]
         public static ushort Reverse(ushort value)
         {
-            return (ushort)((byte)(value / 256) + (value % 256) * 256);
+            return Energy.Base.Binary.Reverse(value);
         }
 
         /// <summary>
@@ -27,14 +30,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned int (32-bit)</param>
         /// <returns>Reversed numeric value</returns>
+        [Obsolete("Use Energy.Base.Binary.Reverse")]
         public static uint Reverse(uint value)
         {
-            byte b1 = (byte)((value >> 0) & 0xff);
-            byte b2 = (byte)((value >> 8) & 0xff);
-            byte b3 = (byte)((value >> 16) & 0xff);
-            byte b4 = (byte)((value >> 24) & 0xff);
-
-            return (uint)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
+            return Energy.Base.Binary.Reverse(value);
         }
 
         #endregion
@@ -47,32 +46,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(byte[] left, byte[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -81,32 +58,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(int[] left, int[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -115,32 +70,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(long[] left, long[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -149,32 +82,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(double[] left, double[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -183,32 +94,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(decimal[] left, decimal[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         #endregion
@@ -221,24 +110,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.GetUInt32MSB")]
         public static UInt32 GetUInt32MSB(params UInt16[] array)
         {
-            if (null == array || 0 == array.Length)
-            {
-                return 0;
-            }
-            UInt32 result = 0;
-            switch (array.Length)
-            {
-                case 1:
-                    result = array[0];
-                    break;
-                default:
-                case 2:
-                    result = (uint)((array[0] << 16) + array[1]);
-                    break;
-            }
-            return result;
+            return Energy.Base.Binary.GetUInt32MSB(array);
         }
 
         /// <summary>
@@ -247,24 +122,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.GetUInt32LSB")]
         public static UInt32 GetUInt32LSB(params UInt16[] array)
         {
-            if (null == array || 0 == array.Length)
-            {
-                return 0;
-            }
-            UInt32 result = 0;
-            switch (array.Length)
-            {
-                case 1:
-                    result = array[0];
-                    break;
-                default:
-                case 2:
-                    result = (uint)(array[0] + (array[1] << 16));
-                    break;
-            }
-            return result;
+            return Energy.Base.Binary.GetUInt32LSB(array);
         }
 
         #endregion
@@ -276,19 +137,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Not")]
         public static byte[] Not(byte[] array)
         {
-            if (null == array || 0 == array.Length)
-            {
-                return array;
-            }
-            int l = array.Length;
-            byte[] result = new byte[l];
-            for (int i = 0; i < l; i++)
-            {
-                result[i] = (byte)(array[i] ^ 0xff);
-            }
-            return result;
+            return Energy.Base.Binary.Not(array);
         }
 
         #endregion
@@ -303,28 +155,10 @@ namespace Energy.Base
         /// <param name="one"></param>
         /// <param name="two"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Or")]
         public static byte[] Or(byte[] one, byte[] two)
         {
-            if (null == one || 0 == one.Length || null == two || 0 == two.Length)
-            {
-                return one;
-            }
-            byte[] result = new byte[one.Length];
-            if (two.Length >= one.Length)
-            {
-                for (int i = 0, l = one.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] | two[i]);
-                }
-            }
-            else
-            {
-                for (int i = 0, l = one.Length, m = two.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] | two[i % m]);
-                }
-            }
-            return result;
+            return Energy.Base.Binary.Or(one, two);
         }
 
         #endregion
@@ -339,28 +173,10 @@ namespace Energy.Base
         /// <param name="one"></param>
         /// <param name="two"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.And")]
         public static byte[] And(byte[] one, byte[] two)
         {
-            if (null == one || 0 == one.Length || null == two || 0 == two.Length)
-            {
-                return one;
-            }
-            byte[] result = new byte[one.Length];
-            if (two.Length >= one.Length)
-            {
-                for (int i = 0, l = one.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] & two[i]);
-                }
-            }
-            else
-            {
-                for (int i = 0, l = one.Length, m = two.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] & two[i % m]);
-                }
-            }
-            return result;
+            return Energy.Base.Binary.And(one, two);
         }
 
         #endregion
@@ -375,28 +191,10 @@ namespace Energy.Base
         /// <param name="one"></param>
         /// <param name="two"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Xor")]
         public static byte[] Xor(byte[] one, byte[] two)
         {
-            if (null == one || 0 == one.Length || null == two || 0 == two.Length)
-            {
-                return one;
-            }
-            byte[] result = new byte[one.Length];
-            if (two.Length >= one.Length)
-            {
-                for (int i = 0, l = one.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] ^ two[i]);
-                }
-            }
-            else
-            {
-                for (int i = 0, l = one.Length, m = two.Length; i < l; i++)
-                {
-                    result[i] = (byte)(one[i] ^ two[i % m]);
-                }
-            }
-            return result;
+            return Energy.Base.Binary.Xor(one, two);
         }
 
         #endregion
@@ -411,59 +209,10 @@ namespace Energy.Base
         /// <param name="array"></param>
         /// <param name="count"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Rol")]
         public static byte[] Rol(byte[] array, int count)
         {
-            if (count < 0)
-            {
-                return Ror(array, -count);
-            }
-            if (null == array || 0 == array.Length || 0 == count)
-            {
-                return array;
-            }
-            int n = array.Length << 3;
-            if (count > n)
-            {
-                count %= n;
-            }
-            if (0 == count || n == count)
-            {
-                return array;
-            }
-            byte[] result = new byte[array.Length];
-            int o = count % 8;
-            int l = array.Length;
-
-            if (0 == o)
-            {
-                int m = count >> 3;
-                for (int i = 0, j = m; i < l; i++, j++)
-                {
-                    if (j >= l)
-                    {
-                        j = 0;
-                    }
-                    result[i] = array[j];
-                }
-            }
-            else
-            {
-                int p = 8 - o;
-                int m = count >> 3;
-                for (int i = 0, j = m, k = m + 1; i < l; i++, j++, k++)
-                {
-                    while (j >= l)
-                    {
-                        j -= l;
-                    }
-                    while (k >= l)
-                    {
-                        k -= l;
-                    }
-                    result[i] = (byte)(((array[j] << o) & 0xff) + (array[k] >> p));
-                }
-            }
-            return result;
+            return Energy.Base.Binary.Rol(array, count);
         }
 
         #endregion
@@ -478,59 +227,10 @@ namespace Energy.Base
         /// <param name="array"></param>
         /// <param name="count"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Ror")]
         public static byte[] Ror(byte[] array, int count)
         {
-            if (count < 0)
-            {
-                return Rol(array, -count);
-            }
-            if (null == array || 0 == array.Length || 0 == count)
-            {
-                return array;
-            }
-            int n = array.Length << 3;
-            if (count > n)
-            {
-                count %= n;
-            }
-            if (0 == count || n == count)
-            {
-                return array;
-            }
-            byte[] result = new byte[array.Length];
-            int o = count % 8;
-            int l = array.Length;
-
-            if (0 == o)
-            {
-                int m = l - (count >> 3);
-                for (int i = 0, j = m; i < l; i++, j++)
-                {
-                    if (j >= l)
-                    {
-                        j = 0;
-                    }
-                    result[i] = array[j];
-                }
-            }
-            else
-            {
-                int p = 8 - o;
-                int m = count >> 3;
-                for (int i = 0, j = l - m + l - 1, k = l - m; i < l; i++, j++, k++)
-                {
-                    while (j >= l)
-                    {
-                        j -= l;
-                    }
-                    while (k >= l)
-                    {
-                        k -= l;
-                    }
-                    result[i] = (byte)(((array[j] << p) & 0xff) + (array[k] >> o));
-                }
-            }
-            return result;
+            return Energy.Base.Binary.Ror(array, count);
         }
 
         #endregion

@@ -19,7 +19,7 @@ namespace ByteMangleTest
             Console.WriteLine("Low:        {0}", Energy.Base.Nibble.Low(e));
             Console.WriteLine("Reverse:    {0}", Energy.Base.Hex.ByteToHex(Energy.Base.Nibble.Reverse(e)));
 
-            byte eb = Energy.Base.Bcd.ToByte(e);
+            byte eb = Energy.Base.Binary.Bcd.ToByte(e);
             Console.WriteLine("BCD as HEX: {0}", Energy.Base.Hex.ByteToHex(eb));
             Console.WriteLine("Decimal:    {0}", eb);
 
@@ -28,13 +28,13 @@ namespace ByteMangleTest
             byte g = 0x58;
             Console.WriteLine("Value:      {0}", Energy.Base.Hex.ByteToHex(g));
             Console.WriteLine("Decimal:    {0}", g);
-            Console.WriteLine("BCD:        {0}", Energy.Base.Hex.ByteToHex(Energy.Base.Bcd.FromByte(g)));
+            Console.WriteLine("BCD:        {0}", Energy.Base.Hex.ByteToHex(Energy.Base.Binary.Bcd.FromByte(g)));
 
             Console.WriteLine();
 
             ushort w = 0x1234;
             Console.WriteLine("Word:       {0}", w);
-            Console.WriteLine("BCD:        {0}", Energy.Base.Bcd.ToWord(w));
+            Console.WriteLine("BCD:        {0}", Energy.Base.Binary.Bcd.ToWord(w));
 
             Console.ReadLine();
         }

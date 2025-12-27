@@ -9,7 +9,7 @@ namespace XmlSerializationExample
     {
         public static void Main()
         {
-            Energy.Core.Application.SetDefaultLanguage();
+            Energy.Core.Program.SetLanguage();
             Console.WriteLine("Hello World");
             Item _ = new Item() { Name = "Example name", Count = 12345, };
             Console.WriteLine(Energy.Base.Xml.Serialize(_));

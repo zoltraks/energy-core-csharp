@@ -13,7 +13,7 @@ namespace RestBinaryGetPut
         {
             try
             {
-                Energy.Core.Application.SetConsoleEncoding();
+                Energy.Core.Program.SetConsoleEncoding();
                 Test.CheckGet("http://www.google.com");
                 Test.AspNetCoreApi("http://localhost:16000/api/");
                 //Test.S();

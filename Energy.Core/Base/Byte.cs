@@ -7,7 +7,7 @@ namespace Energy.Base
     /// <summary>
     /// Byte related functions
     /// </summary>
-    [Obsolete("Class moved to Energy.Base.Bit")]
+    [Obsolete("Class moved to Energy.Base.Binary")]
     public class Byte
     {
         /// <summary>
@@ -18,9 +18,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned short (16-bit)</param>
         /// <returns>Reversed numeric value</returns>
+        [Obsolete("Use Energy.Base.Binary.Reverse")]
         public static ushort Reverse(ushort value)
         {
-            return (ushort)((byte)(value / 256) + (value % 256) * 256);
+            return Energy.Base.Binary.Reverse(value);
         }
 
         /// <summary>
@@ -28,14 +29,10 @@ namespace Energy.Base
         /// </summary>
         /// <param name="value">Unsigned int (32-bit)</param>
         /// <returns>Reversed numeric value</returns>
+        [Obsolete("Use Energy.Base.Binary.Reverse")]
         public static uint Reverse(uint value)
         {
-            byte b1 = (byte)((value >> 0) & 0xff);
-            byte b2 = (byte)((value >> 8) & 0xff);
-            byte b3 = (byte)((value >> 16) & 0xff);
-            byte b4 = (byte)((value >> 24) & 0xff);
-
-            return (uint)(b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0);
+            return Energy.Base.Binary.Reverse(value);
         }
 
         #region Compare
@@ -46,32 +43,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(byte[] left, byte[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -80,32 +55,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(int[] left, int[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -114,32 +67,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(long[] left, long[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -148,32 +79,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(double[] left, double[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         /// <summary>
@@ -182,32 +91,10 @@ namespace Energy.Base
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
+        [Obsolete("Use Energy.Base.Binary.Compare")]
         public static int Compare(decimal[] left, decimal[] right)
         {
-            if (left == null)
-            {
-                if (right == null)
-                    return 0;
-                return -1;
-            }
-            if (right == null)
-            {
-                if (left == null)
-                    return 0;
-                return 1;
-            }
-            if (left.Length != right.Length)
-            {
-                return left.Length < right.Length ? -1 : 1;
-            }
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] < right[i])
-                    return -1;
-                if (left[i] > right[i])
-                    return 1;
-            }
-            return 0;
+            return Energy.Base.Binary.Compare(left, right);
         }
 
         #endregion
