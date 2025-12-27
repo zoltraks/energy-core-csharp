@@ -541,7 +541,7 @@ namespace Energy.Base
                         || ch == 'R' || ch == 'r'
                         || ch == 'A' || ch == 'a'
                         || ch == 'L' || ch == 'l'
-                        || ch == '-' || ch == '_' )
+                        || ch == '-' || ch == '_')
                     {
                         continue;
                     }
@@ -591,7 +591,7 @@ namespace Energy.Base
 
                 return closest;
             }
-        
+
             #endregion
 
             #region RalToColor

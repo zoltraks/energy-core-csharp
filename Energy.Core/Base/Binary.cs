@@ -952,20 +952,27 @@ namespace Energy.Base
             /// </summary>
             public class Options
             {
+                public Options()
+                {
+                    MostSignificantBitFirst = true;
+                    EnableBacktrack = true;
+                    ThrowOnEndOfStream = true;
+                }
+
                 /// <summary>
                 /// Gets or sets whether bits are read most-significant-bit first.
                 /// </summary>
-                public bool MostSignificantBitFirst { get; set; } = true;
+                public bool MostSignificantBitFirst { get; set; }
 
                 /// <summary>
                 /// Gets or sets whether the ZX0-style backtrack flag is enabled.
                 /// </summary>
-                public bool EnableBacktrack { get; set; } = true;
+                public bool EnableBacktrack { get; set; }
 
                 /// <summary>
                 /// Gets or sets whether reading past the end of the buffer or stream should throw.
                 /// </summary>
-                public bool ThrowOnEndOfStream { get; set; } = true;
+                public bool ThrowOnEndOfStream { get; set; }
             }
 
             private readonly byte[] buffer;
@@ -1170,21 +1177,29 @@ namespace Energy.Base
             /// </summary>
             public class Options
             {
+                public Options()
+                {
+                    MostSignificantBitFirst = true;
+                    AllowLiteralInterleave = true;
+                    LeaveStreamOpen = true;
+                }
+
                 /// <summary>
                 /// Gets or sets whether bits should be written most-significant-bit first.
                 /// </summary>
-                public bool MostSignificantBitFirst { get; set; } = true;
+                public bool MostSignificantBitFirst { get; set; }
 
                 /// <summary>
                 /// Gets or sets whether literal bytes may be interleaved with the current bit buffer without forcing alignment.
                 /// </summary>
-                public bool AllowLiteralInterleave { get; set; } = true;
+                public bool AllowLiteralInterleave { get; set; }
 
                 /// <summary>
                 /// Gets or sets whether the underlying stream should remain open when the writer is disposed.
                 /// </summary>
                 public bool LeaveStreamOpen { get; set; }
             }
+
 
             private readonly Stream stream;
             private readonly Options options;
