@@ -469,7 +469,7 @@ namespace Energy.Base
                 return new string(buffer, 0, position);
             }
 
-            private readonly struct LabColor
+            private struct LabColor
             {
                 public LabColor(double l, double a, double b)
                 {
@@ -483,7 +483,7 @@ namespace Energy.Base
                 public double B { get; }
             }
 
-            private readonly struct RalEntry
+            private struct RalEntry
             {
                 public RalEntry(string code, string digits, Energy.Base.Color color, double l, double a, double b)
                 {
@@ -605,7 +605,8 @@ namespace Energy.Base
             /// <returns>Energy.Base.Color instance describing the RAL sample</returns>
             public static Energy.Base.Color RalToColor(string code)
             {
-                if (!TryNormalizeCode(code, out string digits))
+                string digits;
+                if (!TryNormalizeCode(code, out digits))
                     throw new System.ArgumentException("Invalid RAL code format.", nameof(code));
 
                 for (int i = 0; i < RalPalette.Length; i++)
