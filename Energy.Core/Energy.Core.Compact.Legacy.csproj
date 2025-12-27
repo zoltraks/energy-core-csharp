@@ -162,6 +162,7 @@
     <Compile Include="Interface\IDialect.cs" />
     <Compile Include="Interface\IEncapsulation.cs" />
     <Compile Include="Interface\IEscape.cs" />
+    <Compile Include="Interface\IFileHandle.cs" />
     <Compile Include="Interface\IFileSystem.cs" />
     <Compile Include="Interface\ILoadFromFile.cs" />
     <Compile Include="Interface\ILogger.cs" />

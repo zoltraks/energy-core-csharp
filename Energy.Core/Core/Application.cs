@@ -263,7 +263,9 @@ namespace Energy.Core
             return System.Diagnostics.Process.GetCurrentProcess().ProcessName;
 #endif
 #if NETCF
-            return "";
+            string commandPath = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
+            string commandShortName = System.IO.Path.GetFileNameWithoutExtension(commandPath);
+            return commandShortName;
 #endif
         }
 

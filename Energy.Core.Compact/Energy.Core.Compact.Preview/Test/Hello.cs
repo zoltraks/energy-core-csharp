@@ -13,7 +13,10 @@ namespace Energy.Core.Compact.Example.Test
             try
             {
                 string commandName = Energy.Core.Application.GetCommandName();
-                //throw new Exception();
+                if (string.IsNullOrEmpty(commandName))
+                {
+                    throw new Exception("GetCommandName returned empty string");
+                }
             }
             catch (Exception exception)
             {
