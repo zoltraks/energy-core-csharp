@@ -432,6 +432,9 @@ namespace Energy.Core.Test.Base
             ulong ulongInput = 0x8000000000000001ul;
             Assert.AreEqual(0x0000000000000003ul, Energy.Base.Binary.Rol(ulongInput, 1), "64-bit rotation should wrap high bit");
             Assert.AreEqual(0x8000000000000001ul, Energy.Base.Binary.Rol(ulongInput, 64), "Exact width rotations should be no-ops");
+            Assert.AreEqual((byte)0b00000011, Energy.Base.Binary.Rol(byteInput), "Single-parameter byte overload should rotate by one");
+            Assert.AreEqual(0x00000003u, Energy.Base.Binary.Rol(uintInput), "Single-parameter uint overload should rotate by one");
+            Assert.AreEqual(0x0000000000000003ul, Energy.Base.Binary.Rol(ulongInput), "Single-parameter ulong overload should rotate by one");
         }
 
         [TestMethod]
@@ -448,6 +451,9 @@ namespace Energy.Core.Test.Base
             ulong ulongInput = 0x0000000000000003ul;
             Assert.AreEqual(0xC000000000000000ul, Energy.Base.Binary.Ror(ulongInput, 2), "64-bit right rotation should wrap");
             Assert.AreEqual(0xC000000000000000ul, Energy.Base.Binary.Ror(ulongInput, 66), "Counts greater than width should wrap modulo bit size");
+            Assert.AreEqual((byte)0b10000001, Energy.Base.Binary.Ror(byteInput), "Single-parameter byte overload should rotate right by one");
+            Assert.AreEqual(0x80000001u, Energy.Base.Binary.Ror(uintInput), "Single-parameter uint overload should rotate right by one");
+            Assert.AreEqual(0x8000000000000001ul, Energy.Base.Binary.Ror(ulongInput), "Single-parameter ulong overload should rotate right by one");
         }
     }
 }

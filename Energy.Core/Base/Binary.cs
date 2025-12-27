@@ -432,6 +432,14 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Rotate bits left in a single byte by exactly one bit.
+        /// </summary>
+        public static byte Rol(byte value)
+        {
+            return Rol(value, 1);
+        }
+
+        /// <summary>
         /// Rotate bits left in an unsigned 32-bit integer by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, right rotation will be performed instead.
@@ -456,6 +464,14 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Rotate bits left in an unsigned 32-bit integer by exactly one bit.
+        /// </summary>
+        public static uint Rol(uint value)
+        {
+            return Rol(value, 1);
+        }
+
+        /// <summary>
         /// Rotate bits left in an unsigned 64-bit integer by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, right rotation will be performed instead.
@@ -477,6 +493,14 @@ namespace Energy.Base
                 return value;
             }
             return (value << count) | (value >> (bits - count));
+        }
+
+        /// <summary>
+        /// Rotate bits left in an unsigned 64-bit integer by exactly one bit.
+        /// </summary>
+        public static ulong Rol(ulong value)
+        {
+            return Rol(value, 1);
         }
 
         /// <summary>
@@ -574,6 +598,14 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Rotate bits right in a single byte by exactly one bit.
+        /// </summary>
+        public static byte Ror(byte value)
+        {
+            return Ror(value, 1);
+        }
+
+        /// <summary>
         /// Rotate bits right in an unsigned 32-bit integer by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, left rotation will be performed instead.
@@ -598,6 +630,14 @@ namespace Energy.Base
         }
 
         /// <summary>
+        /// Rotate bits right in an unsigned 32-bit integer by exactly one bit.
+        /// </summary>
+        public static uint Ror(uint value)
+        {
+            return Ror(value, 1);
+        }
+
+        /// <summary>
         /// Rotate bits right in an unsigned 64-bit integer by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, left rotation will be performed instead.
@@ -619,6 +659,14 @@ namespace Energy.Base
                 return value;
             }
             return (value >> count) | (value << (bits - count));
+        }
+
+        /// <summary>
+        /// Rotate bits right in an unsigned 64-bit integer by exactly one bit.
+        /// </summary>
+        public static ulong Ror(ulong value)
+        {
+            return Ror(value, 1);
         }
 
         /// <summary>
