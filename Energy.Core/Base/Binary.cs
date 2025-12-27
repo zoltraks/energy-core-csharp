@@ -412,6 +412,81 @@ namespace Energy.Base
         /// <param name="array"></param>
         /// <param name="count"></param>
         /// <returns></returns>
+        public static byte Rol(byte value, int count)
+        {
+            if (count < 0)
+            {
+                return Ror(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 8;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (byte)(((value << count) | (value >> (bits - count))) & 0xff);
+        }
+
+        /// <summary>
+        /// Rotate bits left in an unsigned 32-bit integer by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, right rotation will be performed instead.
+        /// </summary>
+        public static uint Rol(uint value, int count)
+        {
+            if (count < 0)
+            {
+                return Ror(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 32;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (value << count) | (value >> (bits - count));
+        }
+
+        /// <summary>
+        /// Rotate bits left in an unsigned 64-bit integer by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, right rotation will be performed instead.
+        /// </summary>
+        public static ulong Rol(ulong value, int count)
+        {
+            if (count < 0)
+            {
+                return Ror(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 64;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (value << count) | (value >> (bits - count));
+        }
+
+        /// <summary>
+        /// Rotate bits left in an array by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, right rotation will be performed instead.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public static byte[] Rol(byte[] array, int count)
         {
             if (count < 0)
@@ -470,6 +545,81 @@ namespace Energy.Base
         #endregion
 
         #region Ror
+
+        /// <summary>
+        /// Rotate bits right in an array by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, left rotation will be performed instead.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static byte Ror(byte value, int count)
+        {
+            if (count < 0)
+            {
+                return Rol(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 8;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (byte)(((value >> count) | (value << (bits - count))) & 0xff);
+        }
+
+        /// <summary>
+        /// Rotate bits right in an unsigned 32-bit integer by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, left rotation will be performed instead.
+        /// </summary>
+        public static uint Ror(uint value, int count)
+        {
+            if (count < 0)
+            {
+                return Rol(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 32;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (value >> count) | (value << (bits - count));
+        }
+
+        /// <summary>
+        /// Rotate bits right in an unsigned 64-bit integer by given bit count.
+        /// <br/><br/>
+        /// When negative number of bits is given, left rotation will be performed instead.
+        /// </summary>
+        public static ulong Ror(ulong value, int count)
+        {
+            if (count < 0)
+            {
+                return Rol(value, -count);
+            }
+            if (count == 0)
+            {
+                return value;
+            }
+            int bits = 64;
+            count %= bits;
+            if (count == 0)
+            {
+                return value;
+            }
+            return (value >> count) | (value << (bits - count));
+        }
 
         /// <summary>
         /// Rotate bits right in an array by given bit count.

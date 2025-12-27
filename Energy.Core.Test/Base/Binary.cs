@@ -415,5 +415,39 @@ namespace Energy.Core.Test.Base
             }
             CollectionAssert.AreEqual(new int[] { 1, 0, 1, 0 }, trailerRead, "Remaining trailer bits should be readable after backtrack");
         }
+
+        [TestMethod]
+        public void Binary_RolScalarVariants()
+        {
+            byte byteInput = 0b10000001;
+            Assert.AreEqual((byte)0b00000011, Energy.Base.Binary.Rol(byteInput, 1), "Byte left rotation should move high bit to low end");
+            Assert.AreEqual((byte)0b11000000, Energy.Base.Binary.Rol(byteInput, -1), "Negative count should delegate to right rotation");
+            Assert.AreEqual(byteInput, Energy.Base.Binary.Rol(byteInput, 8), "Full rotations should yield original value");
+
+            uint uintInput = 0x80000001u;
+            Assert.AreEqual(0x00000006u, Energy.Base.Binary.Rol(uintInput, 2), "32-bit rotation should wrap upper bits");
+            Assert.AreEqual(0x80000001u, Energy.Base.Binary.Rol(uintInput, 64), "Counts greater than width should wrap modulo bit size");
+            Assert.AreEqual(0x60000000u, Energy.Base.Binary.Rol(uintInput, -2), "Negative rotation should call right rotation");
+
+            ulong ulongInput = 0x8000000000000001ul;
+            Assert.AreEqual(0x0000000000000003ul, Energy.Base.Binary.Rol(ulongInput, 1), "64-bit rotation should wrap high bit");
+            Assert.AreEqual(0x8000000000000001ul, Energy.Base.Binary.Rol(ulongInput, 64), "Exact width rotations should be no-ops");
+        }
+
+        [TestMethod]
+        public void Binary_RorScalarVariants()
+        {
+            byte byteInput = 0b00000011;
+            Assert.AreEqual((byte)0b10000001, Energy.Base.Binary.Ror(byteInput, 1), "Byte right rotation should move low bit to high end");
+            Assert.AreEqual((byte)0b00001100, Energy.Base.Binary.Ror(byteInput, -2), "Negative count should call left rotation");
+
+            uint uintInput = 0x00000003u;
+            Assert.AreEqual(0xC0000000u, Energy.Base.Binary.Ror(uintInput, 2), "32-bit right rotation should wrap lower bits to upper bits");
+            Assert.AreEqual(uintInput, Energy.Base.Binary.Ror(uintInput, 32), "Full-width rotation should be identity");
+
+            ulong ulongInput = 0x0000000000000003ul;
+            Assert.AreEqual(0xC000000000000000ul, Energy.Base.Binary.Ror(ulongInput, 2), "64-bit right rotation should wrap");
+            Assert.AreEqual(0xC000000000000000ul, Energy.Base.Binary.Ror(ulongInput, 66), "Counts greater than width should wrap modulo bit size");
+        }
     }
 }
