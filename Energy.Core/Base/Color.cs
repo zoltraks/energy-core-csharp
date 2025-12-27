@@ -120,6 +120,8 @@ namespace Energy.Base
 
         #endregion
 
+        #region ToString
+
         /// <summary>
         /// Represent as string
         /// </summary>
@@ -130,6 +132,10 @@ namespace Energy.Base
                 return "";
             return ColorToHtml(this);
         }
+
+        #endregion
+
+        #region IsSet
 
         /// <summary>
         /// Check if color was set
@@ -142,6 +148,10 @@ namespace Energy.Base
                 return R != 0 || G != 0 || B != 0 || A != 0;
             }
         }
+
+        #endregion
+
+        #region HexToColor
 
         /// <summary>
         /// Convert hexadecimal string or HTML color to System.Drawing.Color
@@ -163,6 +173,10 @@ namespace Energy.Base
             return new Energy.Base.Color(b[0], b[1], b[2]);
         }
 
+        #endregion
+
+        #region ColorToHtml
+
         /// <summary>
         /// Represent color as HTML value
         /// </summary>
@@ -173,6 +187,10 @@ namespace Energy.Base
             byte[] rgb = new byte[3] { color.R, color.G, color.B };
             return "#" + Hex.ArrayToHex(rgb).ToLower();
         }
+
+        #endregion
+
+        #region ColorTransition
 
         /// <summary>
         /// Color transition
@@ -210,142 +228,396 @@ namespace Energy.Base
             return new Color(a, r, g, b);
         }
 
-        #region IsValidHsl
+        #endregion
+
+        #region FlattenAlpha
 
         /// <summary>
-        /// Validates HSL/HSLA color string format and ranges
+        /// Flatten a single RGB channel against a white background using the provided alpha value.
+        /// <br/><br/>
+        /// Returns the resulting blended channel in double precision to avoid rounding loss.
         /// </summary>
-        /// <param name="hsl">HSL color string to validate</param>
-        /// <returns>True if valid, false otherwise</returns>
-        public static bool IsValidHsl(string hsl)
+        /// <param name="sourceChannel">Original channel value</param>
+        /// <param name="alpha">Alpha component</param>
+        /// <returns>Flattened channel value</returns>
+        public static double FlattenAlpha(byte sourceChannel, byte alpha)
         {
-            if (hsl == null || hsl.Trim() == "")
-                return false;
-
-            // Validate input format - should contain H, S, L values and optionally A
-            string pattern = @"^\s*\(?\s*(\d+)\s*°?\s*,\s*(\d+)\s*%?\s*,\s*(\d+)\s*%?\s*(?:,\s*(\d+(?:\.\d+)?)(?:%?)\s*)?\)?\s*$";
-
-            if (!Regex.IsMatch(hsl, pattern))
-                return false;
-
-            // Extract numeric values
-            var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
-
-            if (matches.Count < 3)
-                return false;
-
-            // Parse HSL values
-            int h = int.Parse(matches[0].Value);
-            int s = int.Parse(matches[1].Value);
-            int l = int.Parse(matches[2].Value);
-
-            // Validate ranges
-            if (h < 0 || h > 360)
-                return false;
-            if (s < 0 || s > 100)
-                return false;
-            if (l < 0 || l > 100)
-                return false;
-
-            // Validate alpha range if present
-            if (matches.Count >= 4)
-            {
-                double alpha = double.Parse(matches[3].Value);
-                // Check if the original string has % after the alpha value
-                var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
-                if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
-                    alpha = alpha / 100.0;
-                
-                if (alpha < 0.0 || alpha > 1.0)
-                    return false;
-            }
-
-            return true;
+            double normalizedAlpha = alpha / 255.0;
+            return sourceChannel * normalizedAlpha + 255.0 * (1.0 - normalizedAlpha);
         }
 
         #endregion
 
-        #region HslToColor
+        #region HSL
 
         /// <summary>
-        /// Converts HSL/HSLA color string to Color object
+        /// HSL conversion helpers.
         /// </summary>
-        /// <param name="hsl">HSL color string in various formats</param>
-        /// <returns>New Color object with RGB values</returns>
-        public static Energy.Base.Color HslToColor(string hsl)
+        public static class HSL
         {
-            if (hsl == null || hsl.Trim() == "")
-                throw new System.FormatException("HSL string cannot be null or empty");
+            #region Private
 
-            if (!IsValidHsl(hsl))
-                throw new System.FormatException("Invalid HSL format: '" + hsl + "'. Expected format: (H°, S%, L%) or (H°, S%, L%, A)");
-
-            // Extract numeric values
-            var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
-
-            // Parse HSL values
-            int h = int.Parse(matches[0].Value);
-            int s = int.Parse(matches[1].Value);
-            int l = int.Parse(matches[2].Value);
-
-            // Parse alpha if present
-            double alpha = 1.0;
-            if (matches.Count >= 4)
+            private static double Hue2Rgb(double p1, double q1, double t1)
             {
-                alpha = double.Parse(matches[3].Value);
-                // Check if the original string has % after the alpha value
-                var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
-                if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
-                    alpha = alpha / 100.0;
+                if (t1 < 0) t1 += 1;
+                if (t1 > 1) t1 -= 1;
+                if (t1 < 1.0 / 6.0) return p1 + (q1 - p1) * 6 * t1;
+                if (t1 < 1.0 / 2.0) return q1;
+                if (t1 < 2.0 / 3.0) return p1 + (q1 - p1) * (2.0 / 3.0 - t1) * 6;
+                return p1;
+            }
+
+            #endregion
+
+            #region IsValidHsl
+
+            /// <summary>
+            /// Validates HSL/HSLA color string format and ranges
+            /// </summary>
+            /// <param name="hsl">HSL color string to validate</param>
+            /// <returns>True if valid, false otherwise</returns>
+            public static bool IsValidHsl(string hsl)
+            {
+                if (hsl == null || hsl.Trim() == "")
+                    return false;
+
+                // Validate input format - should contain H, S, L values and optionally A
+                string pattern = @"^\s*\(?\s*(\d+)\s*°?\s*,\s*(\d+)\s*%?\s*,\s*(\d+)\s*%?\s*(?:,\s*(\d+(?:\.\d+)?)(?:%?)\s*)?\)?\s*$";
+
+                if (!Regex.IsMatch(hsl, pattern))
+                    return false;
+
+                // Extract numeric values
+                var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
+
+                if (matches.Count < 3)
+                    return false;
+
+                // Parse HSL values
+                int h = int.Parse(matches[0].Value);
+                int s = int.Parse(matches[1].Value);
+                int l = int.Parse(matches[2].Value);
+
+                // Validate ranges
+                if (h < 0 || h > 360)
+                    return false;
+                if (s < 0 || s > 100)
+                    return false;
+                if (l < 0 || l > 100)
+                    return false;
+
+                // Validate alpha range if present
+                if (matches.Count >= 4)
+                {
+                    double alpha = double.Parse(matches[3].Value);
+                    // Check if the original string has % after the alpha value
+                    var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
+                    if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
+                        alpha = alpha / 100.0;
+
+                    if (alpha < 0.0 || alpha > 1.0)
+                        return false;
+                }
+
+                return true;
+            }
+
+            #endregion
+
+            #region HslToColor
+
+            /// <summary>
+            /// Converts HSL/HSLA color string to Color object
+            /// </summary>
+            /// <param name="hsl">HSL color string in various formats</param>
+            /// <returns>New Color object with RGB values</returns>
+            public static Energy.Base.Color HslToColor(string hsl)
+            {
+                if (hsl == null || hsl.Trim() == "")
+                    throw new System.FormatException("HSL string cannot be null or empty");
+
+                if (!IsValidHsl(hsl))
+                    throw new System.FormatException("Invalid HSL format: '" + hsl + "'. Expected format: (H°, S%, L%) or (H°, S%, L%, A)");
+
+                // Extract numeric values
+                var matches = Regex.Matches(hsl, @"\d+(?:\.\d+)?");
+
+                // Parse HSL values
+                int h = int.Parse(matches[0].Value);
+                int s = int.Parse(matches[1].Value);
+                int l = int.Parse(matches[2].Value);
+
+                // Parse alpha if present
+                double alpha = 1.0;
+                if (matches.Count >= 4)
+                {
+                    alpha = double.Parse(matches[3].Value);
+                    // Check if the original string has % after the alpha value
+                    var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
+                    if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
+                        alpha = alpha / 100.0;
+                    else
+                        alpha = System.Math.Min(1.0, System.Math.Max(0.0, alpha));
+                }
+
+                // Convert HSL to RGB
+                double hNormalized = h / 360.0;
+                double sNormalized = s / 100.0;
+                double lNormalized = l / 100.0;
+
+                double r, g, b;
+
+                if (sNormalized == 0)
+                {
+                    // Achromatic (gray)
+                    r = g = b = lNormalized;
+                }
                 else
-                    alpha = System.Math.Min(1.0, System.Math.Max(0.0, alpha));
+                {
+                    double q = lNormalized < 0.5 ? lNormalized * (1 + sNormalized) : lNormalized + sNormalized - lNormalized * sNormalized;
+                    double p = 2 * lNormalized - q;
+                    r = Hue2Rgb(p, q, hNormalized + 1.0 / 3.0);
+                    g = Hue2Rgb(p, q, hNormalized);
+                    b = Hue2Rgb(p, q, hNormalized - 1.0 / 3.0);
+                }
+
+                // Convert to 0-255 range
+                int rByte = (int)System.Math.Round(r * 255);
+                int gByte = (int)System.Math.Round(g * 255);
+                int bByte = (int)System.Math.Round(b * 255);
+                int aByte = (int)System.Math.Round(alpha * 255);
+
+                return new Energy.Base.Color((byte)aByte, (byte)rByte, (byte)gByte, (byte)bByte);
             }
 
-            // Convert HSL to RGB
-            double hNormalized = h / 360.0;
-            double sNormalized = s / 100.0;
-            double lNormalized = l / 100.0;
-
-            double r, g, b;
-
-            if (sNormalized == 0)
-            {
-                // Achromatic (gray)
-                r = g = b = lNormalized;
-            }
-            else
-            {
-                double q = lNormalized < 0.5 ? lNormalized * (1 + sNormalized) : lNormalized + sNormalized - lNormalized * sNormalized;
-                double p = 2 * lNormalized - q;
-                r = Hue2Rgb(p, q, hNormalized + 1.0 / 3.0);
-                g = Hue2Rgb(p, q, hNormalized);
-                b = Hue2Rgb(p, q, hNormalized - 1.0 / 3.0);
-            }
-
-            // Convert to 0-255 range
-            int rByte = (int)System.Math.Round(r * 255);
-            int gByte = (int)System.Math.Round(g * 255);
-            int bByte = (int)System.Math.Round(b * 255);
-            int aByte = (int)System.Math.Round(alpha * 255);
-
-            return new Energy.Base.Color((byte)aByte, (byte)rByte, (byte)gByte, (byte)bByte);
+            #endregion
         }
 
+        #endregion
+
+        #region RAL
+
         /// <summary>
-        /// Helper function for HSL to RGB conversion
+        /// RAL conversion helpers.
         /// </summary>
-        /// <param name="p1">First parameter</param>
-        /// <param name="q1">Second parameter</param>
-        /// <param name="t1">Third parameter</param>
-        /// <returns>RGB component value</returns>
-        private static double Hue2Rgb(double p1, double q1, double t1)
+        public static class RAL
         {
-            if (t1 < 0) t1 += 1;
-            if (t1 > 1) t1 -= 1;
-            if (t1 < 1.0 / 6.0) return p1 + (q1 - p1) * 6 * t1;
-            if (t1 < 1.0 / 2.0) return q1;
-            if (t1 < 2.0 / 3.0) return p1 + (q1 - p1) * (2.0 / 3.0 - t1) * 6;
-            return p1;
+            #region Private
+
+            private static double PivotLab(double value)
+            {
+                return value > 0.008856 ? System.Math.Pow(value, 1.0 / 3.0) : (7.787 * value) + (16.0 / 116.0);
+            }
+
+            private static LabColor RgbToLab(double r, double g, double b)
+            {
+                double rNorm = r / 255.0;
+                double gNorm = g / 255.0;
+                double bNorm = b / 255.0;
+
+                double rLinear = rNorm <= 0.04045 ? rNorm / 12.92 : System.Math.Pow((rNorm + 0.055) / 1.055, 2.4);
+                double gLinear = gNorm <= 0.04045 ? gNorm / 12.92 : System.Math.Pow((gNorm + 0.055) / 1.055, 2.4);
+                double bLinear = bNorm <= 0.04045 ? bNorm / 12.92 : System.Math.Pow((bNorm + 0.055) / 1.055, 2.4);
+
+                double x = rLinear * 0.4124 + gLinear * 0.3576 + bLinear * 0.1805;
+                double y = rLinear * 0.2126 + gLinear * 0.7152 + bLinear * 0.0722;
+                double z = rLinear * 0.0193 + gLinear * 0.1192 + bLinear * 0.9505;
+
+                double xRef = x / 0.95047;
+                double yRef = y / 1.00000;
+                double zRef = z / 1.08883;
+
+                double fx = PivotLab(xRef);
+                double fy = PivotLab(yRef);
+                double fz = PivotLab(zRef);
+
+                double l = (116 * fy) - 16;
+                double a = 500 * (fx - fy);
+                double bLab = 200 * (fy - fz);
+
+                return new LabColor(l, a, bLab);
+            }
+
+            private static double DeltaE(LabColor lab, RalEntry entry)
+            {
+                double dL = lab.L - entry.L;
+                double dA = lab.A - entry.A;
+                double dB = lab.B - entry.B;
+                return System.Math.Sqrt(dL * dL + dA * dA + dB * dB);
+            }
+
+            private static RalEntry CreateRalEntry(string code, byte r, byte g, byte b)
+            {
+                LabColor lab = RgbToLab(r, g, b);
+                string digits = ExtractDigits(code);
+                Energy.Base.Color color = new Energy.Base.Color(255, r, g, b);
+                return new RalEntry(code, digits, color, lab.L, lab.A, lab.B);
+            }
+
+            private static string ExtractDigits(string text)
+            {
+                char[] buffer = new char[text.Length];
+                int position = 0;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    char ch = text[i];
+                    if (char.IsDigit(ch))
+                    {
+                        buffer[position++] = ch;
+                    }
+                }
+                return new string(buffer, 0, position);
+            }
+
+            private readonly struct LabColor
+            {
+                public LabColor(double l, double a, double b)
+                {
+                    L = l;
+                    A = a;
+                    B = b;
+                }
+
+                public double L { get; }
+                public double A { get; }
+                public double B { get; }
+            }
+
+            private readonly struct RalEntry
+            {
+                public RalEntry(string code, string digits, Energy.Base.Color color, double l, double a, double b)
+                {
+                    Code = code;
+                    Digits = digits;
+                    Color = color;
+                    L = l;
+                    A = a;
+                    B = b;
+                }
+
+                public string Code { get; }
+                public string Digits { get; }
+                public Energy.Base.Color Color { get; }
+                public double L { get; }
+                public double A { get; }
+                public double B { get; }
+            }
+
+            private static readonly RalEntry[] RalPalette = new RalEntry[]
+            {
+                CreateRalEntry("RAL 7016", 56, 62, 66),
+                CreateRalEntry("RAL 9005", 10, 10, 10),
+                CreateRalEntry("RAL 9010", 244, 244, 244),
+                CreateRalEntry("RAL 9006", 165, 165, 165),
+                CreateRalEntry("RAL 7035", 215, 215, 215),
+                CreateRalEntry("RAL 6005", 47, 69, 56),
+                CreateRalEntry("RAL 3020", 204, 6, 5),
+                CreateRalEntry("RAL 5010", 14, 70, 127),
+                CreateRalEntry("RAL 8017", 69, 50, 46),
+                CreateRalEntry("RAL 1021", 246, 182, 0)
+            };
+
+            private static bool TryNormalizeCode(string value, out string digits)
+            {
+                digits = null;
+                if (value == null)
+                    return false;
+
+                string trimmed = value.Trim();
+                if (trimmed == "")
+                    return false;
+
+                char[] buffer = new char[trimmed.Length];
+                int position = 0;
+
+                for (int i = 0; i < trimmed.Length; i++)
+                {
+                    char ch = trimmed[i];
+                    if (char.IsDigit(ch))
+                    {
+                        buffer[position++] = ch;
+                    }
+                    else if (char.IsWhiteSpace(ch)
+                        || ch == 'R' || ch == 'r'
+                        || ch == 'A' || ch == 'a'
+                        || ch == 'L' || ch == 'l'
+                        || ch == '-' || ch == '_' )
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                if (position != 4)
+                    return false;
+
+                digits = new string(buffer, 0, position);
+                return true;
+            }
+
+            #endregion
+
+            #region ColorToRal
+
+            /// <summary>
+            /// Convert RGBA color to the closest RAL catalog entry.
+            /// <br/><br/>
+            /// Applies alpha flattening against a white background, converts to CIELAB, and finds the smallest Delta E.
+            /// </summary>
+            /// <param name="color">Input color</param>
+            /// <returns>RAL code string</returns>
+            public static string ColorToRal(Energy.Base.Color color)
+            {
+                double rFlat = FlattenAlpha(color.R, color.A);
+                double gFlat = FlattenAlpha(color.G, color.A);
+                double bFlat = FlattenAlpha(color.B, color.A);
+                LabColor lab = RgbToLab(rFlat, gFlat, bFlat);
+
+                string closest = RalPalette[0].Code;
+                double smallestDistance = System.Double.MaxValue;
+
+                for (int i = 0; i < RalPalette.Length; i++)
+                {
+                    double distance = DeltaE(lab, RalPalette[i]);
+                    if (distance < smallestDistance)
+                    {
+                        smallestDistance = distance;
+                        closest = RalPalette[i].Code;
+                    }
+                }
+
+                return closest;
+            }
+        
+            #endregion
+
+            #region RalToColor
+
+            /// <summary>
+            /// Convert a RAL code back to an RGB color sample.
+            /// <br/><br/>
+            /// Accepts inputs such as "RAL 7016" or "7016".
+            /// </summary>
+            /// <param name="code">RAL identifier</param>
+            /// <returns>Energy.Base.Color instance describing the RAL sample</returns>
+            public static Energy.Base.Color RalToColor(string code)
+            {
+                if (!TryNormalizeCode(code, out string digits))
+                    throw new System.ArgumentException("Invalid RAL code format.", nameof(code));
+
+                for (int i = 0; i < RalPalette.Length; i++)
+                {
+                    if (RalPalette[i].Digits == digits)
+                        return RalPalette[i].Color;
+                }
+
+                throw new System.ArgumentOutOfRangeException(nameof(code), "Unknown RAL code.");
+            }
+
+            #endregion
         }
 
         #endregion

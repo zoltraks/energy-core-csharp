@@ -68,6 +68,7 @@ Energy.Query      - SQL query building and dialects
 
 - **Avoid .NET 4.0+ features** in main library code for .NET 2.0/3.5/Compact Framework compatibility
 - **Use compatible alternatives**: Replace `string.IsNullOrWhiteSpace()` with `string == null || string.Trim() == ""`
+- **No `string.IsNullOrWhiteSpace` usage**: The method is unavailable on .NET 2.0/3.5/CF, so never call it in production code—always expand to explicit null/trim checks as shown above.
 - **Modern features allowed in test projects**: Test projects can use newer .NET features
 - **Conditional compilation**: Use `#if` directives when necessary for platform-specific code
 - **No verbatim strings with "$"**: Avoid `$@"..."` interpolated verbatim strings - use string.Format() or regular concatenation instead
