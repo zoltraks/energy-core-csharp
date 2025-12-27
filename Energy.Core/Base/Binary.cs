@@ -273,6 +273,30 @@ namespace Energy.Base
         #region Not
 
         /// <summary>
+        /// Perform bitwise NOT operation on a single byte.
+        /// </summary>
+        public static byte Not(byte value)
+        {
+            return (byte)~value;
+        }
+
+        /// <summary>
+        /// Perform bitwise NOT operation on a 32-bit unsigned integer.
+        /// </summary>
+        public static uint Not(uint value)
+        {
+            return ~value;
+        }
+
+        /// <summary>
+        /// Perform bitwise NOT operation on a 64-bit unsigned integer.
+        /// </summary>
+        public static ulong Not(ulong value)
+        {
+            return ~value;
+        }
+
+        /// <summary>
         /// Perform bitwise NOT operation on every byte in array.
         /// </summary>
         /// <param name="array"></param>
@@ -287,7 +311,7 @@ namespace Energy.Base
             byte[] result = new byte[l];
             for (int i = 0; i < l; i++)
             {
-                result[i] = (byte)(array[i] ^ 0xff);
+                result[i] = (byte)~array[i];
             }
             return result;
         }
@@ -295,6 +319,30 @@ namespace Energy.Base
         #endregion
 
         #region Or
+
+        /// <summary>
+        /// Perform bitwise OR operation on single bytes.
+        /// </summary>
+        public static byte Or(byte one, byte two)
+        {
+            return (byte)(one | two);
+        }
+
+        /// <summary>
+        /// Perform bitwise OR operation on unsigned 32-bit integers.
+        /// </summary>
+        public static uint Or(uint one, uint two)
+        {
+            return one | two;
+        }
+
+        /// <summary>
+        /// Perform bitwise OR operation on unsigned 64-bit integers.
+        /// </summary>
+        public static ulong Or(ulong one, ulong two)
+        {
+            return one | two;
+        }
 
         /// <summary>
         /// Perform bitwise OR operation on every byte in array by second array.
@@ -333,6 +381,30 @@ namespace Energy.Base
         #region And
 
         /// <summary>
+        /// Perform bitwise AND operation on single bytes.
+        /// </summary>
+        public static byte And(byte one, byte two)
+        {
+            return (byte)(one & two);
+        }
+
+        /// <summary>
+        /// Perform bitwise AND operation on unsigned 32-bit integers.
+        /// </summary>
+        public static uint And(uint one, uint two)
+        {
+            return one & two;
+        }
+
+        /// <summary>
+        /// Perform bitwise AND operation on unsigned 64-bit integers.
+        /// </summary>
+        public static ulong And(ulong one, ulong two)
+        {
+            return one & two;
+        }
+
+        /// <summary>
         /// Perform bitwise AND operation on every byte in array by second array.
         /// <br/><br/>
         /// Second array is treated as ring buffer when shorter than first one.
@@ -367,6 +439,30 @@ namespace Energy.Base
         #endregion
 
         #region Xor
+
+        /// <summary>
+        /// Perform bitwise XOR operation on single bytes.
+        /// </summary>
+        public static byte Xor(byte one, byte two)
+        {
+            return (byte)(one ^ two);
+        }
+
+        /// <summary>
+        /// Perform bitwise XOR operation on unsigned 32-bit integers.
+        /// </summary>
+        public static uint Xor(uint one, uint two)
+        {
+            return one ^ two;
+        }
+
+        /// <summary>
+        /// Perform bitwise XOR operation on unsigned 64-bit integers.
+        /// </summary>
+        public static ulong Xor(ulong one, ulong two)
+        {
+            return one ^ two;
+        }
 
         /// <summary>
         /// Perform bitwise XOR operation on every byte in array by second array.

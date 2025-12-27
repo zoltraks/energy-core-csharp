@@ -509,5 +509,30 @@ namespace Energy.Core.Test.Base
                 Energy.Base.Binary.Shr(array, 24),
                 "Array shift beyond total width should produce zeros");
         }
+
+        [TestMethod]
+        public void Binary_BitwiseScalarOperations()
+        {
+            byte byteA = 0b10101010;
+            byte byteB = 0b01010101;
+            Assert.AreEqual((byte)0b01010101, Energy.Base.Binary.Not(byteA), "NOT on byte should invert bits");
+            Assert.AreEqual((byte)0b11111111, Energy.Base.Binary.Or(byteA, byteB), "OR on bytes should combine bits");
+            Assert.AreEqual((byte)0b00000000, Energy.Base.Binary.And(byteA, byteB), "AND on bytes should clear non-overlapping bits");
+            Assert.AreEqual((byte)0b11111111, Energy.Base.Binary.Xor(byteA, byteB), "XOR on bytes should highlight differing bits");
+
+            uint uintA = 0x0F0F0F0Fu;
+            uint uintB = 0x00FF00FFu;
+            Assert.AreEqual(0xF0F0F0F0u, Energy.Base.Binary.Not(uintA), "NOT on uint should invert all bits");
+            Assert.AreEqual(0x0FFF0FFFu, Energy.Base.Binary.Or(uintA, uintB), "OR on uints should combine masks");
+            Assert.AreEqual(0x000F000Fu, Energy.Base.Binary.And(uintA, uintB), "AND on uints should keep overlapping bits");
+            Assert.AreEqual(0x0FF00FF0u, Energy.Base.Binary.Xor(uintA, uintB), "XOR on uints should highlight differing bits");
+
+            ulong ulongA = 0xAAAAAAAAAAAAAAAAul;
+            ulong ulongB = 0x5555555555555555ul;
+            Assert.AreEqual(0x5555555555555555ul, Energy.Base.Binary.Not(ulongA), "NOT on ulong should invert all bits");
+            Assert.AreEqual(0xFFFFFFFFFFFFFFFFul, Energy.Base.Binary.Or(ulongA, ulongB), "OR on ulongs should combine bits");
+            Assert.AreEqual(0x0000000000000000ul, Energy.Base.Binary.And(ulongA, ulongB), "AND on ulongs should clear non-overlapping bits");
+            Assert.AreEqual(0xFFFFFFFFFFFFFFFFul, Energy.Base.Binary.Xor(ulongA, ulongB), "XOR on ulongs should highlight differing bits");
+        }
     }
 }
