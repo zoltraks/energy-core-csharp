@@ -53,14 +53,14 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-#if !NETSTANDARD && !CFNET
+        #if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
-#endif
+        #endif
         public void Set(System.Reflection.Assembly assembly)
         {
-#if !NETCF
+            #if !NETCF
             Product = GetProduct(assembly);
-#endif
+            #endif
             Compilation = GetCompilation(assembly);
         }
 
@@ -94,9 +94,14 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetFileVersion()
         {
+#if !NETCF
             ProcessModule processModule = System.Diagnostics.Process.GetCurrentProcess().MainModule;
             if (processModule == null) return "";
             return processModule.FileVersionInfo.FileVersion;
+#endif
+#if NETCF
+            return "";
+#endif
         }
 
         /// <summary>
@@ -105,9 +110,14 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetProductVersion()
         {
+#if !NETCF
             ProcessModule processModule = System.Diagnostics.Process.GetCurrentProcess().MainModule;
             if (processModule == null) return "";
             return processModule.FileVersionInfo.ProductVersion;
+#endif
+#if NETCF
+            return "";
+#endif
         }
 
         /// <summary>
@@ -162,7 +172,7 @@ namespace Energy.Core
             return Compare(a, b, new char[] { '.', '-', '_' });
         }
 
-#endregion
+        #endregion
 
         #region Library version information
 
@@ -207,6 +217,6 @@ namespace Energy.Core
             }
         }
 
-#endregion
+        #endregion
     }
 }

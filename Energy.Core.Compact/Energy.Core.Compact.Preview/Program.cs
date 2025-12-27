@@ -13,7 +13,7 @@ namespace Energy.Core.Compact.Example
         [MTAThread]
         static void Main()
         {
-            Application.Run(new View.Start());
+            System.Windows.Forms.Application.Run(new View.Start());
         }
     }
 }

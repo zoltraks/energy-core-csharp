@@ -15,5 +15,10 @@ namespace Energy.Core.Compact.Example.View
         {
             InitializeComponent();
         }
+
+        private void Start_Load(object sender, EventArgs e)
+        {
+            new Test.Hello().Test();
+        }
     }
 }

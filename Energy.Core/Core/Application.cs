@@ -268,9 +268,14 @@ namespace Energy.Core
         /// <returns></returns>
         public static string GetCommandName()
         {
+            #if !NETCF
             //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetCallingAssembly();
             //return assembly.GetName().Name;
             return System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+            #endif
+            #if NETCF
+            return "";
+            #endif
         }
 
         #endregion

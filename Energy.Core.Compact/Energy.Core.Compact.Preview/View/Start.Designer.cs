@@ -76,6 +76,7 @@
             this.Menu = this.mainMenu1;
             this.Name = "Start";
             this.Text = "Energy.Core";
+            this.Load += new System.EventHandler(this.Start_Load);
             this.ResumeLayout(false);
 
         }

@@ -188,6 +188,7 @@
     <Compile Include="Interface\IStringList.cs" />
     <Compile Include="Interface\IStrip.cs" />
     <Compile Include="Interface\ITable.cs" />
+    <Compile Include="Interface\ITest.cs" />
     <Compile Include="Interface\IUnescape.cs" />
     <Compile Include="Interface\IWake.cs" />
     <Compile Include="Interface\IWork.cs" />
