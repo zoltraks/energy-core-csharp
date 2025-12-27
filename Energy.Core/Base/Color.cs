@@ -471,36 +471,47 @@ namespace Energy.Base
 
             private struct LabColor
             {
+                private readonly double l;
+                private readonly double a;
+                private readonly double b;
+
                 public LabColor(double l, double a, double b)
                 {
-                    L = l;
-                    A = a;
-                    B = b;
+                    this.l = l;
+                    this.a = a;
+                    this.b = b;
                 }
 
-                public double L { get; }
-                public double A { get; }
-                public double B { get; }
+                public double L { get { return l; } }
+                public double A { get { return a; } }
+                public double B { get { return b; } }
             }
 
             private struct RalEntry
             {
+                private readonly string code;
+                private readonly string digits;
+                private readonly Energy.Base.Color color;
+                private readonly double l;
+                private readonly double a;
+                private readonly double b;
+
                 public RalEntry(string code, string digits, Energy.Base.Color color, double l, double a, double b)
                 {
-                    Code = code;
-                    Digits = digits;
-                    Color = color;
-                    L = l;
-                    A = a;
-                    B = b;
+                    this.code = code;
+                    this.digits = digits;
+                    this.color = color;
+                    this.l = l;
+                    this.a = a;
+                    this.b = b;
                 }
 
-                public string Code { get; }
-                public string Digits { get; }
-                public Energy.Base.Color Color { get; }
-                public double L { get; }
-                public double A { get; }
-                public double B { get; }
+                public string Code { get { return code; } }
+                public string Digits { get { return digits; } }
+                public Energy.Base.Color Color { get { return color; } }
+                public double L { get { return l; } }
+                public double A { get { return a; } }
+                public double B { get { return b; } }
             }
 
             private static readonly RalEntry[] RalPalette = new RalEntry[]
