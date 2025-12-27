@@ -417,7 +417,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void Binary_RolScalarVariants()
+        public void Binary_Rol()
         {
             byte byteInput = 0b10000001;
             Assert.AreEqual((byte)0b00000011, Energy.Base.Binary.Rol(byteInput, 1), "Byte left rotation should move high bit to low end");
@@ -438,7 +438,7 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
-        public void Binary_RorScalarVariants()
+        public void Binary_Ror()
         {
             byte byteInput = 0b00000011;
             Assert.AreEqual((byte)0b10000001, Energy.Base.Binary.Ror(byteInput, 1), "Byte right rotation should move low bit to high end");
@@ -454,6 +454,60 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual((byte)0b10000001, Energy.Base.Binary.Ror(byteInput), "Single-parameter byte overload should rotate right by one");
             Assert.AreEqual(0x80000001u, Energy.Base.Binary.Ror(uintInput), "Single-parameter uint overload should rotate right by one");
             Assert.AreEqual(0x8000000000000001ul, Energy.Base.Binary.Ror(ulongInput), "Single-parameter ulong overload should rotate right by one");
+        }
+
+        [TestMethod]
+        public void Binary_Shl()
+        {
+            byte byteInput = 0b00000011;
+            Assert.AreEqual((byte)0b00000110, Energy.Base.Binary.Shl(byteInput, 1), "Shift left should match logical behavior");
+            Assert.AreEqual((byte)0b00000001, Energy.Base.Binary.Shl(byteInput, -1), "Negative left shift should call right shift");
+
+            Assert.AreEqual(0u, Energy.Base.Binary.Shl(1u, 32), "Left shift beyond width should return zero");
+            Assert.AreEqual((ulong)0, Energy.Base.Binary.Shl(1ul, 64), "Left shift beyond width for ulong should return zero");
+
+            byte[] array = new byte[] { 0x12, 0x34, 0x56 };
+            CollectionAssert.AreEqual(
+                new byte[] { 0x24, 0x68, 0xAC },
+                Energy.Base.Binary.Shl(array, 1),
+                "Array shift should move bits left within byte boundaries");
+
+            CollectionAssert.AreEqual(
+                new byte[] { 0x34, 0x56, 0x00 },
+                Energy.Base.Binary.Shl(array, 8),
+                "Array shift by whole bytes should drop high bytes and insert zeros");
+
+            CollectionAssert.AreEqual(
+                new byte[] { 0x00, 0x00, 0x00 },
+                Energy.Base.Binary.Shl(array, 24),
+                "Array shift beyond total width should produce zeros");
+        }
+
+        [TestMethod]
+        public void Binary_Shr()
+        {
+            byte byteInput = 0b00000011;
+            Assert.AreEqual((byte)0b00000001, Energy.Base.Binary.Shr(byteInput, 1), "Shift right should drop low bits");
+            Assert.AreEqual((byte)0b00000110, Energy.Base.Binary.Shr(byteInput, -1), "Negative right shift should call left shift");
+
+            Assert.AreEqual(0u, Energy.Base.Binary.Shr(1u, 32), "Right shift beyond width should return zero");
+            Assert.AreEqual((ulong)0, Energy.Base.Binary.Shr(1ul, 64), "Right shift beyond width for ulong should return zero");
+
+            byte[] array = new byte[] { 0x12, 0x34, 0x56 };
+            CollectionAssert.AreEqual(
+                new byte[] { 0x09, 0x1A, 0x2B },
+                Energy.Base.Binary.Shr(array, 1),
+                "Array shift should move bits right within byte boundaries");
+
+            CollectionAssert.AreEqual(
+                new byte[] { 0x00, 0x12, 0x34 },
+                Energy.Base.Binary.Shr(array, 8),
+                "Array shift by whole bytes should drop low bytes and insert zeros");
+
+            CollectionAssert.AreEqual(
+                new byte[] { 0x00, 0x00, 0x00 },
+                Energy.Base.Binary.Shr(array, 24),
+                "Array shift beyond total width should produce zeros");
         }
     }
 }

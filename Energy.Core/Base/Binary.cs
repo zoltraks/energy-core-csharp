@@ -405,29 +405,23 @@ namespace Energy.Base
         #region Rol
 
         /// <summary>
-        /// Rotate bits left in an array by given bit count.
+        /// Rotate bits left in a single byte by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, right rotation will be performed instead.
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="value"></param>
         /// <param name="count"></param>
         /// <returns></returns>
         public static byte Rol(byte value, int count)
         {
             if (count < 0)
-            {
                 return Ror(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 8;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (byte)(((value << count) | (value >> (bits - count))) & 0xff);
         }
 
@@ -447,19 +441,13 @@ namespace Energy.Base
         public static uint Rol(uint value, int count)
         {
             if (count < 0)
-            {
                 return Ror(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 32;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (value << count) | (value >> (bits - count));
         }
 
@@ -479,19 +467,13 @@ namespace Energy.Base
         public static ulong Rol(ulong value, int count)
         {
             if (count < 0)
-            {
                 return Ror(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 64;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (value << count) | (value >> (bits - count));
         }
 
@@ -503,46 +485,28 @@ namespace Energy.Base
             return Rol(value, 1);
         }
 
-        /// <summary>
-        /// Rotate bits left in an array by given bit count.
-        /// <br/><br/>
-        /// When negative number of bits is given, right rotation will be performed instead.
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
         public static byte[] Rol(byte[] array, int count)
         {
             if (count < 0)
-            {
                 return Ror(array, -count);
-            }
-            if (null == array || 0 == array.Length || 0 == count)
-            {
+            if (array == null || array.Length == 0 || count == 0)
                 return array;
-            }
             int n = array.Length << 3;
             if (count > n)
-            {
                 count %= n;
-            }
-            if (0 == count || n == count)
-            {
+            if (count == 0 || count == n)
                 return array;
-            }
             byte[] result = new byte[array.Length];
             int o = count % 8;
             int l = array.Length;
 
-            if (0 == o)
+            if (o == 0)
             {
                 int m = count >> 3;
                 for (int i = 0, j = m; i < l; i++, j++)
                 {
                     if (j >= l)
-                    {
                         j = 0;
-                    }
                     result[i] = array[j];
                 }
             }
@@ -553,13 +517,9 @@ namespace Energy.Base
                 for (int i = 0, j = m, k = m + 1; i < l; i++, j++, k++)
                 {
                     while (j >= l)
-                    {
                         j -= l;
-                    }
                     while (k >= l)
-                    {
                         k -= l;
-                    }
                     result[i] = (byte)(((array[j] << o) & 0xff) + (array[k] >> p));
                 }
             }
@@ -571,29 +531,23 @@ namespace Energy.Base
         #region Ror
 
         /// <summary>
-        /// Rotate bits right in an array by given bit count.
+        /// Rotate bits right in a single byte by given bit count.
         /// <br/><br/>
         /// When negative number of bits is given, left rotation will be performed instead.
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="value"></param>
         /// <param name="count"></param>
         /// <returns></returns>
         public static byte Ror(byte value, int count)
         {
             if (count < 0)
-            {
                 return Rol(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 8;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (byte)(((value >> count) | (value << (bits - count))) & 0xff);
         }
 
@@ -613,19 +567,13 @@ namespace Energy.Base
         public static uint Ror(uint value, int count)
         {
             if (count < 0)
-            {
                 return Rol(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 32;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (value >> count) | (value << (bits - count));
         }
 
@@ -645,19 +593,13 @@ namespace Energy.Base
         public static ulong Ror(ulong value, int count)
         {
             if (count < 0)
-            {
                 return Rol(value, -count);
-            }
             if (count == 0)
-            {
                 return value;
-            }
             int bits = 64;
             count %= bits;
             if (count == 0)
-            {
                 return value;
-            }
             return (value >> count) | (value << (bits - count));
         }
 
@@ -669,14 +611,6 @@ namespace Energy.Base
             return Ror(value, 1);
         }
 
-        /// <summary>
-        /// Rotate bits right in an array by given bit count.
-        /// <br/><br/>
-        /// When negative number of bits is given, left rotation will be performed instead.
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
         public static byte[] Ror(byte[] array, int count)
         {
             if (count < 0)
@@ -729,6 +663,182 @@ namespace Energy.Base
                     result[i] = (byte)(((array[j] << p) & 0xff) + (array[k] >> o));
                 }
             }
+            return result;
+        }
+
+        #endregion
+
+        #region Shl
+
+        /// <summary>
+        /// Shift bits left in a single byte by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, right shifting will be performed instead.
+        /// </summary>
+        public static byte Shl(byte value, int count)
+        {
+            if (count < 0)
+                return Shr(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 8)
+                return 0;
+            return (byte)((value << count) & 0xff);
+        }
+
+        /// <summary>
+        /// Shift bits left in an unsigned 32-bit integer by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, right shifting will be performed instead.
+        /// </summary>
+        public static uint Shl(uint value, int count)
+        {
+            if (count < 0)
+                return Shr(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 32)
+                return 0;
+            return value << count;
+        }
+
+        /// <summary>
+        /// Shift bits left in an unsigned 64-bit integer by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, right shifting will be performed instead.
+        /// </summary>
+        public static ulong Shl(ulong value, int count)
+        {
+            if (count < 0)
+                return Shr(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 64)
+                return 0;
+            return value << count;
+        }
+
+        /// <summary>
+        /// Shift bits left in a byte array by the specified amount, inserting zeros on the right.
+        /// <br/><br/>
+        /// When a negative number of bits is given, right shifting will be performed instead.
+        /// </summary>
+        public static byte[] Shl(byte[] array, int count)
+        {
+            if (count < 0)
+                return Shr(array, -count);
+            if (array == null || array.Length == 0 || count == 0)
+                return array;
+            int totalBits = array.Length << 3;
+            if (count >= totalBits)
+                return new byte[array.Length];
+
+            byte[] result = new byte[array.Length];
+            int byteShift = count >> 3;
+            int bitShift = count & 7;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                int sourceIndex = i + byteShift;
+                if (sourceIndex >= array.Length)
+                    break;
+
+                int value = (array[sourceIndex] << bitShift) & 0xFF;
+                if (bitShift != 0 && sourceIndex + 1 < array.Length)
+                {
+                    value |= array[sourceIndex + 1] >> (8 - bitShift);
+                }
+                result[i] = (byte)value;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Shr
+
+        /// <summary>
+        /// Shift bits right in a single byte by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, left shifting will be performed instead.
+        /// </summary>
+        public static byte Shr(byte value, int count)
+        {
+            if (count < 0)
+                return Shl(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 8)
+                return 0;
+            return (byte)((value >> count) & 0xff);
+        }
+
+        /// <summary>
+        /// Shift bits right in an unsigned 32-bit integer by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, left shifting will be performed instead.
+        /// </summary>
+        public static uint Shr(uint value, int count)
+        {
+            if (count < 0)
+                return Shl(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 32)
+                return 0;
+            return value >> count;
+        }
+
+        /// <summary>
+        /// Shift bits right in an unsigned 64-bit integer by the specified amount.
+        /// <br/><br/>
+        /// When a negative number of bits is given, left shifting will be performed instead.
+        /// </summary>
+        public static ulong Shr(ulong value, int count)
+        {
+            if (count < 0)
+                return Shl(value, -count);
+            if (count == 0)
+                return value;
+            if (count >= 64)
+                return 0;
+            return value >> count;
+        }
+
+        /// <summary>
+        /// Shift bits right in a byte array by the specified amount, inserting zeros on the left.
+        /// <br/><br/>
+        /// When a negative number of bits is given, left shifting will be performed instead.
+        /// </summary>
+        public static byte[] Shr(byte[] array, int count)
+        {
+            if (count < 0)
+                return Shl(array, -count);
+            if (array == null || array.Length == 0 || count == 0)
+                return array;
+            int totalBits = array.Length << 3;
+            if (count >= totalBits)
+                return new byte[array.Length];
+
+            byte[] result = new byte[array.Length];
+            int byteShift = count >> 3;
+            int bitShift = count & 7;
+
+            for (int i = array.Length - 1; i >= 0; i--)
+            {
+                int sourceIndex = i - byteShift;
+                if (sourceIndex < 0)
+                    continue;
+
+                int value = array[sourceIndex] >> bitShift;
+                if (bitShift != 0 && sourceIndex - 1 >= 0)
+                {
+                    value |= ((array[sourceIndex - 1] << (8 - bitShift)) & 0xFF);
+                }
+                result[i] = (byte)(value & 0xFF);
+            }
+
             return result;
         }
 
