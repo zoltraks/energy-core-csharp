@@ -124,6 +124,8 @@ Energy.Query      - SQL query building and dialects
 - When a `<summary>` comment needs multiple sentences, separate each sentence with `<br/><br/>` (e.g., `First sentence.<br/><br/>Second sentence.`) to keep formatting consistent across viewers.
 - **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
 - **XML comments**: In `<summary>` blocks, omit the trailing period for single-sentence descriptions. For multiple sentences, end each sentence with a period and separate them using `<br/><br/>`.
+- **XML `<param>`/`<returns>` formatting**: If the description is a single sentence, keep it on one line between the tags **without a trailing period** (e.g., `/// <param name="value">Color string to parse</param>`). When the description needs multiple sentences, expand it so the sentences live on separate `///` lines (no leading spaces before the text), insert `/// <br/><br/>` between them, and keep the entire block between the opening and closing tag, matching the pattern shown in the specification.
+- **Region naming**: When grouping a method inside `#region`/`#endregion`, name the region exactly after the method (for example, `#region IsHex` instead of `#region Hex`) so that the region name always matches the method it contains.
 
 ### Method Organization
 

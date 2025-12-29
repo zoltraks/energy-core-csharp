@@ -5,7 +5,7 @@
     <FileVersion>24.11.0</FileVersion>
     <AssemblyVersion>24.11.0</AssemblyVersion>
     <TargetFrameworks>netstandard2.0;net40;net35;net20</TargetFrameworks>
-    <ApplicationIcon>Application.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Application.ico</ApplicationIcon>
     <RootNamespace>Energy</RootNamespace>
     <Authors>Filip Golewski &lt;f.golewski@gmail.com&gt;</Authors>
     <Company />
@@ -85,6 +85,11 @@ Browse project page for more details.</Description>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RAL.palette">
+      <LogicalName>Energy.RAL.palette</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

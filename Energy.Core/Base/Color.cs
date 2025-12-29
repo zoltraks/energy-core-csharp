@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Energy.Base
 {
@@ -94,10 +95,14 @@ namespace Energy.Base
             if (value == null) return null;
             value = value.Trim();
             if (value == "") return new Color();
-            if (value.Length == 4 && value.StartsWith("#") || value.Length == 3 || value.Length == 6 || value.Length == 7 && value.StartsWith("#"))
-            {
-                return HexToColor(value);
-            }
+
+            byte alpha;
+            byte red;
+            byte green;
+            byte blue;
+            if (TryParseHexColor(value, out alpha, out red, out green, out blue))
+                return new Energy.Base.Color(alpha, red, green, blue);
+
             //return new Color(System.Drawing.Color.FromName(value));
 
 #if !NETCF
@@ -160,17 +165,118 @@ namespace Energy.Base
         /// <returns>System.Drawing.Color equivalent</returns>
         public static Energy.Base.Color HexToColor(string hex)
         {
-            Regex r = new Regex("\\#?(?:(?<r>[a-fA-F0-9]{2})(?<g>[a-fA-F0-9]{2})(?<b>[a-fA-F0-9]{2})|(?<r>[a-fA-F0-9])(?<g>[a-fA-F0-9])(?<b>[a-fA-F0-9]))");
-            Match m = r.Match(hex);
-            if (!m.Success) return 0;
-            string R = m.Groups["r"].Value;
-            string G = m.Groups["g"].Value;
-            string B = m.Groups["b"].Value;
-            if (R.Length == 1) R = new string(R[0], 2);
-            if (G.Length == 1) G = new string(G[0], 2);
-            if (B.Length == 1) B = new string(B[0], 2);
-            byte[] b = Hex.HexToArray(R + G + B);
-            return new Energy.Base.Color(b[0], b[1], b[2]);
+            byte alpha;
+            byte red;
+            byte green;
+            byte blue;
+            if (!TryParseHexColor(hex, out alpha, out red, out green, out blue))
+                return 0;
+            return new Energy.Base.Color(alpha, red, green, blue);
+        }
+
+        #endregion
+
+        #region TryParseHexColor
+
+        /// <summary>
+        /// Try parsing hexadecimal color string supporting RGB, RGBA, RRGGBB, and AARRGGBB formats.
+        /// </summary>
+        /// <param name="value">
+        /// Color string to parse.
+        /// <br/><br/>
+        /// Accepts optional leading '#' and supports 3, 4, 6, or 8 hexadecimal digits.
+        /// </param>
+        /// <param name="alpha">
+        /// Parsed alpha component.
+        /// <br/><br/>
+        /// Defaults to 255 when the input omits alpha information.
+        /// </param>
+        /// <param name="red">Parsed red component from the input string</param>
+        /// <param name="green">Parsed green component from the input string</param>
+        /// <param name="blue">Parsed blue component from the input string</param>
+        /// <returns>
+        /// True if parsing succeeded, false otherwise.
+        /// <br/><br/>
+        /// Returns false when the string is null, empty, or contains invalid hex digits.
+        /// </returns>
+        public static bool TryParseHexColor(string value, out byte alpha, out byte red, out byte green, out byte blue)
+        {
+            alpha = 0;
+            red = 0;
+            green = 0;
+            blue = 0;
+
+            if (value == null)
+                return false;
+
+            string trimmed = value.Trim();
+            if (trimmed == "")
+                return false;
+
+            if (trimmed[0] == '#')
+            {
+                trimmed = trimmed.Substring(1);
+                if (trimmed.Length == 0)
+                    return false;
+            }
+
+            int length = trimmed.Length;
+
+            if (length == 3 || length == 4)
+            {
+                char[] expanded = new char[length * 2];
+                for (int i = 0; i < length; i++)
+                {
+                    char ch = trimmed[i];
+                    if (!Energy.Base.Text.IsHex(ch))
+                        return false;
+                    expanded[i * 2] = ch;
+                    expanded[i * 2 + 1] = ch;
+                }
+                trimmed = new string(expanded);
+                length = trimmed.Length;
+            }
+            else if (length != 6 && length != 8)
+            {
+                return false;
+            }
+            else
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    if (!Energy.Base.Text.IsHex(trimmed[i]))
+                        return false;
+                }
+            }
+
+            try
+            {
+                int position = 0;
+
+                if (length == 8)
+                {
+                    alpha = (byte)System.Convert.ToInt32(trimmed.Substring(position, 2), 16);
+                    position += 2;
+                }
+                else
+                {
+                    alpha = 255;
+                }
+
+                red = (byte)System.Convert.ToInt32(trimmed.Substring(position, 2), 16);
+                position += 2;
+
+                green = (byte)System.Convert.ToInt32(trimmed.Substring(position, 2), 16);
+                position += 2;
+
+                blue = (byte)System.Convert.ToInt32(trimmed.Substring(position, 2), 16);
+
+                return true;
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
         }
 
         #endregion
@@ -348,16 +454,16 @@ namespace Energy.Base
                 int l = int.Parse(matches[2].Value);
 
                 // Parse alpha if present
-                double alpha = 1.0;
+                double a = 1.0;
                 if (matches.Count >= 4)
                 {
-                    alpha = double.Parse(matches[3].Value);
+                    a = double.Parse(matches[3].Value);
                     // Check if the original string has % after the alpha value
                     var alphaMatch = Regex.Match(hsl, @"(\d+(?:\.\d+)?)(?:%?)\s*\)?\s*$");
                     if (alphaMatch.Success && alphaMatch.Value.IndexOf("%") != -1)
-                        alpha = alpha / 100.0;
+                        a = a / 100.0;
                     else
-                        alpha = System.Math.Min(1.0, System.Math.Max(0.0, alpha));
+                        a = System.Math.Min(1.0, System.Math.Max(0.0, a));
                 }
 
                 // Convert HSL to RGB
@@ -385,7 +491,7 @@ namespace Energy.Base
                 int rByte = (int)System.Math.Round(r * 255);
                 int gByte = (int)System.Math.Round(g * 255);
                 int bByte = (int)System.Math.Round(b * 255);
-                int aByte = (int)System.Math.Round(alpha * 255);
+                int aByte = (int)System.Math.Round(a * 255);
 
                 return new Energy.Base.Color((byte)aByte, (byte)rByte, (byte)gByte, (byte)bByte);
             }
@@ -403,6 +509,10 @@ namespace Energy.Base
         public static class RAL
         {
             #region Private
+
+            private const string RalResourceName = "Energy.RAL.palette";
+            private static readonly object PaletteSyncRoot = new object();
+            private static RalEntry[] ralPalette;
 
             private static double PivotLab(double value)
             {
@@ -514,19 +624,22 @@ namespace Energy.Base
                 public double B { get { return b; } }
             }
 
-            private static readonly RalEntry[] RalPalette = new RalEntry[]
+            private static RalEntry[] RalPalette
             {
-                CreateRalEntry("RAL 7016", 56, 62, 66),
-                CreateRalEntry("RAL 9005", 10, 10, 10),
-                CreateRalEntry("RAL 9010", 244, 244, 244),
-                CreateRalEntry("RAL 9006", 165, 165, 165),
-                CreateRalEntry("RAL 7035", 215, 215, 215),
-                CreateRalEntry("RAL 6005", 47, 69, 56),
-                CreateRalEntry("RAL 3020", 204, 6, 5),
-                CreateRalEntry("RAL 5010", 14, 70, 127),
-                CreateRalEntry("RAL 8017", 69, 50, 46),
-                CreateRalEntry("RAL 1021", 246, 182, 0)
-            };
+                get
+                {
+                    RalEntry[] palette = ralPalette;
+                    if (palette != null)
+                        return palette;
+
+                    lock (PaletteSyncRoot)
+                    {
+                        if (ralPalette == null)
+                            ralPalette = BuildRalPalette();
+                        return ralPalette;
+                    }
+                }
+            }
 
             private static bool TryNormalizeCode(string value, out string digits)
             {
@@ -567,6 +680,63 @@ namespace Energy.Base
 
                 digits = new string(buffer, 0, position);
                 return true;
+            }
+
+            private static RalEntry[] BuildRalPalette()
+            {
+                System.Reflection.Assembly assembly = typeof(RAL).Assembly;
+                System.IO.Stream stream = assembly.GetManifestResourceStream(RalResourceName);
+                if (stream == null)
+                    throw new System.InvalidOperationException("Missing embedded RAL palette resource: " + RalResourceName);
+
+                List<RalEntry> entries = new List<RalEntry>();
+                System.IO.StreamReader reader = null;
+
+                try
+                {
+                    reader = new System.IO.StreamReader(stream, System.Text.Encoding.UTF8);
+
+                    while (true)
+                    {
+                        string line = reader.ReadLine();
+                        if (line == null)
+                            break;
+
+                        if (line.Trim() == "" || line.TrimStart().StartsWith("//"))
+                            continue;
+
+                        int hashPosition = line.LastIndexOf('#');
+                        if (hashPosition <= 0 || hashPosition + 7 > line.Length)
+                            continue;
+
+                        string code = line.Substring(0, hashPosition).Trim();
+                        string hex = line.Substring(hashPosition).Trim();
+
+                        if (code == "")
+                            continue;
+
+                        byte alpha;
+                        byte r;
+                        byte g;
+                        byte b;
+                        if (!TryParseHexColor(hex, out alpha, out r, out g, out b))
+                            continue;
+
+                        entries.Add(CreateRalEntry(code, r, g, b));
+                    }
+                }
+                finally
+                {
+                    if (reader != null)
+                        reader.Close();
+                    else
+                        stream.Close();
+                }
+
+                if (entries.Count == 0)
+                    throw new System.InvalidOperationException("Embedded RAL palette resource is empty: " + RalResourceName);
+
+                return entries.ToArray();
             }
 
             #endregion

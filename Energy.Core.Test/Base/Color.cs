@@ -11,14 +11,14 @@ namespace Energy.Core.Test.Base
         private static readonly (Energy.Base.Color Color, string Code)[] KnownRalSamples = new (Energy.Base.Color, string)[]
         {
             (new Energy.Base.Color(255, 56, 62, 66), "RAL 7016"),
-            (new Energy.Base.Color(255, 10, 10, 10), "RAL 9005"),
-            (new Energy.Base.Color(255, 244, 244, 244), "RAL 9010"),
-            (new Energy.Base.Color(255, 165, 165, 165), "RAL 9006"),
-            (new Energy.Base.Color(255, 215, 215, 215), "RAL 7035"),
-            (new Energy.Base.Color(255, 47, 69, 56), "RAL 6005"),
-            (new Energy.Base.Color(255, 204, 6, 5), "RAL 3020"),
-            (new Energy.Base.Color(255, 14, 70, 127), "RAL 5010"),
-            (new Energy.Base.Color(255, 69, 50, 46), "RAL 8017"),
+            (new Energy.Base.Color(255, 14, 14, 16), "RAL 9005"),
+            (new Energy.Base.Color(255, 241, 236, 225), "RAL 9010"),
+            (new Energy.Base.Color(255, 161, 161, 160), "RAL 9006"),
+            (new Energy.Base.Color(255, 197, 199, 196), "RAL 7035"),
+            (new Energy.Base.Color(255, 17, 66, 50), "RAL 6005"),
+            (new Energy.Base.Color(255, 187, 30, 16), "RAL 3020"),
+            (new Energy.Base.Color(255, 0, 79, 124), "RAL 5010"),
+            (new Energy.Base.Color(255, 68, 47, 41), "RAL 8017"),
             (new Energy.Base.Color(255, 246, 182, 0), "RAL 1021")
         };
 
@@ -118,24 +118,10 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void ColorToRalMatchesReferencePalette()
         {
-            (Energy.Base.Color color, string code)[] samples = new (Energy.Base.Color, string)[]
+            foreach (var sample in KnownRalSamples)
             {
-                (new Energy.Base.Color(255, 56, 62, 66), "RAL 7016"),
-                (new Energy.Base.Color(255, 10, 10, 10), "RAL 9005"),
-                (new Energy.Base.Color(255, 244, 244, 244), "RAL 9010"),
-                (new Energy.Base.Color(255, 165, 165, 165), "RAL 9006"),
-                (new Energy.Base.Color(255, 215, 215, 215), "RAL 7035"),
-                (new Energy.Base.Color(255, 47, 69, 56), "RAL 6005"),
-                (new Energy.Base.Color(255, 204, 6, 5), "RAL 3020"),
-                (new Energy.Base.Color(255, 14, 70, 127), "RAL 5010"),
-                (new Energy.Base.Color(255, 69, 50, 46), "RAL 8017"),
-                (new Energy.Base.Color(255, 246, 182, 0), "RAL 1021")
-            };
-
-            foreach (var sample in samples)
-            {
-                string closest = Energy.Base.Color.RAL.ColorToRal(sample.color);
-                Assert.AreEqual(sample.code, closest, "Color {0} should map to {1}", sample.color, sample.code);
+                string closest = Energy.Base.Color.RAL.ColorToRal(sample.Color);
+                Assert.AreEqual(sample.Code, closest, "Color {0} should map to {1}", sample.Color, sample.Code);
             }
         }
 
@@ -144,11 +130,11 @@ namespace Energy.Core.Test.Base
         {
             Energy.Base.Color fullyTransparentRed = new Energy.Base.Color(0, 204, 6, 5);
             string ralFromTransparent = Energy.Base.Color.RAL.ColorToRal(fullyTransparentRed);
-            Assert.AreEqual("RAL 9010", ralFromTransparent, "Transparent colors should blend toward white");
+            Assert.AreEqual("RAL 9016", ralFromTransparent, "Transparent colors should blend toward white");
 
             Energy.Base.Color semiTransparentGrey = new Energy.Base.Color(128, 56, 62, 66);
             string ralFromHalfGrey = Energy.Base.Color.RAL.ColorToRal(semiTransparentGrey);
-            Assert.AreEqual("RAL 9006", ralFromHalfGrey, "Half transparent anthracite should shift toward white aluminium-like tone");
+            Assert.AreEqual("RAL 7040", ralFromHalfGrey, "Half transparent anthracite should shift toward a lighter grey tone");
         }
 
         [TestMethod]
@@ -170,14 +156,14 @@ namespace Energy.Core.Test.Base
             (string code, Energy.Base.Color expected)[] samples = new (string, Energy.Base.Color)[]
             {
                 ("RAL 7016", new Energy.Base.Color(255, 56, 62, 66)),
-                ("RAL 9005", new Energy.Base.Color(255, 10, 10, 10)),
-                ("RAL 9010", new Energy.Base.Color(255, 244, 244, 244)),
-                ("RAL 9006", new Energy.Base.Color(255, 165, 165, 165)),
-                ("RAL 7035", new Energy.Base.Color(255, 215, 215, 215)),
-                ("RAL 6005", new Energy.Base.Color(255, 47, 69, 56)),
-                ("RAL 3020", new Energy.Base.Color(255, 204, 6, 5)),
-                ("RAL 5010", new Energy.Base.Color(255, 14, 70, 127)),
-                ("RAL 8017", new Energy.Base.Color(255, 69, 50, 46)),
+                ("RAL 9005", new Energy.Base.Color(255, 14, 14, 16)),
+                ("RAL 9010", new Energy.Base.Color(255, 241, 236, 225)),
+                ("RAL 9006", new Energy.Base.Color(255, 161, 161, 160)),
+                ("RAL 7035", new Energy.Base.Color(255, 197, 199, 196)),
+                ("RAL 6005", new Energy.Base.Color(255, 17, 66, 50)),
+                ("RAL 3020", new Energy.Base.Color(255, 187, 30, 16)),
+                ("RAL 5010", new Energy.Base.Color(255, 0, 79, 124)),
+                ("RAL 8017", new Energy.Base.Color(255, 68, 47, 41)),
                 ("RAL 1021", new Energy.Base.Color(255, 246, 182, 0))
             };
 
@@ -218,6 +204,35 @@ namespace Energy.Core.Test.Base
             Assert.ThrowsException<System.ArgumentException>(() => Energy.Base.Color.RAL.RalToColor(null));
             Assert.ThrowsException<System.ArgumentException>(() => Energy.Base.Color.RAL.RalToColor("RAL7A16"));
             Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => Energy.Base.Color.RAL.RalToColor("RAL 9999"));
+        }
+
+        [TestMethod]
+        public void TryParseHexColorSupportsAlphaFormats()
+        {
+            byte alpha;
+            byte red;
+            byte green;
+            byte blue;
+
+            Assert.IsTrue(Energy.Base.Color.TryParseHexColor("#80FFFF00", out alpha, out red, out green, out blue));
+            Assert.AreEqual(128, alpha);
+            Assert.AreEqual(255, red);
+            Assert.AreEqual(255, green);
+            Assert.AreEqual(0, blue);
+
+            Assert.IsTrue(Energy.Base.Color.TryParseHexColor("#f000", out alpha, out red, out green, out blue));
+            Assert.AreEqual(255, alpha);
+            Assert.AreEqual(0, red);
+            Assert.AreEqual(0, green);
+            Assert.AreEqual(0, blue);
+
+            Assert.IsTrue(Energy.Base.Color.TryParseHexColor("369", out alpha, out red, out green, out blue));
+            Assert.AreEqual(255, alpha);
+            Assert.AreEqual(51, red);
+            Assert.AreEqual(102, green);
+            Assert.AreEqual(153, blue);
+
+            Assert.IsFalse(Energy.Base.Color.TryParseHexColor("invalid", out alpha, out red, out green, out blue));
         }
     }
 }

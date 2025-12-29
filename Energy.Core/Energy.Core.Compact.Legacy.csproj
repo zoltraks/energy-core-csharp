@@ -18,7 +18,7 @@
     <NativePlatformName>Windows CE</NativePlatformName>
     <FormFactorID>
     </FormFactorID>
-    <ApplicationIcon>Application.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Application.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -220,7 +220,7 @@
     <Compile Include="Support\WinApi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Application.ico" />
+    <Content Include="Resources\Application.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
   <ProjectExtensions>

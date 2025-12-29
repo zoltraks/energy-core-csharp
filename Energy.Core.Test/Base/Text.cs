@@ -335,6 +335,23 @@ namespace Energy.Core.Test.Base
         }
 
         [TestMethod]
+        public void TextIsHex()
+        {
+            Assert.IsTrue(Energy.Base.Text.IsHex('0'));
+            Assert.IsTrue(Energy.Base.Text.IsHex('9'));
+            Assert.IsTrue(Energy.Base.Text.IsHex('a'));
+            Assert.IsTrue(Energy.Base.Text.IsHex('F'));
+            Assert.IsFalse(Energy.Base.Text.IsHex('g'));
+            Assert.IsFalse(Energy.Base.Text.IsHex('Z'));
+
+            Assert.IsTrue(Energy.Base.Text.IsHex("0F1a"));
+            Assert.IsTrue(Energy.Base.Text.IsHex("abcdef"));
+            Assert.IsFalse(Energy.Base.Text.IsHex(null));
+            Assert.IsFalse(Energy.Base.Text.IsHex(""));
+            Assert.IsFalse(Energy.Base.Text.IsHex("xz10"));
+        }
+
+        [TestMethod]
         public void TextPad()
         {
             string text;

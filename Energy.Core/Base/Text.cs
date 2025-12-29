@@ -4479,6 +4479,55 @@ namespace Energy.Base
 
         #endregion
 
+        #region IsHex
+
+        /// <summary>
+        /// Determine whether the provided character represents a hexadecimal digit.
+        /// </summary>
+        /// <param name="value">Character to validate</param>
+        /// <returns>True if value lies between 0-9, a-f, or A-F</returns>
+        public static bool IsHex(char value)
+        {
+            if (value >= '0' && value <= '9')
+                return true;
+
+            if (value >= 'a' && value <= 'f')
+                return true;
+
+            if (value >= 'A' && value <= 'F')
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determine whether a string contains only hexadecimal digits.
+        /// </summary>
+        /// <param name="value">
+        /// String to validate.
+        /// <br/><br/>
+        /// Null or empty inputs always return false.
+        /// </param>
+        /// <returns>True if every character of the string is hexadecimal</returns>
+        public static bool IsHex(string value)
+        {
+            if (value == null)
+                return false;
+
+            if (value == "")
+                return false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!IsHex(value[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
         #region First
 
         /// <summary>
