@@ -180,6 +180,7 @@ Energy.Query      - SQL query building and dialects
 - Uses MSTest framework with modern SDK-style project format
 - Targets .NET Framework 4.8 for maximum compatibility
 - All 263 tests must pass successfully before release
+- **Naming Alignment**: Classes and methods inside `Energy.Core.Test` must mirror the structure and naming of the components they exercise. Match namespaces (e.g., `Energy.Core.Test.Base` for `Energy.Base`) and keep test class and method names aligned with the production type/method to keep intent obvious.
 
 ### Unit Test Maintenance
 
