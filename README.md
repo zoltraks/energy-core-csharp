@@ -9,6 +9,13 @@ To be used by wide range of applications, services, web or console programs.
 
 ☢️ Filled with radioactive rays ☢️
 
+Versioning
+----------
+
+**Energy.Core** uses calendar-style version numbers in the form ``YY.M.R``. ``YY`` is the two-digit year,
+``M`` is the month number, and ``R`` is the zero-based release counter for that month.
+For example, version ``22.6.1`` denotes the second release (counting from 0) published in June 2022.
+
 Installation
 ------------
 
