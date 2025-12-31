@@ -122,6 +122,15 @@ Energy.Query      - SQL query building and dialects
 - Add examples for complex functionality
 - Document platform-specific limitations
 - When a `<summary>` comment needs multiple sentences, separate each sentence with `<br/><br/>` (e.g., `First sentence.<br/><br/>Second sentence.`) to keep formatting consistent across viewers.
+- When a multi-line XML comment (summary, param, or returns) needs `<br/><br/>`, place the tag on its own `///` line between the sentences, as in:
+  ```
+  /// <summary>
+  /// First sentence.
+  /// <br/><br/>
+  /// Second sentence.
+  /// </summary>
+  ```
+- Public APIs in `Energy.Core` are meant for consumption by other projects; avoid wording summaries as if a class or method serves only this project (e.g., prefer "File system related helper functions" instead of "for Energy.Core utilities").
 - **Markdown formatting**: Always include exactly one blank line after section headings (###, ##, etc.) to improve readability in plain text viewers. Do not add multiple blank lines between sections. Also include a blank line before code blocks (``` or ```csharp) for proper spacing.
 - **XML comments**: In `<summary>` blocks, omit the trailing period for single-sentence descriptions. For multiple sentences, end each sentence with a period and separate them using `<br/><br/>`.
 - **XML `<param>`/`<returns>` formatting**: If the description is a single sentence, keep it on one line between the tags **without a trailing period** (e.g., `/// <param name="value">Color string to parse</param>`). When the description needs multiple sentences, expand it so the sentences live on separate `///` lines (no leading spaces before the text), insert `/// <br/><br/>` between them, and keep the entire block between the opening and closing tag, matching the pattern shown in the specification.

@@ -4,43 +4,42 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace Energy.Base
 {
     /// <summary>
-    /// File system related functions
+    /// File system related helper functions
     /// </summary>
     public class File
     {
         #region State
 
         /// <summary>
-        /// Represents file state and provides functions for monitoring changes.
+        /// Represents file state and provides functions for monitoring changes
         /// </summary>
         [Energy.Attribute.Code.Improve("Object might be able to mangle Directory and Path properties together")]
-        public class State: ICloneable
+        public class State : ICloneable
         {
             #region Property
 
             private string _Name;
-            /// <summary>Name of a file</summary>
+            /// <summary>Name of the tracked file</summary>
             public string Name { get { return _Name; } set { _Name = value; } }
 
             private string _Path;
-            /// <summary>Full path to a file</summary>
+            /// <summary>Full path to the tracked file</summary>
             public string Path { get { return _Path; } set { _Path = value; } }
 
             private string _Directory;
-            /// <summary>Directory where file is located</summary>
+            /// <summary>Directory that contains the tracked file</summary>
             public string Directory { get { return _Directory; } set { _Directory = value; } }
 
             private DateTime _Stamp;
-            /// <summary>File modification stamp</summary>
+            /// <summary>Cached file modification timestamp</summary>
             public DateTime Stamp { get { return _Stamp; } set { _Stamp = value; } }
 
             private long _Size;
-            /// <summary>File size</summary>
+            /// <summary>Cached file size in bytes</summary>
             public long Size { get { return _Size; } set { _Size = value; } }
 
             #endregion
@@ -79,9 +78,11 @@ namespace Energy.Base
             #region Refresh
 
             /// <summary>
-            /// Refresh file state
+            /// Refreshes cached file metadata such as timestamp and size.
+            /// <br/><br/>
+            /// Returns false when the path is empty, the file is missing, or an error occurs.
             /// </summary>
-            /// <returns></returns>
+            /// <returns>True if metadata was refreshed</returns>
             public bool Refresh()
             {
                 _Stamp = DateTime.MinValue;
@@ -111,9 +112,9 @@ namespace Energy.Base
             #region Exists
 
             /// <summary>
-            /// Check if file exists
+            /// Determines whether the tracked file currently exists on disk
             /// </summary>
-            /// <returns></returns>
+            /// <returns>True when the file exists</returns>
             public bool Exists()
             {
                 string fileName = _Path;
@@ -136,9 +137,9 @@ namespace Energy.Base
             #region IsChanged
 
             /// <summary>
-            /// Check if file was modified by checking write stamp and size.
+            /// Checks whether the cached timestamp or size differs from the current file metadata
             /// </summary>
-            /// <returns></returns>
+            /// <returns>True when the tracked metadata changed since the last refresh</returns>
             public bool IsChanged()
             {
                 string fileName = _Path;
@@ -171,10 +172,10 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Check if path was changed or file was modified by checking write stamp and size.
+            /// Checks whether the provided path differs from the cached path or if the file metadata changed
             /// </summary>
-            /// <param name="file"></param>
-            /// <returns></returns>
+            /// <param name="file">File path to compare with the cached value</param>
+            /// <returns>True if the path changed or the file metadata differs from the cached values</returns>
             public bool IsChanged(string file)
             {
                 if (0 != string.Compare(file, _Path))
@@ -192,10 +193,11 @@ namespace Energy.Base
             #region GetCreateStamp
 
             /// <summary>
-            /// Returns the creation date and time of the file.
-            /// Returns DateTime.MinValue on error.
+            /// Returns the creation timestamp for the tracked file.
+            /// <br/><br/>
+            /// Returns DateTime.MinValue when the path is empty, the file is missing, or an error occurs.
             /// </summary>
-            /// <returns></returns>
+            /// <returns>Date and time of file creation</returns>
             public DateTime GetCreateStamp()
             {
                 string fileName = _Path;
@@ -224,10 +226,11 @@ namespace Energy.Base
             #region GetWriteStamp
 
             /// <summary>
-            /// Returns the date and time the file was last written to.
-            /// Returns DateTime.MinValue on error.
+            /// Returns the last write timestamp for the tracked file.
+            /// <br/><br/>
+            /// Returns DateTime.MinValue when the path is empty, the file is missing, or an error occurs.
             /// </summary>
-            /// <returns></returns>
+            /// <returns>Date and time of last modification</returns>
             public DateTime GetWriteStamp()
             {
                 string fileName = _Path;
@@ -256,9 +259,9 @@ namespace Energy.Base
             #region SetWriteStamp
 
             /// <summary>
-            /// Set current time of last write for a file.
+            /// Sets the tracked file timestamp to the provided value or to the current time when DateTime.MinValue is passed
             /// </summary>
-            /// <returns></returns>
+            /// <returns>True if the timestamp was updated</returns>
             public bool SetWriteStamp(DateTime now)
             {
                 string fileName = _Path;
@@ -293,9 +296,9 @@ namespace Energy.Base
             }
 
             /// <summary>
-            /// Set current time as time of last write for a file.
+            /// Sets the tracked file timestamp to the current time
             /// </summary>
-            /// <returns></returns>
+            /// <returns>True if the timestamp was updated</returns>
             public bool SetWriteStamp()
             {
                 return SetWriteStamp(DateTime.MinValue);
@@ -306,10 +309,9 @@ namespace Energy.Base
             #region GetSize
 
             /// <summary>
-            /// Returns the size in bytes of the file.
-            /// Returns -1 on error.
+            /// Returns the size in bytes of the tracked file or -1 when the path is empty, missing, or inaccessible
             /// </summary>
-            /// <returns></returns>
+            /// <returns>File size in bytes or -1 on error</returns>
             public long GetSize()
             {
                 if (string.IsNullOrEmpty(_Name))
@@ -332,6 +334,10 @@ namespace Energy.Base
 
             #region Clone
 
+            /// <summary>
+            /// Creates a shallow copy of the current state including cached metadata
+            /// </summary>
+            /// <returns>Cloned state instance</returns>
             public object Clone()
             {
                 State o = new State(_Path)
@@ -347,9 +353,9 @@ namespace Energy.Base
             #region CreateFile
 
             /// <summary>
-            /// Create a file if not exists.
+            /// Creates the tracked file when it does not already exist
             /// </summary>
-            /// <returns>Return true if file was created</returns>
+            /// <returns>True if the file was created</returns>
             public bool CreateFile()
             {
                 try
@@ -375,9 +381,9 @@ namespace Energy.Base
             #region DeleteFile
 
             /// <summary>
-            /// Delete a file if exists.
+            /// Deletes the tracked file when present and resets cached metadata
             /// </summary>
-            /// <returns>Return true if file was deleted</returns>
+            /// <returns>True if the file was deleted or not found</returns>
             public bool DeleteFile()
             {
                 try
@@ -403,9 +409,9 @@ namespace Energy.Base
             #region Touch
 
             /// <summary>
-            /// If file exists, change last write time. Create new file otherwise.
+            /// Updates the last write time when the file exists or creates the file otherwise
             /// </summary>
-            /// <returns>True if file write time was changed or file was succesfully created</returns>
+            /// <returns>True if the timestamp was updated or a new file was created</returns>
             public bool Touch()
             {
                 if (Exists())
@@ -428,10 +434,10 @@ namespace Energy.Base
         #region GetName
 
         /// <summary>
-        /// Get filename without leading directory path.
+        /// Gets the file name without the leading directory path
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Path that may include directory segments</param>
+        /// <returns>File name portion without directory segments</returns>
         public static string GetName(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -447,12 +453,10 @@ namespace Energy.Base
         #region GetExtension
 
         /// <summary>
-        /// Get filename extension. Will return with suffix like ".xml" except
-        /// for names starting with dot like ".gitignore" where function will
-        /// result with empty string.
+        /// Gets the filename extension including the dot while treating leading-dot names like ".gitignore" as having no extension
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">File name or path to inspect for an extension</param>
+        /// <returns>Extension including the dot or empty string when absent</returns>
         public static string GetExtension(string path)
         {
             path = GetName(path);
@@ -470,10 +474,10 @@ namespace Energy.Base
         #region GetRoot
 
         /// <summary>
-        /// Get file root path. Works also with UNC and protocol paths.
+        /// Gets the file root portion of a path including drive letters, UNC prefixes, or protocol roots
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Path from which to extract the root portion</param>
+        /// <returns>Root segment (drive, UNC prefix, or leading separator) or empty string</returns>
         public static string GetRoot(string path)
         {
             if (path == null || path.Length == 0)
@@ -499,11 +503,11 @@ namespace Energy.Base
         #region IncludeRoot
 
         /// <summary>
-        /// Include leading root directory to the path if not specified
+        /// Prepends the specified root directory when the path currently lacks one
         /// </summary>
-        /// <param name="path">string</param>
-        /// <param name="root">string</param>
-        /// <returns>string</returns>
+        /// <param name="path">Path missing a root component</param>
+        /// <param name="root">Root directory to prepend when needed</param>
+        /// <returns>Path guaranteed to include the provided root</returns>
         public static string IncludeRoot(string path, string root)
         {
             string check = path.Trim().Replace("\\", "/");
@@ -519,10 +523,10 @@ namespace Energy.Base
         #region ExcludeRoot
 
         /// <summary>
-        /// Exclude leading path root.
+        /// Removes the root portion from the provided path
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
+        /// <param name="path">Path containing a root segment</param>
+        /// <returns>Path without the leading root portion</returns>
         public static string ExcludeRoot(string path)
         {
             string root = GetRoot(path);
@@ -536,10 +540,10 @@ namespace Energy.Base
         #region IncludeSeparator
 
         /// <summary>
-        /// Include traling path separator if needed.
+        /// Appends a trailing directory separator when the path is missing one
         /// </summary>
-        /// <param name="path">string</param>
-        /// <returns>string</returns>
+        /// <param name="path">Path that should end with a directory separator</param>
+        /// <returns>Path with exactly one trailing separator (or null when input is null)</returns>
         public static string IncludeSeparator(string path)
         {
             if (path == null)
@@ -554,10 +558,10 @@ namespace Energy.Base
         #region ExcludeSeparator
 
         /// <summary>
-        /// Exclude traling path directory separator
+        /// Removes a trailing directory separator from the path
         /// </summary>
-        /// <param name="path">string</param>
-        /// <returns>string</returns>
+        /// <param name="path">Path that may end with a directory separator</param>
+        /// <returns>Path without a trailing separator</returns>
         public static string ExcludeSeparator(string path)
         {
             if (System.IO.Path.DirectorySeparatorChar != '/')
@@ -578,13 +582,14 @@ namespace Energy.Base
         #region FileUniqueIdentity
 
         /// <summary>
-        /// Return unique name for file by checking it's not exists.
-        /// This method may create empty file if reserve option is set true and it is
+        /// Generates a unique file path within the provided directory.
+        /// <br/><br/>
+        /// Creates an empty placeholder file when reserve is true.
         /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="path">string</param>
-        /// <param name="reserve">bool</param>
-        /// <returns>string</returns>
+        /// <param name="file">Base file name used to construct a unique candidate</param>
+        /// <param name="path">Directory in which the uniqueness check should occur</param>
+        /// <param name="reserve">When true, create the file immediately to reserve the name</param>
+        /// <returns>Full path to a unique file name or null when reservation fails</returns>
         public static string FileUniqueIdentity(string file, string path, bool reserve)
         {
             if (String.IsNullOrEmpty(path)) return null;
@@ -619,32 +624,32 @@ namespace Energy.Base
         }
 
         /// <summary>
-        /// Return unique name for file
+        /// Generates a unique file path within the provided directory
         /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="path">string</param>
-        /// <returns>string</returns>
+        /// <param name="file">Base file name used to construct a unique candidate</param>
+        /// <param name="path">Directory in which the uniqueness check should occur</param>
+        /// <returns>Full path to a unique file name or null when uniqueness cannot be determined</returns>
         public static string FileUniqueIdentity(string file, string path)
         {
             return FileUniqueIdentity(file, path, false);
         }
 
         /// <summary>
-        /// Return unique name for file
+        /// Generates a unique file path in the same directory as the supplied file while optionally reserving it
         /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="reserve">bool</param>
-        /// <returns>string</returns>
+        /// <param name="file">Base file name whose directory should be used</param>
+        /// <param name="reserve">When true, create the file immediately to reserve the name</param>
+        /// <returns>Full path to a unique file name or null when reservation fails</returns>
         public static string FileUniqueIdentity(string file, bool reserve)
         {
             return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), reserve);
         }
 
         /// <summary>
-        /// Return unique name for file
+        /// Generates a unique file path in the same directory as the supplied file
         /// </summary>
-        /// <param name="file">string</param>
-        /// <returns>string</returns>
+        /// <param name="file">Base file name whose directory should be used</param>
+        /// <returns>Full path to a unique file name or null when uniqueness cannot be determined</returns>
         public static string FileUniqueIdentity(string file)
         {
             return FileUniqueIdentity(file, System.IO.Path.GetDirectoryName(file), false);
@@ -655,9 +660,9 @@ namespace Energy.Base
         #region HasNoExtension
 
         /// <summary>
-        /// Return true if file name does not contain extension
+        /// Returns true when the file name does not contain an extension
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="file">File path or name whose extension will be inspected</param>
         /// <returns></returns>
         public static bool HasNoExtension(string file)
         {
@@ -671,9 +676,9 @@ namespace Energy.Base
         #region IsDirectory
 
         /// <summary>
-        /// Check if path is directory
+        /// Determines whether the provided path points to a directory
         /// </summary>
-        /// <param name="file">string</param>
+        /// <param name="file">Path to inspect for directory attributes</param>
         /// <returns>bool</returns>
         public static bool IsDirectory(string file)
         {
@@ -704,8 +709,8 @@ namespace Energy.Base
         /// <summary>
         /// Get absolute path
         /// </summary>
-        /// <param name="file">string</param>
-        /// <returns>string</returns>
+        /// <param name="file">Relative or absolute path to normalize</param>
+        /// <returns>Absolute path to the specified file or the original value when empty</returns>
         public static string GetAbsolutePath(string file)
         {
             if (String.IsNullOrEmpty(file))
@@ -716,9 +721,9 @@ namespace Energy.Base
         /// <summary>
         /// Get absolute path
         /// </summary>
-        /// <param name="file">string</param>
-        /// <param name="current">string</param>
-        /// <returns>string</returns>
+        /// <param name="file">Relative path to normalize</param>
+        /// <param name="current">Current directory used to resolve the relative path</param>
+        /// <returns>Absolute path composed from the current directory and relative file</returns>
         public static string GetAbsolutePath(string file, string current)
         {
             if (String.IsNullOrEmpty(file) || String.IsNullOrEmpty(current))
@@ -780,8 +785,8 @@ namespace Energy.Base
         /// <br/><br/>
         /// If file can't be found, empty string will be returned.
         /// </summary>
-        /// <param name="command">string</param>
-        /// <returns>string</returns>
+        /// <param name="command">File or executable name to locate using PATH</param>
+        /// <returns>Absolute path to the first matching file or empty string if not found</returns>
         public static string Locate(string command)
         {
             return Locate(command, Energy.Base.Path.Environment());
@@ -792,9 +797,9 @@ namespace Energy.Base
         /// <br/><br/>
         /// If file can't be found, empty string will be returned.
         /// </summary>
-        /// <param name="command">string</param>
-        /// <param name="search">string[]</param>
-        /// <returns>string</returns>
+        /// <param name="command">Path or command name to locate</param>
+        /// <param name="search">Directories to scan for the command</param>
+        /// <returns>Absolute path to the first matching file or empty string if not found</returns>
         public static string Locate(string command, string[] search)
         {
             string[] executable = new string[] { "", ".exe", ".cmd", ".bat" };
@@ -810,7 +815,7 @@ namespace Energy.Base
         /// <param name="file">File name with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
         /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
-        /// <returns>Empty string if file not found or full path to found one</returns>
+        /// <returns>Absolute path to the first matching file or empty string if not found</returns>
         public static string Locate(string file, string[] search, string[] extension)
         {
             return Locate(file, search, extension, Energy.Enumeration.LocateBehaviour.Default);
@@ -825,7 +830,7 @@ namespace Energy.Base
         /// <param name="search">Directory search list</param>
         /// <param name="extension">List of filename extensions to check (i.e. ".txt", "ini", ".")</param>
         /// <param name="behaviour">Lookup behaviour (iterate over directories or extensions)</param>
-        /// <returns>Empty string if file not found or full path to found one</returns>
+        /// <returns>Absolute path to the first matching file or empty string if not found</returns>
         public static string Locate(string file, string[] search, string[] extension, Energy.Enumeration.LocateBehaviour behaviour)
         {
             if (string.IsNullOrEmpty(file))
@@ -948,7 +953,7 @@ namespace Energy.Base
         /// <summary>
         /// Locate file with one of possible extensions in search directory.
         /// <br/><br/>
-        /// If file can't be found, empty string will be returned.
+        /// Returns empty string when nothing is found.
         /// </summary>
         /// <param name="list">Array of file names with or without extension and leading path</param>
         /// <param name="search">Directory search list</param>
@@ -981,12 +986,12 @@ namespace Energy.Base
 
         #region MakeDirectory
 
-            /// <summary>
-            /// Create directory if not exists.
-            /// </summary>
-            /// <param name="path"></param>
-            /// <returns>Returns true if a directory exists or has been created</returns>
-            public static bool MakeDirectory(string path)
+        /// <summary>
+        /// Create directory if not exists.
+        /// </summary>
+        /// <param name="path">Directory path to create</param>
+        /// <returns>Returns true if a directory exists or has been created</returns>
+        public static bool MakeDirectory(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -1148,7 +1153,7 @@ namespace Energy.Base
             {
                 return -2;
             }
-            
+
             catch
             {
                 Debug.Write(null);
@@ -1163,7 +1168,7 @@ namespace Energy.Base
         private class Storage : Energy.Interface.IFileSystem, IDisposable
         {
             private List<string> _Files = new List<string>();
-            
+
             private string _Root;
 
             public string Root { get { return _Root; } set { _Root = value; } }
