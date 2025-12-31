@@ -22,8 +22,6 @@ namespace FileNameFunctionsDemo
 
             string ext = Energy.Base.File.GetExtension(filename);
             Console.WriteLine(string.Format("Extension: {0}", ext));
-            string pure = Energy.Base.File.GetNameWithoutExtension(filename);
-            Console.WriteLine(string.Format("Filename without extension: {0}", pure));
 
             string plain = Energy.Base.File.ExcludeRoot(filename);
             Console.WriteLine(string.Format("Plain: {0}", plain));

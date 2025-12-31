@@ -425,6 +425,8 @@ namespace Energy.Base
 
         #region Naming
 
+        #region GetName
+
         /// <summary>
         /// Get filename without leading directory path.
         /// </summary>
@@ -439,6 +441,10 @@ namespace Energy.Base
                 path = path.Substring(position + 1);
             return path;
         }
+
+        #endregion
+
+        #region GetExtension
 
         /// <summary>
         /// Get filename extension. Will return with suffix like ".xml" except
@@ -458,6 +464,10 @@ namespace Energy.Base
             path = path.Substring(dot);
             return path;
         }
+
+        #endregion
+
+        #region GetRoot
 
         /// <summary>
         /// Get file root path. Works also with UNC and protocol paths.
@@ -484,71 +494,29 @@ namespace Energy.Base
             return "";
         }
 
-        /// <summary>
-        /// Get directory name from file path. Returns path itself if it looks like directory.
-        /// </summary>
-        /// <param name="path">File path</param>
-        /// <returns>Directory name</returns>
-        public static string GetDirectory(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return "";
-            if (Energy.Base.File.IsDirectory(path))
-                return path;
-            try
-            {
-                return System.IO.Path.GetDirectoryName(path);
-            }
-            catch
-            {
-                return "";
-            }
-        }
+        #endregion
+
+        #region IncludeRoot
 
         /// <summary>
-        /// Get filename without extension.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string GetNameWithoutExtension(string path)
-        {
-            path = GetName(path);
-            if (string.IsNullOrEmpty(path))
-                return path;
-            int dot = path.LastIndexOf('.');
-            if (dot <= 0)
-                return path;
-            path = path.Substring(0, dot);
-            return path;
-        }
-
-        /// <summary>
-        /// Include traling path directory separator if needed.
+        /// Include leading root directory to the path if not specified
         /// </summary>
         /// <param name="path">string</param>
+        /// <param name="root">string</param>
         /// <returns>string</returns>
-        public static string IncludeTrailingPathSeparator(string path)
+        public static string IncludeRoot(string path, string root)
         {
-            if (path == null)
-                return null;
-            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
-            path += System.IO.Path.DirectorySeparatorChar;
-            return path;
+            string check = path.Trim().Replace("\\", "/");
+            if (check.StartsWith("/") || (new Regex("^[a-z]:/", RegexOptions.IgnoreCase)).Match(check).Success)
+            {
+                return path;
+            }
+            return IncludeSeparator(root) + path;
         }
 
-        /// <summary>
-        /// Include traling path directory separator if needed.
-        /// </summary>
-        /// <param name="path">string</param>
-        /// <returns>string</returns>
-        public static string IncludeTrailingDirectorySeparator(string path)
-        {
-            if (path == null)
-                return null;
-            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
-            path += System.IO.Path.DirectorySeparatorChar;
-            return path;
-        }
+        #endregion
+
+        #region ExcludeRoot
 
         /// <summary>
         /// Exclude leading path root.
@@ -563,28 +531,34 @@ namespace Energy.Base
             return path.Substring(root.Length);
         }
 
+        #endregion
+
+        #region IncludeSeparator
+
         /// <summary>
-        /// Include leading root directory to the path if not specified
+        /// Include traling path separator if needed.
         /// </summary>
         /// <param name="path">string</param>
-        /// <param name="root">string</param>
         /// <returns>string</returns>
-        public static string IncludeLeadingRoot(string path, string root)
+        public static string IncludeSeparator(string path)
         {
-            string check = path.Trim().Replace("\\", "/");
-            if (check.StartsWith("/") || (new Regex("^[a-z]:/", RegexOptions.IgnoreCase)).Match(check).Success)
-            {
-                return path;
-            }
-            return IncludeTrailingPathSeparator(root) + path;
+            if (path == null)
+                return null;
+            path = path.TrimEnd(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+            path += System.IO.Path.DirectorySeparatorChar;
+            return path;
         }
+
+        #endregion
+
+        #region ExcludeSeparator
 
         /// <summary>
         /// Exclude traling path directory separator
         /// </summary>
         /// <param name="path">string</param>
         /// <returns>string</returns>
-        public static string ExcludeTrailingPathSeparator(string path)
+        public static string ExcludeSeparator(string path)
         {
             if (System.IO.Path.DirectorySeparatorChar != '/')
             {
@@ -597,35 +571,7 @@ namespace Energy.Base
             return path;
         }
 
-        /// <summary>
-        /// Get short command name from file path.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public static string GetCommandName(string file)
-        {
-            if (string.IsNullOrEmpty(file))
-                return "";
-            try
-            {
-                string ext = System.IO.Path.GetExtension(file);
-                if (Energy.Base.Text.InArray(new string[] { ".exe", ".bat", ".cmd" }
-                    , new string[] { ext, null }, true))
-                {
-                    string cmd = System.IO.Path.GetFileNameWithoutExtension(file);
-                    return cmd;
-                }
-                else
-                {
-                    string cmd = System.IO.Path.GetFileName(file);
-                    return cmd;
-                }
-            }
-            catch (NotSupportedException)
-            {
-                return "";
-            }
-        }
+        #endregion
 
         #endregion
 
@@ -779,7 +725,7 @@ namespace Energy.Base
                 return file;
             if (!IsRelativePath(file))
                 return file;
-            string path = IncludeTrailingPathSeparator(current);
+            string path = IncludeSeparator(current);
             return String.Concat(path, file);
         }
 
@@ -1335,7 +1281,7 @@ namespace Energy.Base
 #if NETCF
                 path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 #endif
-                path = Energy.Base.File.IncludeTrailingPathSeparator(path);
+                path = Energy.Base.File.IncludeSeparator(path);
                 _HomeDirectory = path;
             }
             return _HomeDirectory;

@@ -201,7 +201,7 @@ namespace Energy.Core
             try
             {
                 string location = Energy.Base.Class.GetAssemblyFile(assembly);
-                return Energy.Base.File.GetCommandName(location);
+                return System.IO.Path.GetFileNameWithoutExtension(location);
             }
             catch (NotSupportedException)
             {
