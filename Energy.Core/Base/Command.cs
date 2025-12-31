@@ -61,9 +61,9 @@ namespace Energy.Base
 
             private string _About = "";
 
-            private string _Usage = "";
+            private List<string> _Usage = new List<string>();
 
-            private string _Greetings = "";
+            private List<string> _Greetings = new List<string>();
 
             private bool _UnknownAsParameter = false;
 
@@ -623,7 +623,14 @@ namespace Energy.Base
             /// <returns></returns>
             public Arguments Usage(string usage)
             {
-                _Usage = usage;
+                if (null == usage)
+                {
+                    _Usage.Clear();
+                }
+                else
+                {
+                    _Usage.Add(usage);
+                }
                 return this;
             }
 
@@ -638,7 +645,14 @@ namespace Energy.Base
             /// <returns></returns>
             public Arguments Greetings(string greetings)
             {
-                _Greetings = greetings;
+                if (null == greetings)
+                {
+                    _Greetings.Clear();
+                }
+                else
+                {
+                    _Greetings.Add(greetings);
+                }
                 return this;
             }
 
@@ -856,7 +870,7 @@ namespace Energy.Base
                     text.Add(_About.TrimEnd());
                 }
 
-                if (!string.IsNullOrEmpty(_Usage))
+                if (_Usage.Count > 0)
                 {
                     if (empty)
                     {
@@ -871,7 +885,14 @@ namespace Energy.Base
                         text.Add("USAGE");
                         text.Add("");
                     }
-                    text.Add(_Usage.TrimEnd());
+                    for (int i = 0; i < _Usage.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add((_Usage[i] ?? "").TrimEnd());
+                    }
                 }
 
                 if (_Option.Count > 0)
@@ -1024,7 +1045,7 @@ namespace Energy.Base
                     }
                 }
 
-                if (!string.IsNullOrEmpty(_Greetings))
+                if (_Greetings.Count > 0)
                 {
                     if (empty)
                     {
@@ -1039,7 +1060,14 @@ namespace Energy.Base
                         text.Add("GREETINGS");
                         text.Add("");
                     }
-                    text.Add(_Greetings.TrimEnd());
+                    for (int i = 0; i < _Greetings.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add((_Greetings[i] ?? "").TrimEnd());
+                    }
                 }
 
                 if (_Copyrights.Count > 0)

@@ -75,5 +75,22 @@ namespace Energy.Core.Test.Base
                 Assert.AreEqual(arg, args[i++]);
             }
         }
+
+        [TestMethod]
+        public void PrintContainsUsageAndGreetingsLines()
+        {
+            var argv = new Energy.Base.Command.Arguments(new string[0])
+                .Usage("Usage line one.")
+                .Usage("Usage line two.")
+                .Greetings("Greetings line one.")
+                .Greetings("Greetings line two.");
+
+            var text = argv.Print();
+
+            Assert.IsTrue(text.Contains("Usage line one."), "First usage line should be printed.");
+            Assert.IsTrue(text.Contains("Usage line two."), "Second usage line should be printed.");
+            Assert.IsTrue(text.Contains("Greetings line one."), "First greetings line should be printed.");
+            Assert.IsTrue(text.Contains("Greetings line two."), "Second greetings line should be printed.");
+        }
     }
 }
