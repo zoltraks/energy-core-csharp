@@ -261,6 +261,33 @@ Before releasing with a new version:
 - Documentation should be updated if API changes were made
 - Version bump should be the last commit before release tag
 
+### NuGet Package Creation
+
+To create a new NuGet package release:
+
+1. **Create .nuspec file** for the current version:
+   - Copy the latest .nuspec file from `nuget/` directory
+   - Update version number to match `Energy.Core.csproj` version
+   - Name format: `Energy.Core.YY.M.RR.nuspec`
+
+2. **Build project in Release mode**:
+   ```bash
+   dotnet build Energy.Core/Energy.Core.csproj --configuration Release
+   ```
+
+3. **Create NuGet package**:
+   ```bash
+   dotnet pack Energy.Core/Energy.Core.csproj --configuration Release --output nuget
+   ```
+
+4. **Verify package creation**:
+   - Check that `Energy.Core.YY.M.RR.nupkg` exists in `nuget/` directory
+   - Package should contain all target framework binaries and documentation
+
+**Example for version 26.1.0:**
+- .nuspec file: `nuget/Energy.Core.26.1.0.nuspec`
+- Package file: `nuget/Energy.Core.26.1.0.nupkg`
+
 ## Dependencies
 
 - **Minimal external dependencies** for maximum compatibility
