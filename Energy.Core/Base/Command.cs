@@ -39,6 +39,32 @@ namespace Energy.Base
 
             #endregion
 
+            #region Author
+
+            /// <summary>
+            /// Add author note.
+            /// <br/><br/>
+            /// May be used more than once.
+            /// <br/><br/>
+            /// Use null to clear all author notes.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public Arguments Author(string text)
+            {
+                if (null == text)
+                {
+                    _Authors.Clear();
+                }
+                else
+                {
+                    _Authors.Add(text);
+                }
+                return this;
+            }
+
+            #endregion
+
             #region Private
 
             private List<string> _List = new List<string>();
@@ -70,6 +96,8 @@ namespace Energy.Base
             private List<string> _Notes = new List<string>();
 
             private List<string> _Repositories = new List<string>();
+
+            private List<string> _Authors = new List<string>();
 
             private List<string> _Copyrights = new List<string>();
 
@@ -1067,6 +1095,31 @@ namespace Energy.Base
                             text.Add("");
                         }
                         text.Add((_Greetings[i] ?? "").TrimEnd());
+                    }
+                }
+
+                if (_Authors.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add(_Authors.Count > 1 ? "AUTHORS" : "AUTHOR");
+                        text.Add("");
+                    }
+                    for (int i = 0; i < _Authors.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add(_Authors[i]);
                     }
                 }
 

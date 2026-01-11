@@ -92,5 +92,32 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(text.Contains("Greetings line one."), "First greetings line should be printed.");
             Assert.IsTrue(text.Contains("Greetings line two."), "Second greetings line should be printed.");
         }
+
+        [TestMethod]
+        public void PrintContainsAuthorSection()
+        {
+            var singleAuthor = new Energy.Base.Command.Arguments(new string[0])
+                .Author("Single author");
+
+            var singleText = singleAuthor.Print();
+
+            Assert.IsTrue(singleText.Contains("AUTHOR"), "Single author section header should be printed.");
+            Assert.IsTrue(singleText.Contains("Single author"), "Single author entry should be printed.");
+
+            var multipleAuthors = new Energy.Base.Command.Arguments(new string[0])
+                .Author("First author")
+                .Author("Second author");
+
+            var multipleText = multipleAuthors.Print();
+
+            Assert.IsTrue(multipleText.Contains("AUTHORS"), "Multiple author section header should be printed.");
+            Assert.IsTrue(multipleText.Contains("First author"), "First author entry should be printed.");
+            Assert.IsTrue(multipleText.Contains("Second author"), "Second author entry should be printed.");
+
+            multipleAuthors.Author(null);
+            var clearedText = multipleAuthors.Print();
+
+            Assert.IsFalse(clearedText.Contains("AUTHOR"), "Clearing authors should remove the author section.");
+        }
     }
 }
