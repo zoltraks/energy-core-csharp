@@ -326,12 +326,12 @@ namespace Energy.Core.Test.Base
         public void TextInArray()
         {
             string[] a = new string[] { "a", "B", null };
-            Assert.AreEqual(true, Energy.Base.Text.InArray(a, "a"));
-            Assert.AreEqual(false, Energy.Base.Text.InArray(a, "A"));
+            Assert.IsTrue(Energy.Base.Text.InArray(a, "a"));
+            Assert.IsFalse(Energy.Base.Text.InArray(a, "A"));
             // illegal
             //Assert.AreEqual(true, Energy.Base.Text.InArray(a, null));
-            Assert.AreEqual(false, Energy.Base.Text.InArray(null, "A"));
-            Assert.AreEqual(true, Energy.Base.Text.InArray(a, "b", true));
+            Assert.IsFalse(Energy.Base.Text.InArray(null, "A"));
+            Assert.IsTrue(Energy.Base.Text.InArray(a, "b", true));
         }
 
         [TestMethod]
@@ -609,11 +609,11 @@ namespace Energy.Core.Test.Base
             text = null;
             Assert.AreEqual("", Energy.Base.Text.First(text));
             Assert.AreEqual("", Energy.Base.Text.First(text, 2));
-            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
+            Assert.IsNull(Energy.Base.Text.FirstOrNull(text));
             text = "";
             Assert.AreEqual("", Energy.Base.Text.First(text, 2));
-            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text));
-            Assert.AreEqual(null, Energy.Base.Text.FirstOrNull(text, 2));
+            Assert.IsNull(Energy.Base.Text.FirstOrNull(text));
+            Assert.IsNull(Energy.Base.Text.FirstOrNull(text, 2));
             text = "a";
             Assert.AreEqual("a", Energy.Base.Text.First(text, 2));
             Assert.AreEqual("a", Energy.Base.Text.FirstOrNull(text, 2));
@@ -752,56 +752,56 @@ Another
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("%%");
             Assert.IsNotNull(q);
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("%%%");
             Assert.IsNotNull(q);
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("%+%");
             Assert.IsNotNull(q);
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("+%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("<<>>");
             Assert.IsNotNull(q);
             Assert.AreEqual("<<", q.Prefix);
             Assert.AreEqual(">>", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual(">>>>", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("<<->>");
             Assert.IsNotNull(q);
             Assert.AreEqual("<<", q.Prefix);
             Assert.AreEqual(">>", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("->>", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("% %% %");
             Assert.IsNotNull(q);
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From(@"% %% \% %");
             Assert.IsNotNull(q);
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(2, q.Escape.Length);
+            Assert.HasCount(2, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             Assert.AreEqual(@"\%", q.Escape[1]);
             q = Energy.Base.Text.Quotation.From("% %");
@@ -809,28 +809,28 @@ Another
             Assert.AreEqual("%", q.Prefix);
             Assert.AreEqual("%", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("%%", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From(" ");
             Assert.IsNotNull(q);
             Assert.AreEqual(" ", q.Prefix);
             Assert.AreEqual(" ", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("  ", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From("  ");
             Assert.IsNotNull(q);
             Assert.AreEqual(" ", q.Prefix);
             Assert.AreEqual(" ", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual("  ", q.Escape[0]);
             q = Energy.Base.Text.Quotation.From(@" \ ");
             Assert.IsNotNull(q);
             Assert.AreEqual(" ", q.Prefix);
             Assert.AreEqual(" ", q.Suffix);
             Assert.IsNotNull(q.Escape);
-            Assert.AreEqual(1, q.Escape.Length);
+            Assert.HasCount(1, q.Escape);
             Assert.AreEqual(@"\ ", q.Escape[0]);
         }
 
@@ -959,7 +959,7 @@ Another
         public void TextSplitLine()
         {
             Assert.IsNull(Energy.Base.Text.SplitLine(null));
-            Assert.AreEqual(0, Energy.Base.Text.SplitLine("").Length);
+            Assert.HasCount(0, Energy.Base.Text.SplitLine(""));
             string content;
             string[] array;
             content = "a";
@@ -1377,10 +1377,10 @@ Another
         {
             Assert.IsNull(Energy.Base.Text.RemoveEmptyElements((List<string>)null));
             Assert.IsNull(Energy.Base.Text.RemoveEmptyElements((string[])null));
-            Assert.AreEqual(0, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "" }).Length);
-            Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "X" }).Length);
-            Assert.AreEqual(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "" }).Length);
-            Assert.AreEqual(2, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "X" }).Length);
+            Assert.HasCount(0, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "" }));
+            Assert.HasCount(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "", null, "X" }));
+            Assert.HasCount(1, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "" }));
+            Assert.HasCount(2, Energy.Base.Text.RemoveEmptyElements(new string[] { "X", null, "X" }));
         }
 
         [TestMethod]

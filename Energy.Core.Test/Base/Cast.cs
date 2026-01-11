@@ -1283,28 +1283,28 @@ namespace Energy.Core.Test.Base
             {
             });
             Assert.IsNotNull(x);
-            Assert.AreEqual(0, x.Count);
+            Assert.HasCount(0, x);
             x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
             {
                 null,
             });
             Assert.IsNotNull(x);
-            Assert.AreEqual(0, x.Count);
+            Assert.HasCount(0, x);
             x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
             {
                 null, null, null, "1", "2", "3", "2", null, null,
             });
             Assert.IsNotNull(x);
-            Assert.AreEqual(1, x.Count);
-            Assert.AreEqual(x["2"], null);
+            Assert.HasCount(1, x);
+            Assert.AreEqual(null, x["2"]);
             x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
             {
                 "2", "1", "1", null, "1", "2", "1",
             });
             Assert.IsNotNull(x);
-            Assert.AreEqual(2, x.Count);
-            Assert.AreEqual(x["1"], "2");
-            Assert.AreEqual(x["2"], "1");
+            Assert.HasCount(2, x);
+            Assert.AreEqual("2", x["1"]);
+            Assert.AreEqual("1", x["2"]);
         }
 
         [TestMethod]

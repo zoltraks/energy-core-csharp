@@ -111,16 +111,16 @@ namespace Energy.Core.Test.Base
             filters = new string[] { "111-" };
 
             y = x.Filter(Energy.Enumeration.MatchStyle.Any, Energy.Enumeration.MatchMode.Simple, true, filters);
-            Assert.AreEqual(3, y.Count);
+            Assert.HasCount(3, y);
 
             filters = new string[]
             {
                 "111-222"
             };
             y = x.Filter(Energy.Enumeration.MatchMode.Same, true, filters);
-            Assert.AreEqual(1, y.Count);
+            Assert.HasCount(1, y);
             y = x.Filter(Energy.Enumeration.MatchMode.Simple, true, filters);
-            Assert.AreEqual(2, y.Count);
+            Assert.HasCount(2, y);
         }
 
         [TestMethod]
@@ -171,18 +171,18 @@ namespace Energy.Core.Test.Base
             d = new Energy.Base.Collection.StringDictionary<object>("a");
 
             Assert.IsNotNull(d);
-            Assert.AreEqual(0, d.Count);
+            Assert.HasCount(0, d);
 
             d = new Energy.Base.Collection.StringDictionary<object>("a", "b");
 
             Assert.IsNotNull(d);
-            Assert.AreEqual(1, d.Count);
+            Assert.HasCount(1, d);
             Assert.AreEqual("b", d["a"]);
 
             d = new Energy.Base.Collection.StringDictionary<object>("a", "b", null);
 
             Assert.IsNotNull(d);
-            Assert.AreEqual(1, d.Count);
+            Assert.HasCount(1, d);
             Assert.AreEqual("b", d["a"]);
         }
 
@@ -191,7 +191,7 @@ namespace Energy.Core.Test.Base
         {
             var x = Energy.Base.Cast.StringArrayToDictionary<string, object>("0", null, "a", 1, "b", false, "c", true, null);
             Assert.IsNotNull(x);
-            Assert.AreEqual(4, x.Count);
+            Assert.HasCount(4, x);
             Assert.AreEqual(false, Energy.Base.Cast.AsBool(x["b"]));
             Assert.AreEqual(true, Energy.Base.Cast.AsBool(x["c"]));
         }

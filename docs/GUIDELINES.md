@@ -213,6 +213,54 @@ Energy.Query      - SQL query building and dialects
 - **Platform-specific builds** for each target framework
 - **Conditional symbols** for feature detection
 
+## Version Management
+
+### Version Format
+
+Energy.Core uses the **YY.M.RR** version format:
+
+- **YY**: 2-digit current year (e.g., 26 for 2026)
+- **M**: Integer number of current month (e.g., 1 for January, 12 for December)
+- **RR**: Incremental release number for the current year and month, starting from 0
+
+**Examples:**
+- `26.1.0` = January 2026, first release
+- `26.1.1` = January 2026, second release
+- `26.2.0` = February 2026, first release
+
+### Version Bumping Process
+
+When bumping the version of the library project:
+
+1. **Update all version fields** in `Energy.Core.csproj`:
+   - `<Version>`
+   - `<FileVersion>`
+   - `<AssemblyVersion>`
+
+2. **Set all fields to the same version number** (e.g., `26.1.0`)
+
+3. **Determine the RR value**:
+   - For first release in a month: use `0`
+   - For subsequent releases: increment by 1 from previous release in same month
+
+4. **Update YY.M** based on current date when making the release
+
+**Example update:**
+```xml
+<Version>26.1.0</Version>
+<FileVersion>26.1.0</FileVersion>
+<AssemblyVersion>26.1.0</AssemblyVersion>
+```
+
+### Release Requirements
+
+Before releasing with a new version:
+
+- All unit tests must pass (297 tests in Energy.Core.Test)
+- Build must succeed with minimal warnings
+- Documentation should be updated if API changes were made
+- Version bump should be the last commit before release tag
+
 ## Dependencies
 
 - **Minimal external dependencies** for maximum compatibility

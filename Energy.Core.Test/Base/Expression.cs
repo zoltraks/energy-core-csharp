@@ -14,32 +14,32 @@ namespace Energy.Core.Test.Base
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, null);
             Assert.IsNotNull(r);
-            Assert.AreEqual(0, r.Count);
+            Assert.HasCount(0, r);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, new string[] { });
             Assert.IsNotNull(r);
-            Assert.AreEqual(0, r.Count);
+            Assert.HasCount(0, r);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, new string[] { "X" });
             Assert.IsNotNull(r);
-            Assert.AreEqual(1, r.Count);
+            Assert.HasCount(1, r);
             Assert.AreEqual(null, r["X"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, new string[] { "X", "Y" });
             Assert.IsNotNull(r);
-            Assert.AreEqual(2, r.Count);
+            Assert.HasCount(2, r);
             Assert.AreEqual(null, r["X"]);
             Assert.AreEqual(null, r["Y"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", @"(?<X>\w+)", RegexOptions.None, new string[] { "X", "Y" });
             Assert.IsNotNull(r);
-            Assert.AreEqual(2, r.Count);
+            Assert.HasCount(2, r);
             Assert.AreEqual("a", r["X"]);
             Assert.AreEqual(null, r["Y"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("ab123", @"(?<X>\p{L}+)(?<Y>\d+)", RegexOptions.None, null);
             Assert.IsNotNull(r);
-            Assert.AreEqual(2, r.Count);
+            Assert.HasCount(2, r);
             Assert.AreEqual("ab", r["X"]);
             Assert.AreEqual("123", r["Y"]);
         }

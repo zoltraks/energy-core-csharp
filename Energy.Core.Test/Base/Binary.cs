@@ -382,7 +382,7 @@ namespace Energy.Core.Test.Base
                 buffer = stream.ToArray();
             }
 
-            Assert.AreEqual(3, buffer.Length, "Writer should emit two full bytes and one partial byte in LSB mode");
+            Assert.HasCount(3, buffer);
             Assert.AreEqual(0x2D, buffer[0], "LSB-first packed byte should match expected pattern");
             Assert.AreEqual(0x11, buffer[1], "Literal byte should match written value");
             Assert.AreEqual(0x05, buffer[2], "Trailer bits should flush into final byte in LSB order");

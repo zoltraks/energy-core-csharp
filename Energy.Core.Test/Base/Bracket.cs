@@ -146,18 +146,18 @@ namespace Energy.Core.Test.Base
             array.Add(new Energy.Base.Bracket("[]"));
             array.Add(new Energy.Base.Bracket("()"));
 
-            Assert.AreEqual(3, array.Count);
+            Assert.HasCount(3, array);
             // Check if bracket with same enclosure exists
             var foundBracket = array.Find(b => b.Enclosure == "{}");
             Assert.IsNotNull(foundBracket);
 
             // Remove bracket
             array.RemoveAt(1); // Remove the second bracket ([])
-            Assert.AreEqual(2, array.Count);
+            Assert.HasCount(2, array);
 
             // Clear array
             array.Clear();
-            Assert.AreEqual(0, array.Count);
+            Assert.HasCount(0, array);
         }
 
         [TestMethod]

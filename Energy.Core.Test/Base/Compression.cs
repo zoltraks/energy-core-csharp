@@ -418,7 +418,7 @@ namespace Energy.Core.Test.Base
             // Decompress
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
             Assert.IsNotNull(decompressedData, "Decompressed data should not be null");
-            Assert.AreEqual(originalData.Length, decompressedData.Length, "Decompressed data should have same length as original");
+            Assert.HasCount(originalData.Length, decompressedData);
 
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(originalText, decompressedText, "Decompressed text should match original");
@@ -437,8 +437,7 @@ namespace Energy.Core.Test.Base
             Assert.IsNotNull(decompressedData, "Decompression should not return null");
             
             // Verify length is exactly 1000 characters
-            Assert.AreEqual(1000, decompressedData.Length, 
-                "Decompressed data should be exactly 1000 bytes");
+            Assert.HasCount(1000, decompressedData);
             
             // Build expected output: "0123456789" repeated 100 times
             System.Text.StringBuilder expected = new System.Text.StringBuilder(1000);
