@@ -120,10 +120,15 @@ namespace Energy.Core.Test.Base
             Assert.IsNull(nullStringFunc);
 
             // Test invoking null delegate should throw
-            Assert.ThrowsException<NullReferenceException>(() =>
+            try
             {
                 var result = nullStringFunc();
-            });
+                Assert.Fail("Expected NullReferenceException when invoking null delegate");
+            }
+            catch (NullReferenceException)
+            {
+                // expected
+            }
         }
 
         [TestMethod]

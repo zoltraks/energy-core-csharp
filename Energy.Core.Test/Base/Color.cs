@@ -121,7 +121,8 @@ namespace Energy.Core.Test.Base
             foreach (var sample in KnownRalSamples)
             {
                 string closest = Energy.Base.Color.RAL.ColorToRal(sample.Color);
-                Assert.AreEqual(sample.Code, closest, "Color {0} should map to {1}", sample.Color, sample.Code);
+                string message = string.Format("Color {0} should map to {1}", sample.Color, sample.Code);
+                Assert.AreEqual(sample.Code, closest, message);
             }
         }
 
@@ -201,9 +202,35 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void RalToColorRejectsUnknownCodes()
         {
-            Assert.ThrowsException<System.ArgumentException>(() => Energy.Base.Color.RAL.RalToColor(null));
-            Assert.ThrowsException<System.ArgumentException>(() => Energy.Base.Color.RAL.RalToColor("RAL7A16"));
-            Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => Energy.Base.Color.RAL.RalToColor("RAL 9999"));
+            try
+            {
+                Energy.Base.Color.RAL.RalToColor(null);
+                Assert.Fail("Expected ArgumentException when passing null");
+            }
+            catch (System.ArgumentException)
+            {
+                // expected
+            }
+
+            try
+            {
+                Energy.Base.Color.RAL.RalToColor("RAL7A16");
+                Assert.Fail("Expected ArgumentException for malformed RAL code");
+            }
+            catch (System.ArgumentException)
+            {
+                // expected
+            }
+
+            try
+            {
+                Energy.Base.Color.RAL.RalToColor("RAL 9999");
+                Assert.Fail("Expected ArgumentOutOfRangeException for unknown RAL code");
+            }
+            catch (System.ArgumentOutOfRangeException)
+            {
+                // expected
+            }
         }
 
         [TestMethod]
