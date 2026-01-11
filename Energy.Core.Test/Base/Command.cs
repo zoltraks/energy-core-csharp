@@ -87,10 +87,10 @@ namespace Energy.Core.Test.Base
 
             var text = argv.Print();
 
-            Assert.IsTrue(text.Contains("Usage line one."), "First usage line should be printed.");
-            Assert.IsTrue(text.Contains("Usage line two."), "Second usage line should be printed.");
-            Assert.IsTrue(text.Contains("Greetings line one."), "First greetings line should be printed.");
-            Assert.IsTrue(text.Contains("Greetings line two."), "Second greetings line should be printed.");
+            Assert.Contains("Usage line one.", text, "First usage line should be printed.");
+            Assert.Contains("Usage line two.", text, "Second usage line should be printed.");
+            Assert.Contains("Greetings line one.", text, "First greetings line should be printed.");
+            Assert.Contains("Greetings line two.", text, "Second greetings line should be printed.");
         }
 
         [TestMethod]
@@ -101,8 +101,8 @@ namespace Energy.Core.Test.Base
 
             var singleText = singleAuthor.Print();
 
-            Assert.IsTrue(singleText.Contains("AUTHOR"), "Single author section header should be printed.");
-            Assert.IsTrue(singleText.Contains("Single author"), "Single author entry should be printed.");
+            Assert.Contains("AUTHOR", singleText, "Single author section header should be printed.");
+            Assert.Contains("Single author", singleText, "Single author entry should be printed.");
 
             var multipleAuthors = new Energy.Base.Command.Arguments(new string[0])
                 .Author("First author")
@@ -110,14 +110,41 @@ namespace Energy.Core.Test.Base
 
             var multipleText = multipleAuthors.Print();
 
-            Assert.IsTrue(multipleText.Contains("AUTHORS"), "Multiple author section header should be printed.");
-            Assert.IsTrue(multipleText.Contains("First author"), "First author entry should be printed.");
-            Assert.IsTrue(multipleText.Contains("Second author"), "Second author entry should be printed.");
+            Assert.Contains("AUTHORS", multipleText, "Multiple author section header should be printed.");
+            Assert.Contains("First author", multipleText, "First author entry should be printed.");
+            Assert.Contains("Second author", multipleText, "Second author entry should be printed.");
 
             multipleAuthors.Author(null);
             var clearedText = multipleAuthors.Print();
 
-            Assert.IsFalse(clearedText.Contains("AUTHOR"), "Clearing authors should remove the author section.");
+            Assert.DoesNotContain("AUTHOR", clearedText, "Clearing authors should remove the author section.");
+        }
+
+        [TestMethod]
+        public void PrintContainsLicenseSection()
+        {
+            var singleLicense = new Energy.Base.Command.Arguments(new string[0])
+                .License("MIT License");
+
+            var singleText = singleLicense.Print();
+
+            Assert.Contains("LICENSE", singleText, "Single license section header should be printed.");
+            Assert.Contains("MIT License", singleText, "Single license entry should be printed.");
+
+            var multipleLicenses = new Energy.Base.Command.Arguments(new string[0])
+                .License("MIT License")
+                .License("Apache License 2.0");
+
+            var multipleText = multipleLicenses.Print();
+
+            Assert.Contains("LICENSES", multipleText, "Multiple license section header should be printed.");
+            Assert.Contains("MIT License", multipleText, "First license entry should be printed.");
+            Assert.Contains("Apache License 2.0", multipleText, "Second license entry should be printed.");
+
+            multipleLicenses.License(null);
+            var clearedText = multipleLicenses.Print();
+
+            Assert.DoesNotContain("LICENSE", clearedText, "Clearing licenses should remove the license section.");
         }
     }
 }

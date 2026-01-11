@@ -101,6 +101,8 @@ namespace Energy.Base
 
             private List<string> _Copyrights = new List<string>();
 
+            private List<string> _Licenses = new List<string>();
+
             #endregion
 
             #region Accessor
@@ -606,6 +608,32 @@ namespace Energy.Base
                 else
                 {
                     _Copyrights.Add(text);
+                }
+                return this;
+            }
+
+            #endregion
+
+            #region License
+
+            /// <summary>
+            /// Add license note.
+            /// <br/><br/>
+            /// May be used more than once.
+            /// <br/><br/>
+            /// Use null to clear all license notes.
+            /// </summary>
+            /// <param name="text"></param>
+            /// <returns></returns>
+            public Arguments License(string text)
+            {
+                if (null == text)
+                {
+                    _Licenses.Clear();
+                }
+                else
+                {
+                    _Licenses.Add(text);
                 }
                 return this;
             }
@@ -1145,6 +1173,31 @@ namespace Energy.Base
                             text.Add("");
                         }
                         text.Add(_Copyrights[i]);
+                    }
+                }
+
+                if (_Licenses.Count > 0)
+                {
+                    if (empty)
+                    {
+                        empty = false;
+                    }
+                    else
+                    {
+                        text.Add("");
+                    }
+                    if (!format.HideSectionName)
+                    {
+                        text.Add(_Licenses.Count > 1 ? "LICENSES" : "LICENSE");
+                        text.Add("");
+                    }
+                    for (int i = 0; i < _Licenses.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            text.Add("");
+                        }
+                        text.Add(_Licenses[i]);
                     }
                 }
 
