@@ -43,6 +43,16 @@
     <EmbeddedResource Include="Resources\ZX0_NUMBERS.zx0" />
     <EmbeddedResource Include="Resources\ZX0_SIMPLE.txt" />
     <EmbeddedResource Include="Resources\ZX0_SIMPLE.zx0" />
+    <EmbeddedResource Include="Resources\LZ4_EMPTY.bin" />
+    <EmbeddedResource Include="Resources\LZ4_EMPTY_ORIGINAL.bin" />
+    <EmbeddedResource Include="Resources\LZ4_SMALL.bin" />
+    <EmbeddedResource Include="Resources\LZ4_SMALL_ORIGINAL.bin" />
+    <EmbeddedResource Include="Resources\LZ4_PATTERN.bin" />
+    <EmbeddedResource Include="Resources\LZ4_PATTERN_ORIGINAL.bin" />
+    <EmbeddedResource Include="Resources\LZ4_RANDOM.bin" />
+    <EmbeddedResource Include="Resources\LZ4_RANDOM_ORIGINAL.bin" />
+    <EmbeddedResource Include="Resources\LZ4_LARGE.bin" />
+    <EmbeddedResource Include="Resources\LZ4_LARGE_ORIGINAL.bin" />
   </ItemGroup>
 
 </Project>

@@ -6,6 +6,12 @@ Energy.Core is a .NET class library providing type conversions, utilities, datab
 
 **IMPORTANT**: Before making any code changes, always read README.md in the project root and follow all guidelines and rules specified there unless specifically instructed to do something differently.
 
+## Copyright and License
+
+**ALL code changes must comply with the requirements documented in `COPYRIGHTS.md`.**
+
+Before adding any code, verify it is original work or properly licensed and attributed. Third-party dependencies must be compatible with the project's LGPL-3.0 license.
+
 ## Target Frameworks
 
 - **.NET Standard 2.0** - Modern cross-platform support

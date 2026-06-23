@@ -453,6 +453,136 @@ namespace Energy.Core.Test.Base
                 "Decompressed ZX0_1000.zx0 should be 1000 characters of repeated '0123456789'");
         }
 
+        #region LZ4
+
+        [TestMethod]
+        public void Compression_LZ4_DecompressSmallFixture()
+        {
+            byte[] compressed = ReadEmbeddedResource("Resources.LZ4_SMALL.bin");
+            byte[] expected = ReadEmbeddedResource("Resources.LZ4_SMALL_ORIGINAL.bin");
+            Assert.IsNotNull(compressed, "LZ4_SMALL.bin fixture should exist");
+            Assert.IsNotNull(expected, "LZ4_SMALL_ORIGINAL.bin fixture should exist");
+
+            byte[] actual = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(actual, "Decompression should not return null");
+            CollectionAssert.AreEqual(expected, actual, "Decompressed data should match original fixture");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_DecompressEmptyFixture()
+        {
+            byte[] compressed = ReadEmbeddedResource("Resources.LZ4_EMPTY.bin");
+            byte[] expected = ReadEmbeddedResource("Resources.LZ4_EMPTY_ORIGINAL.bin");
+            Assert.IsNotNull(compressed, "LZ4_EMPTY.bin fixture should exist");
+
+            byte[] actual = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(actual, "Decompression should not return null");
+            Assert.AreEqual(0, actual.Length, "Empty decompression should produce empty output");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_DecompressPatternFixture()
+        {
+            byte[] compressed = ReadEmbeddedResource("Resources.LZ4_PATTERN.bin");
+            byte[] expected = ReadEmbeddedResource("Resources.LZ4_PATTERN_ORIGINAL.bin");
+            Assert.IsNotNull(compressed, "LZ4_PATTERN.bin fixture should exist");
+            Assert.IsNotNull(expected, "LZ4_PATTERN_ORIGINAL.bin fixture should exist");
+
+            byte[] actual = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(actual, "Decompression should not return null");
+            CollectionAssert.AreEqual(expected, actual, "Decompressed pattern should match original");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_DecompressRandomFixture()
+        {
+            byte[] compressed = ReadEmbeddedResource("Resources.LZ4_RANDOM.bin");
+            byte[] expected = ReadEmbeddedResource("Resources.LZ4_RANDOM_ORIGINAL.bin");
+            Assert.IsNotNull(compressed, "LZ4_RANDOM.bin fixture should exist");
+            Assert.IsNotNull(expected, "LZ4_RANDOM_ORIGINAL.bin fixture should exist");
+
+            byte[] actual = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(actual, "Decompression should not return null");
+            CollectionAssert.AreEqual(expected, actual, "Decompressed random should match original");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_RoundTripSmall()
+        {
+            string text = "Hello World! Hello World! Hello World!";
+            byte[] original = System.Text.Encoding.ASCII.GetBytes(text);
+
+            byte[] compressed = Energy.Base.Compression.LZ4.Compress(original);
+            Assert.IsNotNull(compressed, "Compression should not return null");
+
+            byte[] decompressed = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(decompressed, "Decompression should not return null");
+            CollectionAssert.AreEqual(original, decompressed, "Round-trip should reproduce original");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_RoundTripPattern()
+        {
+            byte[] original = new byte[5000];
+            for (int i = 0; i < 5000; i++)
+            {
+                original[i] = (byte)(i % 256);
+            }
+
+            byte[] compressed = Energy.Base.Compression.LZ4.Compress(original);
+            Assert.IsNotNull(compressed, "Compression should not return null");
+
+            byte[] decompressed = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(decompressed, "Decompression should not return null");
+            CollectionAssert.AreEqual(original, decompressed, "Round-trip should reproduce original pattern");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_RoundTripRandom()
+        {
+            byte[] original = new byte[5000];
+            System.Random rng = new System.Random(42);
+            rng.NextBytes(original);
+
+            byte[] compressed = Energy.Base.Compression.LZ4.Compress(original);
+            Assert.IsNotNull(compressed, "Compression should not return null");
+
+            byte[] decompressed = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(decompressed, "Decompression should not return null");
+            CollectionAssert.AreEqual(original, decompressed, "Round-trip should reproduce original random data");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_RoundTripLarge()
+        {
+            byte[] original = new byte[1024 * 1024];
+            string phrase = "Hello World! This is a test of LZ4 compression. ";
+            byte[] phraseBytes = System.Text.Encoding.ASCII.GetBytes(phrase);
+            for (int i = 0; i < original.Length; i++)
+            {
+                original[i] = phraseBytes[i % phraseBytes.Length];
+            }
+
+            byte[] compressed = Energy.Base.Compression.LZ4.Compress(original);
+            Assert.IsNotNull(compressed, "Compression should not return null");
+
+            byte[] decompressed = Energy.Base.Compression.LZ4.Decompress(compressed);
+            Assert.IsNotNull(decompressed, "Decompression should not return null");
+            CollectionAssert.AreEqual(original, decompressed, "Round-trip should reproduce 1MB original");
+        }
+
+        [TestMethod]
+        public void Compression_LZ4_NullData()
+        {
+            byte[] compressed = Energy.Base.Compression.LZ4.Compress(null);
+            byte[] decompressed = Energy.Base.Compression.LZ4.Decompress(null);
+
+            Assert.IsNull(compressed, "Compressing null should return null");
+            Assert.IsNull(decompressed, "Decompressing null should return null");
+        }
+
+        #endregion
+
         // .NET 2.0 compatible file reading method
         private byte[] ReadAllBytes(string path)
         {
