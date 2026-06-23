@@ -882,6 +882,31 @@ namespace Energy.Base
 
             #endregion
 
+            #region Unknown
+
+            /// <summary>
+            /// Return a list of option names that were not predefined and appeared during parsing
+            /// </summary>
+            /// <returns>List of unrecognized option names</returns>
+            public System.Collections.Generic.List<string> Unknown()
+            {
+                System.Collections.Generic.List<string> result = new System.Collections.Generic.List<string>();
+                if (null == _Option)
+                {
+                    return result;
+                }
+                for (int i = 0; i < _Option.Count; i++)
+                {
+                    if (_Option[i].IsTemporary)
+                    {
+                        result.Add(_Option[i].Name);
+                    }
+                }
+                return result;
+            }
+
+            #endregion
+
             #region Print
 
             /// <summary>

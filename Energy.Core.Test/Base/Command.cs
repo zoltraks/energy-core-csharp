@@ -146,5 +146,60 @@ namespace Energy.Core.Test.Base
 
             Assert.DoesNotContain("LICENSE", clearedText, "Clearing licenses should remove the license section.");
         }
+
+        [TestMethod]
+        public void Unknown_EmptyWhenAllOptionsRecognized()
+        {
+            var argv = new Energy.Base.Command.Arguments(new string[] { "--help", "-o", "file.txt" })
+                .Switch("help")
+                .Parameter("output")
+                .Alias("o", "output")
+                .Parse();
+
+            var unknown = argv.Unknown();
+
+            Assert.IsNotNull(unknown);
+            Assert.AreEqual(0, unknown.Count);
+        }
+
+        [TestMethod]
+        public void Unknown_SingleUnknownSwitch()
+        {
+            var argv = new Energy.Base.Command.Arguments(new string[] { "--verbose" })
+                .Switch("help")
+                .Parse();
+
+            var unknown = argv.Unknown();
+
+            Assert.AreEqual(1, unknown.Count);
+            Assert.AreEqual("verbose", unknown[0]);
+        }
+
+        [TestMethod]
+        public void Unknown_MultipleUnknownOptions()
+        {
+            var argv = new Energy.Base.Command.Arguments(new string[] { "--foo", "--bar", "value" })
+                .Switch("help")
+                .Parse();
+
+            var unknown = argv.Unknown();
+
+            Assert.AreEqual(2, unknown.Count);
+            Assert.IsTrue(unknown.Contains("foo"));
+            Assert.IsTrue(unknown.Contains("bar"));
+        }
+
+        [TestMethod]
+        public void Unknown_AliasedOptionNotReturned()
+        {
+            var argv = new Energy.Base.Command.Arguments(new string[] { "-h" })
+                .Switch("help")
+                .Alias("h", "help")
+                .Parse();
+
+            var unknown = argv.Unknown();
+
+            Assert.AreEqual(0, unknown.Count);
+        }
     }
 }
