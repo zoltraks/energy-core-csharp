@@ -38,6 +38,8 @@ For developers working on the library, see [Development Guidelines](docs/GUIDELI
 
 For information about the project structure and build files, see [Project Structure](docs/STRUCTURE.md).
 
+The development process is documented in [Workflow](docs/WORKFLOW.md), [Testing](docs/TESTING.md), and [Versioning](docs/VERSIONING.md). Templates for change requests and implementation plans live under [docs/template](docs/template).
+
 Examples
 --------
 

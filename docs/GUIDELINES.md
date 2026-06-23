@@ -6,6 +6,29 @@ Energy.Core is a .NET class library providing type conversions, utilities, datab
 
 **IMPORTANT**: Before making any code changes, always read README.md in the project root and follow all guidelines and rules specified there unless specifically instructed to do something differently.
 
+## Related Documents
+
+This file is the central source of development rules. The following documents cover specific areas:
+
+- `WORKFLOW.md`: development process and version-based implementation cycle.
+- `VERSIONING.md`: version numbering and bump process (authoritative).
+- `TESTING.md`: testing strategy and verification loop.
+- `STRUCTURE.md`: project and solution layout.
+- `COPYRIGHTS.md`: copyright and license requirements.
+- `template/`: templates for change requests and implementation plans.
+
+Before any code change, read README.md, this file, and STRUCTURE.md. For a non-trivial change, follow the version-based cycle in WORKFLOW.md: author a change request and an implementation plan before modifying source.
+
+## Documentation Guidelines
+
+These rules apply to the markdown documents in this `docs/` directory and to the project-energy technical documentation. They keep the documentation durable and plain-text friendly.
+
+Prefer durable content over restating the code. Keep decisions and their rationale, constraints that are not inferable from the code, intended behaviour and invariants, and the rules that govern how to work on the project. Remove content that simply mirrors the source tree, such as exhaustive file lists or signatures that duplicate the code, because it goes stale the moment the code changes.
+
+Write short sentences. Separate sentences or list groups with a blank line for readability in simple text viewers. Put exactly one blank line before and after a list. Avoid nested lists; keep a single level. Prefer plain ASCII characters and standard double quotes. Do not number section titles, so the structure stays easy to change.
+
+When editing an existing, non-empty document, follow the style already used in that document rather than imposing these rules on it.
+
 ## Copyright and License
 
 **ALL code changes must comply with the requirements documented in `COPYRIGHTS.md`.**
@@ -174,43 +197,14 @@ Energy.Query      - SQL query building and dialects
 - Use compiled delegates over reflection
 - Pre-generate serialization code if needed
 
-## Testing Requirements
+## Testing
 
-- Unit tests for all public APIs
-- Integration tests for database functionality
-- Platform-specific test suites
-- Performance benchmarks for critical paths
+See TESTING.md for the full testing strategy. Key rules:
 
-### Test Project Configuration
-
-- **Energy.Core.Test** project requires **Visual Studio 2019** minimum
-- Uses MSTest framework with modern SDK-style project format
-- Targets .NET Framework 4.8 for maximum compatibility
-- All 263 tests must pass successfully before release
-- **Naming Alignment**: Classes and methods inside `Energy.Core.Test` must mirror the structure and naming of the components they exercise. Match namespaces (e.g., `Energy.Core.Test.Base` for `Energy.Base`) and keep test class and method names aligned with the production type/method to keep intent obvious.
-
-### Unit Test Maintenance
-
-**After any code change or addition, unit tests must be updated or created:**
-
-- **New functionality**: Create comprehensive unit tests covering all public methods, edge cases, and error conditions
-- **Bug fixes**: Add regression tests to prevent the bug from reoccurring
-- **API changes**: Update existing tests to reflect new method signatures, parameters, or return values
-- **Refactoring**: Ensure all existing tests still pass and cover the refactored code paths
-- **Platform-specific code**: Add tests for each target framework where behavior differs
-- **Performance changes**: Update benchmark tests to validate performance improvements or regressions
-
-**Test Execution Requirements:**
-- **After each code change**: Run all unit tests immediately to verify no regressions
-- **Fix all failing tests**: No code change is complete until all tests pass
-- **Test validation**: Ensure new functionality works as expected before committing
-- **Continuous testing**: Run tests frequently during development to catch issues early
-
-**Test Coverage Requirements:**
-- All public methods must have corresponding unit tests
-- Test coverage should remain at or above current levels
-- Critical paths and error handling must be thoroughly tested
-- Tests must be maintainable and clearly document the expected behavior
+- Every public method must have unit tests covering edge cases and error conditions.
+- After any code change, run `dotnet test Energy.Core.Test/Energy.Core.Test.csproj`; all tests must pass before the change is complete.
+- Test class and method names mirror the production type and method they exercise.
+- Where the library implements an external format, verify output byte-for-byte against the reference tool using committed fixtures.
 
 ## Build Configuration
 
@@ -221,78 +215,9 @@ Energy.Query      - SQL query building and dialects
 
 ## Version Management
 
-### Version Format
+See VERSIONING.md for the authoritative version numbering rules, bump process, and NuGet packaging steps.
 
-Energy.Core uses the **YY.M.RR** version format:
-
-- **YY**: 2-digit current year (e.g., 26 for 2026)
-- **M**: Integer number of current month (e.g., 1 for January, 12 for December)
-- **RR**: Incremental release number for the current year and month, starting from 0
-
-**Examples:**
-- `26.1.0` = January 2026, first release
-- `26.1.1` = January 2026, second release
-- `26.2.0` = February 2026, first release
-
-### Version Bumping Process
-
-When bumping the version of the library project:
-
-1. **Update all version fields** in `Energy.Core.csproj`:
-   - `<Version>`
-   - `<FileVersion>`
-   - `<AssemblyVersion>`
-
-2. **Set all fields to the same version number** (e.g., `26.1.0`)
-
-3. **Determine the RR value**:
-   - For first release in a month: use `0`
-   - For subsequent releases: increment by 1 from previous release in same month
-
-4. **Update YY.M** based on current date when making the release
-
-**Example update:**
-```xml
-<Version>26.1.0</Version>
-<FileVersion>26.1.0</FileVersion>
-<AssemblyVersion>26.1.0</AssemblyVersion>
-```
-
-### Release Requirements
-
-Before releasing with a new version:
-
-- All unit tests must pass (297 tests in Energy.Core.Test)
-- Build must succeed with minimal warnings
-- Documentation should be updated if API changes were made
-- Version bump should be the last commit before release tag
-
-### NuGet Package Creation
-
-To create a new NuGet package release:
-
-1. **Create .nuspec file** for the current version:
-   - Copy the latest .nuspec file from `nuget/` directory
-   - Update version number to match `Energy.Core.csproj` version
-   - Name format: `Energy.Core.YY.M.RR.nuspec`
-
-2. **Build project in Release mode**:
-   ```bash
-   dotnet build Energy.Core/Energy.Core.csproj --configuration Release
-   ```
-
-3. **Create NuGet package**:
-   ```bash
-   dotnet pack Energy.Core/Energy.Core.csproj --configuration Release --output nuget
-   ```
-
-4. **Verify package creation**:
-   - Check that `Energy.Core.YY.M.RR.nupkg` exists in `nuget/` directory
-   - Package should contain all target framework binaries and documentation
-
-**Example for version 26.1.0:**
-- .nuspec file: `nuget/Energy.Core.26.1.0.nuspec`
-- Package file: `nuget/Energy.Core.26.1.0.nupkg`
+In short: the format is YY.M.RR; the `.csproj` files are the source of truth for the current version; update `<Version>`, `<FileVersion>`, and `<AssemblyVersion>` together to the same value.
 
 ## Dependencies
 
