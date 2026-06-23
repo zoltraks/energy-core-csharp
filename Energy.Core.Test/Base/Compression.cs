@@ -163,199 +163,68 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void Compression_ZX0_TestFile()
         {
-            // Test with ZX0_NUMBERS.zx0 - decompress and compare with ZX0_NUMBERS.txt
-            try
-            {
-                // Load ZX0_NUMBERS.zx0 compressed data
-                byte[] numbersCompressedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.zx0");
-                Assert.IsNotNull(numbersCompressedData, "ZX0_NUMBERS.zx0 should exist and not be null");
-                Assert.IsTrue(numbersCompressedData.Length > 0, "ZX0_NUMBERS.zx0 should not be empty");
+            // ZX0_NUMBERS: reference fixture decodes to source, and recompressing the
+            // source reproduces the fixture byte for byte.
+            byte[] numbersCompressedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.zx0");
+            Assert.IsNotNull(numbersCompressedData, "ZX0_NUMBERS.zx0 should exist and not be null");
+            Assert.IsTrue(numbersCompressedData.Length > 0, "ZX0_NUMBERS.zx0 should not be empty");
 
-                // Decompress using ZX0 algorithm
-                byte[] numbersDecompressedData = Energy.Base.Compression.ZX0.Decompress(numbersCompressedData);
-                Assert.IsNotNull(numbersDecompressedData, "Decompression should not return null");
-                
-                // Load expected result from ZX0_NUMBERS.txt
-                byte[] numbersExpectedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.txt");
-                Assert.IsNotNull(numbersExpectedData, "ZX0_NUMBERS.txt should exist and not be null");
-                
-                // Compare decompressed data with expected result
-                Assert.AreEqual(numbersExpectedData.Length, numbersDecompressedData.Length, 
-                    "Decompressed ZX0_NUMBERS data should have same length as expected");
-                
-                string expectedText = System.Text.Encoding.UTF8.GetString(numbersExpectedData);
-                string actualText = System.Text.Encoding.UTF8.GetString(numbersDecompressedData);
-                Assert.AreEqual(expectedText, actualText, 
-                    "Decompressed ZX0_NUMBERS.zx0 should match ZX0_NUMBERS.txt");
+            byte[] numbersExpectedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.txt");
+            Assert.IsNotNull(numbersExpectedData, "ZX0_NUMBERS.txt should exist and not be null");
 
-                // Test compression of ZX0_NUMBERS.txt and compare with fixture
-                byte[] numbersCompressedFromText = Energy.Base.Compression.ZX0.Compress(numbersExpectedData);
-                Assert.IsNotNull(numbersCompressedFromText, "Compression should not return null");
-                
-                // Compare compressed data with fixture
-                Assert.AreEqual(numbersCompressedData.Length, numbersCompressedFromText.Length, 
-                    "Compressed data should have same length as fixture");
-                
-                bool compressedDataMatches = true;
-                if (numbersCompressedData.Length == numbersCompressedFromText.Length)
-                {
-                    for (int i = 0; i < numbersCompressedData.Length; i++)
-                    {
-                        if (numbersCompressedData[i] != numbersCompressedFromText[i])
-                        {
-                            compressedDataMatches = false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    compressedDataMatches = false;
-                }
-                
-                Assert.IsTrue(compressedDataMatches, 
-                    "Compressed data should match fixture ZX0_NUMBERS.zx0");
-                
-                // Test roundtrip: compress then decompress
-                byte[] numbersRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(numbersCompressedFromText);
-                Assert.IsNotNull(numbersRoundtripDecompressed, "Roundtrip decompression should not return null");
-                
-                string roundtripText = System.Text.Encoding.UTF8.GetString(numbersRoundtripDecompressed);
-                Assert.AreEqual(expectedText, roundtripText, 
-                    "Roundtrip compression/decompression should match original");
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive("ZX0_NUMBERS test error: " + ex.Message);
-            }
+            byte[] numbersDecompressedData = Energy.Base.Compression.ZX0.Decompress(numbersCompressedData);
+            Assert.IsNotNull(numbersDecompressedData, "Decompression should not return null");
+            CollectionAssert.AreEqual(numbersExpectedData, numbersDecompressedData, "Decompressed ZX0_NUMBERS.zx0 should match ZX0_NUMBERS.txt");
 
-            // Test with ZX0_LETTERS.zx0 - decompress and compare with ZX0_LETTERS.txt
-            try
-            {
-                // Load ZX0_LETTERS.zx0 compressed data
-                byte[] testCompressedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.zx0");
-                Assert.IsNotNull(testCompressedData, "ZX0_LETTERS.zx0 should exist and not be null");
-                Assert.IsTrue(testCompressedData.Length > 0, "ZX0_LETTERS.zx0 should not be empty");
+            byte[] numbersCompressedFromText = Energy.Base.Compression.ZX0.Compress(numbersExpectedData);
+            Assert.IsNotNull(numbersCompressedFromText, "Compression should not return null");
+            CollectionAssert.AreEqual(numbersCompressedData, numbersCompressedFromText, "Compressed data should match fixture ZX0_NUMBERS.zx0");
 
-                // Decompress using ZX0 algorithm
-                byte[] testDecompressedData = Energy.Base.Compression.ZX0.Decompress(testCompressedData);
-                Assert.IsNotNull(testDecompressedData, "Decompression should not return null");
-                
-                // Load expected result from ZX0_LETTERS.txt
-                byte[] testExpectedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.txt");
-                Assert.IsNotNull(testExpectedData, "ZX0_LETTERS.txt should exist and not be null");
-                
-                // Compare decompressed data with expected result
-                Assert.AreEqual(testExpectedData.Length, testDecompressedData.Length, 
-                    "Decompressed ZX0_LETTERS data should have same length as expected");
-                
-                string expectedText = System.Text.Encoding.UTF8.GetString(testExpectedData);
-                string actualText = System.Text.Encoding.UTF8.GetString(testDecompressedData);
-                Assert.AreEqual(expectedText, actualText, 
-                    "Decompressed ZX0_LETTERS.zx0 should match ZX0_LETTERS.txt");
+            byte[] numbersRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(numbersCompressedFromText);
+            Assert.IsNotNull(numbersRoundtripDecompressed, "Roundtrip decompression should not return null");
+            CollectionAssert.AreEqual(numbersExpectedData, numbersRoundtripDecompressed, "Roundtrip compression/decompression should match original");
 
-                // Test compression of ZX0_LETTERS.txt and compare with fixture
-                byte[] testCompressedFromText = Energy.Base.Compression.ZX0.Compress(testExpectedData);
-                Assert.IsNotNull(testCompressedFromText, "Compression should not return null");
-                
-                // Compare compressed data with fixture
-                Assert.AreEqual(testCompressedData.Length, testCompressedFromText.Length, 
-                    "Compressed data should have same length as fixture");
-                
-                bool compressedDataMatches = true;
-                if (testCompressedData.Length == testCompressedFromText.Length)
-                {
-                    for (int i = 0; i < testCompressedData.Length; i++)
-                    {
-                        if (testCompressedData[i] != testCompressedFromText[i])
-                        {
-                            compressedDataMatches = false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    compressedDataMatches = false;
-                }
-                
-                Assert.IsTrue(compressedDataMatches, 
-                    "Compressed data should match fixture ZX0_LETTERS.zx0");
-                
-                // Test roundtrip: compress then decompress
-                byte[] testRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(testCompressedFromText);
-                Assert.IsNotNull(testRoundtripDecompressed, "Roundtrip decompression should not return null");
-                
-                string roundtripText = System.Text.Encoding.UTF8.GetString(testRoundtripDecompressed);
-                Assert.AreEqual(expectedText, roundtripText, 
-                    "Roundtrip compression/decompression should match original");
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive("ZX0_LETTERS test error: " + ex.Message);
-            }
+            // ZX0_LETTERS
+            byte[] testCompressedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.zx0");
+            Assert.IsNotNull(testCompressedData, "ZX0_LETTERS.zx0 should exist and not be null");
+            Assert.IsTrue(testCompressedData.Length > 0, "ZX0_LETTERS.zx0 should not be empty");
 
-            // Test with ZX0_SIMPLE.zx0 - decompress and compare with ZX0_SIMPLE.txt
-            try
-            {
-                // Load ZX0_SIMPLE.zx0 compressed data
-                byte[] simpleCompressedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.zx0");
-                Assert.IsNotNull(simpleCompressedData, "ZX0_SIMPLE.zx0 should exist and not be null");
-                Assert.IsTrue(simpleCompressedData.Length > 0, "ZX0_SIMPLE.zx0 should not be empty");
-                Assert.AreEqual(17, simpleCompressedData.Length, "ZX0_SIMPLE.zx0 should be 17 bytes");
+            byte[] testExpectedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.txt");
+            Assert.IsNotNull(testExpectedData, "ZX0_LETTERS.txt should exist and not be null");
 
-                // Decompress using ZX0 algorithm
-                byte[] simpleDecompressedData = Energy.Base.Compression.ZX0.Decompress(simpleCompressedData);
-                Assert.IsNotNull(simpleDecompressedData, "Decompression should not return null");
-                
-                // Load expected result from ZX0_SIMPLE.txt
-                byte[] simpleExpectedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.txt");
-                Assert.IsNotNull(simpleExpectedData, "ZX0_SIMPLE.txt should exist and not be null");
-                Assert.AreEqual(13, simpleExpectedData.Length, "ZX0_SIMPLE.txt should be 13 bytes");
-                
-                // Compare decompressed data with expected result
-                Assert.AreEqual(simpleExpectedData.Length, simpleDecompressedData.Length, 
-                    "Decompressed ZX0_SIMPLE data should have same length as expected");
-                
-                string expectedText = System.Text.Encoding.UTF8.GetString(simpleExpectedData);
-                string actualText = System.Text.Encoding.UTF8.GetString(simpleDecompressedData);
-                Assert.AreEqual(expectedText, actualText, 
-                    "Decompressed ZX0_SIMPLE.zx0 should match ZX0_SIMPLE.txt");
+            byte[] testDecompressedData = Energy.Base.Compression.ZX0.Decompress(testCompressedData);
+            Assert.IsNotNull(testDecompressedData, "Decompression should not return null");
+            CollectionAssert.AreEqual(testExpectedData, testDecompressedData, "Decompressed ZX0_LETTERS.zx0 should match ZX0_LETTERS.txt");
 
-                // Test compression of ZX0_SIMPLE.txt and compare with fixture
-                byte[] simpleCompressedFromText = Energy.Base.Compression.ZX0.Compress(simpleExpectedData);
-                Assert.IsNotNull(simpleCompressedFromText, "Compression should not return null");
-                Assert.AreEqual(17, simpleCompressedFromText.Length, "Compressed ZX0_SIMPLE should be 17 bytes");
-                
-                // Compare compressed data with fixture byte by byte
-                Assert.AreEqual(simpleCompressedData.Length, simpleCompressedFromText.Length, 
-                    "Compressed data should have same length as fixture (17 bytes)");
-                
-                bool compressedDataMatches = true;
-                for (int i = 0; i < simpleCompressedData.Length; i++)
-                {
-                    if (simpleCompressedData[i] != simpleCompressedFromText[i])
-                    {
-                        compressedDataMatches = false;
-                        break;
-                    }
-                }
-                
-                Assert.IsTrue(compressedDataMatches, 
-                    "Compressed data should match fixture ZX0_SIMPLE.zx0 byte by byte");
-                
-                // Test roundtrip: compress then decompress
-                byte[] simpleRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(simpleCompressedFromText);
-                Assert.IsNotNull(simpleRoundtripDecompressed, "Roundtrip decompression should not return null");
-                
-                string roundtripText = System.Text.Encoding.UTF8.GetString(simpleRoundtripDecompressed);
-                Assert.AreEqual(expectedText, roundtripText, 
-                    "Roundtrip compression/decompression should match original");
-            }
-            catch (Exception ex)
-            {
-                Assert.Inconclusive("ZX0_SIMPLE test error: " + ex.Message);
-            }
+            byte[] testCompressedFromText = Energy.Base.Compression.ZX0.Compress(testExpectedData);
+            Assert.IsNotNull(testCompressedFromText, "Compression should not return null");
+            CollectionAssert.AreEqual(testCompressedData, testCompressedFromText, "Compressed data should match fixture ZX0_LETTERS.zx0");
+
+            byte[] testRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(testCompressedFromText);
+            Assert.IsNotNull(testRoundtripDecompressed, "Roundtrip decompression should not return null");
+            CollectionAssert.AreEqual(testExpectedData, testRoundtripDecompressed, "Roundtrip compression/decompression should match original");
+
+            // ZX0_SIMPLE
+            byte[] simpleCompressedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.zx0");
+            Assert.IsNotNull(simpleCompressedData, "ZX0_SIMPLE.zx0 should exist and not be null");
+            Assert.AreEqual(17, simpleCompressedData.Length, "ZX0_SIMPLE.zx0 should be 17 bytes");
+
+            byte[] simpleExpectedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.txt");
+            Assert.IsNotNull(simpleExpectedData, "ZX0_SIMPLE.txt should exist and not be null");
+            Assert.AreEqual(13, simpleExpectedData.Length, "ZX0_SIMPLE.txt should be 13 bytes");
+
+            byte[] simpleDecompressedData = Energy.Base.Compression.ZX0.Decompress(simpleCompressedData);
+            Assert.IsNotNull(simpleDecompressedData, "Decompression should not return null");
+            CollectionAssert.AreEqual(simpleExpectedData, simpleDecompressedData, "Decompressed ZX0_SIMPLE.zx0 should match ZX0_SIMPLE.txt");
+
+            byte[] simpleCompressedFromText = Energy.Base.Compression.ZX0.Compress(simpleExpectedData);
+            Assert.IsNotNull(simpleCompressedFromText, "Compression should not return null");
+            Assert.AreEqual(17, simpleCompressedFromText.Length, "Compressed ZX0_SIMPLE should be 17 bytes");
+            CollectionAssert.AreEqual(simpleCompressedData, simpleCompressedFromText, "Compressed data should match fixture ZX0_SIMPLE.zx0 byte by byte");
+
+            byte[] simpleRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(simpleCompressedFromText);
+            Assert.IsNotNull(simpleRoundtripDecompressed, "Roundtrip decompression should not return null");
+            CollectionAssert.AreEqual(simpleExpectedData, simpleRoundtripDecompressed, "Roundtrip compression/decompression should match original");
         }
 
         [TestMethod]
@@ -449,8 +318,53 @@ namespace Energy.Core.Test.Base
             
             // Compare decompressed data with expected result
             string actualText = System.Text.Encoding.UTF8.GetString(decompressedData);
-            Assert.AreEqual(expectedText, actualText, 
+            Assert.AreEqual(expectedText, actualText,
                 "Decompressed ZX0_1000.zx0 should be 1000 characters of repeated '0123456789'");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Big16KFixture()
+        {
+            // Larger structured input. Guards byte-identical output against the
+            // reference zx0 tool and confirms the optimizer still completes promptly
+            // as input size grows (regression guard for the arena rewrite).
+            byte[] plain = ReadEmbeddedResource("Resources.ZX0_BIG16K.txt");
+            byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_BIG16K.zx0");
+            Assert.IsNotNull(plain, "ZX0_BIG16K.txt fixture should be embedded");
+            Assert.IsNotNull(expectedCompressed, "ZX0_BIG16K.zx0 fixture should be embedded");
+            Assert.AreEqual(16384, plain.Length, "ZX0_BIG16K.txt should be 16384 bytes");
+
+            byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+            Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
+            CollectionAssert.AreEqual(expectedCompressed, actualCompressed, "ZX0 compression output should match ZX0_BIG16K.zx0 fixture byte for byte");
+
+            byte[] roundTrip = Energy.Base.Compression.ZX0.Decompress(actualCompressed);
+            Assert.IsNotNull(roundTrip, "ZX0 decompression should not return null");
+            CollectionAssert.AreEqual(plain, roundTrip, "Round-trip should reproduce ZX0_BIG16K.txt");
+
+            byte[] fixtureDecompressed = Energy.Base.Compression.ZX0.Decompress(expectedCompressed);
+            Assert.IsNotNull(fixtureDecompressed, "Decompressing the reference fixture should not return null");
+            CollectionAssert.AreEqual(plain, fixtureDecompressed, "Reference fixture should decode to ZX0_BIG16K.txt");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Random8KFixture()
+        {
+            // Incompressible input exercises the literal-heavy path at scale and keeps
+            // output byte-identical to the reference zx0 tool.
+            byte[] plain = ReadEmbeddedResource("Resources.ZX0_RANDOM8K.bin");
+            byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_RANDOM8K.zx0");
+            Assert.IsNotNull(plain, "ZX0_RANDOM8K.bin fixture should be embedded");
+            Assert.IsNotNull(expectedCompressed, "ZX0_RANDOM8K.zx0 fixture should be embedded");
+            Assert.AreEqual(8192, plain.Length, "ZX0_RANDOM8K.bin should be 8192 bytes");
+
+            byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+            Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
+            CollectionAssert.AreEqual(expectedCompressed, actualCompressed, "ZX0 compression output should match ZX0_RANDOM8K.zx0 fixture byte for byte");
+
+            byte[] roundTrip = Energy.Base.Compression.ZX0.Decompress(actualCompressed);
+            Assert.IsNotNull(roundTrip, "ZX0 decompression should not return null");
+            CollectionAssert.AreEqual(plain, roundTrip, "Round-trip should reproduce ZX0_RANDOM8K.bin");
         }
 
         #region LZ4

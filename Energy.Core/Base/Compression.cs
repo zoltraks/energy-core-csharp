@@ -158,25 +158,32 @@ namespace Energy.Base
             private const int INITIAL_OFFSET = 1;
             private const int MAX_OFFSET_ZX0 = 32640;
 
-            private class Block
+            // Optimal-parse graph node. Stored in a flat arena (see Optimizer) and
+            // addressed by integer index rather than by object reference, so the hot
+            // optimizer loop allocates no per-edge objects and creates no GC pressure.
+            private struct Block
             {
                 public int Bits;
                 public int Index;
                 public int Offset;
-                public Block Chain;
-
-                public Block(int bits, int index, int offset, Block chain)
-                {
-                    this.Bits = bits;
-                    this.Index = index;
-                    this.Offset = offset;
-                    this.Chain = chain;
-                }
+                public int Chain;       // arena index of the chained node, -1 when none
+                public int References;  // live reference count, drives recycling
+                public int GhostChain;  // free-list link while recycled, -1 when none
             }
 
-            private static Block Allocate(int bits, int index, int offset, Block chain)
+            // Upper bound for the number of graph nodes simultaneously alive: every
+            // input position keeps one optimal node, plus up to one pending node per
+            // candidate offset. Seeding the arena to this size avoids growth in the
+            // common case; the arena still grows on demand if the estimate is low.
+            private static int InitialArenaCapacity(int inputSize, int offsetLimit)
             {
-                return new Block(bits, index, offset, chain);
+                int window = OffsetCeiling(inputSize - 1, offsetLimit);
+                long capacity = (long)inputSize + window + 2;
+                if (capacity < 16)
+                    capacity = 16;
+                if (capacity > int.MaxValue)
+                    capacity = int.MaxValue;
+                return (int)capacity;
             }
 
             private static int OffsetCeiling(int index, int offsetLimit)
@@ -196,98 +203,251 @@ namespace Energy.Base
                 return bits;
             }
 
-            private static Block Optimize(byte[] inputData, int inputSize, int skip, int offsetLimit)
+            // Per-call optimal parser. Holds the block arena and the recycling free
+            // list, so a single Compress call performs all its bookkeeping without any
+            // shared mutable static state - which keeps Compress thread-safe.
+            private sealed class Optimizer
             {
-                int maxOffset = OffsetCeiling(inputSize - 1, offsetLimit);
+                private Block[] _arena;
+                private int _count;
+                private int _ghostRoot;
 
-                Block[] lastLiteral = new Block[maxOffset + 1];
-                Block[] lastMatch = new Block[maxOffset + 1];
-                Block[] optimal = new Block[inputSize];
-                int[] matchLength = new int[maxOffset + 1];
-                int[] bestLength = new int[inputSize];
-
-                if (inputSize > 2)
-                    bestLength[2] = 2;
-
-                lastMatch[INITIAL_OFFSET] = Allocate(-1, skip - 1, INITIAL_OFFSET, null);
-
-                for (int index = skip; index < inputSize; index++)
+                public Optimizer(int capacity)
                 {
-                    int bestLengthSize = 2;
-                    maxOffset = OffsetCeiling(index, offsetLimit);
+                    if (capacity < 16)
+                        capacity = 16;
+                    _arena = new Block[capacity];
+                    _count = 0;
+                    _ghostRoot = -1;
+                }
 
-                    for (int offset = 1; offset <= maxOffset; offset++)
+                // Reserve a node. Mirrors the reference allocator: reuse a recycled node
+                // when one is available (releasing its old chain, which may cascade),
+                // otherwise take the next free arena slot, growing only when exhausted.
+                private int Allocate(int bits, int index, int offset, int chain)
+                {
+                    int node;
+                    if (_ghostRoot != -1)
                     {
-                        if (index != skip && index >= offset && inputData[index] == inputData[index - offset])
+                        node = _ghostRoot;
+                        _ghostRoot = _arena[node].GhostChain;
+                        int oldChain = _arena[node].Chain;
+                        if (oldChain != -1 && --_arena[oldChain].References == 0)
                         {
-                            Block lastLiteralBlock = lastLiteral[offset];
-                            if (lastLiteralBlock != null)
-                            {
-                                int length = index - lastLiteralBlock.Index;
-                                int bits = lastLiteralBlock.Bits + 1 + EliasGammaBits(length);
-                                Block candidate = Allocate(bits, index, offset, lastLiteralBlock);
-                                lastMatch[offset] = candidate;
-                                Block optimalIndexBlock = optimal[index];
-                                if (optimalIndexBlock == null || optimalIndexBlock.Bits > bits)
-                                    optimal[index] = candidate;
-                            }
-
-                            int currentMatchLength = ++matchLength[offset];
-                            if (currentMatchLength > 1)
-                            {
-                                if (bestLengthSize < currentMatchLength)
-                                {
-                                    int bits = optimal[index - bestLength[bestLengthSize]].Bits + EliasGammaBits(bestLength[bestLengthSize] - 1);
-                                    int bits2;
-                                    do
-                                    {
-                                        bestLengthSize++;
-                                        bits2 = optimal[index - bestLengthSize].Bits + EliasGammaBits(bestLengthSize - 1);
-                                        if (bits2 <= bits)
-                                        {
-                                            bestLength[bestLengthSize] = bestLengthSize;
-                                            bits = bits2;
-                                        }
-                                        else
-                                        {
-                                            bestLength[bestLengthSize] = bestLength[bestLengthSize - 1];
-                                        }
-                                    }
-                                    while (bestLengthSize < currentMatchLength);
-                                }
-
-                                int length = bestLength[currentMatchLength];
-                                int bitsForMatch = optimal[index - length].Bits + 8 + EliasGammaBits((offset - 1) / 128 + 1) + EliasGammaBits(length - 1);
-                                Block lastMatchBlock = lastMatch[offset];
-                                if (lastMatchBlock == null || lastMatchBlock.Index != index || lastMatchBlock.Bits > bitsForMatch)
-                                {
-                                    Block candidate = Allocate(bitsForMatch, index, offset, optimal[index - length]);
-                                    lastMatch[offset] = candidate;
-                                    Block optimalIndexBlock = optimal[index];
-                                    if (optimalIndexBlock == null || optimalIndexBlock.Bits > bitsForMatch)
-                                        optimal[index] = candidate;
-                                }
-                            }
+                            _arena[oldChain].GhostChain = _ghostRoot;
+                            _ghostRoot = oldChain;
                         }
-                        else
+                    }
+                    else
+                    {
+                        if (_count == _arena.Length)
                         {
-                            matchLength[offset] = 0;
-                            Block lastMatchBlock = lastMatch[offset];
-                            if (lastMatchBlock != null)
+                            Block[] grown = new Block[_arena.Length * 2];
+                            System.Array.Copy(_arena, grown, _arena.Length);
+                            _arena = grown;
+                        }
+                        node = _count++;
+                    }
+                    _arena[node].Bits = bits;
+                    _arena[node].Index = index;
+                    _arena[node].Offset = offset;
+                    _arena[node].Chain = chain;
+                    _arena[node].References = 0;
+                    if (chain != -1)
+                        _arena[chain].References++;
+                    return node;
+                }
+
+                // Repoint a slot to a node. Mirrors the reference assign(): the new node
+                // gains a reference and the previous occupant loses one, recycling it
+                // onto the free list when its last reference is gone.
+                private void Assign(ref int slot, int node)
+                {
+                    _arena[node].References++;
+                    int old = slot;
+                    if (old != -1 && --_arena[old].References == 0)
+                    {
+                        _arena[old].GhostChain = _ghostRoot;
+                        _ghostRoot = old;
+                    }
+                    slot = node;
+                }
+
+                // Build the optimal parse and return the arena index of the final node,
+                // or -1 for empty input. The selection logic matches the reference ZX0
+                // optimizer exactly, so the encoded output stays byte-identical.
+                public int Optimize(byte[] inputData, int inputSize, int skip, int offsetLimit)
+                {
+                    int maxOffset = OffsetCeiling(inputSize - 1, offsetLimit);
+
+                    int[] lastLiteral = new int[maxOffset + 1];
+                    int[] lastMatch = new int[maxOffset + 1];
+                    int[] optimal = new int[inputSize];
+                    int[] matchLength = new int[maxOffset + 1];
+                    int[] bestLength = new int[inputSize];
+
+                    for (int i = 0; i <= maxOffset; i++)
+                    {
+                        lastLiteral[i] = -1;
+                        lastMatch[i] = -1;
+                    }
+                    for (int i = 0; i < inputSize; i++)
+                        optimal[i] = -1;
+
+                    if (inputSize > 2)
+                        bestLength[2] = 2;
+
+                    Assign(ref lastMatch[INITIAL_OFFSET], Allocate(-1, skip - 1, INITIAL_OFFSET, -1));
+
+                    for (int index = skip; index < inputSize; index++)
+                    {
+                        int bestLengthSize = 2;
+                        maxOffset = OffsetCeiling(index, offsetLimit);
+
+                        for (int offset = 1; offset <= maxOffset; offset++)
+                        {
+                            if (index != skip && index >= offset && inputData[index] == inputData[index - offset])
                             {
-                                int length = index - lastMatchBlock.Index;
-                                int bits = lastMatchBlock.Bits + 1 + EliasGammaBits(length) + length * 8;
-                                Block candidate = Allocate(bits, index, 0, lastMatchBlock);
-                                lastLiteral[offset] = candidate;
-                                Block optimalIndexBlock = optimal[index];
-                                if (optimalIndexBlock == null || optimalIndexBlock.Bits > bits)
-                                    optimal[index] = candidate;
+                                if (lastLiteral[offset] != -1)
+                                {
+                                    int length = index - _arena[lastLiteral[offset]].Index;
+                                    int bits = _arena[lastLiteral[offset]].Bits + 1 + EliasGammaBits(length);
+                                    int candidate = Allocate(bits, index, offset, lastLiteral[offset]);
+                                    Assign(ref lastMatch[offset], candidate);
+                                    if (optimal[index] == -1 || _arena[optimal[index]].Bits > bits)
+                                        Assign(ref optimal[index], candidate);
+                                }
+
+                                int currentMatchLength = ++matchLength[offset];
+                                if (currentMatchLength > 1)
+                                {
+                                    if (bestLengthSize < currentMatchLength)
+                                    {
+                                        int bits = _arena[optimal[index - bestLength[bestLengthSize]]].Bits + EliasGammaBits(bestLength[bestLengthSize] - 1);
+                                        int bits2;
+                                        do
+                                        {
+                                            bestLengthSize++;
+                                            bits2 = _arena[optimal[index - bestLengthSize]].Bits + EliasGammaBits(bestLengthSize - 1);
+                                            if (bits2 <= bits)
+                                            {
+                                                bestLength[bestLengthSize] = bestLengthSize;
+                                                bits = bits2;
+                                            }
+                                            else
+                                            {
+                                                bestLength[bestLengthSize] = bestLength[bestLengthSize - 1];
+                                            }
+                                        }
+                                        while (bestLengthSize < currentMatchLength);
+                                    }
+
+                                    int length = bestLength[currentMatchLength];
+                                    int bitsForMatch = _arena[optimal[index - length]].Bits + 8 + EliasGammaBits((offset - 1) / 128 + 1) + EliasGammaBits(length - 1);
+                                    if (lastMatch[offset] == -1 || _arena[lastMatch[offset]].Index != index || _arena[lastMatch[offset]].Bits > bitsForMatch)
+                                    {
+                                        int candidate = Allocate(bitsForMatch, index, offset, optimal[index - length]);
+                                        Assign(ref lastMatch[offset], candidate);
+                                        if (optimal[index] == -1 || _arena[optimal[index]].Bits > bitsForMatch)
+                                            Assign(ref optimal[index], candidate);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                matchLength[offset] = 0;
+                                if (lastMatch[offset] != -1)
+                                {
+                                    int length = index - _arena[lastMatch[offset]].Index;
+                                    int bits = _arena[lastMatch[offset]].Bits + 1 + EliasGammaBits(length) + length * 8;
+                                    int candidate = Allocate(bits, index, 0, lastMatch[offset]);
+                                    Assign(ref lastLiteral[offset], candidate);
+                                    if (optimal[index] == -1 || _arena[optimal[index]].Bits > bits)
+                                        Assign(ref optimal[index], candidate);
+                                }
                             }
                         }
                     }
+
+                    return optimal[inputSize - 1];
                 }
 
-                return optimal[inputSize - 1];
+                // Emit the ZX0 bit stream for the parse rooted at the given node.
+                public byte[] Encode(int root, byte[] inputData, int skip, bool backwardsMode, bool invertMode)
+                {
+                    if (root == -1)
+                        return new byte[0];
+
+                    int outputSize = (_arena[root].Bits + 25) / 8;
+                    byte[] output = new byte[outputSize];
+
+                    EncoderState state = new EncoderState();
+                    state.OutputData = output;
+                    state.OutputIndex = 0;
+                    state.InputIndex = skip;
+                    state.BitMask = 0;
+                    state.Backtrack = true;
+
+                    // Reverse the chain in place so it can be walked front to back.
+                    int previous = -1;
+                    int current = root;
+                    while (current != -1)
+                    {
+                        int next = _arena[current].Chain;
+                        _arena[current].Chain = previous;
+                        previous = current;
+                        current = next;
+                    }
+
+                    int lastOffset = INITIAL_OFFSET;
+                    int prevNode = previous;
+
+                    for (int node = _arena[prevNode].Chain; node != -1; )
+                    {
+                        int thisNode = node;
+                        node = _arena[node].Chain;
+
+                        int length = _arena[thisNode].Index - _arena[prevNode].Index;
+                        int blockOffset = _arena[thisNode].Offset;
+
+                        if (blockOffset == 0)
+                        {
+                            WriteBit(state, 0);
+                            WriteInterlacedEliasGamma(state, length, backwardsMode, false);
+                            for (int i = 0; i < length; i++)
+                            {
+                                WriteByte(state, inputData[state.InputIndex]);
+                                state.InputIndex++;
+                            }
+                        }
+                        else if (blockOffset == lastOffset)
+                        {
+                            WriteBit(state, 0);
+                            WriteInterlacedEliasGamma(state, length, backwardsMode, false);
+                            state.InputIndex += length;
+                        }
+                        else
+                        {
+                            WriteBit(state, 1);
+                            WriteInterlacedEliasGamma(state, ((blockOffset - 1) / 128) + 1, backwardsMode, invertMode);
+                            if (backwardsMode)
+                                WriteByte(state, ((blockOffset - 1) % 128) << 1);
+                            else
+                                WriteByte(state, (127 - ((blockOffset - 1) % 128)) << 1);
+                            state.Backtrack = true;
+                            WriteInterlacedEliasGamma(state, length - 1, backwardsMode, false);
+                            state.InputIndex += length;
+                            lastOffset = blockOffset;
+                        }
+
+                        prevNode = thisNode;
+                    }
+
+                    WriteBit(state, 1);
+                    WriteInterlacedEliasGamma(state, 256, backwardsMode, invertMode);
+
+                    return output;
+                }
             }
 
             private sealed class EncoderState
@@ -298,80 +458,6 @@ namespace Energy.Base
                 public int BitIndex;
                 public int BitMask;
                 public bool Backtrack;
-            }
-
-            private static byte[] CompressInternal(Block optimal, byte[] inputData, int inputSize, int skip, bool backwardsMode, bool invertMode)
-            {
-                if (optimal == null)
-                    return new byte[0];
-
-                int outputSize = (optimal.Bits + 25) / 8;
-                byte[] output = new byte[outputSize];
-
-                EncoderState state = new EncoderState();
-                state.OutputData = output;
-                state.OutputIndex = 0;
-                state.InputIndex = skip;
-                state.BitMask = 0;
-                state.Backtrack = true;
-
-                Block prev = null;
-                Block next;
-
-                while (optimal != null)
-                {
-                    next = optimal.Chain;
-                    optimal.Chain = prev;
-                    prev = optimal;
-                    optimal = next;
-                }
-
-                int lastOffset = INITIAL_OFFSET;
-
-                for (Block current = prev.Chain; current != null; )
-                {
-                    Block block = current;
-                    current = current.Chain;
-
-                    int length = block.Index - prev.Index;
-
-                    if (block.Offset == 0)
-                    {
-                        WriteBit(state, 0);
-                        WriteInterlacedEliasGamma(state, length, backwardsMode, false);
-                        for (int i = 0; i < length; i++)
-                        {
-                            WriteByte(state, inputData[state.InputIndex]);
-                            state.InputIndex++;
-                        }
-                    }
-                    else if (block.Offset == lastOffset)
-                    {
-                        WriteBit(state, 0);
-                        WriteInterlacedEliasGamma(state, length, backwardsMode, false);
-                        state.InputIndex += length;
-                    }
-                    else
-                    {
-                        WriteBit(state, 1);
-                        WriteInterlacedEliasGamma(state, ((block.Offset - 1) / 128) + 1, backwardsMode, invertMode);
-                        if (backwardsMode)
-                            WriteByte(state, ((block.Offset - 1) % 128) << 1);
-                        else
-                            WriteByte(state, (127 - ((block.Offset - 1) % 128)) << 1);
-                        state.Backtrack = true;
-                        WriteInterlacedEliasGamma(state, length - 1, backwardsMode, false);
-                        state.InputIndex += length;
-                        lastOffset = block.Offset;
-                    }
-
-                    prev = block;
-                }
-
-                WriteBit(state, 1);
-                WriteInterlacedEliasGamma(state, 256, backwardsMode, invertMode);
-
-                return output;
             }
 
             private static void WriteByte(EncoderState state, int value)
@@ -428,25 +514,6 @@ namespace Energy.Base
                 WriteBit(state, backwardsMode ? 0 : 1);
             }
 
-            private static void WriteInterlacedEliasGamma(Energy.Base.Binary.BitWriter writer, int value, bool inverted)
-            {
-                int bits = 0;
-                int temp = value;
-                while (temp > 1)
-                {
-                    temp >>= 1;
-                    bits++;
-                }
-
-                for (int i = bits - 1; i >= 0; i--)
-                {
-                    writer.WriteBit(0);
-                    int bit = (value >> i) & 1;
-                    writer.WriteBit(inverted ? bit ^ 1 : bit);
-                }
-                writer.WriteBit(1);
-            }
-
             private static int ReadInterlacedEliasGamma(Energy.Base.Binary.BitReader reader, bool inverted)
             {
                 int value = 1;
@@ -458,17 +525,40 @@ namespace Energy.Base
                 return value;
             }
 
-            private static void WriteBytes(System.Collections.Generic.List<byte> output, int offset, int length)
+            // Grow a decode buffer to at least the required length (power-of-two growth).
+            private static byte[] Grow(byte[] buffer, int required)
             {
+                int size = buffer.Length < 256 ? 256 : buffer.Length;
+                while (size < required)
+                    size <<= 1;
+                byte[] grown = new byte[size];
+                System.Array.Copy(buffer, grown, buffer.Length);
+                return grown;
+            }
+
+            // Copy a back-reference of the given length from "offset" bytes back, one
+            // byte at a time so that overlapping runs expand correctly. Returns the new
+            // output length.
+            private static int CopyMatch(ref byte[] output, int outputLength, int offset, int length)
+            {
+                if (offset <= 0 || offset > outputLength)
+                    throw new InvalidOperationException("ZX0 invalid back-reference offset");
+                if (outputLength + length > output.Length)
+                    output = Grow(output, outputLength + length);
+                int source = outputLength - offset;
                 for (int i = 0; i < length; i++)
-                {
-                    int pos = output.Count - offset;
-                    if (pos < 0)
-                        throw new InvalidOperationException(string.Format("Invalid offset: pos={0}, output.Count={1}, offset={2}", pos, output.Count, offset));
-                    if (pos >= output.Count)
-                        throw new InvalidOperationException(string.Format("Copy beyond buffer: pos={0}, i={1}, output.Count={2}", pos, i, output.Count));
-                    output.Add(output[pos]);
-                }
+                    output[outputLength++] = output[source++];
+                return outputLength;
+            }
+
+            // Return a byte[] trimmed to the produced length, avoiding a copy when exact.
+            private static byte[] Trim(byte[] output, int outputLength)
+            {
+                if (outputLength == output.Length)
+                    return output;
+                byte[] result = new byte[outputLength];
+                System.Array.Copy(output, result, outputLength);
+                return result;
             }
 
             /// <summary>
@@ -489,15 +579,16 @@ namespace Energy.Base
                     int skip = 0;
                     int offsetLimit = MAX_OFFSET_ZX0;
 
-                    Block optimal = Optimize(data, inputSize, skip, offsetLimit);
-                    if (optimal == null)
+                    Optimizer optimizer = new Optimizer(InitialArenaCapacity(inputSize, offsetLimit));
+                    int optimal = optimizer.Optimize(data, inputSize, skip, offsetLimit);
+                    if (optimal == -1)
                         return new byte[0];
 
                     bool backwardsMode = false;
                     bool classicMode = false;
                     bool invertMode = !classicMode && !backwardsMode;
 
-                    return CompressInternal(optimal, data, inputSize, skip, backwardsMode, invertMode);
+                    return optimizer.Encode(optimal, data, skip, backwardsMode, invertMode);
                 }
                 catch (Exception exception)
                 {
@@ -521,7 +612,8 @@ namespace Energy.Base
                     if (data.Length == 0) return new byte[0];
 
                     Energy.Base.Binary.BitReader reader = new Energy.Base.Binary.BitReader(data);
-                    System.Collections.Generic.List<byte> output = new System.Collections.Generic.List<byte>();
+                    byte[] output = new byte[256];
+                    int outputLength = 0;
                     int lastOffset = INITIAL_OFFSET;
                     bool classicMode = false;
 
@@ -529,8 +621,10 @@ namespace Energy.Base
                     {
                         // COPY_LITERALS
                         int length = ReadInterlacedEliasGamma(reader, false);
+                        if (outputLength + length > output.Length)
+                            output = Grow(output, outputLength + length);
                         for (int i = 0; i < length; i++)
-                            output.Add((byte)reader.ReadByte());
+                            output[outputLength++] = (byte)reader.ReadByte();
 
                         if (reader.ReadBit() != 0)
                         {
@@ -539,12 +633,12 @@ namespace Energy.Base
                             {
                                 int offsetMsb = ReadInterlacedEliasGamma(reader, !classicMode);
                                 if (offsetMsb == 256)
-                                    return output.ToArray();
+                                    return Trim(output, outputLength);
 
                                 lastOffset = offsetMsb * 128 - (reader.ReadByte() >> 1);
                                 reader.SetBacktrack();
                                 length = ReadInterlacedEliasGamma(reader, false) + 1;
-                                WriteBytes(output, lastOffset, length);
+                                outputLength = CopyMatch(ref output, outputLength, lastOffset, length);
 
                                 if (reader.ReadBit() == 0)
                                     break; // back to literals
@@ -555,7 +649,7 @@ namespace Energy.Base
 
                         // COPY_FROM_LAST_OFFSET
                         length = ReadInterlacedEliasGamma(reader, false);
-                        WriteBytes(output, lastOffset, length);
+                        outputLength = CopyMatch(ref output, outputLength, lastOffset, length);
 
                         if (reader.ReadBit() != 0)
                         {
@@ -564,12 +658,12 @@ namespace Energy.Base
                             {
                                 int offsetMsb = ReadInterlacedEliasGamma(reader, !classicMode);
                                 if (offsetMsb == 256)
-                                    return output.ToArray();
+                                    return Trim(output, outputLength);
 
                                 lastOffset = offsetMsb * 128 - (reader.ReadByte() >> 1);
                                 reader.SetBacktrack();
                                 length = ReadInterlacedEliasGamma(reader, false) + 1;
-                                WriteBytes(output, lastOffset, length);
+                                outputLength = CopyMatch(ref output, outputLength, lastOffset, length);
 
                                 if (reader.ReadBit() == 0)
                                     break; // back to literals
