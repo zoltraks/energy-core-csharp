@@ -45,14 +45,14 @@ namespace Energy.Core.Test.Enumeration
             var styleB = Energy.Enumeration.BooleanStyle.B;
             var styleX = Energy.Enumeration.BooleanStyle.X;
             var styleBit = Energy.Enumeration.BooleanStyle.Bit;
-            
+
             Assert.IsTrue(styleB == Energy.Enumeration.BooleanStyle.B);
             Assert.IsFalse(styleB == styleX);
             Assert.IsTrue(styleB != styleX);
-            
+
             // Test that aliases are equal
             Assert.IsTrue(styleB == styleBit);
-            
+
             // Test ordering
             Assert.IsTrue(styleB < styleX);
             Assert.IsTrue(styleX > styleB);
@@ -63,13 +63,13 @@ namespace Energy.Core.Test.Enumeration
         {
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.BooleanStyle>("B", out var result));
             Assert.AreEqual(Energy.Enumeration.BooleanStyle.B, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.BooleanStyle>("YesNo", out result));
             Assert.AreEqual(Energy.Enumeration.BooleanStyle.YesNo, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.BooleanStyle>("Bit", out result));
             Assert.AreEqual(Energy.Enumeration.BooleanStyle.Bit, result);
-            
+
             Assert.IsFalse(Enum.TryParse<Energy.Enumeration.BooleanStyle>("InvalidStyle", out result));
         }
 
@@ -79,7 +79,7 @@ namespace Energy.Core.Test.Enumeration
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.BooleanStyle)) as Energy.Enumeration.BooleanStyle[];
             Assert.IsNotNull(allValues);
             Assert.IsTrue(allValues.Length >= 7); // At least the main values
-            
+
             // Verify all main styles are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.BooleanStyle.B));
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.BooleanStyle.X));

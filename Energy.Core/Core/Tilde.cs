@@ -402,7 +402,7 @@ namespace Energy.Core
             catch (ArgumentOutOfRangeException) { }
             catch (SecurityException) { }
             catch (IOException) { }
-            
+
             ConsoleColor foreground = ConsoleColor.Gray;
             try
             {
@@ -429,7 +429,7 @@ namespace Energy.Core
             catch { }
 
             string answer = System.Console.ReadLine().Trim();
-            
+
             if (!_Colorless)
             {
                 System.Console.ForegroundColor = foreground;
@@ -1060,12 +1060,12 @@ namespace Energy.Core
             }
 
             ColorTextList list = ColorTextList.Explode(text);
-            
+
             if (list.Count == 0)
             {
                 return;
             }
-            
+
             lock (_ConsoleLock)
             {
                 // TODO Fix new lines :)
@@ -1679,7 +1679,7 @@ namespace Energy.Core
         public static bool IsConsolePresent { get { return GetConsolePresent(); } }
 
         private static bool? _ConsolePresent;
-        
+
         private static bool GetConsolePresent()
         {
             if (_ConsolePresent == null)

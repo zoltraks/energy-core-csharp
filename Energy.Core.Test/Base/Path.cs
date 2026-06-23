@@ -187,7 +187,7 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
             System.Environment.SetEnvironmentVariable("XXX-TEST", "A:B:C");
             result = Energy.Base.Path.Environment("XXX-TEST", ':');
-            expect = new string[] { "A", "B", "C"};
+            expect = new string[] { "A", "B", "C" };
             Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
             System.Environment.SetEnvironmentVariable("XXX-TEST", null);
             //System.Environment.SetEnvironmentVariable

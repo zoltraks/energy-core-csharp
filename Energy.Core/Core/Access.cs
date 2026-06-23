@@ -20,7 +20,7 @@ namespace Energy.Core
 
         public class Permission
         {
-            
+
         }
 
         #endregion

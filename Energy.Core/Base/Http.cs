@@ -190,7 +190,7 @@ namespace Energy.Base
 
             //[XmlElement("Header")]
             //public List<string> Headers = new List<string>();
-            
+
             #endregion
 
             #region Constructor
@@ -251,7 +251,7 @@ namespace Energy.Base
             #endregion
 
             #region Method
-            
+
             #endregion
         }
 
@@ -261,7 +261,7 @@ namespace Energy.Base
         public class Response : Message
         {
             #region Public
-     
+
             //public WebResponse ResponseObject { get; set; }
 
             [DefaultValue((int)0)]

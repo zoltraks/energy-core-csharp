@@ -37,28 +37,28 @@ namespace Energy.Core.Test.Enumeration
         {
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Plain", out var result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Plain, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Text", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Text, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Number", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Number, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Integer", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Integer, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Date", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Date, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Time", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Time, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Stamp", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Stamp, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.FormatType>("Binary", out result));
             Assert.AreEqual(Energy.Enumeration.FormatType.Binary, result);
-            
+
             Assert.IsFalse(Enum.TryParse<Energy.Enumeration.FormatType>("InvalidType", out result));
         }
 
@@ -68,7 +68,7 @@ namespace Energy.Core.Test.Enumeration
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.FormatType)) as Energy.Enumeration.FormatType[];
             Assert.IsNotNull(allValues);
             Assert.AreEqual(8, allValues.Length);
-            
+
             // Verify all types are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.FormatType.Plain));
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.FormatType.Text));

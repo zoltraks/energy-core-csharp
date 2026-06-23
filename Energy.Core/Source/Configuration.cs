@@ -18,7 +18,7 @@ namespace Energy.Source
         /// Connection string database dialect type.
         /// This value is used for making connection string for any SQL server in exact form recognized by server of that dialect.
         /// </summary>
-        public Energy.Enumeration.SqlDialect Dialect { get; set;  }
+        public Energy.Enumeration.SqlDialect Dialect { get; set; }
 
         /// <summary>
         /// Server

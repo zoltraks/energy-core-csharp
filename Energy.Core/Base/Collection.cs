@@ -1004,7 +1004,8 @@ namespace Energy.Base
                             string key = Index[indexKey];
                             list.Add((object)key);
                             list.Add((object)base[key]);
-                        };
+                        }
+                        ;
                     }
                     return list.ToArray();
                 }

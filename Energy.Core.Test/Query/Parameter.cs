@@ -133,7 +133,7 @@ GO
             string must;
 
             Energy.Query.Parameter.Bag bag;
-            
+
             bag = new Energy.Query.Parameter.Bag();
             bag.Set("a", "'X'");
             bag.Set("b", true);

@@ -23,7 +23,7 @@ namespace Energy.Core.Test.Core
 
         public class Class
         {
-            public class Worker1: Energy.Core.Worker<object>
+            public class Worker1 : Energy.Core.Worker<object>
             {
                 public override void Work()
                 {
@@ -32,7 +32,7 @@ namespace Energy.Core.Test.Core
                 }
             }
 
-            public class Worker2: Energy.Core.Worker.Simple
+            public class Worker2 : Energy.Core.Worker.Simple
             {
                 public override void Work()
                 {

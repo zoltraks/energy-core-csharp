@@ -267,7 +267,7 @@ namespace Energy.Core
                     return _Empty;
                 }
             }
-            
+
             public override string ToString()
             {
                 List<string> list = new List<string>();

@@ -253,16 +253,16 @@ namespace Energy.Core.Test.Base
 
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(originalText, decompressedText, "Decompressed text should match original");
-            
+
             // Verify the text contains only numbers and is 200 characters long
             Assert.AreEqual(200, originalText.Length, "Original text should be 200 characters long");
             Assert.AreEqual(200, decompressedText.Length, "Decompressed text should be 200 characters long");
-            
+
             foreach (char c in originalText)
             {
                 Assert.IsTrue(c >= '0' && c <= '9', "Original text should contain only digits 0-9");
             }
-            
+
             foreach (char c in decompressedText)
             {
                 Assert.IsTrue(c >= '0' && c <= '9', "Decompressed text should contain only digits 0-9");
@@ -304,10 +304,10 @@ namespace Energy.Core.Test.Base
             // Decompress using ZX0 algorithm
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
             Assert.IsNotNull(decompressedData, "Decompression should not return null");
-            
+
             // Verify length is exactly 1000 characters
             Assert.HasCount(1000, decompressedData);
-            
+
             // Build expected output: "0123456789" repeated 100 times
             System.Text.StringBuilder expected = new System.Text.StringBuilder(1000);
             for (int i = 0; i < 100; i++)
@@ -315,7 +315,7 @@ namespace Energy.Core.Test.Base
                 expected.Append("0123456789");
             }
             string expectedText = expected.ToString();
-            
+
             // Compare decompressed data with expected result
             string actualText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(expectedText, actualText,
@@ -513,14 +513,14 @@ namespace Energy.Core.Test.Base
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             string fullResourceName = assembly.GetName().Name + "." + resourceName;
-            
+
             using (Stream stream = assembly.GetManifestResourceStream(fullResourceName))
             {
                 if (stream == null)
                 {
                     throw new FileNotFoundException("Embedded resource not found: " + fullResourceName);
                 }
-                
+
                 byte[] buffer = new byte[stream.Length];
                 stream.Read(buffer, 0, buffer.Length);
                 return buffer;

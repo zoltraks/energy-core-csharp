@@ -10,11 +10,11 @@ namespace Energy.Base
         public class Address
         {
             public long Row;
-            
+
             public string Column;
 
             public bool StickyRow = false;
-            
+
             public bool StickyColumn = false;
 
             public override string ToString()
@@ -46,14 +46,14 @@ namespace Energy.Base
                 }
             }
 
-            public bool RowLess 
+            public bool RowLess
             {
                 get
                 {
                     return 0 >= Row;
                 }
             }
-            
+
             public bool ColumnLess
             {
                 get
@@ -130,11 +130,13 @@ namespace Energy.Base
                 bool stickyRow = "$" == match.Groups["stickyRow"].Value;
                 bool stickyColumn = "$" == match.Groups["stickyColumn"].Value;
                 long row = Energy.Base.Text.TryParse<long>(match.Groups["row"].Value);
-                return 
-                    new Address() 
-                    { 
-                        Row = row, Column = column, 
-                        StickyRow = stickyRow, StickyColumn = stickyColumn
+                return
+                    new Address()
+                    {
+                        Row = row,
+                        Column = column,
+                        StickyRow = stickyRow,
+                        StickyColumn = stickyColumn
                     };
             }
         }

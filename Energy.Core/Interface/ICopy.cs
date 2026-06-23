@@ -9,7 +9,7 @@
         T Copy();
     }
 
-    public interface ICopy: ICopy<object>
+    public interface ICopy : ICopy<object>
     {
     }
 }

@@ -144,7 +144,7 @@ namespace Energy.Base
                 return file.Substring(0, file.Length - 1);
             }
             return System.IO.Path.GetDirectoryName(file);
-        }               
+        }
 
         public static Tree<string> Tree(string root, int depth)
         {
@@ -155,8 +155,8 @@ namespace Energy.Base
             Tree<string> tree = new Base.Tree<string>();
             var x = tree.Children.Add("x");
             x.Children.Add("y");
-           
-            return null;           
+
+            return null;
         }
 
         public static IEnumerable<string> GetAllFiles(string path, string search)

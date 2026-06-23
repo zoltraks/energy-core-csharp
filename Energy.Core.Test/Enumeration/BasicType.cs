@@ -35,11 +35,11 @@ namespace Energy.Core.Test.Enumeration
         {
             var textType = Energy.Enumeration.BasicType.Text;
             var numberType = Energy.Enumeration.BasicType.Number;
-            
+
             Assert.IsTrue(textType == Energy.Enumeration.BasicType.Text);
             Assert.IsFalse(textType == numberType);
             Assert.IsTrue(textType != numberType);
-            
+
             // Test ordering
             Assert.IsTrue(textType < numberType);
             Assert.IsTrue(numberType > textType);
@@ -50,10 +50,10 @@ namespace Energy.Core.Test.Enumeration
         {
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.BasicType>("Text", out var result));
             Assert.AreEqual(Energy.Enumeration.BasicType.Text, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.BasicType>("Number", out result));
             Assert.AreEqual(Energy.Enumeration.BasicType.Number, result);
-            
+
             Assert.IsFalse(Enum.TryParse<Energy.Enumeration.BasicType>("InvalidType", out result));
         }
     }

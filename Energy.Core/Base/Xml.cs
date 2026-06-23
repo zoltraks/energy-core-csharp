@@ -644,7 +644,7 @@ namespace Energy.Base
             {
                 return text;
             }
-            string replace = Regex.Replace(text, "&#?(?:[xX][0-9a-fA-F]+|[0-9]+|[a-zA-Z]+);", delegate(Match match) 
+            string replace = Regex.Replace(text, "&#?(?:[xX][0-9a-fA-F]+|[0-9]+|[a-zA-Z]+);", delegate (Match match)
             {
                 string check = match.Value;
                 if (false) { }
@@ -658,7 +658,7 @@ namespace Energy.Base
                         {
                             return check;
                         }
-                        code = Energy.Base.Hex.HexToInteger(hex); 
+                        code = Energy.Base.Hex.HexToInteger(hex);
                         //if (!int.TryParse(check.Substring(3, check.Length - 4),
                         //    NumberStyles.HexNumber, CultureInfo.InvariantCulture, out code))
                         //{

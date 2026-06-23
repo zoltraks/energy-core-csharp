@@ -210,7 +210,7 @@ namespace Energy.Core
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]
         public static void SetConsoleEncoding(System.Text.Encoding encoding)
         {
-            Energy.Core.Program.SetConsoleEncoding(encoding);            
+            Energy.Core.Program.SetConsoleEncoding(encoding);
         }
 
         [Obsolete("Use Energy.Core.Program.SetConsoleEncoding instead")]

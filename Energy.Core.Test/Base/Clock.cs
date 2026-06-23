@@ -140,7 +140,7 @@ namespace Energy.Core.Test.Base
             dt1 = DateTime.MinValue;
             dt2 = DateTime.MaxValue;
             Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt1, dt2));
-            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1)); 
+            Assert.AreEqual(dt1, Energy.Base.Clock.SelectEarlier(dt2, dt1));
             dt1 = now.AddTicks(-1);
             dt2 = now.AddTicks(-2);
             Assert.AreEqual(dt2, Energy.Base.Clock.SelectEarlier(dt1, dt2));

@@ -166,7 +166,7 @@ namespace Energy.Base
         /// Expression for finding root element in XML
         /// </summary>
         public static readonly string XmlRootName = @"(?:<\?[xX][mM][lL][^>]*>\s*)?(?:<\s*([a-zA-Z_][^\s>]*))";
-        
+
         /// <summary>
         /// Expression for XML tag line (informal)
         /// </summary>
@@ -310,7 +310,7 @@ namespace Energy.Base
                 Group group = match.Groups[i];
                 Class.GroupDescription.Item item = new Class.GroupDescription.Item()
                 {
-                    Key = groupNames != null && groupNames.Length > i 
+                    Key = groupNames != null && groupNames.Length > i
                         ? groupNames[i] : null,
                     Value = group.Value,
                     Index = group.Index,

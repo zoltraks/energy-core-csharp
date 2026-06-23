@@ -469,7 +469,7 @@ namespace Energy.Base
         #region Dictionary
 
         [Serializable]
-        public class Dictionary: Energy.Base.Collection.StringDictionary<Value>
+        public class Dictionary : Energy.Base.Collection.StringDictionary<Value>
         {
 
         }

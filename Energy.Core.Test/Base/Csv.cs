@@ -99,7 +99,7 @@ namespace Energy.Core.Test.Base
 
             line = ";\"\"\"\",'''''','\"\"';";
             result = Energy.Base.Csv.Explode(line, new char[] { ';', ',' }, new char[] { '"', '\'', }, true);
-            expect = new string[] { "", "\"", "''", "\"\"", ""};
+            expect = new string[] { "", "\"", "''", "\"\"", "" };
             Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
         }
 

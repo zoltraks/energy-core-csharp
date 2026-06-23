@@ -7,7 +7,7 @@
 //
 #define CFNET
 #else
-    //
+//
 #endif
 
 using System;
@@ -53,23 +53,23 @@ namespace Energy.Core
         /// Set product and compilation information
         /// </summary>
         /// <param name="assembly">System.Reflection.Assembly</param>
-        #if !NETSTANDARD && !CFNET
+#if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]
-        #endif
+#endif
         public void Set(System.Reflection.Assembly assembly)
         {
-            #if !NETCF
+#if !NETCF
             Product = GetProduct(assembly);
-            #endif
+#endif
             Compilation = GetCompilation(assembly);
         }
 
         #region Static
 
-/// <summary>
-/// Get product version for assembly
-/// </summary>
-/// <param name="assembly">System.Reflection.Assembly</param>
+        /// <summary>
+        /// Get product version for assembly
+        /// </summary>
+        /// <param name="assembly">System.Reflection.Assembly</param>
         /// <returns>string</returns>
 #if !NETSTANDARD && !CFNET
         [System.Security.Permissions.EnvironmentPermissionAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Unrestricted = true)]

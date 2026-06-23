@@ -284,7 +284,7 @@ namespace Energy.Base
                         _Overflow = true;
                         if (_Loop)
                         {
-                            _Value = _Value- _Maximum + by;
+                            _Value = _Value - _Maximum + by;
                         }
                         else
                         {

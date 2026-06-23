@@ -818,7 +818,8 @@ namespace Energy.Base
                     if (empty)
                     {
                         b.Append("  ");
-                    } else
+                    }
+                    else
                     {
                         if (tildeOutput)
                         {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Energy.Query
 {
-    public class Style: Energy.Base.Pattern.GlobalObject<Style>
+    public class Style : Energy.Base.Pattern.GlobalObject<Style>
     {
         /// <summary>
         /// Identity column type

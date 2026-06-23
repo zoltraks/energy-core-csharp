@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Energy.Base
 {
-    public class Table: List<Energy.Base.Record>
+    public class Table : List<Energy.Base.Record>
     {
         public Energy.Base.Record New()
         {

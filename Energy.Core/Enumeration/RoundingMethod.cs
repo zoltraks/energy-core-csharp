@@ -41,13 +41,13 @@ namespace Energy.Enumeration
         /// Do you remember that "5/4" option in vintage calculators?
         /// </summary>
         HalfDown = 5,
-        
+
         /// <summary>
         /// Round to Even (Banker's Rounding)
         /// Example: 7.5 rounds up to 8 (because 8 is an even number) but 6.5 rounds down to 6 (because 6 is an even number).
         /// </summary>
         ToEven = 2,
-        
+
         /// <summary>
         /// Round to Odd.
         /// Example: 7.5 rounds down to 7 (because 7 is an odd number) but 6.5 rounds up to 7 (because 7 is an odd number).

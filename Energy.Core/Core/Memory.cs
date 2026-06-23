@@ -7,7 +7,7 @@
 //
 #define CFNET
 #else
-    //
+//
 #endif
 
 using System;

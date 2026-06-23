@@ -8,7 +8,7 @@ namespace Energy.Base
     /// <summary>
     /// Class used to represent URL (Uniform Resource Locator).
     /// </summary>
-    public class Url: Energy.Interface.ICopy<Url>
+    public class Url : Energy.Interface.ICopy<Url>
     {
         #region Field
 
@@ -753,7 +753,7 @@ namespace Energy.Base
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static bool IsUnreserved(char c) 
+        public static bool IsUnreserved(char c)
         {
             return false
                 || c >= 0x41 && c <= 0x5a     // capital letter

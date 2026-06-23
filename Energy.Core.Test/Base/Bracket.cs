@@ -84,7 +84,7 @@ namespace Energy.Core.Test.Base
         public void Bracket_Array_GetMatchExpression()
         {
             var array = new Energy.Base.Bracket.Array();
-            
+
             // Empty array
             Assert.AreEqual("", array.GetMatchExpression());
 
@@ -140,7 +140,7 @@ namespace Energy.Core.Test.Base
         public void Bracket_ArrayOperations()
         {
             var array = new Energy.Base.Bracket.Array();
-            
+
             // Add brackets
             array.Add(new Energy.Base.Bracket("{}"));
             array.Add(new Energy.Base.Bracket("[]"));

@@ -8,7 +8,7 @@ namespace Energy.Query.Dialect
     /// <summary>
     /// Microsoft SQL Server
     /// </summary>
-    public class SQLSERVER: Energy.Interface.IDialect
+    public class SQLSERVER : Energy.Interface.IDialect
     {
         public Format Format { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
 

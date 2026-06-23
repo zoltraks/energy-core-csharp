@@ -9,7 +9,7 @@ namespace Energy.Core
     /// Shell related classes including command line options
     /// </summary>
     public class Shell
-    {        
+    {
         #region OptionStyle
 
         public class OptionStyle
@@ -283,9 +283,9 @@ namespace Energy.Core
 
         #region Parameter
 
-        public class Parameter: Energy.Attribute.Command.OptionAttribute
+        public class Parameter : Energy.Attribute.Command.OptionAttribute
         {
-            public class List: System.Collections.Generic.List<Parameter>
+            public class List : System.Collections.Generic.List<Parameter>
             {
                 public Parameter Find(string name)
                 {
@@ -316,7 +316,7 @@ namespace Energy.Core
                             continue;
                         if (this[i].IsLongEqual(name))
                             list.Add(this[i]);
-                    }                    
+                    }
                     for (int i = 0; i < Count; i++)
                     {
                         if (list.Contains(this[i]))

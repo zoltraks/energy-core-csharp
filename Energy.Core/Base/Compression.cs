@@ -402,7 +402,7 @@ namespace Energy.Base
                     int lastOffset = INITIAL_OFFSET;
                     int prevNode = previous;
 
-                    for (int node = _arena[prevNode].Chain; node != -1; )
+                    for (int node = _arena[prevNode].Chain; node != -1;)
                     {
                         int thisNode = node;
                         node = _arena[node].Chain;

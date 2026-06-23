@@ -91,7 +91,7 @@ namespace Energy.Core.Test.Base
             // Test delegate chaining with multiple functions
             Energy.Base.Anonymous.Function<int, int> multiplyBy2 = (int x) => x * 2;
             Energy.Base.Anonymous.Function<int, int> add10 = (int x) => x + 10;
-            
+
             // Chain delegates - only the last delegate's return value is used
             Energy.Base.Anonymous.Function<int, int> chained = multiplyBy2 + add10;
             int result = chained(5); // Should execute both but return only add10 result: 5+10=15

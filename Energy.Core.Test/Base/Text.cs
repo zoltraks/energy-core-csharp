@@ -32,7 +32,7 @@ namespace Energy.Core.Test.Base
             a3 = new string[] {
                 null,
                 "A",
-                "" + '\0' + 'X' + '\0', 
+                "" + '\0' + 'X' + '\0',
                 "",
                 "" + (char)(2) + '-' + (char)(3),
                 null,

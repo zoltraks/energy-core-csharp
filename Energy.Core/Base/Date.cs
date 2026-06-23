@@ -9,7 +9,7 @@ namespace Energy.Base
         public short Year;
 
         public byte Month;
-        
+
         public byte Day;
 
         public sbyte Zone;

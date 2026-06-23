@@ -57,7 +57,7 @@ namespace Energy.Core
         /// <summary>
         /// Logger
         /// </summary>
-        public class Logger: Energy.Interface.ILogger
+        public class Logger : Energy.Interface.ILogger
         {
             #region Destination
 
@@ -199,7 +199,7 @@ namespace Energy.Core
             #endregion
 
             #region Clean
-         
+
             /// <summary>
             /// Remove entries that were sucesfully written to all destinations.
             /// If no destination set, all entries will be removed.
@@ -236,7 +236,7 @@ namespace Energy.Core
                     }
                 }
             }
-           
+
             #endregion
 
             #region Add
@@ -959,7 +959,7 @@ namespace Energy.Core
                     }
                     else
                     {
-                        Thread thread = new Thread(() => { WriteUnsafe(log); }) 
+                        Thread thread = new Thread(() => { WriteUnsafe(log); })
                         {
                             IsBackground = true,
                         };

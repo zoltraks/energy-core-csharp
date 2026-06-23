@@ -42,26 +42,29 @@ namespace Energy.Query
         {
             get
             {
-				return _Dialect;
+                return _Dialect;
             }
             set
             {
-				_Dialect = value;
+                _Dialect = value;
             }
         }
 
-		private Energy.Query.Format _Format;
+        private Energy.Query.Format _Format;
 
-		public Energy.Query.Format Format {
-			get {
-				if (_Format == null)
-					_Format = (Energy.Query.Format)Dialect;
-				return _Format;
-			}
-			set {
-				_Format = value;
-			}
-		}
+        public Energy.Query.Format Format
+        {
+            get
+            {
+                if (_Format == null)
+                    _Format = (Energy.Query.Format)Dialect;
+                return _Format;
+            }
+            set
+            {
+                _Format = value;
+            }
+        }
 
         #region CREATE
 
@@ -77,22 +80,22 @@ namespace Energy.Query
 
         public virtual string CreateDescription(Energy.Source.Structure.Table table)
         {
-			throw new NotImplementedException ();
+            throw new NotImplementedException();
         }
 
         public virtual string CreateIndex(Energy.Source.Structure.Table table)
         {
-			throw new NotImplementedException ();
+            throw new NotImplementedException();
         }
 
         #endregion
 
         #region DROP
 
-		public virtual string DropTable(string table)
-		{
-			throw new NotImplementedException ();
-		}
+        public virtual string DropTable(string table)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

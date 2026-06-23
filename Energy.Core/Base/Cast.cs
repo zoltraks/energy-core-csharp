@@ -4147,7 +4147,8 @@ namespace Energy.Base
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
-            };
+            }
+            ;
             return list.ToArray();
         }
 
@@ -4179,7 +4180,8 @@ namespace Energy.Base
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
-            };
+            }
+            ;
             return list.ToArray();
         }
 
@@ -4195,7 +4197,8 @@ namespace Energy.Base
             {
                 list.Add((object)key);
                 list.Add((object)dictionary[key]);
-            };
+            }
+            ;
             return list.ToArray();
         }
 

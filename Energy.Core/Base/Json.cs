@@ -23,7 +23,7 @@ namespace Energy.Base
 
         #region Document
 
-        public class Document: JsonValue
+        public class Document : JsonValue
         {
             JsonValue _Root;
 

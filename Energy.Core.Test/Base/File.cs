@@ -13,11 +13,11 @@ namespace Energy.Core.Test.Base
             // Test with a simple approach - look for current directory files
             string currentDir = System.IO.Directory.GetCurrentDirectory();
             Debug.WriteLine($"Current directory: {currentDir}");
-            
+
             // Look for the project file in current directory
             string projectFile = Energy.Base.File.Locate("Energy.Core.Test", new string[] { currentDir }, new string[] { ".csproj" });
             Debug.WriteLine($"projectFile: {projectFile}");
-            
+
             // If that doesn't work, let's just test that the method doesn't crash
             // and returns null when file is not found
             string nonExistentFile = Energy.Base.File.Locate("NonExistentFile12345", new string[] { "." }, new string[] { ".xyz" });

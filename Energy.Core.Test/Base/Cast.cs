@@ -239,7 +239,7 @@ namespace Energy.Core.Test.Base
         {
             A,
             B,
-            AB=A|B,
+            AB = A | B,
         }
 
         [TestMethod]
@@ -969,7 +969,7 @@ namespace Energy.Core.Test.Base
             expect = 65469; // should 67 be considered instead of 65469?
             Assert.AreEqual(expect, result);
         }
-        
+
         [TestMethod]
         public void StringToInteger()
         {

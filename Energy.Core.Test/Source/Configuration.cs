@@ -10,7 +10,7 @@ namespace Energy.Core.Test.Source
         public void Configuration_DefaultValues()
         {
             var config = new Energy.Source.Configuration();
-            
+
             Assert.AreEqual(Energy.Enumeration.SqlDialect.ANSI, config.Dialect);
             Assert.AreEqual(0, config.Port);
             Assert.IsFalse(config.Encryption);
@@ -39,7 +39,7 @@ namespace Energy.Core.Test.Source
                 Timeout = 30,
                 Charset = "utf8"
             };
-            
+
             Assert.AreEqual(Energy.Enumeration.SqlDialect.MYSQL, config.Dialect);
             Assert.AreEqual("localhost", config.Server);
             Assert.AreEqual(3306, config.Port);
@@ -59,7 +59,7 @@ namespace Energy.Core.Test.Source
             {
                 Dialect = Energy.Enumeration.SqlDialect.SQLSERVER
             };
-            
+
             string connectionString = config.GetConnectionString();
             Assert.IsTrue(connectionString.Contains("Data Source=."));
             Assert.IsTrue(connectionString.Contains("Integrated Security=Yes"));
@@ -78,7 +78,7 @@ namespace Energy.Core.Test.Source
                 Password = "mypass",
                 Timeout = 15
             };
-            
+
             string connectionString = config.GetConnectionString();
             Assert.IsTrue(connectionString.Contains("Data Source=MYSERVER,1433"));
             Assert.IsTrue(connectionString.Contains("Initial Catalog=My Database"));
@@ -101,7 +101,7 @@ namespace Energy.Core.Test.Source
                 Password = "mysqlpass",
                 Encryption = true
             };
-            
+
             string connectionString = config.GetConnectionString();
             Assert.IsTrue(connectionString.Contains("Server=mysql.example.com"));
             Assert.IsTrue(connectionString.Contains("Port=3306"));
@@ -120,7 +120,7 @@ namespace Energy.Core.Test.Source
                 Server = "testserver",
                 Catalog = "testdb"
             };
-            
+
             string entityConnectionString = config.GetEntityConnectionString("System.Data.SqlClient");
             Assert.IsTrue(entityConnectionString.Contains("metadata=res://*"));
             Assert.IsTrue(entityConnectionString.Contains("provider=System.Data.SqlClient"));
@@ -132,22 +132,22 @@ namespace Energy.Core.Test.Source
         public void Configuration_GetDSNPrefix()
         {
             var config = new Energy.Source.Configuration();
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.MYSQL;
             Assert.AreEqual("mysql", config.GetDSNPrefix());
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.SQLSERVER;
             Assert.AreEqual("sqlsrv", config.GetDSNPrefix());
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.POSTGRESQL;
             Assert.AreEqual("pg", config.GetDSNPrefix());
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.ORACLE;
             Assert.AreEqual("oracle", config.GetDSNPrefix());
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.SQLITE;
             Assert.AreEqual("sqlite", config.GetDSNPrefix());
-            
+
             config.Dialect = Energy.Enumeration.SqlDialect.FIREBIRD;
             Assert.AreEqual("firebird", config.GetDSNPrefix());
         }
@@ -162,7 +162,7 @@ namespace Energy.Core.Test.Source
                 Port = 1433,
                 Catalog = "mydatabase"
             };
-            
+
             string result = config.ToString();
             Assert.IsTrue(result.Contains("sqlsrv:"));
             Assert.IsTrue(result.Contains("Server=myserver,1433"));
@@ -180,7 +180,7 @@ namespace Energy.Core.Test.Source
                 Catalog = "mysqldb",
                 Charset = "utf8mb4"
             };
-            
+
             string result = config.ToString();
             Assert.IsTrue(result.Contains("mysql:"));
             Assert.IsTrue(result.Contains("host=mysqlhost"));
@@ -197,7 +197,7 @@ namespace Energy.Core.Test.Source
                 Dialect = Energy.Enumeration.SqlDialect.SQLSERVER,
                 Server = "testserver"
             };
-            
+
             Assert.AreEqual(config.GetConnectionString(), config.ConnectionString);
         }
 
@@ -205,12 +205,12 @@ namespace Energy.Core.Test.Source
         public void Configuration_EmptyConfiguration()
         {
             var config = new Energy.Source.Configuration();
-            
+
             // Test with minimal configuration
             config.Dialect = Energy.Enumeration.SqlDialect.SQLITE;
             string connectionString = config.GetConnectionString();
             Assert.AreEqual("", connectionString);
-            
+
             string dsnPrefix = config.GetDSNPrefix();
             Assert.AreEqual("sqlite", dsnPrefix);
         }

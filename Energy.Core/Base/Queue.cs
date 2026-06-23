@@ -8,7 +8,7 @@ namespace Energy.Base
     /// Generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Queue<T>: IDisposable, Energy.Interface.IQueue<T>
+    public class Queue<T> : IDisposable, Energy.Interface.IQueue<T>
     {
         #region Constructor
 
@@ -506,7 +506,7 @@ namespace Energy.Base
     /// <summary>
     /// Non generic thread-safe class which can be used to implement FIFO (first-in first-out) queues.
     /// </summary>
-    public class Queue: Queue<object>
+    public class Queue : Queue<object>
     {
     }
 }

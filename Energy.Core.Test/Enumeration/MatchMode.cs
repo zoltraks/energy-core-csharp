@@ -33,19 +33,19 @@ namespace Energy.Core.Test.Enumeration
         {
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.MatchMode>("None", out var result));
             Assert.AreEqual(Energy.Enumeration.MatchMode.None, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.MatchMode>("Same", out result));
             Assert.AreEqual(Energy.Enumeration.MatchMode.Same, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.MatchMode>("Simple", out result));
             Assert.AreEqual(Energy.Enumeration.MatchMode.Simple, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.MatchMode>("Wild", out result));
             Assert.AreEqual(Energy.Enumeration.MatchMode.Wild, result);
-            
+
             Assert.IsTrue(Enum.TryParse<Energy.Enumeration.MatchMode>("Regex", out result));
             Assert.AreEqual(Energy.Enumeration.MatchMode.Regex, result);
-            
+
             Assert.IsFalse(Enum.TryParse<Energy.Enumeration.MatchMode>("InvalidMode", out result));
         }
 
@@ -55,7 +55,7 @@ namespace Energy.Core.Test.Enumeration
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.MatchMode)) as Energy.Enumeration.MatchMode[];
             Assert.IsNotNull(allValues);
             Assert.AreEqual(5, allValues.Length);
-            
+
             // Verify all modes are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.MatchMode.None));
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.MatchMode.Same));

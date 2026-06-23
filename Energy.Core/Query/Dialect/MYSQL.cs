@@ -6,7 +6,7 @@ using Energy.Source;
 
 namespace Energy.Query.Dialect
 {
-    public class MYSQL: Energy.Interface.IDialect
+    public class MYSQL : Energy.Interface.IDialect
     {
         public Energy.Query.Format Format { get; set; }
 
