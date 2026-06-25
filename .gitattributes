@@ -4,6 +4,14 @@
 * text=auto
 
 ###############################################################################
+# Compression reference fixtures are byte-exact and compared byte for byte by
+# the unit tests. They must never be line-ending normalized.
+###############################################################################
+Energy.Core.Test/Resources/ZX0_* binary
+Energy.Core.Test/Resources/LZ4_* binary
+Energy.Core.Test/Resources/LZSS_* binary
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by

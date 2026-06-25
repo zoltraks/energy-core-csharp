@@ -497,6 +497,157 @@ namespace Energy.Core.Test.Base
 
         #endregion
 
+        #region LZSS
+
+        private static Energy.Base.Compression.LZSS.Options LzssOptions(int offsetBits, int lengthBits, int minimumMatch, bool literalFirst, bool positionStartZero, bool forceLastLiteral)
+        {
+            Energy.Base.Compression.LZSS.Options options = new Energy.Base.Compression.LZSS.Options();
+            options.OffsetBits = offsetBits;
+            options.LengthBits = lengthBits;
+            options.MinimumMatch = minimumMatch;
+            options.LiteralFirst = literalFirst;
+            options.PositionStartZero = positionStartZero;
+            options.ForceLastLiteral = forceLastLiteral;
+            return options;
+        }
+
+        // Compress the plain fixture, assert it equals the reference fixture byte for
+        // byte, then assert that both the produced stream and the reference stream
+        // decode back to the original.
+        private void LzssFixtureCheck(string plainResource, string compressedResource, Energy.Base.Compression.LZSS.Options options)
+        {
+            byte[] plain = ReadEmbeddedResource(plainResource);
+            byte[] expectedCompressed = ReadEmbeddedResource(compressedResource);
+            Assert.IsNotNull(plain, plainResource + " should be embedded");
+            Assert.IsNotNull(expectedCompressed, compressedResource + " should be embedded");
+
+            byte[] actualCompressed = Energy.Base.Compression.LZSS.Compress(plain, options);
+            Assert.IsNotNull(actualCompressed, "LZSS compression should not return null");
+            CollectionAssert.AreEqual(expectedCompressed, actualCompressed, "LZSS output should match " + compressedResource + " byte for byte");
+
+            byte[] roundTrip = Energy.Base.Compression.LZSS.Decompress(actualCompressed, options);
+            Assert.IsNotNull(roundTrip, "LZSS decompression should not return null");
+            CollectionAssert.AreEqual(plain, roundTrip, "Round-trip should reproduce " + plainResource);
+
+            byte[] fixtureDecompressed = Energy.Base.Compression.LZSS.Decompress(expectedCompressed, options);
+            Assert.IsNotNull(fixtureDecompressed, "Decompressing the reference fixture should not return null");
+            CollectionAssert.AreEqual(plain, fixtureDecompressed, "Reference fixture should decode to " + plainResource);
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_DefaultFixtures()
+        {
+            // Default 8-bit preset (offset 4, length 4, minimum match 2), byte-for-byte
+            // against the reference lzss-sap encoder for several inputs.
+            Energy.Base.Compression.LZSS.Options options = LzssOptions(4, 4, 2, true, false, true);
+            LzssFixtureCheck("Resources.LZSS_HELLO.bin", "Resources.LZSS_HELLO.lz8", options);
+            LzssFixtureCheck("Resources.LZSS_PATTERN.bin", "Resources.LZSS_PATTERN.lz8", options);
+            LzssFixtureCheck("Resources.LZSS_REGLOG.bin", "Resources.LZSS_REGLOG.lz8", options);
+            LzssFixtureCheck("Resources.LZSS_RANDOM.bin", "Resources.LZSS_RANDOM.lz8", options);
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_WideFixtures()
+        {
+            // 12-bit preset exercises the half-byte match path; 16-bit preset exercises
+            // the two-byte match path and the maximum-length wrap.
+            LzssFixtureCheck("Resources.LZSS_BIG.bin", "Resources.LZSS_BIG.lz12", LzssOptions(7, 5, 2, true, false, true));
+            LzssFixtureCheck("Resources.LZSS_BIG.bin", "Resources.LZSS_BIG.lz16", LzssOptions(8, 8, 1, true, false, true));
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_DefaultOverloadMatchesPreset()
+        {
+            // The parameterless overloads must behave like the explicit default preset.
+            byte[] plain = ReadEmbeddedResource("Resources.LZSS_HELLO.bin");
+            byte[] expectedCompressed = ReadEmbeddedResource("Resources.LZSS_HELLO.lz8");
+
+            byte[] compressed = Energy.Base.Compression.LZSS.Compress(plain);
+            Assert.IsNotNull(compressed, "Default compression should not return null");
+            CollectionAssert.AreEqual(expectedCompressed, compressed, "Default overload should match the 8-bit fixture");
+
+            byte[] roundTrip = Energy.Base.Compression.LZSS.Decompress(compressed);
+            Assert.IsNotNull(roundTrip, "Default decompression should not return null");
+            CollectionAssert.AreEqual(plain, roundTrip, "Default overload round-trip should reproduce the original");
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_RoundTrip()
+        {
+            // Round-trip a range of inputs across all presets and both format versions.
+            Energy.Base.Compression.LZSS.Options[] presets = new Energy.Base.Compression.LZSS.Options[]
+            {
+                LzssOptions(4, 4, 2, true, false, true),    // 8-bit current
+                LzssOptions(7, 5, 2, true, false, true),    // 12-bit current
+                LzssOptions(8, 8, 1, true, false, true),    // 16-bit current
+                LzssOptions(4, 4, 2, false, true, true),    // 8-bit old format
+                LzssOptions(4, 4, 2, true, false, false),   // no forced last literal
+            };
+
+            byte[][] inputs = new byte[][]
+            {
+                new byte[] { 65 },
+                System.Text.Encoding.ASCII.GetBytes("ABABABABABABABABABABAB"),
+                System.Text.Encoding.ASCII.GetBytes("The quick brown fox. The quick brown fox. The quick brown fox."),
+                BuildRepeating(2000),
+                BuildPseudoRandom(1500),
+            };
+
+            for (int p = 0; p < presets.Length; p++)
+            {
+                for (int i = 0; i < inputs.Length; i++)
+                {
+                    byte[] compressed = Energy.Base.Compression.LZSS.Compress(inputs[i], presets[p]);
+                    Assert.IsNotNull(compressed, "Compression should not return null");
+                    byte[] decompressed = Energy.Base.Compression.LZSS.Decompress(compressed, presets[p]);
+                    Assert.IsNotNull(decompressed, "Decompression should not return null");
+                    CollectionAssert.AreEqual(inputs[i], decompressed, "Round-trip should reproduce input " + i + " for preset " + p);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_NullAndEmpty()
+        {
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(null), "Compressing null should return null");
+            Assert.IsNull(Energy.Base.Compression.LZSS.Decompress(null), "Decompressing null should return null");
+
+            byte[] compressedEmpty = Energy.Base.Compression.LZSS.Compress(new byte[0]);
+            Assert.IsNotNull(compressedEmpty, "Compressing empty should not return null");
+            Assert.AreEqual(0, compressedEmpty.Length, "Compressing empty should return empty");
+
+            byte[] decompressedEmpty = Energy.Base.Compression.LZSS.Decompress(new byte[0]);
+            Assert.IsNotNull(decompressedEmpty, "Decompressing empty should not return null");
+            Assert.AreEqual(0, decompressedEmpty.Length, "Decompressing empty should return empty");
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_InvalidOptions()
+        {
+            byte[] data = System.Text.Encoding.ASCII.GetBytes("some data to compress");
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, LzssOptions(13, 4, 2, true, false, true)), "Offset bits above 12 should fail");
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, LzssOptions(4, 2, 2, true, false, true)), "Total bits below 8 should fail");
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, LzssOptions(4, 4, 0, true, false, true)), "Minimum match below 1 should fail");
+        }
+
+        private static byte[] BuildRepeating(int length)
+        {
+            byte[] data = new byte[length];
+            for (int i = 0; i < length; i++)
+                data[i] = (byte)(65 + (i % 13));
+            return data;
+        }
+
+        private static byte[] BuildPseudoRandom(int length)
+        {
+            byte[] data = new byte[length];
+            Random random = new Random(7);
+            random.NextBytes(data);
+            return data;
+        }
+
+        #endregion
+
         // .NET 2.0 compatible file reading method
         private byte[] ReadAllBytes(string path)
         {

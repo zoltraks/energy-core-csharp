@@ -976,5 +976,561 @@ namespace Energy.Base
         }
 
         #endregion
+
+        #region LZSS
+
+        /// <summary>
+        /// LZSS block compression and decompression.
+        /// <br/><br/>
+        /// Implements the LZSS variant used by the Atari SAP-R compressor (dmsc/lzss-sap), operating on a single byte stream.
+        /// <br/><br/>
+        /// The encoder performs an optimal parse, so for a given input and parameters it produces a stream that is bit-for-bit compatible with the reference per-stream encoding.
+        /// </summary>
+        public class LZSS
+        {
+            #region Options
+
+            /// <summary>
+            /// LZSS format parameters.
+            /// <br/><br/>
+            /// A raw LZSS stream carries no parameter header, so Decompress must use the same options that were used to Compress.
+            /// </summary>
+            public class Options
+            {
+                /// <summary>Number of bits used to encode a match offset (0 to 12)</summary>
+                public int OffsetBits;
+
+                /// <summary>Number of bits used to encode a match length (2 or more, with offset bits summing to 8 through 16)</summary>
+                public int LengthBits;
+
+                /// <summary>Minimum match length (1 to 16)</summary>
+                public int MinimumMatch;
+
+                /// <summary>Force the stream to end in a literal so a decoder can detect the end</summary>
+                public bool ForceLastLiteral;
+
+                /// <summary>Store the first byte as a literal and start matching at the second byte</summary>
+                public bool LiteralFirst;
+
+                /// <summary>Base match positions at zero instead of the maximum offset (older format)</summary>
+                public bool PositionStartZero;
+
+                /// <summary>
+                /// Create options with the default 8-bit preset (offset 4 bits, length 4 bits, minimum match 2)
+                /// </summary>
+                public Options()
+                {
+                    OffsetBits = 4;
+                    LengthBits = 4;
+                    MinimumMatch = 2;
+                    ForceLastLiteral = true;
+                    LiteralFirst = true;
+                    PositionStartZero = false;
+                }
+            }
+
+            private static void ValidateOptions(Options options)
+            {
+                if (options == null)
+                    throw new ArgumentNullException("options");
+                int total = options.OffsetBits + options.LengthBits;
+                if (options.OffsetBits < 0 || options.OffsetBits > 12)
+                    throw new ArgumentException("LZSS offset bits must be from 0 to 12");
+                if (options.LengthBits < 2 || options.LengthBits > 16)
+                    throw new ArgumentException("LZSS length bits must be from 2 to 16");
+                if (total < 8 || total > 16)
+                    throw new ArgumentException("LZSS total match bits (offset + length) must be from 8 to 16");
+                if (options.MinimumMatch < 1 || options.MinimumMatch > 16)
+                    throw new ArgumentException("LZSS minimum match length must be from 1 to 16");
+            }
+
+            #endregion
+
+            #region Parser
+
+            // Per-call optimal parser. Holds the cost and match tables in instance
+            // fields so a single Compress call performs all its bookkeeping without
+            // any shared mutable static state, which keeps Compress thread-safe.
+            // The selection logic mirrors the reference lzss-sap optimizer exactly,
+            // so the encoded output stays byte-identical.
+            private sealed class Parser
+            {
+                private readonly byte[] _data;
+                private readonly int _size;
+                private readonly int _minMatch;
+                private readonly int _maxOffset;
+                private readonly int _maxLength;
+                private readonly int _bitsLiteral;
+                private readonly int _bitsMatch;
+
+                public int[] Bits;
+                public int[] MatchLength;
+                public int[] MatchPos;
+
+                // Mirrors the reference lz->size: transiently shortened by one while a
+                // forced last literal is computed, then restored.
+                private int _length;
+
+                public Parser(byte[] data, int size, int offsetBits, int lengthBits, int minMatch)
+                {
+                    _data = data;
+                    _size = size;
+                    _minMatch = minMatch;
+                    _maxOffset = 1 << offsetBits;
+                    _maxLength = minMatch + (1 << lengthBits) - 1;
+                    _bitsLiteral = 1 + 8;
+                    _bitsMatch = 1 + offsetBits + lengthBits;
+                    Bits = new int[size];
+                    MatchLength = new int[size];
+                    MatchPos = new int[size];
+                    _length = size;
+                }
+
+                private int GetMatchLength(int a, int b, int max)
+                {
+                    for (int i = 0; i < max; i++)
+                    {
+                        if (_data[a + i] != _data[b + i])
+                            return i;
+                    }
+                    return max;
+                }
+
+                // Return the longest match length at pos within the offset window, and
+                // its distance through matchPos.
+                private int Match(int pos, out int matchPos)
+                {
+                    matchPos = 0;
+                    int remaining = _length - pos;
+                    int maxLen = _maxLength < remaining ? _maxLength : remaining;
+                    int best = 0;
+                    int start = pos - _maxOffset;
+                    if (start < 0)
+                        start = 0;
+                    for (int i = start; i < pos; i++)
+                    {
+                        int ml = GetMatchLength(pos, i, maxLen);
+                        if (ml > best)
+                        {
+                            best = ml;
+                            matchPos = pos - i;
+                        }
+                    }
+                    return best;
+                }
+
+                // Compute the optimal parse from the end of the stream. When
+                // lastLiteral is set, the final byte is forced to be a literal.
+                public void Backfill(bool lastLiteral)
+                {
+                    int lastBits = 0;
+                    if (_size == 0)
+                        return;
+                    _length = _size;
+                    if (lastLiteral)
+                    {
+                        MatchLength[_length - 1] = 0;
+                        Bits[_length - 1] = _bitsLiteral;
+                        lastBits = _bitsLiteral;
+                        if (_length == 1)
+                            return;
+                        _length--;
+                    }
+                    MatchLength[_length - 1] = 0;
+                    Bits[_length - 1] = _bitsLiteral + lastBits;
+                    for (int pos = _length - 2; pos >= 0; pos--)
+                    {
+                        int mp;
+                        int ml = Match(pos, out mp);
+                        int best = Bits[pos + 1] + _bitsLiteral;
+                        Bits[pos] = best;
+                        MatchLength[pos] = 0;
+                        MatchPos[pos] = mp;
+                        for (int l = ml; l >= _minMatch; l--)
+                        {
+                            int b = 0;
+                            if (pos + l < _length)
+                                b = Bits[pos + l] + _bitsMatch;
+                            else if (pos + l == _length)
+                                b = _bitsMatch + lastBits;
+                            if (b < best)
+                            {
+                                best = b;
+                                Bits[pos] = best;
+                                MatchLength[pos] = l;
+                                MatchPos[pos] = mp;
+                            }
+                        }
+                    }
+                    if (lastLiteral)
+                        _length++;
+                }
+
+                // Return true if walking the parse would end the stream with a match.
+                public bool LastIsMatch(bool literalFirst)
+                {
+                    bool last = false;
+                    int pos = literalFirst ? 1 : 0;
+                    while (pos < _size)
+                    {
+                        int mlen = MatchLength[pos];
+                        if (mlen < _minMatch)
+                        {
+                            last = false;
+                            pos++;
+                        }
+                        else
+                        {
+                            pos += mlen;
+                            last = true;
+                        }
+                    }
+                    return last;
+                }
+            }
+
+            #endregion
+
+            #region Writer
+
+            // Reproduces the reference bit buffer semantics exactly: a lazily
+            // allocated flag byte filled least-significant-bit first, whole bytes
+            // appended at the growing end, and a lazily allocated half-byte holder
+            // filled low nibble then high nibble. This buffer management is
+            // load-bearing for byte-identical output.
+            private sealed class Writer
+            {
+                private byte[] _buffer;
+                private int _length;
+                private int _bitNum;
+                private int _bitPos;
+                private int _halfPos;
+
+                public Writer(int capacity)
+                {
+                    if (capacity < 16)
+                        capacity = 16;
+                    _buffer = new byte[capacity];
+                    _length = 0;
+                    _bitNum = 0;
+                    _bitPos = -1;
+                    _halfPos = -1;
+                }
+
+                private void Ensure(int extra)
+                {
+                    if (_length + extra <= _buffer.Length)
+                        return;
+                    int size = _buffer.Length;
+                    while (size < _length + extra)
+                        size <<= 1;
+                    byte[] grown = new byte[size];
+                    System.Array.Copy(_buffer, grown, _length);
+                    _buffer = grown;
+                }
+
+                public void AddBit(int bit)
+                {
+                    if (_bitPos < 0)
+                    {
+                        Ensure(1);
+                        _bitPos = _length;
+                        _bitNum = 0;
+                        _length++;
+                        _buffer[_bitPos] = 0;
+                    }
+                    if (bit != 0)
+                        _buffer[_bitPos] |= (byte)(1 << _bitNum);
+                    _bitNum++;
+                    if (_bitNum == 8)
+                    {
+                        _bitPos = -1;
+                        _bitNum = 0;
+                    }
+                }
+
+                public void AddByte(int value)
+                {
+                    Ensure(1);
+                    _buffer[_length++] = (byte)value;
+                }
+
+                public void AddHalfByte(int value)
+                {
+                    if (_halfPos < 0)
+                    {
+                        Ensure(1);
+                        _halfPos = _length;
+                        _length++;
+                        _buffer[_halfPos] = (byte)(value & 0x0F);
+                    }
+                    else
+                    {
+                        _buffer[_halfPos] |= (byte)(value << 4);
+                        _halfPos = -1;
+                    }
+                }
+
+                public byte[] ToArray()
+                {
+                    byte[] result = new byte[_length];
+                    System.Array.Copy(_buffer, result, _length);
+                    return result;
+                }
+            }
+
+            #endregion
+
+            #region Compress
+
+            /// <summary>
+            /// Compress data using the LZSS block format with the default 8-bit preset.
+            /// </summary>
+            /// <param name="data">Uncompressed input data</param>
+            /// <returns>Compressed LZSS stream</returns>
+            public static byte[] Compress(byte[] data)
+            {
+                return Compress(data, new Options());
+            }
+
+            /// <summary>
+            /// Compress data using the LZSS block format with the given parameters.
+            /// </summary>
+            /// <param name="data">Uncompressed input data</param>
+            /// <param name="options">Format parameters</param>
+            /// <returns>Compressed LZSS stream</returns>
+            public static byte[] Compress(byte[] data, Options options)
+            {
+                if (data == null)
+                {
+                    return null;
+                }
+                if (data.Length == 0)
+                {
+                    return new byte[0];
+                }
+
+                try
+                {
+                    ValidateOptions(options);
+
+                    int size = data.Length;
+                    Parser parser = new Parser(data, size, options.OffsetBits, options.LengthBits, options.MinimumMatch);
+                    parser.Backfill(false);
+                    if (options.ForceLastLiteral && parser.LastIsMatch(options.LiteralFirst))
+                        parser.Backfill(true);
+
+                    int maxOffset = 1 << options.OffsetBits;
+                    int positionBase = options.PositionStartZero ? 1 : 2;
+                    int total = options.OffsetBits + options.LengthBits;
+
+                    Writer writer = new Writer(size + 16);
+                    if (options.LiteralFirst)
+                        writer.AddByte(data[0]);
+
+                    int lastPos = -1;
+                    for (int pos = options.LiteralFirst ? 1 : 0; pos < size; pos++)
+                    {
+                        if (pos <= lastPos)
+                            continue;
+
+                        int mlen = parser.MatchLength[pos];
+                        if (mlen < options.MinimumMatch)
+                        {
+                            writer.AddBit(1);
+                            writer.AddByte(data[pos]);
+                            lastPos = pos;
+                        }
+                        else
+                        {
+                            int codePos = (pos - parser.MatchPos[pos] - positionBase) & (maxOffset - 1);
+                            int codeLen = mlen - options.MinimumMatch;
+                            writer.AddBit(0);
+                            if (total <= 8)
+                            {
+                                writer.AddByte((codePos << options.LengthBits) + codeLen);
+                            }
+                            else if (total <= 12)
+                            {
+                                int shift = 8 - options.OffsetBits;
+                                writer.AddByte((codePos << shift) + (codeLen & ((1 << shift) - 1)));
+                                writer.AddHalfByte(codeLen >> shift);
+                            }
+                            else
+                            {
+                                int code = ((codeLen + 1) << options.OffsetBits) + codePos;
+                                writer.AddByte(code & 0xFF);
+                                writer.AddByte(code >> 8);
+                            }
+                            lastPos = pos + mlen - 1;
+                        }
+                    }
+
+                    return writer.ToArray();
+                }
+                catch (Exception exception)
+                {
+                    Energy.Core.Bug.Catch(exception);
+                    return null;
+                }
+            }
+
+            #endregion
+
+            #region Decompress
+
+            private static byte[] EnsureCapacity(byte[] buffer, int required)
+            {
+                if (required <= buffer.Length)
+                    return buffer;
+                int size = buffer.Length < 256 ? 256 : buffer.Length;
+                while (size < required)
+                    size <<= 1;
+                byte[] grown = new byte[size];
+                System.Array.Copy(buffer, grown, buffer.Length);
+                return grown;
+            }
+
+            /// <summary>
+            /// Decompress data previously compressed with the LZSS block format using the default 8-bit preset.
+            /// </summary>
+            /// <param name="data">Compressed LZSS stream</param>
+            /// <returns>Decompressed original data</returns>
+            public static byte[] Decompress(byte[] data)
+            {
+                return Decompress(data, new Options());
+            }
+
+            /// <summary>
+            /// Decompress data previously compressed with the LZSS block format using the given parameters.
+            /// <br/><br/>
+            /// The parameters must match those used to compress, because a raw LZSS stream carries no header.
+            /// </summary>
+            /// <param name="data">Compressed LZSS stream</param>
+            /// <param name="options">Format parameters, matching those used to compress</param>
+            /// <returns>Decompressed original data</returns>
+            public static byte[] Decompress(byte[] data, Options options)
+            {
+                if (data == null)
+                {
+                    return null;
+                }
+                if (data.Length == 0)
+                {
+                    return new byte[0];
+                }
+
+                try
+                {
+                    ValidateOptions(options);
+
+                    int maxOffset = 1 << options.OffsetBits;
+                    int total = options.OffsetBits + options.LengthBits;
+                    int positionBase = options.PositionStartZero ? 1 : 2;
+                    int lengthMask = (1 << options.LengthBits) - 1;
+
+                    byte[] output = new byte[256];
+                    int outputLength = 0;
+
+                    int cursor = 0;
+                    int bitBuffer = 0;
+                    int bitCount = 0;
+                    int halfBuffer = 0;
+                    bool halfPending = false;
+
+                    if (options.LiteralFirst)
+                    {
+                        output = EnsureCapacity(output, outputLength + 1);
+                        output[outputLength++] = data[cursor++];
+                    }
+
+                    while (cursor < data.Length)
+                    {
+                        if (bitCount == 0)
+                        {
+                            bitBuffer = data[cursor++];
+                            bitCount = 8;
+                        }
+                        int flag = bitBuffer & 1;
+                        bitBuffer >>= 1;
+                        bitCount--;
+
+                        if (flag != 0)
+                        {
+                            output = EnsureCapacity(output, outputLength + 1);
+                            output[outputLength++] = data[cursor++];
+                            continue;
+                        }
+
+                        int codePos;
+                        int codeLen;
+                        if (total <= 8)
+                        {
+                            int code = data[cursor++];
+                            codeLen = code & lengthMask;
+                            codePos = code >> options.LengthBits;
+                        }
+                        else if (total <= 12)
+                        {
+                            int shift = 8 - options.OffsetBits;
+                            int low = data[cursor++];
+                            int high;
+                            if (!halfPending)
+                            {
+                                halfBuffer = data[cursor++];
+                                halfPending = true;
+                                high = halfBuffer & 0x0F;
+                            }
+                            else
+                            {
+                                high = halfBuffer >> 4;
+                                halfPending = false;
+                            }
+                            codePos = low >> shift;
+                            codeLen = (low & ((1 << shift) - 1)) | (high << shift);
+                        }
+                        else
+                        {
+                            // The match code stores (length code + 1) in the high
+                            // bits, which can equal 2^LengthBits and wrap to zero in
+                            // the stored field. A zero field therefore means the
+                            // maximum length code, matching the reference player.
+                            int low = data[cursor++];
+                            int high = data[cursor++];
+                            int code = low | (high << 8);
+                            int lengthLimit = 1 << options.LengthBits;
+                            int field = (code >> options.OffsetBits) & (lengthLimit - 1);
+                            codePos = code & (maxOffset - 1);
+                            codeLen = (field == 0 ? lengthLimit : field) - 1;
+                        }
+
+                        int matchLength = codeLen + options.MinimumMatch;
+                        int distance = (outputLength - codePos - positionBase) % maxOffset;
+                        if (distance <= 0)
+                            distance += maxOffset;
+
+                        output = EnsureCapacity(output, outputLength + matchLength);
+                        int source = outputLength - distance;
+                        for (int i = 0; i < matchLength; i++)
+                            output[outputLength++] = output[source++];
+                    }
+
+                    if (outputLength == output.Length)
+                        return output;
+                    byte[] result = new byte[outputLength];
+                    System.Array.Copy(output, result, outputLength);
+                    return result;
+                }
+                catch (Exception exception)
+                {
+                    Energy.Core.Bug.Catch(exception);
+                    return null;
+                }
+            }
+
+            #endregion
+        }
+
+        #endregion
     }
 }

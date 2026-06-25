@@ -24,6 +24,8 @@ This document defines the rules and process only. It does not list the current v
 
 ## Version Bump Process
 
+Only bump the version when explicitly instructed to do so. A version bump is a release action, not part of implementing a feature or fix. Do not bump the version as a side effect of any other task.
+
 When bumping the version, update all three version properties together in both project files:
 
 **Energy.Core/Energy.Core.csproj**

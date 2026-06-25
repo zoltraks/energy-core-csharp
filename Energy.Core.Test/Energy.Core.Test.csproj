@@ -5,9 +5,9 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>26.6.0</Version>
-    <FileVersion>26.6.0</FileVersion>
-    <AssemblyVersion>26.6.0</AssemblyVersion>
+    <Version>26.6.1</Version>
+    <FileVersion>26.6.1</FileVersion>
+    <AssemblyVersion>26.6.1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -60,6 +60,17 @@
     <EmbeddedResource Include="Resources\LZ4_RANDOM_ORIGINAL.bin" />
     <EmbeddedResource Include="Resources\LZ4_LARGE.bin" />
     <EmbeddedResource Include="Resources\LZ4_LARGE_ORIGINAL.bin" />
+    <EmbeddedResource Include="Resources\LZSS_HELLO.bin" />
+    <EmbeddedResource Include="Resources\LZSS_HELLO.lz8" />
+    <EmbeddedResource Include="Resources\LZSS_PATTERN.bin" />
+    <EmbeddedResource Include="Resources\LZSS_PATTERN.lz8" />
+    <EmbeddedResource Include="Resources\LZSS_REGLOG.bin" />
+    <EmbeddedResource Include="Resources\LZSS_REGLOG.lz8" />
+    <EmbeddedResource Include="Resources\LZSS_RANDOM.bin" />
+    <EmbeddedResource Include="Resources\LZSS_RANDOM.lz8" />
+    <EmbeddedResource Include="Resources\LZSS_BIG.bin" />
+    <EmbeddedResource Include="Resources\LZSS_BIG.lz12" />
+    <EmbeddedResource Include="Resources\LZSS_BIG.lz16" />
   </ItemGroup>
 
 </Project>

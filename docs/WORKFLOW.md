@@ -74,7 +74,7 @@ When implementing a new feature or fix:
 - Create a change request in `docs/change/[version]/[short-title].md` describing what and why. Use the template in `docs/template/change-request-template.md`.
 - Create an implementation plan in `docs/plan/[version]/[short-title]-implementation.md` before modifying source code. Use the template in `docs/template/implementation-plan-template.md`.
 - Implement the change, update or add tests, and run the build and test loop.
-- The version value follows the rules in VERSIONING.md.
+- Do not bump the version as part of this cycle. Version bumps are a separate, explicit release step. See VERSIONING.md.
 
 Source code may only be modified after both documents exist, and only when implementation has been explicitly requested.
 
