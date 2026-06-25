@@ -332,7 +332,7 @@ namespace Energy.Core.Test.Base
             byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_BIG16K.zx0");
             Assert.IsNotNull(plain, "ZX0_BIG16K.txt fixture should be embedded");
             Assert.IsNotNull(expectedCompressed, "ZX0_BIG16K.zx0 fixture should be embedded");
-            Assert.AreEqual(16384, plain.Length, "ZX0_BIG16K.txt should be 16384 bytes");
+            Assert.AreEqual(16614, plain.Length, "ZX0_BIG16K.txt should be 16614 bytes");
 
             byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(plain);
             Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");

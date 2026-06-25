@@ -436,9 +436,6 @@ namespace Energy.Base
 
         #region Trim
 
-        //private static readonly char[] whiteCharacters = new char[] { ' ', '\t', '\n', '\r', '\v', '\f', '\0' };
-        //private static readonly char[] WHITESPACE_CHARACTERS = new char[] { ' ', '\t', '\n', '\r', '\v', '\f' };
-
         /// <summary>
         /// Remove all trailing and leading whitespace characters from text.
         /// <br/><br/>
@@ -457,12 +454,6 @@ namespace Energy.Base
                 return text;
             }
             text = text.Trim();
-            //if (0 <= text.IndexOfAny(WHITESPACE_CHARACTERS))
-            //{
-            //    //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f', '\0');
-            //    //value = value.Trim(' ', '\t', '\n', '\r', '\v', '\f' );
-            //    text = text.Trim();
-            //}
             return text;
         }
 
@@ -487,21 +478,6 @@ namespace Energy.Base
                 list[i] = null == list[i] ? null : list[i].Trim();
             }
             return list;
-            //for (int i = -1 + list.Count; i >= 0; --i)
-            //{
-            //    if (string.IsNullOrEmpty(list[i]))
-            //    {
-            //        list.RemoveAt(i);
-            //        continue;
-            //    }
-            //    string trim = list[i].Trim();
-            //    if (0 == trim.Length)
-            //    {
-            //        list.RemoveAt(i);
-            //        continue;
-            //    }
-            //    list[i] = trim;
-            //}
         }
 
         /// <summary>

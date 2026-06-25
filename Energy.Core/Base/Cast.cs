@@ -42,6 +42,25 @@ namespace Energy.Base
 
         #endregion
 
+#if !NETCF
+        #region TryParseTruncated
+
+        // Parse already-normalised text to its integer part as a decimal, truncating
+        // toward zero. Shared by the StringToNullable* integer conversions so the parse
+        // and truncation behave identically across those types. The Compact Framework
+        // path is intentionally not routed here, because it parses and truncates
+        // differently to work within that runtime's reduced Math support.
+        private static bool TryParseTruncated(string value, NumberStyles numberStyles, out decimal number)
+        {
+            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out number))
+                return false;
+            number = number < 0 ? Math.Ceiling(number) : Math.Floor(number);
+            return true;
+        }
+
+        #endregion
+#endif
+
         #endregion
 
         #region As
@@ -1564,7 +1583,7 @@ namespace Energy.Base
 
         #endregion
 
-        #region UInt32
+        #region UInt64
 
         private static ulong RealStringToUInt64(string value, bool allowReal, bool allowOverflow)
         {
@@ -2820,10 +2839,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (round < byte.MinValue || round > byte.MaxValue)
+            if (_number < byte.MinValue || _number > byte.MaxValue)
                 return null;
             return (byte?)_number;
 #endif
@@ -2873,10 +2891,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (round < Int16.MinValue || round > Int16.MaxValue)
+            if (_number < Int16.MinValue || _number > Int16.MaxValue)
                 return null;
             return (Int16?)_number;
 #endif
@@ -2926,10 +2943,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (round < UInt16.MinValue || round > UInt16.MaxValue)
+            if (_number < UInt16.MinValue || _number > UInt16.MaxValue)
                 return null;
             return (UInt16?)_number;
 #endif
@@ -2979,10 +2995,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (round < 0 || round > UInt32.MaxValue)
+            if (_number < 0 || _number > UInt32.MaxValue)
                 return null;
             return (UInt32?)_number;
 #endif
@@ -3032,10 +3047,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var round = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (round < 0 || round > UInt64.MaxValue)
+            if (_number < 0 || _number > UInt64.MaxValue)
                 return null;
             return (UInt64?)_number;
 #endif
@@ -3085,10 +3099,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (floor < Int32.MinValue || floor > Int32.MaxValue)
+            if (_number < Int32.MinValue || _number > Int32.MaxValue)
                 return null;
             return (Int32?)_number;
 #endif
@@ -3138,10 +3151,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
             decimal _number;
 #if !NETCF
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (floor < Int64.MinValue || floor > Int64.MaxValue)
+            if (_number < Int64.MinValue || _number > Int64.MaxValue)
                 return null;
             return (Int64?)_number;
 #endif
@@ -3191,10 +3203,9 @@ namespace Energy.Base
             //numberStyles = NumberStyles.Any & ~NumberStyles.Currency;
 #if !NETCF
             decimal _number;
-            if (!decimal.TryParse(value, numberStyles, CultureInfo.InvariantCulture, out _number))
+            if (!TryParseTruncated(value, numberStyles, out _number))
                 return null;
-            var floor = _number < 0 ? Math.Ceiling(_number) : Math.Floor(_number);
-            if (floor < sbyte.MinValue || floor > sbyte.MaxValue)
+            if (_number < sbyte.MinValue || _number > sbyte.MaxValue)
                 return null;
             return (sbyte?)_number;
 #endif

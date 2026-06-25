@@ -98,7 +98,7 @@ namespace Energy.Core
                     {
                         if (_Default == null)
                         {
-                            lock (typeof(SuppressCodeList))
+                            lock (_DefaultLock)
                             {
                                 if (_Default == null)
                                 {

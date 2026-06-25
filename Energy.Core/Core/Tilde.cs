@@ -1591,7 +1591,7 @@ namespace Energy.Core
             }
             else
             {
-                if (message.Contains("{0}"))
+                if (Energy.Base.Text.Contains(message, "{0}"))
                 {
                     message = string.Format(message, defaultValue);
                 }
