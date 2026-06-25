@@ -54,7 +54,7 @@ namespace Energy.Core.Test.Enumeration
         {
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.MatchMode)) as Energy.Enumeration.MatchMode[];
             Assert.IsNotNull(allValues);
-            Assert.AreEqual(5, allValues.Length);
+            Assert.HasCount(5, allValues);
 
             // Verify all modes are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.MatchMode.None));

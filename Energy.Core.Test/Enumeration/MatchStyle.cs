@@ -49,7 +49,7 @@ namespace Energy.Core.Test.Enumeration
         {
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.MatchStyle)) as Energy.Enumeration.MatchStyle[];
             Assert.IsNotNull(allValues);
-            Assert.AreEqual(4, allValues.Length);
+            Assert.HasCount(4, allValues);
 
             // Verify all styles are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.MatchStyle.Any));

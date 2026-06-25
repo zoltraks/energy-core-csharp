@@ -67,7 +67,7 @@ namespace Energy.Core.Test.Enumeration
         {
             var allValues = Enum.GetValues(typeof(Energy.Enumeration.FormatType)) as Energy.Enumeration.FormatType[];
             Assert.IsNotNull(allValues);
-            Assert.AreEqual(8, allValues.Length);
+            Assert.HasCount(8, allValues);
 
             // Verify all types are present
             Assert.IsTrue(System.Array.Exists(allValues, x => x == Energy.Enumeration.FormatType.Plain));

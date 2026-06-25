@@ -36,13 +36,13 @@ namespace Energy.Core.Test.Enumeration
             var textType = Energy.Enumeration.BasicType.Text;
             var numberType = Energy.Enumeration.BasicType.Number;
 
-            Assert.IsTrue(textType == Energy.Enumeration.BasicType.Text);
-            Assert.IsFalse(textType == numberType);
-            Assert.IsTrue(textType != numberType);
+            Assert.AreEqual(Energy.Enumeration.BasicType.Text, textType);
+            Assert.AreNotEqual(numberType, textType);
+            Assert.AreNotEqual(numberType, textType);
 
             // Test ordering
-            Assert.IsTrue(textType < numberType);
-            Assert.IsTrue(numberType > textType);
+            Assert.IsLessThan((int)numberType, (int)textType);
+            Assert.IsGreaterThan((int)textType, (int)numberType);
         }
 
         [TestMethod]

@@ -1,0 +1,6 @@
+# MSTEST0032 flags assertions whose result is a compile-time constant. The tests
+# in this folder deliberately pin the numeric and string values of public
+# enumerations as a regression guard against accidental reordering or renaming,
+# so the "condition is always true" reported here is intentional by design.
+[*.cs]
+dotnet_diagnostic.MSTEST0032.severity = none

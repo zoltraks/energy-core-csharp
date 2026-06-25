@@ -37,7 +37,7 @@ namespace Energy.Core.Test.Base
         {
             Assert.AreEqual(123, new Energy.Base.Variant.Value(123).Object);
             Assert.AreEqual("hello", new Energy.Base.Variant.Value("hello").Object);
-            Assert.AreEqual(true, new Energy.Base.Variant.Value(true).Object);
+            Assert.IsTrue((bool?)new Energy.Base.Variant.Value(true).Object);
             Assert.IsNull(new Energy.Base.Variant.Value(null).Object);
         }
 

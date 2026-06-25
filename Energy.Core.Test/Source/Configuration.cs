@@ -61,8 +61,8 @@ namespace Energy.Core.Test.Source
             };
 
             string connectionString = config.GetConnectionString();
-            Assert.IsTrue(connectionString.Contains("Data Source=."));
-            Assert.IsTrue(connectionString.Contains("Integrated Security=Yes"));
+            Assert.Contains("Data Source=.", connectionString);
+            Assert.Contains("Integrated Security=Yes", connectionString);
         }
 
         [TestMethod]
@@ -80,12 +80,12 @@ namespace Energy.Core.Test.Source
             };
 
             string connectionString = config.GetConnectionString();
-            Assert.IsTrue(connectionString.Contains("Data Source=MYSERVER,1433"));
-            Assert.IsTrue(connectionString.Contains("Initial Catalog=My Database"));
-            Assert.IsTrue(connectionString.Contains("User ID=myuser"));
-            Assert.IsTrue(connectionString.Contains("Password=mypass"));
-            Assert.IsTrue(connectionString.Contains("Connect Timeout=15"));
-            Assert.IsFalse(connectionString.Contains("Integrated Security"));
+            Assert.Contains("Data Source=MYSERVER,1433", connectionString);
+            Assert.Contains("Initial Catalog=My Database", connectionString);
+            Assert.Contains("User ID=myuser", connectionString);
+            Assert.Contains("Password=mypass", connectionString);
+            Assert.Contains("Connect Timeout=15", connectionString);
+            Assert.DoesNotContain("Integrated Security", connectionString);
         }
 
         [TestMethod]
@@ -103,12 +103,12 @@ namespace Energy.Core.Test.Source
             };
 
             string connectionString = config.GetConnectionString();
-            Assert.IsTrue(connectionString.Contains("Server=mysql.example.com"));
-            Assert.IsTrue(connectionString.Contains("Port=3306"));
-            Assert.IsTrue(connectionString.Contains("Database=mydb"));
-            Assert.IsTrue(connectionString.Contains("Uid=mysqluser"));
-            Assert.IsTrue(connectionString.Contains("Pwd=mysqlpass"));
-            Assert.IsTrue(connectionString.Contains("Encrypt=true"));
+            Assert.Contains("Server=mysql.example.com", connectionString);
+            Assert.Contains("Port=3306", connectionString);
+            Assert.Contains("Database=mydb", connectionString);
+            Assert.Contains("Uid=mysqluser", connectionString);
+            Assert.Contains("Pwd=mysqlpass", connectionString);
+            Assert.Contains("Encrypt=true", connectionString);
         }
 
         [TestMethod]
@@ -122,10 +122,10 @@ namespace Energy.Core.Test.Source
             };
 
             string entityConnectionString = config.GetEntityConnectionString("System.Data.SqlClient");
-            Assert.IsTrue(entityConnectionString.Contains("metadata=res://*"));
-            Assert.IsTrue(entityConnectionString.Contains("provider=System.Data.SqlClient"));
-            Assert.IsTrue(entityConnectionString.Contains("provider connection string="));
-            Assert.IsTrue(entityConnectionString.Contains(config.GetConnectionString()));
+            Assert.Contains("metadata=res://*", entityConnectionString);
+            Assert.Contains("provider=System.Data.SqlClient", entityConnectionString);
+            Assert.Contains("provider connection string=", entityConnectionString);
+            Assert.Contains(config.GetConnectionString(), entityConnectionString);
         }
 
         [TestMethod]
@@ -164,9 +164,9 @@ namespace Energy.Core.Test.Source
             };
 
             string result = config.ToString();
-            Assert.IsTrue(result.Contains("sqlsrv:"));
-            Assert.IsTrue(result.Contains("Server=myserver,1433"));
-            Assert.IsTrue(result.Contains("Database=mydatabase"));
+            Assert.Contains("sqlsrv:", result);
+            Assert.Contains("Server=myserver,1433", result);
+            Assert.Contains("Database=mydatabase", result);
         }
 
         [TestMethod]
@@ -182,11 +182,11 @@ namespace Energy.Core.Test.Source
             };
 
             string result = config.ToString();
-            Assert.IsTrue(result.Contains("mysql:"));
-            Assert.IsTrue(result.Contains("host=mysqlhost"));
-            Assert.IsTrue(result.Contains("port=3306"));
-            Assert.IsTrue(result.Contains("dbname=mysqldb"));
-            Assert.IsTrue(result.Contains("charset=utf8mb4"));
+            Assert.Contains("mysql:", result);
+            Assert.Contains("host=mysqlhost", result);
+            Assert.Contains("port=3306", result);
+            Assert.Contains("dbname=mysqldb", result);
+            Assert.Contains("charset=utf8mb4", result);
         }
 
         [TestMethod]

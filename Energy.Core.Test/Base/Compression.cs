@@ -19,13 +19,13 @@ namespace Energy.Core.Test.Base
             // Compress
             byte[] compressedData = Energy.Base.Compression.Deflate.Compress(originalData);
             Assert.IsNotNull(compressedData, "Compressed data should not be null");
-            Assert.IsTrue(compressedData.Length > 0, "Compressed data should not be empty");
-            Assert.IsTrue(compressedData.Length < originalData.Length, "Compressed data should be smaller than original");
+            Assert.IsNotEmpty(compressedData, "Compressed data should not be empty");
+            Assert.IsLessThan(originalData.Length, compressedData.Length, "Compressed data should be smaller than original");
 
             // Decompress
             byte[] decompressedData = Energy.Base.Compression.Deflate.Decompress(compressedData);
             Assert.IsNotNull(decompressedData, "Decompressed data should not be null");
-            Assert.AreEqual(originalData.Length, decompressedData.Length, "Decompressed data should have same length as original");
+            Assert.HasCount(originalData.Length, decompressedData, "Decompressed data should have same length as original");
 
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(originalText, decompressedText, "Decompressed text should match original");
@@ -36,11 +36,11 @@ namespace Energy.Core.Test.Base
         {
             byte[] expectedPlain = ReadEmbeddedResource("Resources.ZX0_500.txt");
             Assert.IsNotNull(expectedPlain, "Fixture ZX0_500.txt should be embedded");
-            Assert.IsTrue(expectedPlain.Length > 0, "Fixture ZX0_500.txt should not be empty");
+            Assert.IsNotEmpty(expectedPlain, "Fixture ZX0_500.txt should not be empty");
 
             byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_500.zx0");
             Assert.IsNotNull(expectedCompressed, "Fixture ZX0_500.zx0 should be embedded");
-            Assert.IsTrue(expectedCompressed.Length > 0, "Fixture ZX0_500.zx0 should not be empty");
+            Assert.IsNotEmpty(expectedCompressed, "Fixture ZX0_500.zx0 should not be empty");
 
             byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(expectedPlain);
             Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
@@ -59,7 +59,7 @@ namespace Energy.Core.Test.Base
             byte[] compressedData = Energy.Base.Compression.Deflate.Compress(emptyData);
             byte[] decompressedData = Energy.Base.Compression.Deflate.Decompress(compressedData);
 
-            Assert.AreEqual(0, decompressedData.Length, "Empty data should remain empty after compression/decompression");
+            Assert.IsEmpty(decompressedData, "Empty data should remain empty after compression/decompression");
         }
 
         [TestMethod]
@@ -84,13 +84,13 @@ namespace Energy.Core.Test.Base
             // Compress
             byte[] compressedData = Energy.Base.Compression.GZip.Compress(originalData);
             Assert.IsNotNull(compressedData, "Compressed data should not be null");
-            Assert.IsTrue(compressedData.Length > 0, "Compressed data should not be empty");
-            Assert.IsTrue(compressedData.Length < originalData.Length, "Compressed data should be smaller than original");
+            Assert.IsNotEmpty(compressedData, "Compressed data should not be empty");
+            Assert.IsLessThan(originalData.Length, compressedData.Length, "Compressed data should be smaller than original");
 
             // Decompress
             byte[] decompressedData = Energy.Base.Compression.GZip.Decompress(compressedData);
             Assert.IsNotNull(decompressedData, "Decompressed data should not be null");
-            Assert.AreEqual(originalData.Length, decompressedData.Length, "Decompressed data should have same length as original");
+            Assert.HasCount(originalData.Length, decompressedData, "Decompressed data should have same length as original");
 
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(originalText, decompressedText, "Decompressed text should match original");
@@ -104,7 +104,7 @@ namespace Energy.Core.Test.Base
             byte[] compressedData = Energy.Base.Compression.GZip.Compress(emptyData);
             byte[] decompressedData = Energy.Base.Compression.GZip.Decompress(compressedData);
 
-            Assert.AreEqual(0, decompressedData.Length, "Empty data should remain empty after compression/decompression");
+            Assert.IsEmpty(decompressedData, "Empty data should remain empty after compression/decompression");
         }
 
         [TestMethod]
@@ -129,7 +129,7 @@ namespace Energy.Core.Test.Base
             // Compress
             byte[] compressedData = Energy.Base.Compression.ZX0.Compress(originalData);
             Assert.IsNotNull(compressedData, "Compressed data should not be null");
-            Assert.IsTrue(compressedData.Length > 0, "Compressed data should not be empty");
+            Assert.IsNotEmpty(compressedData, "Compressed data should not be empty");
 
             // Decompress
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
@@ -147,7 +147,7 @@ namespace Energy.Core.Test.Base
             byte[] compressedData = Energy.Base.Compression.ZX0.Compress(emptyData);
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
 
-            Assert.AreEqual(0, decompressedData.Length, "Empty data should remain empty after compression/decompression");
+            Assert.IsEmpty(decompressedData, "Empty data should remain empty after compression/decompression");
         }
 
         [TestMethod]
@@ -167,7 +167,7 @@ namespace Energy.Core.Test.Base
             // source reproduces the fixture byte for byte.
             byte[] numbersCompressedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.zx0");
             Assert.IsNotNull(numbersCompressedData, "ZX0_NUMBERS.zx0 should exist and not be null");
-            Assert.IsTrue(numbersCompressedData.Length > 0, "ZX0_NUMBERS.zx0 should not be empty");
+            Assert.IsNotEmpty(numbersCompressedData, "ZX0_NUMBERS.zx0 should not be empty");
 
             byte[] numbersExpectedData = ReadEmbeddedResource("Resources.ZX0_NUMBERS.txt");
             Assert.IsNotNull(numbersExpectedData, "ZX0_NUMBERS.txt should exist and not be null");
@@ -187,7 +187,7 @@ namespace Energy.Core.Test.Base
             // ZX0_LETTERS
             byte[] testCompressedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.zx0");
             Assert.IsNotNull(testCompressedData, "ZX0_LETTERS.zx0 should exist and not be null");
-            Assert.IsTrue(testCompressedData.Length > 0, "ZX0_LETTERS.zx0 should not be empty");
+            Assert.IsNotEmpty(testCompressedData, "ZX0_LETTERS.zx0 should not be empty");
 
             byte[] testExpectedData = ReadEmbeddedResource("Resources.ZX0_LETTERS.txt");
             Assert.IsNotNull(testExpectedData, "ZX0_LETTERS.txt should exist and not be null");
@@ -207,11 +207,11 @@ namespace Energy.Core.Test.Base
             // ZX0_SIMPLE
             byte[] simpleCompressedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.zx0");
             Assert.IsNotNull(simpleCompressedData, "ZX0_SIMPLE.zx0 should exist and not be null");
-            Assert.AreEqual(17, simpleCompressedData.Length, "ZX0_SIMPLE.zx0 should be 17 bytes");
+            Assert.HasCount(17, simpleCompressedData, "ZX0_SIMPLE.zx0 should be 17 bytes");
 
             byte[] simpleExpectedData = ReadEmbeddedResource("Resources.ZX0_SIMPLE.txt");
             Assert.IsNotNull(simpleExpectedData, "ZX0_SIMPLE.txt should exist and not be null");
-            Assert.AreEqual(13, simpleExpectedData.Length, "ZX0_SIMPLE.txt should be 13 bytes");
+            Assert.HasCount(13, simpleExpectedData, "ZX0_SIMPLE.txt should be 13 bytes");
 
             byte[] simpleDecompressedData = Energy.Base.Compression.ZX0.Decompress(simpleCompressedData);
             Assert.IsNotNull(simpleDecompressedData, "Decompression should not return null");
@@ -219,7 +219,7 @@ namespace Energy.Core.Test.Base
 
             byte[] simpleCompressedFromText = Energy.Base.Compression.ZX0.Compress(simpleExpectedData);
             Assert.IsNotNull(simpleCompressedFromText, "Compression should not return null");
-            Assert.AreEqual(17, simpleCompressedFromText.Length, "Compressed ZX0_SIMPLE should be 17 bytes");
+            Assert.HasCount(17, simpleCompressedFromText, "Compressed ZX0_SIMPLE should be 17 bytes");
             CollectionAssert.AreEqual(simpleCompressedData, simpleCompressedFromText, "Compressed data should match fixture ZX0_SIMPLE.zx0 byte by byte");
 
             byte[] simpleRoundtripDecompressed = Energy.Base.Compression.ZX0.Decompress(simpleCompressedFromText);
@@ -243,13 +243,13 @@ namespace Energy.Core.Test.Base
             // Compress
             byte[] compressedData = Energy.Base.Compression.ZX0.Compress(originalData);
             Assert.IsNotNull(compressedData, "Compressed data should not be null");
-            Assert.IsTrue(compressedData.Length > 0, "Compressed data should not be empty");
-            Assert.IsFalse(compressedData.Length == originalData.Length, "Compressed data length must not be the same as original");
+            Assert.IsNotEmpty(compressedData, "Compressed data should not be empty");
+            Assert.AreNotEqual(originalData.Length, compressedData.Length, "Compressed data length must not be the same as original");
 
             // Decompress
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
             Assert.IsNotNull(decompressedData, "Decompressed data should not be null");
-            Assert.AreEqual(originalData.Length, decompressedData.Length, "Decompressed data should have same length as original");
+            Assert.HasCount(originalData.Length, decompressedData, "Decompressed data should have same length as original");
 
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             Assert.AreEqual(originalText, decompressedText, "Decompressed text should match original");
@@ -299,7 +299,7 @@ namespace Energy.Core.Test.Base
             // Load ZX0_1000.zx0 compressed data
             byte[] compressedData = ReadEmbeddedResource("Resources.ZX0_1000.zx0");
             Assert.IsNotNull(compressedData, "ZX0_1000.zx0 should exist and not be null");
-            Assert.IsTrue(compressedData.Length > 0, "ZX0_1000.zx0 should not be empty");
+            Assert.IsNotEmpty(compressedData, "ZX0_1000.zx0 should not be empty");
 
             // Decompress using ZX0 algorithm
             byte[] decompressedData = Energy.Base.Compression.ZX0.Decompress(compressedData);
@@ -332,7 +332,7 @@ namespace Energy.Core.Test.Base
             byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_BIG16K.zx0");
             Assert.IsNotNull(plain, "ZX0_BIG16K.txt fixture should be embedded");
             Assert.IsNotNull(expectedCompressed, "ZX0_BIG16K.zx0 fixture should be embedded");
-            Assert.AreEqual(16614, plain.Length, "ZX0_BIG16K.txt should be 16614 bytes");
+            Assert.HasCount(16614, plain, "ZX0_BIG16K.txt should be 16614 bytes");
 
             byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(plain);
             Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
@@ -356,7 +356,7 @@ namespace Energy.Core.Test.Base
             byte[] expectedCompressed = ReadEmbeddedResource("Resources.ZX0_RANDOM8K.zx0");
             Assert.IsNotNull(plain, "ZX0_RANDOM8K.bin fixture should be embedded");
             Assert.IsNotNull(expectedCompressed, "ZX0_RANDOM8K.zx0 fixture should be embedded");
-            Assert.AreEqual(8192, plain.Length, "ZX0_RANDOM8K.bin should be 8192 bytes");
+            Assert.HasCount(8192, plain, "ZX0_RANDOM8K.bin should be 8192 bytes");
 
             byte[] actualCompressed = Energy.Base.Compression.ZX0.Compress(plain);
             Assert.IsNotNull(actualCompressed, "ZX0 compression should not return null");
@@ -391,7 +391,7 @@ namespace Energy.Core.Test.Base
 
             byte[] actual = Energy.Base.Compression.LZ4.Decompress(compressed);
             Assert.IsNotNull(actual, "Decompression should not return null");
-            Assert.AreEqual(0, actual.Length, "Empty decompression should produce empty output");
+            Assert.IsEmpty(actual, "Empty decompression should produce empty output");
         }
 
         [TestMethod]
@@ -614,11 +614,11 @@ namespace Energy.Core.Test.Base
 
             byte[] compressedEmpty = Energy.Base.Compression.LZSS.Compress(new byte[0]);
             Assert.IsNotNull(compressedEmpty, "Compressing empty should not return null");
-            Assert.AreEqual(0, compressedEmpty.Length, "Compressing empty should return empty");
+            Assert.IsEmpty(compressedEmpty, "Compressing empty should return empty");
 
             byte[] decompressedEmpty = Energy.Base.Compression.LZSS.Decompress(new byte[0]);
             Assert.IsNotNull(decompressedEmpty, "Decompressing empty should not return null");
-            Assert.AreEqual(0, decompressedEmpty.Length, "Decompressing empty should return empty");
+            Assert.IsEmpty(decompressedEmpty, "Decompressing empty should return empty");
         }
 
         [TestMethod]

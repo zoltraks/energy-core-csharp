@@ -29,7 +29,7 @@ namespace Energy.Core.Test.Base
             Assert.IsNull(result);
 
             result = Energy.Base.Hex.HexToArray("");
-            Assert.AreEqual(0, result.Length);
+            Assert.IsEmpty(result);
 
             value = hex1;
             except = new byte[] { 0xa };
@@ -84,7 +84,7 @@ namespace Energy.Core.Test.Base
             string s;
             b = null;
             s = Energy.Base.Hex.ArrayToHex(b);
-            Assert.AreEqual(null, s);
+            Assert.IsNull(s);
             b = new byte[] { };
             s = Energy.Base.Hex.ArrayToHex(b);
             Assert.AreEqual("", s);
@@ -135,7 +135,7 @@ namespace Energy.Core.Test.Base
         {
             string s;
             s = Energy.Base.Hex.HexToBin(null);
-            Assert.AreEqual(null, s);
+            Assert.IsNull(s);
             s = Energy.Base.Hex.HexToBin("");
             Assert.AreEqual("", s);
             s = Energy.Base.Hex.HexToBin("0");
@@ -153,7 +153,7 @@ namespace Energy.Core.Test.Base
         {
             string s;
             s = Energy.Base.Hex.BinToHex(null);
-            Assert.AreEqual(null, s);
+            Assert.IsNull(s);
             s = Energy.Base.Hex.BinToHex("");
             Assert.AreEqual("", s);
             s = Energy.Base.Hex.BinToHex("0");
@@ -249,7 +249,7 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void Trim()
         {
-            Assert.AreEqual(null, Energy.Base.Hex.Trim(null));
+            Assert.IsNull(Energy.Base.Hex.Trim(null));
             Assert.AreEqual("Abc123", Energy.Base.Hex.Trim("y A bgg-nc.1.2.3.."));
         }
 

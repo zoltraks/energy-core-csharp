@@ -70,11 +70,11 @@ namespace Energy.Core.Test.Base
             text = "How are you?";
             hash = Energy.Base.Hash.SHA512(text);
             must = "B4664D8CDD2A11410ED1EF1E5C0889B3E0B8CF8DD603F92AFE87DAE8E3F13C66C9791DC7DC6AB68CD81998C85BBE64BDB54917E0E025AF53A65649D1FFB5DE31";
-            Assert.IsTrue(0 == string.Compare(must, hash, true));
+            Assert.AreEqual(0, string.Compare(must, hash, true));
             text = "Ąę";
             hash = Energy.Base.Hash.SHA512(text);
             must = "70E06D64116978A3C4615635C1EBE149822AF49602F897C960C80E91D8819E0A94B3F357AA776488B28A02550B71D6397D5B124AC9AE7762471BD5B2104142E9";
-            Assert.IsTrue(0 == string.Compare(must, hash, true));
+            Assert.AreEqual(0, string.Compare(must, hash, true));
         }
 
         [TestMethod]

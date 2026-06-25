@@ -344,7 +344,7 @@ namespace Energy.Core.Test.Base
                 data = stream.ToArray();
             }
 
-            Assert.AreEqual(3, data.Length, "Stream should contain two full bytes and one flushed partial byte");
+            Assert.HasCount(3, data, "Stream should contain two full bytes and one flushed partial byte");
             Assert.AreEqual(0xB4, data[0], "First byte should match MSB-first packed bits");
             Assert.AreEqual(0xAA, data[1], "Literal byte should be preserved");
             Assert.AreEqual(0x80, data[2], "Remaining bits should be flushed into high bits of last byte");

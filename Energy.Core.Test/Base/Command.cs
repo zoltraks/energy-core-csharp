@@ -159,7 +159,7 @@ namespace Energy.Core.Test.Base
             var unknown = argv.Unknown();
 
             Assert.IsNotNull(unknown);
-            Assert.AreEqual(0, unknown.Count);
+            Assert.IsEmpty(unknown);
         }
 
         [TestMethod]
@@ -171,7 +171,7 @@ namespace Energy.Core.Test.Base
 
             var unknown = argv.Unknown();
 
-            Assert.AreEqual(1, unknown.Count);
+            Assert.HasCount(1, unknown);
             Assert.AreEqual("verbose", unknown[0]);
         }
 
@@ -184,9 +184,9 @@ namespace Energy.Core.Test.Base
 
             var unknown = argv.Unknown();
 
-            Assert.AreEqual(2, unknown.Count);
-            Assert.IsTrue(unknown.Contains("foo"));
-            Assert.IsTrue(unknown.Contains("bar"));
+            Assert.HasCount(2, unknown);
+            Assert.Contains("foo", unknown);
+            Assert.Contains("bar", unknown);
         }
 
         [TestMethod]
@@ -199,7 +199,7 @@ namespace Energy.Core.Test.Base
 
             var unknown = argv.Unknown();
 
-            Assert.AreEqual(0, unknown.Count);
+            Assert.IsEmpty(unknown);
         }
     }
 }

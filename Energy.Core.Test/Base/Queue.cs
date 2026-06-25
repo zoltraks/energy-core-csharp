@@ -24,12 +24,12 @@ namespace Energy.Core.Test.Base
             TimeSpan spend;
 
             start = DateTime.Now;
-            Assert.AreEqual(null, q.Pull());
+            Assert.IsNull(q.Pull());
             spend = DateTime.Now - start;
             Assert.IsTrue(spend < TimeSpan.FromSeconds(0.1), "Time spend should be less than 0.1 s");
 
             start = DateTime.Now;
-            Assert.AreEqual(null, q.Pull(0.2));
+            Assert.IsNull(q.Pull(0.2));
             spend = DateTime.Now - start;
             Assert.IsTrue(spend >= TimeSpan.FromSeconds(0.1), "Time spend should be at least more than 0.1 s");
 

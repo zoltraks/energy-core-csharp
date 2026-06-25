@@ -21,9 +21,9 @@ namespace Energy.Core.Test.Core
             string file = Energy.Core.Program.GetExecutionFile();
             Assert.IsNotNull(directory);
             Assert.IsNotNull(file);
-            Assert.IsTrue(file.EndsWith(".dll"));
-            Assert.IsTrue(directory.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()));
-            Assert.IsFalse(directory.EndsWith(".dll" + System.IO.Path.DirectorySeparatorChar));
+            Assert.EndsWith(".dll", file);
+            Assert.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString(), directory);
+            Assert.DoesNotEndWith(".dll" + System.IO.Path.DirectorySeparatorChar, directory);
         }
     }
 }

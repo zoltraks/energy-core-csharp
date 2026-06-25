@@ -92,7 +92,7 @@ namespace Energy.Core.Test.Base
             Assert.AreNotEqual(0, objectArray1.Length);
             object[] objectArray2 = Energy.Base.Cast.StringDictionaryToObjectArray<object>(dictionary);
             Assert.IsNotNull(objectArray2);
-            Assert.AreEqual(objectArray1.Length, objectArray2.Length);
+            Assert.HasCount(objectArray1.Length, objectArray2);
         }
 
         [TestMethod]
@@ -192,8 +192,8 @@ namespace Energy.Core.Test.Base
             var x = Energy.Base.Cast.StringArrayToDictionary<string, object>("0", null, "a", 1, "b", false, "c", true, null);
             Assert.IsNotNull(x);
             Assert.HasCount(4, x);
-            Assert.AreEqual(false, Energy.Base.Cast.AsBool(x["b"]));
-            Assert.AreEqual(true, Energy.Base.Cast.AsBool(x["c"]));
+            Assert.IsFalse(Energy.Base.Cast.AsBool(x["b"]));
+            Assert.IsTrue(Energy.Base.Cast.AsBool(x["c"]));
         }
 
         [TestMethod]
@@ -206,16 +206,16 @@ namespace Energy.Core.Test.Base
 
             expect = new string[] { "a", "b", "c" };
             result = Energy.Base.Collection.StringArray.Exclude(array, exclude, false);
-            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
 
             exclude = new string[] { "a", "B", null };
             expect = new string[] { "b", "c" };
             result = Energy.Base.Collection.StringArray.Exclude(array, exclude, false);
-            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
 
             expect = new string[] { "c" };
             result = Energy.Base.Collection.StringArray.Exclude(array, exclude, true);
-            Assert.IsTrue(0 == Energy.Base.Collection.StringArray.Compare(expect, result));
+            Assert.AreEqual(0, Energy.Base.Collection.StringArray.Compare(expect, result));
         }
 
         [TestMethod]

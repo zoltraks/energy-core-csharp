@@ -35,10 +35,10 @@ namespace Energy.Core.Test.Base
             Type[] classList;
             classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
                 , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
-            Assert.IsTrue(classList.Length > 0);
+            Assert.IsNotEmpty(classList);
             classList = Energy.Base.Class.GetTypes(Energy.Base.Class.GetAssemblies()
                 , delegate (Type e) { return e.FullName.StartsWith("Energy"); });
-            Assert.IsTrue(classList.Length > 0);
+            Assert.IsNotEmpty(classList);
         }
 
         [TestMethod]

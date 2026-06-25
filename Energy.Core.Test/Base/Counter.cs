@@ -49,11 +49,11 @@ namespace Energy.Core.Test.Base
         public void Reset()
         {
             Energy.Base.Counter counter1 = new Energy.Base.Counter();
-            Assert.AreEqual(counter1.Overflow, false);
+            Assert.IsFalse(counter1.Overflow);
             counter1.Decrement();
-            Assert.AreEqual(counter1.Overflow, true);
+            Assert.IsTrue(counter1.Overflow);
             counter1.Reset();
-            Assert.AreEqual(counter1.Overflow, false);
+            Assert.IsFalse(counter1.Overflow);
         }
     }
 }

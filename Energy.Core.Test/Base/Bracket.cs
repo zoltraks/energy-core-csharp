@@ -96,10 +96,10 @@ namespace Energy.Core.Test.Base
             array.Add(new Energy.Base.Bracket("[]"));
             array.Add(new Energy.Base.Bracket("()"));
             string expression = array.GetMatchExpression();
-            Assert.IsTrue(expression.Contains(@"\{([^}]*)}"));
-            Assert.IsTrue(expression.Contains(@"\[([^]]*)]"));
-            Assert.IsTrue(expression.Contains(@"\(([^\)]*)\)"));
-            Assert.IsTrue(expression.Contains("|"));
+            Assert.Contains(@"\{([^}]*)}", expression);
+            Assert.Contains(@"\[([^]]*)]", expression);
+            Assert.Contains(@"\(([^\)]*)\)", expression);
+            Assert.Contains("|", expression);
         }
 
         [TestMethod]

@@ -47,21 +47,21 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("", s);
             d = d.AddTicks(1);
             s = Energy.Base.Clock.GetZoneString(d);
-            Assert.IsTrue(s.StartsWith("00:00:00.000 "));
+            Assert.StartsWith("00:00:00.000 ", s);
             s = Energy.Base.Clock.GetZoneString(d, 6);
-            Assert.IsTrue(s.StartsWith("00:00:00.000000 "));
+            Assert.StartsWith("00:00:00.000000 ", s);
             s = Energy.Base.Clock.GetZoneString(d, 7);
-            Assert.IsTrue(s.StartsWith("00:00:00.0000001 "));
+            Assert.StartsWith("00:00:00.0000001 ", s);
             s = Energy.Base.Clock.GetZoneString(d, 8);
-            Assert.IsTrue(s.StartsWith("00:00:00.0000001 "));
+            Assert.StartsWith("00:00:00.0000001 ", s);
             d = d.AddDays(1);
             d = d.AddTicks(TimeSpan.TicksPerSecond - 1);
             s = Energy.Base.Clock.GetZoneString(d);
-            Assert.IsTrue(s.StartsWith("0001-01-02 00:00:01 "));
+            Assert.StartsWith("0001-01-02 00:00:01 ", s);
             s = Energy.Base.Clock.GetZoneString(d, 3);
-            Assert.IsTrue(s.StartsWith("0001-01-02 00:00:01 "));
+            Assert.StartsWith("0001-01-02 00:00:01 ", s);
             s = Energy.Base.Clock.GetZoneString(d, -3);
-            Assert.IsTrue(s.StartsWith("0001-01-02 00:00:01.000 "));
+            Assert.StartsWith("0001-01-02 00:00:01.000 ", s);
         }
 
         [TestMethod]

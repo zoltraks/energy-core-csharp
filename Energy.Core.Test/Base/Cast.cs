@@ -184,11 +184,11 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("Gęś", Energy.Base.Cast.Base64ToString(s2));
             // wrong Base64
             string s3 = null;
-            Assert.AreEqual(null, Energy.Base.Cast.Base64ToString(s3));
+            Assert.IsNull(Energy.Base.Cast.Base64ToString(s3));
             string s4 = "";
             Assert.AreEqual("", Energy.Base.Cast.Base64ToString(s4));
             string s5 = "=";
-            Assert.AreEqual(null, Energy.Base.Cast.Base64ToString(s5));
+            Assert.IsNull(Energy.Base.Cast.Base64ToString(s5));
             // wrong much more with valid BASE64 but invalid UTF-8
             byte[] b1 = new byte[] { 0xfe, 0xff, 0xff, 0xf0, 0x90, 0xbc };
             string s6 = Convert.ToBase64String(b1);
@@ -1296,7 +1296,7 @@ namespace Energy.Core.Test.Base
             });
             Assert.IsNotNull(x);
             Assert.HasCount(1, x);
-            Assert.AreEqual(null, x["2"]);
+            Assert.IsNull(x["2"]);
             x = Energy.Base.Cast.ObjectArrayToDictionary<string, object>(new object[]
             {
                 "2", "1", "1", null, "1", "2", "1",

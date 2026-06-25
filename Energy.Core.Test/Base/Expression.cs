@@ -23,19 +23,19 @@ namespace Energy.Core.Test.Base
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, new string[] { "X" });
             Assert.IsNotNull(r);
             Assert.HasCount(1, r);
-            Assert.AreEqual(null, r["X"]);
+            Assert.IsNull(r["X"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", null, RegexOptions.None, new string[] { "X", "Y" });
             Assert.IsNotNull(r);
             Assert.HasCount(2, r);
-            Assert.AreEqual(null, r["X"]);
-            Assert.AreEqual(null, r["Y"]);
+            Assert.IsNull(r["X"]);
+            Assert.IsNull(r["Y"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("a b c", @"(?<X>\w+)", RegexOptions.None, new string[] { "X", "Y" });
             Assert.IsNotNull(r);
             Assert.HasCount(2, r);
             Assert.AreEqual("a", r["X"]);
-            Assert.AreEqual(null, r["Y"]);
+            Assert.IsNull(r["Y"]);
 
             r = Energy.Base.Expression.MatchNamedGroups("ab123", @"(?<X>\p{L}+)(?<Y>\d+)", RegexOptions.None, null);
             Assert.IsNotNull(r);

@@ -33,6 +33,15 @@ Browse project page for more details.</Description>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == ''">true</ContinuousIntegrationBuild>
+    <!-- Production build: run static analysis and treat every remaining warning as an error.
+         CS1591 (missing XML documentation on public members) stays suppressed through NoWarn,
+         because not every public member is individually documented. AnalysisLevel is kept at
+         the default-severity rule set; the opinionated latest-all set is intentionally not used,
+         as several of its rules would require breaking the public API of this legacy library. -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <OutputPath>bin\</OutputPath>
