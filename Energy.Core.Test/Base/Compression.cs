@@ -630,6 +630,93 @@ namespace Energy.Core.Test.Base
             Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, LzssOptions(4, 4, 0, true, false, true)), "Minimum match below 1 should fail");
         }
 
+        private static Energy.Base.Compression.LZSS.Options SaprLz16Options()
+        {
+            // The SAP-R lz16 preset: 9-byte frames (9 interleaved channels), 8 offset
+            // bits, 8 length bits, minimum match 1, current format.
+            Energy.Base.Compression.LZSS.Options options = LzssOptions(8, 8, 1, true, false, true);
+            options.FrameSize = 9;
+            return options;
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_MultiChannelFixtures()
+        {
+            // Byte-for-byte against the interleaved SAP-R container, both directions.
+            // SAPR_SMALL is an independent fixture produced by the reference-derived
+            // encoder from an authored raw stream; it exercises the channel-skip header
+            // (constant channels) and a ring-buffer wrap (more than 256 frames).
+            // SAPR_DANTE is a genuine file from the upstream lzss-sap tool with every
+            // channel active.
+            Energy.Base.Compression.LZSS.Options options = SaprLz16Options();
+            LzssFixtureCheck("Resources.SAPR_SMALL.bin", "Resources.SAPR_SMALL.lz16", options);
+            LzssFixtureCheck("Resources.SAPR_DANTE.bin", "Resources.SAPR_DANTE.lz16", options);
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_MultiChannelRoundTrip()
+        {
+            // Round-trip authored interleaved frame data through the container.
+            Energy.Base.Compression.LZSS.Options options = SaprLz16Options();
+            byte[][] inputs = new byte[][]
+            {
+                BuildChannelFrames(9, 320),
+                BuildChannelFrames(9, 1),
+                BuildChannelFrames(9, 257),
+            };
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                byte[] compressed = Energy.Base.Compression.LZSS.Compress(inputs[i], options);
+                Assert.IsNotNull(compressed, "Container compression should not return null for input " + i);
+                byte[] decompressed = Energy.Base.Compression.LZSS.Decompress(compressed, options);
+                Assert.IsNotNull(decompressed, "Container decompression should not return null for input " + i);
+                CollectionAssert.AreEqual(inputs[i], decompressed, "Container round-trip should reproduce input " + i);
+            }
+        }
+
+        [TestMethod]
+        public void Compression_LZSS_MultiChannelInvalidOptions()
+        {
+            byte[] data = BuildChannelFrames(9, 16);
+
+            // A negative frame size is rejected.
+            Energy.Base.Compression.LZSS.Options negative = SaprLz16Options();
+            negative.FrameSize = -1;
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, negative), "Negative frame size should fail");
+
+            // Multi-channel mode requires LiteralFirst.
+            Energy.Base.Compression.LZSS.Options noLiteralFirst = SaprLz16Options();
+            noLiteralFirst.LiteralFirst = false;
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(data, noLiteralFirst), "Multi-channel without LiteralFirst should fail");
+
+            // Input length must be a whole number of frames.
+            byte[] ragged = new byte[9 * 4 + 3];
+            Assert.IsNull(Energy.Base.Compression.LZSS.Compress(ragged, SaprLz16Options()), "Non-frame-aligned input should fail");
+        }
+
+        // Build interleaved channel frames with a mix of constant, periodic, and
+        // varying channels so the container exercises skips, literals, and matches.
+        private static byte[] BuildChannelFrames(int channels, int frames)
+        {
+            byte[] data = new byte[channels * frames];
+            for (int f = 0; f < frames; f++)
+            {
+                int b = f * channels;
+                for (int c = 0; c < channels; c++)
+                {
+                    int value;
+                    if (c == 1 || c == 5)
+                        value = 0x20 + c;             // constant channels (skippable)
+                    else if (c == 0)
+                        value = (f * 7) % 17;          // always-active channel 0
+                    else
+                        value = (f / (c + 1)) % (c + 3);
+                    data[b + c] = (byte)value;
+                }
+            }
+            return data;
+        }
+
         private static byte[] BuildRepeating(int length)
         {
             byte[] data = new byte[length];

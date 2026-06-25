@@ -1016,6 +1016,13 @@ namespace Energy.Base
                 public bool PositionStartZero;
 
                 /// <summary>
+                /// Frame size in bytes, equal to the number of interleaved channels (sub-streams) in the input.
+                /// <br/><br/>
+                /// A value of 0 or 1 selects the plain single-stream format. A value of 2 or more selects the interleaved multi-channel container used by the Atari SAP-R format, where the input is a sequence of frames of this many bytes and each channel is compressed independently.
+                /// </summary>
+                public int FrameSize;
+
+                /// <summary>
                 /// Create options with the default 8-bit preset (offset 4 bits, length 4 bits, minimum match 2)
                 /// </summary>
                 public Options()
@@ -1026,6 +1033,7 @@ namespace Energy.Base
                     ForceLastLiteral = true;
                     LiteralFirst = true;
                     PositionStartZero = false;
+                    FrameSize = 0;
                 }
             }
 
@@ -1042,6 +1050,10 @@ namespace Energy.Base
                     throw new ArgumentException("LZSS total match bits (offset + length) must be from 8 to 16");
                 if (options.MinimumMatch < 1 || options.MinimumMatch > 16)
                     throw new ArgumentException("LZSS minimum match length must be from 1 to 16");
+                if (options.FrameSize < 0)
+                    throw new ArgumentException("LZSS frame size must be 0 or greater");
+                if (options.FrameSize >= 2 && !options.LiteralFirst)
+                    throw new ArgumentException("LZSS multi-channel mode requires LiteralFirst");
             }
 
             #endregion
@@ -1271,6 +1283,17 @@ namespace Energy.Base
                     }
                 }
 
+                // Abandon any partial flag byte and half-byte holder so the next
+                // AddBit or AddHalfByte starts a fresh byte. Mirrors the reference
+                // bflush boundary between the header, the initial values, and the
+                // token stream in the multi-channel container.
+                public void Flush()
+                {
+                    _bitPos = -1;
+                    _bitNum = 0;
+                    _halfPos = -1;
+                }
+
                 public byte[] ToArray()
                 {
                     byte[] result = new byte[_length];
@@ -1314,6 +1337,9 @@ namespace Energy.Base
                 {
                     ValidateOptions(options);
 
+                    if (options.FrameSize >= 2)
+                        return CompressChannels(data, options);
+
                     int size = data.Length;
                     Parser parser = new Parser(data, size, options.OffsetBits, options.LengthBits, options.MinimumMatch);
                     parser.Backfill(false);
@@ -1333,37 +1359,8 @@ namespace Energy.Base
                     {
                         if (pos <= lastPos)
                             continue;
-
-                        int mlen = parser.MatchLength[pos];
-                        if (mlen < options.MinimumMatch)
-                        {
-                            writer.AddBit(1);
-                            writer.AddByte(data[pos]);
-                            lastPos = pos;
-                        }
-                        else
-                        {
-                            int codePos = (pos - parser.MatchPos[pos] - positionBase) & (maxOffset - 1);
-                            int codeLen = mlen - options.MinimumMatch;
-                            writer.AddBit(0);
-                            if (total <= 8)
-                            {
-                                writer.AddByte((codePos << options.LengthBits) + codeLen);
-                            }
-                            else if (total <= 12)
-                            {
-                                int shift = 8 - options.OffsetBits;
-                                writer.AddByte((codePos << shift) + (codeLen & ((1 << shift) - 1)));
-                                writer.AddHalfByte(codeLen >> shift);
-                            }
-                            else
-                            {
-                                int code = ((codeLen + 1) << options.OffsetBits) + codePos;
-                                writer.AddByte(code & 0xFF);
-                                writer.AddByte(code >> 8);
-                            }
-                            lastPos = pos + mlen - 1;
-                        }
+                        lastPos = EncodeToken(writer, parser.MatchLength, parser.MatchPos, data, pos,
+                            options.MinimumMatch, options.LengthBits, options.OffsetBits, maxOffset, positionBase, total);
                     }
 
                     return writer.ToArray();
@@ -1373,6 +1370,147 @@ namespace Energy.Base
                     Energy.Core.Bug.Catch(exception);
                     return null;
                 }
+            }
+
+            // Emit one literal-or-match token for position pos into the shared writer,
+            // using the same bit layout as the reference lzop_encode. Returns the last
+            // input position covered by this token, so the caller can skip the
+            // positions a match spans. Both the single-stream and multi-channel paths
+            // call this so their token bytes stay identical.
+            private static int EncodeToken(Writer writer, int[] matchLength, int[] matchPos, byte[] data, int pos,
+                int minMatch, int lengthBits, int offsetBits, int maxOffset, int positionBase, int total)
+            {
+                int mlen = matchLength[pos];
+                if (mlen < minMatch)
+                {
+                    writer.AddBit(1);
+                    writer.AddByte(data[pos]);
+                    return pos;
+                }
+
+                int codePos = (pos - matchPos[pos] - positionBase) & (maxOffset - 1);
+                int codeLen = mlen - minMatch;
+                writer.AddBit(0);
+                if (total <= 8)
+                {
+                    writer.AddByte((codePos << lengthBits) + codeLen);
+                }
+                else if (total <= 12)
+                {
+                    int shift = 8 - offsetBits;
+                    writer.AddByte((codePos << shift) + (codeLen & ((1 << shift) - 1)));
+                    writer.AddHalfByte(codeLen >> shift);
+                }
+                else
+                {
+                    int code = ((codeLen + 1) << offsetBits) + codePos;
+                    writer.AddByte(code & 0xFF);
+                    writer.AddByte(code >> 8);
+                }
+                return pos + mlen - 1;
+            }
+
+            // Compress an interleaved N-channel frame stream into the SAP-R container:
+            // a channel-skip header, one initial byte per channel, then per-frame
+            // interleaved tokens through a single shared writer.
+            private static byte[] CompressChannels(byte[] data, Options options)
+            {
+                int channels = options.FrameSize;
+                if ((data.Length % channels) != 0)
+                    throw new ArgumentException("LZSS multi-channel input length must be a multiple of the frame size");
+
+                int frames = data.Length / channels;
+                int maxOffset = 1 << options.OffsetBits;
+                int positionBase = options.PositionStartZero ? 1 : 2;
+                int total = options.OffsetBits + options.LengthBits;
+
+                // Deinterleave into one byte array per channel.
+                byte[][] channelData = new byte[channels][];
+                for (int c = 0; c < channels; c++)
+                {
+                    byte[] stream = new byte[frames];
+                    for (int f = 0; f < frames; f++)
+                        stream[f] = data[f * channels + c];
+                    channelData[c] = stream;
+                }
+
+                // A non-zero channel is skipped when its value never changes. Channel 0
+                // is always included.
+                bool[] skip = new bool[channels];
+                for (int c = 1; c < channels; c++)
+                {
+                    bool constant = true;
+                    byte first = channelData[c][0];
+                    for (int f = 1; f < frames; f++)
+                    {
+                        if (channelData[c][f] != first)
+                        {
+                            constant = false;
+                            break;
+                        }
+                    }
+                    skip[c] = constant;
+                }
+
+                Writer writer = new Writer(data.Length / 2 + 16);
+
+                // Channel-skip header: one bit per channel from channels-1 down to 1,
+                // least-significant-bit first. Channel 0 has no bit.
+                for (int c = channels - 1; c >= 1; c--)
+                    writer.AddBit(skip[c] ? 1 : 0);
+                writer.Flush();
+
+                // Initial values: one byte per channel from channels-1 down to 0.
+                for (int c = channels - 1; c >= 0; c--)
+                    writer.AddByte(channelData[c][0]);
+                writer.Flush();
+
+                // Per-channel optimal parse. Skipped channels carry no tokens.
+                Parser[] parsers = new Parser[channels];
+                for (int c = 0; c < channels; c++)
+                {
+                    if (skip[c])
+                        continue;
+                    parsers[c] = new Parser(channelData[c], frames, options.OffsetBits, options.LengthBits, options.MinimumMatch);
+                    parsers[c].Backfill(false);
+                }
+
+                // Force a final literal only on channel 0, and only when every active
+                // channel would otherwise end in a match, matching the reference.
+                if (options.ForceLastLiteral)
+                {
+                    bool allMatch = true;
+                    for (int c = 0; c < channels; c++)
+                    {
+                        if (skip[c])
+                            continue;
+                        if (!parsers[c].LastIsMatch(options.LiteralFirst))
+                        {
+                            allMatch = false;
+                            break;
+                        }
+                    }
+                    if (allMatch)
+                        parsers[0].Backfill(true);
+                }
+
+                // Interleave tokens frame by frame, channel channels-1 down to 0.
+                int[] lastPos = new int[channels];
+                for (int c = 0; c < channels; c++)
+                    lastPos[c] = 0;
+
+                for (int pos = 1; pos < frames; pos++)
+                {
+                    for (int c = channels - 1; c >= 0; c--)
+                    {
+                        if (skip[c] || pos <= lastPos[c])
+                            continue;
+                        lastPos[c] = EncodeToken(writer, parsers[c].MatchLength, parsers[c].MatchPos, channelData[c], pos,
+                            options.MinimumMatch, options.LengthBits, options.OffsetBits, maxOffset, positionBase, total);
+                    }
+                }
+
+                return writer.ToArray();
             }
 
             #endregion
@@ -1423,6 +1561,9 @@ namespace Energy.Base
                 try
                 {
                     ValidateOptions(options);
+
+                    if (options.FrameSize >= 2)
+                        return DecompressChannels(data, options);
 
                     int maxOffset = 1 << options.OffsetBits;
                     int total = options.OffsetBits + options.LengthBits;
@@ -1526,6 +1667,173 @@ namespace Energy.Base
                     Energy.Core.Bug.Catch(exception);
                     return null;
                 }
+            }
+
+            // Decompress the SAP-R interleaved container: read the channel-skip
+            // header and the initial values, then decode the shared token stream into
+            // per-channel ring buffers, reassembling frames in channel order 0 to N-1.
+            private static byte[] DecompressChannels(byte[] data, Options options)
+            {
+                int channels = options.FrameSize;
+                int maxOffset = 1 << options.OffsetBits;
+                int ringMask = maxOffset - 1;
+                int total = options.OffsetBits + options.LengthBits;
+                int positionBase = options.PositionStartZero ? 1 : 2;
+                int lengthMask = (1 << options.LengthBits) - 1;
+
+                // Channel-skip header: one bit per channel from channels-1 down to 1,
+                // least-significant-bit first. Channel 0 is always active.
+                bool[] skip = new bool[channels];
+                int headerBits = channels - 1;
+                int headerBytes = (headerBits + 7) / 8;
+                int bitIndex = 0;
+                for (int c = channels - 1; c >= 1; c--)
+                {
+                    int bit = (data[bitIndex >> 3] >> (bitIndex & 7)) & 1;
+                    skip[c] = (bit != 0);
+                    bitIndex++;
+                }
+                int cursor = headerBytes;
+
+                // Per-channel ring buffers, current value, and copy state.
+                byte[][] ring = new byte[channels][];
+                byte[] current = new byte[channels];
+                int[] copyLeft = new int[channels];
+                int[] copyPos = new int[channels];
+                for (int c = 0; c < channels; c++)
+                {
+                    ring[c] = new byte[maxOffset];
+                    copyLeft[c] = 0;
+                    copyPos[c] = 0;
+                }
+
+                // Initial values: one byte per channel from channels-1 down to 0,
+                // seeded at ring index maxOffset-1 (the frame-0 slot).
+                for (int c = channels - 1; c >= 0; c--)
+                {
+                    byte value = data[cursor++];
+                    current[c] = value;
+                    ring[c][maxOffset - 1] = value;
+                }
+
+                // Frame 0 holds the initial values.
+                byte[] output = new byte[channels * 64];
+                int outputLength = 0;
+                output = EnsureCapacity(output, outputLength + channels);
+                for (int c = 0; c < channels; c++)
+                    output[outputLength++] = current[c];
+
+                int curPos = 0;
+                int bitBuffer = 0;
+                int bitCount = 0;
+                int halfBuffer = 0;
+                bool halfPending = false;
+
+                // Decode frames until the stream is exhausted and no channel is still
+                // copying. Channels are processed from channels-1 down to 0, matching
+                // the encoder's interleave order.
+                while (cursor < data.Length || AnyCopying(copyLeft))
+                {
+                    for (int c = channels - 1; c >= 0; c--)
+                    {
+                        if (skip[c])
+                            continue;
+
+                        byte produced;
+                        if (copyLeft[c] > 0)
+                        {
+                            copyLeft[c]--;
+                            copyPos[c] = (copyPos[c] + 1) & ringMask;
+                            produced = ring[c][copyPos[c]];
+                        }
+                        else
+                        {
+                            if (bitCount == 0)
+                            {
+                                bitBuffer = data[cursor++];
+                                bitCount = 8;
+                            }
+                            int flag = bitBuffer & 1;
+                            bitBuffer >>= 1;
+                            bitCount--;
+
+                            if (flag != 0)
+                            {
+                                produced = data[cursor++];
+                            }
+                            else
+                            {
+                                int codePos;
+                                int codeLen;
+                                if (total <= 8)
+                                {
+                                    int code = data[cursor++];
+                                    codeLen = code & lengthMask;
+                                    codePos = code >> options.LengthBits;
+                                }
+                                else if (total <= 12)
+                                {
+                                    int shift = 8 - options.OffsetBits;
+                                    int low = data[cursor++];
+                                    int high;
+                                    if (!halfPending)
+                                    {
+                                        halfBuffer = data[cursor++];
+                                        halfPending = true;
+                                        high = halfBuffer & 0x0F;
+                                    }
+                                    else
+                                    {
+                                        high = halfBuffer >> 4;
+                                        halfPending = false;
+                                    }
+                                    codePos = low >> shift;
+                                    codeLen = (low & ((1 << shift) - 1)) | (high << shift);
+                                }
+                                else
+                                {
+                                    int low = data[cursor++];
+                                    int high = data[cursor++];
+                                    int code = low | (high << 8);
+                                    int lengthLimit = 1 << options.LengthBits;
+                                    int field = (code >> options.OffsetBits) & (lengthLimit - 1);
+                                    codePos = code & (maxOffset - 1);
+                                    codeLen = (field == 0 ? lengthLimit : field) - 1;
+                                }
+
+                                int matchLength = codeLen + options.MinimumMatch;
+                                copyLeft[c] = matchLength - 1;
+                                copyPos[c] = (codePos + positionBase - 1) & ringMask;
+                                produced = ring[c][copyPos[c]];
+                            }
+                        }
+
+                        current[c] = produced;
+                        ring[c][curPos] = produced;
+                    }
+
+                    output = EnsureCapacity(output, outputLength + channels);
+                    for (int c = 0; c < channels; c++)
+                        output[outputLength++] = current[c];
+
+                    curPos = (curPos + 1) & ringMask;
+                }
+
+                if (outputLength == output.Length)
+                    return output;
+                byte[] result = new byte[outputLength];
+                System.Array.Copy(output, result, outputLength);
+                return result;
+            }
+
+            private static bool AnyCopying(int[] copyLeft)
+            {
+                for (int c = 0; c < copyLeft.Length; c++)
+                {
+                    if (copyLeft[c] > 0)
+                        return true;
+                }
+                return false;
             }
 
             #endregion

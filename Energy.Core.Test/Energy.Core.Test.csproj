@@ -71,6 +71,10 @@
     <EmbeddedResource Include="Resources\LZSS_BIG.bin" />
     <EmbeddedResource Include="Resources\LZSS_BIG.lz12" />
     <EmbeddedResource Include="Resources\LZSS_BIG.lz16" />
+    <EmbeddedResource Include="Resources\SAPR_SMALL.bin" />
+    <EmbeddedResource Include="Resources\SAPR_SMALL.lz16" />
+    <EmbeddedResource Include="Resources\SAPR_DANTE.bin" />
+    <EmbeddedResource Include="Resources\SAPR_DANTE.lz16" />
   </ItemGroup>
 
 </Project>
