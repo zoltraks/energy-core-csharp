@@ -14,6 +14,7 @@ This file is the central source of development rules. The following documents co
 - `VERSIONING.md`: version numbering and bump process (authoritative).
 - `TESTING.md`: testing strategy and verification loop.
 - `STRUCTURE.md`: project and solution layout.
+- `REFACTORING.md`: refactoring proposal and assessment process (authoritative).
 - `COPYRIGHTS.md`: copyright and license requirements.
 - `template/`: templates for change requests and implementation plans.
 
