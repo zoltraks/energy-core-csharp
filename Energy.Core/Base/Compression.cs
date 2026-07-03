@@ -756,6 +756,40 @@ namespace Energy.Base
 
             #endregion
 
+            #region Options
+
+            /// <summary>
+            /// LZ4 compression options.
+            /// <br/><br/>
+            /// The only configurable parameter is the maximum back-reference offset the compressor may use. The default is the full LZ4 window of 65535 bytes, so <c>new Options()</c> and the parameterless <c>Compress</c> overload produce byte-identical output.
+            /// <br/><br/>
+            /// A window-limited stream is still a valid LZ4 raw block that any LZ4 decompressor can decode. The constraint is one-directional: a stream compressed with a smaller window can be decompressed by any decoder, but a stream compressed with the full window may contain offsets that a constrained decoder (such as a fixed-size ring-buffer player) cannot resolve. The caller is responsible for choosing a window that matches the target decoder.
+            /// </summary>
+            public class Options
+            {
+                /// <summary>Maximum back-reference offset in bytes the compressor may use (1 to 65535).</summary>
+                public int MaxOffset;
+
+                /// <summary>
+                /// Create options with the default full LZ4 window (65535 bytes).
+                /// </summary>
+                public Options()
+                {
+                    MaxOffset = MAX_OFFSET;
+                }
+            }
+
+            private static int ClampMaxOffset(int maxOffset)
+            {
+                if (maxOffset < 1)
+                    return 1;
+                if (maxOffset > MAX_OFFSET)
+                    return MAX_OFFSET;
+                return maxOffset;
+            }
+
+            #endregion
+
             #region Compress
 
             /// <summary>
@@ -764,6 +798,27 @@ namespace Energy.Base
             /// <param name="data">Uncompressed input data</param>
             /// <returns>Compressed LZ4 block</returns>
             public static byte[] Compress(byte[] data)
+            {
+                return CompressWithLimit(data, MAX_OFFSET);
+            }
+
+            /// <summary>
+            /// Compress data using the LZ4 block format with the given options.
+            /// <br/><br/>
+            /// A null options reference is treated as the default full-window options.
+            /// </summary>
+            /// <param name="data">Uncompressed input data</param>
+            /// <param name="options">Compression options, or null for defaults.</param>
+            /// <returns>Compressed LZ4 block</returns>
+            public static byte[] Compress(byte[] data, Options options)
+            {
+                int maxOffset = (options == null)
+                    ? MAX_OFFSET
+                    : ClampMaxOffset(options.MaxOffset);
+                return CompressWithLimit(data, maxOffset);
+            }
+
+            private static byte[] CompressWithLimit(byte[] data, int maxOffset)
             {
                 if (data == null)
                 {
@@ -803,7 +858,7 @@ namespace Energy.Base
                             int refPos = hashTable[hash];
                             hashTable[hash] = ip;
 
-                            if (refPos >= 0 && refPos < ip && (ip - refPos) <= MAX_OFFSET)
+                            if (refPos >= 0 && refPos < ip && (ip - refPos) <= maxOffset)
                             {
                                 int matchLen = CountMatch(data, refPos, ip, inputSize);
                                 if (matchLen >= MIN_MATCH)
