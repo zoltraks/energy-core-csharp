@@ -562,6 +562,36 @@ namespace Energy.Base
             }
 
             /// <summary>
+            /// ZX0 compression options.
+            /// <br/><br/>
+            /// The only configurable parameter is the maximum back-reference offset the optimizer may use. The default is the full ZX0 window of 32640 bytes, so <c>new Options()</c> and the parameterless <c>Compress</c> overload produce byte-identical output.
+            /// <br/><br/>
+            /// A window-limited stream is still a valid ZX0 stream that any ZX0 decompressor can decode. The constraint is one-directional: a stream compressed with a smaller window can be decompressed by any decoder, but a stream compressed with the full window may contain offsets that a constrained decoder (such as a fixed-size ring-buffer player) cannot resolve. The caller is responsible for choosing a window that matches the target decoder.
+            /// </summary>
+            public class Options
+            {
+                /// <summary>Maximum back-reference offset in bytes the optimizer may use (1 to 32640).</summary>
+                public int MaxOffset;
+
+                /// <summary>
+                /// Create options with the default full ZX0 window (32640 bytes).
+                /// </summary>
+                public Options()
+                {
+                    MaxOffset = MAX_OFFSET_ZX0;
+                }
+            }
+
+            private static int ClampMaxOffset(int maxOffset)
+            {
+                if (maxOffset < INITIAL_OFFSET)
+                    return INITIAL_OFFSET;
+                if (maxOffset > MAX_OFFSET_ZX0)
+                    return MAX_OFFSET_ZX0;
+                return maxOffset;
+            }
+
+            /// <summary>
             /// Compress using the ZX0 algorithm (forward, non-classic mode).
             /// This implementation is a C# port of the official ZX0 optimizer and encoder
             /// and produces byte-identical output to the reference zx0 tool for this mode.
@@ -570,6 +600,27 @@ namespace Energy.Base
             /// <returns>Compressed data in ZX0 format that can be decompressed by any compatible ZX0 decompressor.</returns>
             public static byte[] Compress(byte[] data)
             {
+                return CompressWithLimit(data, MAX_OFFSET_ZX0);
+            }
+
+            /// <summary>
+            /// Compress using the ZX0 algorithm (forward, non-classic mode) with the given options.
+            /// <br/><br/>
+            /// A null options reference is treated as the default full-window options.
+            /// </summary>
+            /// <param name="data">Uncompressed data to compress.</param>
+            /// <param name="options">Compression options, or null for defaults.</param>
+            /// <returns>Compressed data in ZX0 format that can be decompressed by any compatible ZX0 decompressor.</returns>
+            public static byte[] Compress(byte[] data, Options options)
+            {
+                int offsetLimit = (options == null)
+                    ? MAX_OFFSET_ZX0
+                    : ClampMaxOffset(options.MaxOffset);
+                return CompressWithLimit(data, offsetLimit);
+            }
+
+            private static byte[] CompressWithLimit(byte[] data, int offsetLimit)
+            {
                 try
                 {
                     if (data == null) return null;
@@ -577,7 +628,6 @@ namespace Energy.Base
 
                     int inputSize = data.Length;
                     int skip = 0;
-                    int offsetLimit = MAX_OFFSET_ZX0;
 
                     Optimizer optimizer = new Optimizer(InitialArenaCapacity(inputSize, offsetLimit));
                     int optimal = optimizer.Optimize(data, inputSize, skip, offsetLimit);

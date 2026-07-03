@@ -367,6 +367,155 @@ namespace Energy.Core.Test.Base
             CollectionAssert.AreEqual(plain, roundTrip, "Round-trip should reproduce ZX0_RANDOM8K.bin");
         }
 
+        [TestMethod]
+        public void Compression_ZX0_Options_NullMatchesDefault()
+        {
+            // A null options reference must behave like the parameterless overload.
+            byte[] plain = ReadEmbeddedResource("Resources.ZX0_BIG16K.txt");
+            Assert.IsNotNull(plain, "ZX0_BIG16K.txt fixture should be embedded");
+
+            byte[] defaultCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+            byte[] nullOptionsCompressed = Energy.Base.Compression.ZX0.Compress(plain, null);
+            Assert.IsNotNull(defaultCompressed, "Default compression should not return null");
+            Assert.IsNotNull(nullOptionsCompressed, "Null-options compression should not return null");
+            CollectionAssert.AreEqual(defaultCompressed, nullOptionsCompressed,
+                "Compress(data, null) must match Compress(data) byte for byte");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Options_DefaultMatchesParameterless()
+        {
+            // new Options() with the default MaxOffset must match the parameterless overload.
+            byte[] plain = ReadEmbeddedResource("Resources.ZX0_BIG16K.txt");
+            Assert.IsNotNull(plain, "ZX0_BIG16K.txt fixture should be embedded");
+
+            byte[] defaultCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+            byte[] optionsCompressed = Energy.Base.Compression.ZX0.Compress(plain,
+                new Energy.Base.Compression.ZX0.Options());
+            Assert.IsNotNull(defaultCompressed, "Default compression should not return null");
+            Assert.IsNotNull(optionsCompressed, "Options compression should not return null");
+            CollectionAssert.AreEqual(defaultCompressed, optionsCompressed,
+                "Compress(data, new Options()) must match Compress(data) byte for byte");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Options_SmallWindowRoundTrip()
+        {
+            // A window-limited stream is still a valid ZX0 stream decodable by the
+            // parameterless Decompress. Use a repetitive input that benefits from
+            // back-references within the 1023-byte window.
+            byte[] plain = new byte[2048];
+            for (int i = 0; i < plain.Length; i++)
+                plain[i] = (byte)(i % 256);
+
+            Energy.Base.Compression.ZX0.Options options = new Energy.Base.Compression.ZX0.Options();
+            options.MaxOffset = 1023;
+
+            byte[] compressed = Energy.Base.Compression.ZX0.Compress(plain, options);
+            Assert.IsNotNull(compressed, "Small-window compression should not return null");
+            Assert.IsLessThan(plain.Length, compressed.Length,
+                "Repetitive input should compress smaller than original even with a limited window");
+
+            byte[] restored = Energy.Base.Compression.ZX0.Decompress(compressed);
+            Assert.IsNotNull(restored, "Decompression should not return null");
+            CollectionAssert.AreEqual(plain, restored,
+                "Small-window compressed stream must round-trip through the parameterless decoder");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Options_SmallWindowLimitsOffsets()
+        {
+            // Construct input with a long-range repeat at a distance above the small
+            // window: a 250-byte block repeated 800 bytes apart (total distance 1050).
+            // The default-window optimizer can reference the repeat directly; the
+            // 1023-byte window cannot reach back 1050 bytes, so the two outputs must
+            // differ. This proves the window constraint is active.
+            byte[] part = new byte[250];
+            for (int i = 0; i < part.Length; i++)
+                part[i] = (byte)((i * 73 + 11) & 0xff);
+            byte[] gap = new byte[800];
+            for (int i = 0; i < gap.Length; i++)
+                gap[i] = (byte)((i * 181 + 200) & 0xff);
+            byte[] plain = new byte[part.Length + gap.Length + part.Length];
+            System.Array.Copy(part, 0, plain, 0, part.Length);
+            System.Array.Copy(gap, 0, plain, part.Length, gap.Length);
+            System.Array.Copy(part, 0, plain, part.Length + gap.Length, part.Length);
+
+            byte[] defaultCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+            Assert.IsNotNull(defaultCompressed, "Default compression should not return null");
+
+            Energy.Base.Compression.ZX0.Options smallOptions = new Energy.Base.Compression.ZX0.Options();
+            smallOptions.MaxOffset = 1023;
+            byte[] smallCompressed = Energy.Base.Compression.ZX0.Compress(plain, smallOptions);
+            Assert.IsNotNull(smallCompressed, "Small-window compression should not return null");
+
+            CollectionAssert.AreNotEqual(defaultCompressed, smallCompressed,
+                "Small-window output must differ from default-window output when the input has a long-range repeat");
+
+            // Both must still decode back to the original.
+            byte[] defaultRestored = Energy.Base.Compression.ZX0.Decompress(defaultCompressed);
+            byte[] smallRestored = Energy.Base.Compression.ZX0.Decompress(smallCompressed);
+            CollectionAssert.AreEqual(plain, defaultRestored, "Default-window stream must round-trip");
+            CollectionAssert.AreEqual(plain, smallRestored, "Small-window stream must round-trip");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Options_Clamping()
+        {
+            // Out-of-range MaxOffset values are clamped, not rejected.
+            byte[] plain = new byte[512];
+            for (int i = 0; i < plain.Length; i++)
+                plain[i] = (byte)(i % 128);
+
+            byte[] defaultCompressed = Energy.Base.Compression.ZX0.Compress(plain);
+
+            // MaxOffset above the format maximum clamps to 32640 (the default).
+            Energy.Base.Compression.ZX0.Options hugeOptions = new Energy.Base.Compression.ZX0.Options();
+            hugeOptions.MaxOffset = 99999;
+            byte[] hugeCompressed = Energy.Base.Compression.ZX0.Compress(plain, hugeOptions);
+            CollectionAssert.AreEqual(defaultCompressed, hugeCompressed,
+                "MaxOffset above 32640 must clamp to the default and match the parameterless overload");
+
+            // MaxOffset of 0 and negative both clamp to 1 (INITIAL_OFFSET), so they
+            // produce identical output.
+            Energy.Base.Compression.ZX0.Options zeroOptions = new Energy.Base.Compression.ZX0.Options();
+            zeroOptions.MaxOffset = 0;
+            byte[] zeroCompressed = Energy.Base.Compression.ZX0.Compress(plain, zeroOptions);
+
+            Energy.Base.Compression.ZX0.Options negativeOptions = new Energy.Base.Compression.ZX0.Options();
+            negativeOptions.MaxOffset = -5;
+            byte[] negativeCompressed = Energy.Base.Compression.ZX0.Compress(plain, negativeOptions);
+
+            CollectionAssert.AreEqual(zeroCompressed, negativeCompressed,
+                "MaxOffset of 0 and negative must both clamp to 1 and produce identical output");
+
+            // A window of 1 still round-trips through the parameterless decoder.
+            byte[] zeroRestored = Energy.Base.Compression.ZX0.Decompress(zeroCompressed);
+            CollectionAssert.AreEqual(plain, zeroRestored,
+                "Window-1 compressed stream must round-trip through the parameterless decoder");
+        }
+
+        [TestMethod]
+        public void Compression_ZX0_Options_NullAndEmpty()
+        {
+            Energy.Base.Compression.ZX0.Options options = new Energy.Base.Compression.ZX0.Options();
+            options.MaxOffset = 1023;
+
+            byte[] nullCompressed = Energy.Base.Compression.ZX0.Compress(null, options);
+            Assert.IsNull(nullCompressed, "Compress(null, options) should return null");
+
+            byte[] emptyCompressed = Energy.Base.Compression.ZX0.Compress(new byte[0], options);
+            Assert.IsNotNull(emptyCompressed, "Compress(empty, options) should not return null");
+            Assert.HasCount(0, emptyCompressed, "Compress(empty, options) should return an empty array");
+
+            byte[] nullOptionsNullData = Energy.Base.Compression.ZX0.Compress(null, null);
+            Assert.IsNull(nullOptionsNullData, "Compress(null, null) should return null");
+
+            byte[] nullOptionsEmptyData = Energy.Base.Compression.ZX0.Compress(new byte[0], null);
+            Assert.IsNotNull(nullOptionsEmptyData, "Compress(empty, null) should not return null");
+            Assert.HasCount(0, nullOptionsEmptyData, "Compress(empty, null) should return an empty array");
+        }
+
         #region LZ4
 
         [TestMethod]
