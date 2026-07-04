@@ -5,9 +5,9 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Version>26.6.1</Version>
-    <FileVersion>26.6.1</FileVersion>
-    <AssemblyVersion>26.6.1</AssemblyVersion>
+    <Version>26.7.0</Version>
+    <FileVersion>26.7.0</FileVersion>
+    <AssemblyVersion>26.7.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

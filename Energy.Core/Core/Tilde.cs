@@ -400,17 +400,17 @@ namespace Energy.Core
                 left = System.Console.CursorLeft;
             }
             catch (ArgumentOutOfRangeException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
             catch (SecurityException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
             catch (IOException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
 
             ConsoleColor foreground = ConsoleColor.Gray;
             try
@@ -422,13 +422,13 @@ namespace Energy.Core
                 }
             }
             catch (ArgumentException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
             catch (IOException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
             catch (SecurityException)
             {
                 _Colorless = true;
@@ -442,9 +442,9 @@ namespace Energy.Core
                 _Cancel_Foreground_ConsoleColor = foreground;
             }
             catch
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
 
             string answer = System.Console.ReadLine().Trim();
 
@@ -458,9 +458,9 @@ namespace Energy.Core
                 Console.CancelKeyPress -= Console_CancelKeyPress;
             }
             catch
-{
-    // Console may be unavailable; ignore and continue.
-}
+            {
+                // Console may be unavailable; ignore and continue.
+            }
 
             if (answer.Length == 0)
             {
@@ -472,17 +472,17 @@ namespace Energy.Core
                     System.Console.WriteLine(answer);
                 }
                 catch (ArgumentOutOfRangeException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+                {
+                    // Console may be unavailable; ignore and continue.
+                }
                 catch (SecurityException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+                {
+                    // Console may be unavailable; ignore and continue.
+                }
                 catch (IOException)
-{
-    // Console may be unavailable; ignore and continue.
-}
+                {
+                    // Console may be unavailable; ignore and continue.
+                }
             }
 
             return answer;
