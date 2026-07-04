@@ -1155,11 +1155,13 @@ namespace Energy.Base
             try
             {
                 BinaryFormatter bf = new BinaryFormatter();
-                MemoryStream ms = new MemoryStream();
-                byte[] Array;
-                bf.Serialize(ms, o);
-                Array = ms.ToArray();
-                return Array.Length;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    byte[] Array;
+                    bf.Serialize(ms, o);
+                    Array = ms.ToArray();
+                    return Array.Length;
+                }
             }
             catch
             { }

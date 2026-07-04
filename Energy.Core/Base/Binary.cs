@@ -57,11 +57,7 @@ namespace Energy.Base
                 return -1;
             }
             if (right == null)
-            {
-                if (left == null)
-                    return 0;
                 return 1;
-            }
             if (left.Length != right.Length)
             {
                 return left.Length < right.Length ? -1 : 1;
@@ -91,11 +87,7 @@ namespace Energy.Base
                 return -1;
             }
             if (right == null)
-            {
-                if (left == null)
-                    return 0;
                 return 1;
-            }
             if (left.Length != right.Length)
             {
                 return left.Length < right.Length ? -1 : 1;
@@ -125,11 +117,7 @@ namespace Energy.Base
                 return -1;
             }
             if (right == null)
-            {
-                if (left == null)
-                    return 0;
                 return 1;
-            }
             if (left.Length != right.Length)
             {
                 return left.Length < right.Length ? -1 : 1;
@@ -159,11 +147,7 @@ namespace Energy.Base
                 return -1;
             }
             if (right == null)
-            {
-                if (left == null)
-                    return 0;
                 return 1;
-            }
             if (left.Length != right.Length)
             {
                 return left.Length < right.Length ? -1 : 1;
@@ -193,11 +177,7 @@ namespace Energy.Base
                 return -1;
             }
             if (right == null)
-            {
-                if (left == null)
-                    return 0;
                 return 1;
-            }
             if (left.Length != right.Length)
             {
                 return left.Length < right.Length ? -1 : 1;

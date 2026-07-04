@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Energy.Core.Test.Core
@@ -9,24 +13,66 @@ namespace Energy.Core.Test.Core
         [TestMethod]
         public void Rest()
         {
-            Energy.Core.Web.IgnoreCertificateValidation = true;
-            string service = "https://reqres.in";
-            string path, url;
-            path = "/api/users";
-            url = service + path;
-            //url = "https://localhost:44318/api/values";
-            string body;
-            body = @"{
+            string body = @"{
     ""name"": ""morpheus"",
     ""job"": ""leader""
 }";
-            Energy.Base.Http.Response response;
-            response = Energy.Core.Web.Post(url, body, "application/json");
-            Assert.IsNotNull(response);
-            response = Energy.Core.Web.Patch(url, body, "application/json");
-            Assert.IsNotNull(response);
-            response = Energy.Core.Web.Put(url, body, "application/json");
-            Assert.IsNotNull(response);
+            byte[] responseBytes = Encoding.UTF8.GetBytes(body);
+
+            int port;
+            TcpListener probe = new TcpListener(IPAddress.Loopback, 0);
+            probe.Start();
+            try
+            {
+                port = ((IPEndPoint)probe.LocalEndpoint).Port;
+            }
+            finally
+            {
+                probe.Stop();
+            }
+
+            string prefix = "http://localhost:" + port + "/";
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(prefix);
+            listener.Start();
+
+            Thread listenerThread = new Thread(() =>
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    try
+                    {
+                        HttpListenerContext context = listener.GetContext();
+                        context.Response.StatusCode = 200;
+                        context.Response.ContentType = "application/json";
+                        context.Response.ContentLength64 = responseBytes.Length;
+                        context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
+                        context.Response.Close();
+                    }
+                    catch (HttpListenerException)
+                    {
+                        break;
+                    }
+                }
+            });
+            listenerThread.Start();
+
+            try
+            {
+                Energy.Base.Http.Response response;
+                response = Energy.Core.Web.Post(prefix, body, "application/json");
+                Assert.IsNotNull(response);
+                response = Energy.Core.Web.Patch(prefix, body, "application/json");
+                Assert.IsNotNull(response);
+                response = Energy.Core.Web.Put(prefix, body, "application/json");
+                Assert.IsNotNull(response);
+            }
+            finally
+            {
+                listener.Stop();
+                listenerThread.Join(TimeSpan.FromSeconds(5));
+                listener.Close();
+            }
         }
     }
 }

@@ -856,42 +856,44 @@ namespace Energy.Base
                 return text;
             }
 
-            MemoryStream ms = new MemoryStream(text.Length);
-            int x = 0;
-            int n = text.Length;
-            for (int i = 0; i < n; i++)
+            using (MemoryStream ms = new MemoryStream(text.Length))
             {
-                char c = text[i];
-                if (i < n - 2 && c == '%')
+                int x = 0;
+                int n = text.Length;
+                for (int i = 0; i < n; i++)
                 {
-                    string h = text.Substring(i + 1, 2);
-                    if (Energy.Base.Hex.IsHex(h))
+                    char c = text[i];
+                    if (i < n - 2 && c == '%')
                     {
-                        if (x < i)
+                        string h = text.Substring(i + 1, 2);
+                        if (Energy.Base.Hex.IsHex(h))
                         {
-                            byte[] a = encoding.GetBytes(text.Substring(x, i - x));
-                            ms.Write(a, 0, a.Length);
+                            if (x < i)
+                            {
+                                byte[] a = encoding.GetBytes(text.Substring(x, i - x));
+                                ms.Write(a, 0, a.Length);
+                            }
+                            byte v = Energy.Base.Hex.HexToByte(text.Substring(i + 1, 2));
+                            ms.WriteByte(v);
+                            i += 2;
+                            x = i + 1;
+                            continue;
                         }
-                        byte v = Energy.Base.Hex.HexToByte(text.Substring(i + 1, 2));
-                        ms.WriteByte(v);
-                        i += 2;
-                        x = i + 1;
-                        continue;
                     }
                 }
-            }
 
-            if (x < n)
-            {
-                byte[] a = encoding.GetBytes(text.Substring(x, n - x));
-                ms.Write(a, 0, a.Length);
-            }
+                if (x < n)
+                {
+                    byte[] a = encoding.GetBytes(text.Substring(x, n - x));
+                    ms.Write(a, 0, a.Length);
+                }
 
-            byte[] bytes = new byte[ms.Length];
-            ms.Seek(0, SeekOrigin.Begin);
-            ms.Read(bytes, 0, (int)ms.Length);
-            string result = encoding.GetString(bytes, 0, bytes.Length);
-            return result;
+                byte[] bytes = new byte[ms.Length];
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.Read(bytes, 0, (int)ms.Length);
+                string result = encoding.GetString(bytes, 0, bytes.Length);
+                return result;
+            }
         }
 
         #endregion

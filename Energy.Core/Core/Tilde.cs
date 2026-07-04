@@ -399,9 +399,18 @@ namespace Energy.Core
             {
                 left = System.Console.CursorLeft;
             }
-            catch (ArgumentOutOfRangeException) { }
-            catch (SecurityException) { }
-            catch (IOException) { }
+            catch (ArgumentOutOfRangeException)
+{
+    // Console may be unavailable; ignore and continue.
+}
+            catch (SecurityException)
+{
+    // Console may be unavailable; ignore and continue.
+}
+            catch (IOException)
+{
+    // Console may be unavailable; ignore and continue.
+}
 
             ConsoleColor foreground = ConsoleColor.Gray;
             try
@@ -412,8 +421,14 @@ namespace Energy.Core
                     System.Console.ForegroundColor = System.ConsoleColor.Yellow;
                 }
             }
-            catch (ArgumentException) { }
-            catch (IOException) { }
+            catch (ArgumentException)
+{
+    // Console may be unavailable; ignore and continue.
+}
+            catch (IOException)
+{
+    // Console may be unavailable; ignore and continue.
+}
             catch (SecurityException)
             {
                 _Colorless = true;
@@ -426,7 +441,10 @@ namespace Energy.Core
 #endif
                 _Cancel_Foreground_ConsoleColor = foreground;
             }
-            catch { }
+            catch
+{
+    // Console may be unavailable; ignore and continue.
+}
 
             string answer = System.Console.ReadLine().Trim();
 
@@ -439,7 +457,10 @@ namespace Energy.Core
             {
                 Console.CancelKeyPress -= Console_CancelKeyPress;
             }
-            catch { }
+            catch
+{
+    // Console may be unavailable; ignore and continue.
+}
 
             if (answer.Length == 0)
             {
@@ -450,9 +471,18 @@ namespace Energy.Core
                     System.Console.SetCursorPosition(left, top - 1);
                     System.Console.WriteLine(answer);
                 }
-                catch (ArgumentOutOfRangeException) { }
-                catch (SecurityException) { }
-                catch (IOException) { }
+                catch (ArgumentOutOfRangeException)
+{
+    // Console may be unavailable; ignore and continue.
+}
+                catch (SecurityException)
+{
+    // Console may be unavailable; ignore and continue.
+}
+                catch (IOException)
+{
+    // Console may be unavailable; ignore and continue.
+}
             }
 
             return answer;

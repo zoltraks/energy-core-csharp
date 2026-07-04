@@ -20,27 +20,6 @@ namespace Energy.Base
             return Split(path, null);
         }
 
-        //public static string[] Split(string path)
-        //{
-        //    if (path == null)
-        //        return null;
-        //    if (path.Length == 0)
-        //        return new string[] { };
-        //    Regex r = new Regex(Energy.Base.Expression.PathSplitCapture, RegexOptions.IgnorePatternWhitespace);
-        //    Match m = r.Match(path);
-        //    if (!m.Success)
-        //        return new string[] { };
-        //    List<string> l = new List<string>();
-        //    for (int n = 1; n < m.Groups.Count; n++)
-        //    {
-        //        for (int i = 0; i < m.Groups[n].Captures.Count; i++)
-        //        {
-        //            l.Add(m.Groups[n].Captures[i].Value);
-        //        }
-        //    }
-        //    return l.ToArray();
-        //}
-
         /// <summary>
         /// Split path into parts.
         /// Each part will contain trailing directory separator characters.

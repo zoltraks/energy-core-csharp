@@ -146,7 +146,8 @@ namespace Energy.Core.Test.Base
         {
             var a = System.Reflection.Assembly.GetExecutingAssembly();
             var x = Energy.Base.Class.GetAssemblyFile(a);
-            // TODO Something, something, etc...
+            Assert.IsNotNull(x);
+            Assert.IsTrue(x.EndsWith("Energy.Core.Test.dll", StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]

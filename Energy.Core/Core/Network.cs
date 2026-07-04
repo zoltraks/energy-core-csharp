@@ -675,7 +675,6 @@ namespace Energy.Core
                         this.OnException(this, exception);
                     }
                     return false;
-                    throw;
                 }
 
             }
