@@ -55,11 +55,11 @@ namespace Energy.Core.Test.Base
         [TestMethod]
         public void Variant_Value_TypeAccessorCasts()
         {
-            Assert.AreEqual((uint)70000, new Energy.Base.Variant.Value((uint)70000).Union.UInt32);
-            Assert.AreEqual((uint)0, new Energy.Base.Variant.Value(null).Union.UInt32);
+            Assert.AreEqual((uint)70000, new Energy.Base.Variant.Value((uint)70000).UInt32);
+            Assert.AreEqual((uint)0, new Energy.Base.Variant.Value(null).UInt32);
 
-            Assert.AreEqual(3.14f, new Energy.Base.Variant.Value(3.14f).Union.Float, 0.001f);
-            Assert.AreEqual(0f, new Energy.Base.Variant.Value(null).Union.Float, 0.001f);
+            Assert.AreEqual(3.14f, new Energy.Base.Variant.Value(3.14f).Float, 0.001f);
+            Assert.AreEqual(0f, new Energy.Base.Variant.Value(null).Float, 0.001f);
         }
     }
 }

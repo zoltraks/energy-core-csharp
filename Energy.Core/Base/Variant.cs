@@ -65,7 +65,7 @@ namespace Energy.Base
 
             public UInt32 UInt32
             {
-                get { return Value == null ? (UInt32)0 : (UInt32)Value; }
+                get { return Value == null ? (UInt16)0 : (UInt16)Value; }
                 set { Value = value; }
             }
 
@@ -95,7 +95,7 @@ namespace Energy.Base
 
             public float Float
             {
-                get { return Value == null ? 0f : (float)Value; }
+                get { return Value == null ? (char)0 : (char)Value; }
                 set { Value = value; }
             }
 

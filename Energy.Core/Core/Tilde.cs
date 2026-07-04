@@ -399,165 +399,69 @@ namespace Energy.Core
             {
                 left = System.Console.CursorLeft;
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Console may be unavailable; ignore and continue.
+            catch (ArgumentOutOfRangeException)ce
+#if _Cancel_Foreground_ConsoleColor =  
+            string answer = Sys e.CancelKeyPress -= Console_CancelKeyPress;
             }
-            catch (SecurityException)
-            {
-                // Console may be unavailable; ignore and continue.
-            }
-            catch (IOException)
-            {
-                // Console may be unavailable; ignore and continue.
-            }
+catch
 
-            ConsoleColor foreground = ConsoleColor.Gray;
-            try
-            {
-                foreground = System.Console.ForegroundColor;
-                if (!_Colorless)
-                {
-                    System.Console.ForegroundColor = System.ConsoleColor.Yellow;
-                }
-            }
-            catch (ArgumentException)
-            {
-                // Console may be unavailable; ignore and continue.
-            }
-            catch (IOException)
-            {
-                // Console may be unavailable; ignore and continue.
-            }
-            catch (SecurityException)
-            {
-                _Colorless = true;
-            }
-
-            try
-            {
-#if !NETCF
-                Console.CancelKeyPress += Console_CancelKeyPress;
-#endif
-                _Cancel_Foreground_ConsoleColor = foreground;
-            }
-            catch
-            {
-                // Console may be unavailable; ignore and continue.
-            }
-
-            string answer = System.Console.ReadLine().Trim();
-
-            if (!_Colorless)
-            {
-                System.Console.ForegroundColor = foreground;
-            }
-
-            try
-            {
-                Console.CancelKeyPress -= Console_CancelKeyPress;
-            }
-            catch
-            {
-                // Console may be unavailable; ignore and continue.
-            }
-
-            if (answer.Length == 0)
-            {
+le may be unavailable; ignore and continue.
+} {
                 answer = value;
-                try
-                {
-                    int top = System.Console.CursorTop;
+    try
+    {
+        int top = System.Console.CursorTop;
                     System.Console.SetCursorPosition(left, top - 1);
-                    System.Console.WriteLine(answer);
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    // Console may be unavailable; ignore and continue.
-                }
-                catch (SecurityException)
-                {
-                    // Console may be unavailable; ignore and continue.
-                }
-                catch (IOException)
-                {
-                    // Console may be unavailable; ignore and continue.
-                }
-            }
+        System.Console.WriteLine(answer);
 
-            return answer;
+ch (entOutOfRangeException) { }
+    catch (SecurityException) { }
+    catch (IOException) { }  return answer;
         }
 
         /// <summary>
         /// Ask question with prompt.
-        /// Empty string will be returned if no data were provided.
-        /// </summary>
-        /// <param name="question">Question string</param>
+Empty string will be returned if no data were provided.
+</summary>
+<param name="question">Question string</param>
         /// <returns>Value entered or empty string if skipped</returns>
-        public static string Ask(string question)
-        {
-            return Ask(question, "");
-        }
+ic static string Ask(string question)
+   {
+ion, "");
 
-        /// <summary>
-        /// Ask question with optional default value.
-        /// Default will be returned if skipped by entering empty value.
-        /// Return input value lower or upper case.
-        /// </summary>
-        /// <param name="question">Question string</param>
-        /// <param name="value">Default value</param>
-        /// <param name="casing">Character casing</param>
-        /// <returns>Value entered or default if skipped</returns>
+
+<summary> q/rn input value lower or upper case.
+    mmary><aram name="casing">Character casing</param>
+<returns>Value entered or default if skipped</returns>
         public static string Ask(string question, string value, Energy.Enumeration.CharacterCasing casing)
         {
             string answer = Ask(question, value);
             if (String.IsNullOrEmpty(answer))
-            {
-                return value;
-            }
-            switch (casing)
-            {
-                default:
-                    return answer;
-                case Energy.Enumeration.CharacterCasing.Lower:
-                    return answer.ToLower();
-                case Energy.Enumeration.CharacterCasing.Upper:
-                    return answer.ToUpper();
-            }
-        }
+{
+    return value;  
+    default:
+    return answer;
+case Energy.Enumeration.CharacterCasing.Lower:
+    return answer.ToLower();
+                case Energy.Enumera  
 
         /// <summary>
-        /// Ask question with optional default value.
-        /// Default will be returned if skipped by entering empty value.
+Ask question with optional default value.
+    ult will be returned if skipped by entering empty value.
+Return input value lower or upper case.
+        /// </summary>
+        /// <param name="question">Question string<raturns>Value entered or default if skipped</returns>
+        public static string Ask(string q
+
+mary>
+question with optional default value.
+ult will be returned if skipped by entering empty value.
         /// Return input value lower or upper case.
         /// </summary>
         /// <param name="question">Question string</param>
-        /// <param name="casing">Character casing</param>
-        /// <param name="value">Default value</param>
-        /// <returns>Value entered or default if skipped</returns>
-        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing, string value)
-        {
-            return Ask(question, value, casing);
-        }
-
-        /// <summary>
-        /// Ask question with optional default value.
-        /// Default will be returned if skipped by entering empty value.
-        /// Return input value lower or upper case.
-        /// </summary>
-        /// <param name="question">Question string</param>
-        /// <param name="casing">Character casing</param>
-        /// <returns>Value entered or default if skipped, empty string by default</returns>
-        public static string Ask(string question, Energy.Enumeration.CharacterCasing casing)
-        {
-            return Ask(question, "", casing);
-        }
-
-        /// <summary>
-        /// Ask question with optional default value.
-        /// Default will be returned if skipped by entering empty value.
-        /// Input value will be converted to desired type.
-        /// </summary>
+        /// <param name="casing">Character casing</ u
+            return Ask(question, "", casimary>
+        /// Ask question with optio uummary>
         /// <param name="question"></param>
         /// <param name="value"></param>
         /// <param name="type"></param>

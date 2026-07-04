@@ -41,18 +41,17 @@ namespace Energy.Core.Test.Base
             Assert.IsTrue(state.Touch());
             Energy.Base.File.State clone = state.Clone() as Energy.Base.File.State;
             Assert.IsNotNull(clone);
+            Assert.IsTrue(clone.SetWriteStamp());
             DateTime deadline = DateTime.Now.AddSeconds(1);
             bool changed = false;
             while (DateTime.Now < deadline)
             {
-                System.Threading.Thread.Sleep(15);
-                if (!clone.SetWriteStamp())
-                    continue;
                 if (state.IsChanged())
                 {
                     changed = true;
                     break;
                 }
+                System.Threading.Thread.Sleep(10);
             }
             Assert.IsTrue(changed, "Running tests may fail here");
             Assert.IsTrue(state.DeleteFile());

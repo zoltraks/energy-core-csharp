@@ -20,12 +20,25 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual("DEF", q.Pull());
             Assert.AreEqual("GHI", q.Pull());
 
-            Assert.IsNull(q.Pull());
-            Assert.IsNull(q.Pull(0.2));
+            DateTime start;
+            TimeSpan spend;
 
+            start = DateTime.Now;
+            Assert.IsNull(q.Pull());
+            spend = DateTime.Now - start;
+            Assert.IsTrue(spend < TimeSpan.FromSeconds(0.1), "Time spend should be less than 0.1 s");
+
+            start = DateTime.Now;
+            Assert.IsNull(q.Pull(0.2));
+            spend = DateTime.Now - start;
+            Assert.IsTrue(spend >= TimeSpan.FromSeconds(0.1), "Time spend should be at least more than 0.1 s");
+
+            start = DateTime.Now;
             Thread t1 = new Thread(() => { Thread.Sleep(10); q.Push("123"); });
             t1.Start();
             Assert.AreEqual("123", q.Pull(0.3));
+            spend = DateTime.Now - start;
+            Assert.IsTrue(spend >= TimeSpan.FromMilliseconds(10), "Time spend should be at least 10 ms");
 
             q.Push("XYZ");
             Assert.AreEqual(1, q.Count);
@@ -45,6 +58,7 @@ namespace Energy.Core.Test.Base
             Assert.AreEqual(2, queue.Count);
             string value;
             value = queue.Pull();
+            System.Diagnostics.Debug.WriteLine(value);
             Assert.AreEqual("B", value);
             value = queue.Pull();
             Assert.AreEqual("C", value);

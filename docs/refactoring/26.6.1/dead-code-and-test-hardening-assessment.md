@@ -51,15 +51,6 @@ The public-field-to-property conversion and the `Base/Variant.cs` defects were c
 
 No produced output changed. The LZSS, ZX0, and all other compression fixtures still decode and encode byte-for-byte, confirmed by the unchanged pass state of every fixture test. The `Url.Decode` method produces the same decoded string because the `using` statement only affects disposal; the `MemoryStream` read path is unchanged. The `Binary.Compare` simplification removes only a provably unreachable branch, so all comparison results are identical. The `Money.Manager` live `readonly` currency definitions are untouched.
 
-## Post-Assessment Note
-
-The two `Base/Variant.cs` type-conversion defects that were excluded from this refactoring as behaviour-changing fixes have been addressed separately under:
-
-- `docs/change/26.6.1/fix-variant-conversion-bugs.md`
-- `docs/plan/26.6.1/fix-variant-conversion-bugs-implementation.md`
-
-The `UInt32` and `Float` getters were corrected, and regression tests were added. The full test suite now passes with 342 tests.
-
 ## Conclusion
 
 Pass. The implemented changes are behaviour-preserving, the public API is unchanged, and every buildable target compiles with zero warnings and zero errors. The full test suite passes, including the hardened Web test that no longer depends on an external service. The Compact Framework build is not expected to change because the modified paths are either shared logic or guarded by `#if !NETCF`.
