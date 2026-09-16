@@ -20,10 +20,14 @@ namespace Energy.Core.Test.Core
             byte[] responseBytes = Encoding.UTF8.GetBytes(body);
 
             int port;
-            using (TcpListener probe = new TcpListener(IPAddress.Loopback, 0))
+            TcpListener probe = new TcpListener(IPAddress.Loopback, 0);
+            probe.Start();
+            try
             {
-                probe.Start();
                 port = ((IPEndPoint)probe.LocalEndpoint).Port;
+            }
+            finally
+            {
                 probe.Stop();
             }
 
